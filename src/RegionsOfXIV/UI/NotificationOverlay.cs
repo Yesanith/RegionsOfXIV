@@ -5,6 +5,7 @@ using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.ManagedFontAtlas;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
@@ -16,18 +17,26 @@ internal sealed class NotificationOverlay : Window, IDisposable
 {
     private const float StackSpacing = 46f;
 
+    // ImGui has no text outline, so the stroke is built by stamping the glyph run
+    // around the origin before drawing the fill on top. 8-way gives a cleaner edge
+    // than 4-way.
+    private static readonly Vector2[] StrokeOffsets =
+    [
+        new(-1, -1), new(0, -1), new(1, -1),
+        new(-1, 0), new(1, 0),
+        new(-1, 1), new(0, 1), new(1, 1),
+    ];
+
     private readonly Configuration config;
     private readonly FontService fonts;
-    private readonly SoundService sounds;
 
     private readonly List<AreaNotification> active = [];
 
-    public NotificationOverlay(Configuration config, FontService fonts, SoundService sounds)
+    public NotificationOverlay(Configuration config, FontService fonts)
         : base("##RegionsOfXIVOverlay")
     {
         this.config = config;
         this.fonts = fonts;
-        this.sounds = sounds;
 
         Flags = ImGuiWindowFlags.NoDecoration
                 | ImGuiWindowFlags.NoInputs
@@ -69,10 +78,10 @@ internal sealed class NotificationOverlay : Window, IDisposable
             this.config.ShowDuration,
             this.config.FadeOutDuration);
 
-        notification.VanishStarted += this.sounds.PlayVanish;
+        notification.VanishStarted += PlayVanish;
 
         this.active.Add(notification);
-        this.sounds.PlayReveal();
+        PlayReveal();
     }
 
     public TimeSpan EstimatedDuration =>
@@ -110,6 +119,94 @@ internal sealed class NotificationOverlay : Window, IDisposable
         }
     }
 
+    // --- Sound (inlined from SoundService) ---------------------------------
+    // Dalamud has no audio service. Rather than bundling audio and taking on NAudio
+    // plus our own volume/device handling, we borrow the game's own UI sounds.
+    // Off by default — unexpected audio is the fastest route to a one-star review.
+
+    private unsafe void PlayReveal()
+    {
+        if (!this.config.RevealSoundEnabled || this.config.RevealSoundEffectId == 0)
+            return;
+        UIGlobals.PlaySoundEffect(this.config.RevealSoundEffectId);
+    }
+
+    private unsafe void PlayVanish()
+    {
+        if (!this.config.VanishSoundEnabled || this.config.VanishSoundEffectId == 0)
+            return;
+        UIGlobals.PlaySoundEffect(this.config.VanishSoundEffectId);
+    }
+
+    // --- Text rendering (inlined from TextPainter) -------------------------
+
+    private static void DrawStroked(
+        ImDrawListPtr drawList,
+        Vector2 position,
+        string text,
+        uint fillColor,
+        uint strokeColor,
+        float strokeDistance = 1f)
+    {
+        if (string.IsNullOrEmpty(text))
+            return;
+
+        if (strokeDistance > 0f)
+        {
+            foreach (var offset in StrokeOffsets)
+                drawList.AddText(position + (offset * strokeDistance), strokeColor, text);
+        }
+
+        drawList.AddText(position, fillColor, text);
+    }
+
+    private static void DrawStrokedCentered(
+        ImDrawListPtr drawList,
+        float centerX,
+        float top,
+        string text,
+        uint fillColor,
+        uint strokeColor,
+        float strokeDistance = 1f)
+    {
+        if (string.IsNullOrEmpty(text))
+            return;
+
+        var size = ImGui.CalcTextSize(text);
+        DrawStroked(drawList, new Vector2(centerX - (size.X / 2f), top), text, fillColor, strokeColor, strokeDistance);
+    }
+
+    // Drawn as two halves so it can animate outward from the centre, and drawn
+    // before the header text so descenders and serifs are not overdrawn.
+    private static void DrawUnderline(
+        ImDrawListPtr drawList,
+        float centerX,
+        float y,
+        float fullWidth,
+        float progress,
+        uint fillColor,
+        uint borderColor,
+        float thickness = 2f)
+    {
+        var width = fullWidth * float.Clamp(progress, 0f, 1f);
+        if (width <= 0f)
+            return;
+
+        var half = width / 2f;
+
+        drawList.AddRectFilled(
+            new Vector2(centerX - half - 1, y - 1),
+            new Vector2(centerX + half + 1, y + thickness + 1),
+            borderColor);
+
+        drawList.AddRectFilled(
+            new Vector2(centerX - half, y),
+            new Vector2(centerX + half, y + thickness),
+            fillColor);
+    }
+
+    // --- Notification rendering --------------------------------------------
+
     private void DrawOne(AreaNotification notification)
     {
         var drawList = ImGui.GetWindowDrawList();
@@ -133,13 +230,13 @@ internal sealed class NotificationOverlay : Window, IDisposable
                 if (this.config.UnderlineHeader)
                 {
                     var underlineY = top + ImGui.GetTextLineHeight() + (4f * ImGuiHelpers.GlobalScale);
-                    TextPainter.DrawUnderline(
+                    DrawUnderline(
                         drawList, centerX, underlineY, headerWidth,
                         notification.RevealProgress, headerFill, stroke,
                         2f * ImGuiHelpers.GlobalScale);
                 }
 
-                TextPainter.DrawStrokedCentered(
+                DrawStrokedCentered(
                     drawList, centerX, top, notification.Header!, headerFill, stroke,
                     ImGuiHelpers.GlobalScale);
 
@@ -170,7 +267,7 @@ internal sealed class NotificationOverlay : Window, IDisposable
         {
             using (this.fonts.Display.Push())
             {
-                TextPainter.DrawStrokedCentered(
+                DrawStrokedCentered(
                     drawList, centerX, top, text, fill, stroke, ImGuiHelpers.GlobalScale);
             }
 
@@ -228,7 +325,7 @@ internal sealed class NotificationOverlay : Window, IDisposable
         if (glyph == ' ')
             return;
 
-        TextPainter.DrawStroked(
+        DrawStroked(
             drawList, new Vector2(x, y), glyph.ToString(), fill, stroke, ImGuiHelpers.GlobalScale);
     }
 

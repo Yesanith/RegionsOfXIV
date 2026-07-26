@@ -1,5 +1,23 @@
+# Build & Output directories
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+
+# IDE & Tooling
 .vs/
 .idea/
-obj/
-bin/
+.vscode/
+.claude/
 *.user
+*.userprefs
+*.suo
+
+# Markdown documentation files
+*.md
+!README.md
+
+# System files
+.DS_Store
+Thumbs.db
+

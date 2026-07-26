@@ -5,6 +5,7 @@ using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
+using Lumina.Excel.Sheets;
 using RegionsOfXIV.Models;
 using RegionsOfXIV.Services;
 using RegionsOfXIV.UI;
@@ -29,41 +30,32 @@ public sealed class Plugin : IDalamudPlugin
 
     private readonly Configuration config;
     private readonly LocationTracker tracker;
-    private readonly PlaceNameResolver resolver;
     private readonly NotificationGate gate;
     private readonly FontService fonts;
-    private readonly SoundService sounds;
-    private readonly NaviMapAnchor naviMap;
-    private readonly NativeAreaTextHider nativeAreaText;
+    private readonly NativeUiSuppressor nativeUiSuppressor;
     private readonly NotificationOverlay overlay;
-    private readonly CompassLabel compassLabel;
     private readonly ConfigWindow configWindow;
 
     public Plugin()
     {
         this.config = LoadConfiguration();
 
-        this.resolver = new PlaceNameResolver();
         this.gate = new NotificationGate(this.config);
         this.fonts = new FontService(this.config);
-        this.sounds = new SoundService(this.config);
-        this.naviMap = new NaviMapAnchor();
-        this.nativeAreaText = new NativeAreaTextHider(this.config);
+        this.nativeUiSuppressor = new NativeUiSuppressor(this.config);
 
         this.fonts.Rebuild(this.config.DisplayFontSize, this.config.HeaderFontSize);
 
-        this.overlay = new NotificationOverlay(this.config, this.fonts, this.sounds);
-        this.compassLabel = new CompassLabel(this.config, this.naviMap);
+        this.overlay = new NotificationOverlay(this.config, this.fonts);
         this.configWindow = new ConfigWindow(
             this.config,
             new ConfigActions(
                 this.overlay.Push,
                 RebuildFonts,
-                this.nativeAreaText.Restore,
+                this.nativeUiSuppressor.RestoreAreaText,
                 () => this.fonts.EffectiveCeilingPx));
 
         this.windowSystem.AddWindow(this.overlay);
-        this.windowSystem.AddWindow(this.compassLabel);
         this.windowSystem.AddWindow(this.configWindow);
 
         this.tracker = new LocationTracker();
@@ -101,11 +93,9 @@ public sealed class Plugin : IDalamudPlugin
         this.windowSystem.RemoveAllWindows();
 
         this.configWindow.Dispose();
-        this.compassLabel.Dispose();
         this.overlay.Dispose();
 
-        this.nativeAreaText.Dispose();
-        this.naviMap.Dispose();
+        this.nativeUiSuppressor.Dispose();
         this.fonts.Dispose();
     }
 
@@ -155,7 +145,7 @@ public sealed class Plugin : IDalamudPlugin
         {
             // Bypasses the gate deliberately: this is for checking the visuals,
             // not the suppression rules.
-            var names = this.resolver.Resolve(this.tracker.Current);
+            var names = ResolveLocation(this.tracker.Current);
             this.overlay.Push(names.Area ?? names.Place ?? "Middle La Noscea",
                               names.SubArea ?? names.Area ?? "Summerford Farms");
             return;
@@ -166,11 +156,7 @@ public sealed class Plugin : IDalamudPlugin
 
     private void ToggleConfigUi() => this.configWindow.Toggle();
 
-    private void OnLogout(int type, int code)
-    {
-        this.gate.Reset();
-        this.compassLabel.Set(null);
-    }
+    private void OnLogout(int type, int code) => this.gate.Reset();
 
     private void RebuildFonts() =>
         this.fonts.Rebuild(this.config.DisplayFontSize, this.config.HeaderFontSize);
@@ -180,14 +166,11 @@ public sealed class Plugin : IDalamudPlugin
     private void OnLocationChanged(LocationSnapshot previous, LocationSnapshot current)
     {
         var tier = current.DiffTier(previous);
-        var names = this.resolver.Resolve(current);
+        var names = ResolveLocation(current);
 
         Log.Debug(
             $"Location changed [{tier}]: {names.Region} / {names.Zone} / {names.Place} " +
             $"/ {names.Area} / {names.SubArea}");
-
-        // The companion label tracks position regardless of notification gating.
-        this.compassLabel.Set(names.Finest);
 
         if (!this.gate.ShouldAnnounce(previous, current, tier))
             return;
@@ -217,4 +200,35 @@ public sealed class Plugin : IDalamudPlugin
 
         return (header, text ?? string.Empty);
     }
+
+    // --- Name resolution (inlined from PlaceNameResolver) ------------------
+
+    private static string? ResolvePlaceName(uint placeNameRowId)
+    {
+        if (placeNameRowId == 0)
+            return null;
+
+        if (!DataManager.GetExcelSheet<PlaceName>().TryGetRow(placeNameRowId, out var row))
+            return null;
+
+        // Name is a ReadOnlySeString. ToString() strips payloads, which is what we
+        // want for display; ToMacroString() is the one to reach for when debugging
+        // an odd-looking name.
+        var name = row.Name.ToString();
+        return string.IsNullOrWhiteSpace(name) ? null : name.Trim();
+    }
+
+    private static ResolvedLocation ResolveLocation(in LocationSnapshot snapshot) => new(
+        ResolvePlaceName(snapshot.RegionPlaceNameId),
+        ResolvePlaceName(snapshot.ZonePlaceNameId),
+        ResolvePlaceName(snapshot.PlacePlaceNameId),
+        ResolvePlaceName(snapshot.AreaPlaceNameId),
+        ResolvePlaceName(snapshot.SubAreaPlaceNameId));
+
+    private readonly record struct ResolvedLocation(
+        string? Region,
+        string? Zone,
+        string? Place,
+        string? Area,
+        string? SubArea);
 }

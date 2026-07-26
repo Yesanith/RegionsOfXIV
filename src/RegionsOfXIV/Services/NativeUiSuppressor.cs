@@ -1,6 +1,8 @@
 using System;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace RegionsOfXIV.Services;
@@ -17,18 +19,21 @@ namespace RegionsOfXIV.Services;
 //
 // Neither has a dedicated FFXIVClientStructs struct; both are plain AtkUnitBase,
 // so setting IsVisible is enough.
+//
+// Loading-screen detection (previously LoadingScreenWatcher) is inlined here:
+// BetweenAreas covers ordinary zone changes; BetweenAreas51 covers the variants
+// the game uses for instanced content and a few scripted transitions.
 internal sealed class NativeUiSuppressor : IDisposable
 {
     private static readonly string[] AreaTextAddons = ["_AreaText"];
     private static readonly string[] LoadingTitleAddons = ["_Image"];
 
     private readonly Configuration config;
-    private readonly LoadingScreenWatcher loading;
+    private bool isLoading;
 
-    public NativeUiSuppressor(Configuration config, LoadingScreenWatcher loading)
+    public NativeUiSuppressor(Configuration config)
     {
         this.config = config;
-        this.loading = loading;
 
         // PostSetup hides it before it ever paints; PreDraw catches the addon
         // re-showing itself partway through its own timeline. PreDraw only fires
@@ -39,12 +44,12 @@ internal sealed class NativeUiSuppressor : IDisposable
 
         Plugin.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, LoadingTitleAddons, OnLoadingTitle);
 
-        this.loading.LoadingEnded += RestoreLoadingTitle;
+        Plugin.Framework.Update += OnFrameworkUpdate;
     }
 
     public void Dispose()
     {
-        this.loading.LoadingEnded -= RestoreLoadingTitle;
+        Plugin.Framework.Update -= OnFrameworkUpdate;
 
         Plugin.AddonLifecycle.UnregisterListener(OnAreaText, OnLoadingTitle);
 
@@ -56,7 +61,23 @@ internal sealed class NativeUiSuppressor : IDisposable
     // needing a reload.
     public void RestoreAreaText() => SetVisible(AreaTextAddons, true);
 
-    public void RestoreLoadingTitle() => SetVisible(LoadingTitleAddons, true);
+    private void RestoreLoadingTitle() => SetVisible(LoadingTitleAddons, true);
+
+    // Tracks whether a zone-transition loading screen is up, and restores the
+    // loading title addon when the screen ends.
+    private void OnFrameworkUpdate(IFramework framework)
+    {
+        var loading = Plugin.Condition[ConditionFlag.BetweenAreas]
+                      || Plugin.Condition[ConditionFlag.BetweenAreas51];
+
+        if (loading == this.isLoading)
+            return;
+
+        this.isLoading = loading;
+
+        if (!loading)
+            RestoreLoadingTitle();
+    }
 
     private unsafe void OnAreaText(AddonEvent type, AddonArgs args)
     {
@@ -68,7 +89,7 @@ internal sealed class NativeUiSuppressor : IDisposable
 
     private unsafe void OnLoadingTitle(AddonEvent type, AddonArgs args)
     {
-        if (!this.config.HideNativeLoadingTitle || !this.loading.IsLoading)
+        if (!this.config.HideNativeLoadingTitle || !this.isLoading)
             return;
 
         Hide(args);

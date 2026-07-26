@@ -41,6 +41,9 @@ public class Configuration : IPluginConfiguration
     // renders underneath it. On by default, since showing both is never wanted.
     public bool HideNativeAreaText { get; set; } = true;
 
+    // Suppresses the loading-screen title ("_Image") during zone transitions.
+    public bool HideNativeLoadingTitle { get; set; } = true;
+
     // Layout and style.
     // VerticalPosition is a percentage of viewport height.
     public float VerticalPosition { get; set; } = 25f;
@@ -91,10 +94,6 @@ public class Configuration : IPluginConfiguration
     public bool VanishSoundEnabled { get; set; } = false;
 
     public uint VanishSoundEffectId { get; set; } = 2;
-
-    // Minimap companion label. See ROADMAP Phase 0/7 — may be redundant with the
-    // native minimap text.
-    public bool ShowCompassLabel { get; set; } = false;
 
     public void Save() => Plugin.PluginInterface.SavePluginConfig(this);
 }
