@@ -1,78 +1,67 @@
-> ⚠️ **Don't click Fork!**
-> 
-> This is a GitHub Template repo. If you want to use this for a plugin, [use this template][new-repo] to make a new repo!
->
-> ![image](https://github.com/goatcorp/SamplePlugin/assets/16760685/d9732094-e1ed-4769-a70b-58ed2b92580c)
+# Regions of XIV
 
-# SamplePlugin
+A Dalamud plugin that announces the region, zone, area and sub-area you walk into
+with a styled, animated on-screen notification.
 
-[![Use This Template badge](https://img.shields.io/badge/Use%20This%20Template-0?logo=github&labelColor=grey)][new-repo]
+Final Fantasy XIV announces zone changes on screen, but changes your **sub-area**
+silently — the only feedback is the small text above the minimap. Regions of XIV
+surfaces those transitions, and lets you restyle zone announcements to taste.
 
+Inspired by [Nekres' *Regions of Tyria*](https://github.com/agaertner/bhm-zone-display)
+for Guild Wars 2.
 
-Simple example plugin for Dalamud.
+> **Status: in development.** Detection, name resolution and the notification
+> pipeline work. The reveal effect and the minimap label are still stubs.
+> See [ROADMAP.md](ROADMAP.md).
 
-This is not designed to be the simplest possible example, but it is also not designed to cover everything you might want to do. For more detailed questions, come ask in [the Discord](https://discord.gg/holdshift).
+## Layout
 
-## Main Points
+```
+src/RegionsOfXIV/
+├─ Plugin.cs                entrypoint, service wiring, lifecycle
+├─ Configuration.cs         IPluginConfiguration
+├─ Models/
+│  └─ LocationSnapshot.cs   the five naming tiers, as row IDs
+├─ Services/
+│  ├─ LocationTracker.cs    polls TerritoryInfo, raises LocationChanged
+│  ├─ PlaceNameResolver.cs  row IDs -> display strings via Lumina
+│  ├─ NotificationGate.cs   cooldown / ping-pong / game-state suppression
+│  ├─ FontService.cs        game + bundled font handles
+│  ├─ SoundService.cs       game UI sound effects
+│  └─ NaviMapAnchor.cs      tracks the minimap's screen rect
+└─ UI/
+   ├─ NotificationOverlay.cs  full-screen draw surface
+   ├─ AreaNotification.cs     one notification + its animation state
+   ├─ TextPainter.cs          stroked / centred text, underline
+   ├─ CompassLabel.cs         minimap companion label (stub)
+   └─ ConfigWindow.cs         settings
 
-* Simple functional plugin
-  * Slash command
-  * Main UI
-  * Settings UI
-  * Image loading
-  * Plugin json
-* Simple, slightly-improved plugin configuration handling
-* Project organization
-  * Copies all necessary plugin files to the output directory
-    * Does not copy dependencies that are provided by dalamud
-    * Output directory can be zipped directly and have exactly what is required
-  * Hides data files from visual studio to reduce clutter
-    * Also allows having data files in different paths than VS would usually allow if done in the IDE directly
+assets/
+├─ fonts/    bundled fonts (Eorzean only — see the README there)
+└─ images/   installer icon + preview shots (not compiled)
+```
 
+## Building
 
-The intention is less that any of this is used directly in other projects, and more to show how similar things can be done.
+Requires the **.NET 10 SDK (10.0.101 or later)** and a XIVLauncher install that has
+run Dalamud at least once.
 
-## How To Use
+```sh
+dotnet build RegionsOfXIV.sln -c Release
+```
 
-### Getting Started
+Output lands in `src/RegionsOfXIV/bin/x64/Release/RegionsOfXIV/`, packaged and ready
+to point Dalamud's **Dev Plugin Locations** at.
 
-To begin, [clone this template repository][new-repo] to your own GitHub account. This will automatically bring in everything you need to get a jumpstart on development. You do not need to fork this repository unless you intend to contribute modifications to it.
+## Usage
 
-Be sure to also check out the [Dalamud Developer Docs][dalamud-docs] for helpful information about building your own plugin. The Developer Docs includes helpful information about all sorts of things, including [how to submit][submit] your newly-created plugin to the official repository. Assuming you use this template repository, the provided project build configuration and license are already chosen to make everything a breeze.
+`/regions` opens the settings.
 
-[new-repo]: https://github.com/new?template_name=SamplePlugin&template_owner=goatcorp
-[dalamud-docs]: https://dalamud.dev
-[submit]: https://dalamud.dev/plugin-publishing/submission
+## Documentation
 
-### Prerequisites
+- [ROADMAP.md](ROADMAP.md) — analysis of the GW2 original and the phased build plan
+- [DALAMUD_PLUGIN_GUIDE.md](DALAMUD_PLUGIN_GUIDE.md) — full Dalamud API 15 reference
 
-SamplePlugin assumes all the following prerequisites are met:
+## License
 
-* XIVLauncher, FINAL FANTASY XIV, and Dalamud have all been installed and the game has been run with Dalamud at least once.
-* XIVLauncher is installed to its default directories and configurations.
-  * If a custom path is required for Dalamud's dev directory, it must be set with the `DALAMUD_HOME` environment variable.
-* A .NET Core 8 SDK has been installed and configured, or is otherwise available. (In most cases, the IDE will take care of this.)
-
-### Building
-
-1. Open up `SamplePlugin.sln` in your C# editor of choice (likely [Visual Studio](https://visualstudio.microsoft.com) or [JetBrains Rider](https://www.jetbrains.com/rider/)).
-2. Build the solution. By default, this will build a `Debug` build, but you can switch to `Release` in your IDE.
-3. The resulting plugin can be found at `SamplePlugin/bin/x64/Debug/SamplePlugin.dll` (or `Release` if appropriate.)
-
-### Activating in-game
-
-1. Launch the game and use `/xlsettings` in chat or `xlsettings` in the Dalamud Console to open up the Dalamud settings.
-    * In here, go to `Experimental`, and add the full path to the `SamplePlugin.dll` to the list of Dev Plugin Locations.
-2. Next, use `/xlplugins` (chat) or `xlplugins` (console) to open up the Plugin Installer.
-    * In here, go to `Dev Tools > Installed Dev Plugins`, and the `SamplePlugin` should be visible. Enable it.
-3. You should now be able to use `/pmycommand` (chat) or `pmycommand` (console)!
-
-Note that you only need to add it to the Dev Plugin Locations once (Step 1); it is preserved afterwards. You can disable, enable, or load your plugin on startup through the Plugin Installer.
-
-### Reconfiguring for your own uses
-
-Replace all references to `SamplePlugin` in all the files and filenames with your desired name, then start building the plugin of your dreams. You'll figure it out 😁
-
-Dalamud will load the JSON file (by default, `SamplePlugin/SamplePlugin.json`) next to your DLL and use it for metadata, including the description for your plugin in the Plugin Installer. Make sure to update this with information relevant to _your_ plugin!
-
-All participation in this repository is governed by our [Code of Conduct](https://dalamud.dev/code-of-conduct). If you used AI tooling at any point, review the [AI Usage Policy](https://dalamud.dev/plugin-publishing/ai-policy) and disclose your level of AI use. Entirely AI-generated submissions will be rejected, and undisclosed AI use may result in a ban.
+AGPL-3.0-or-later. See [LICENSE.md](LICENSE.md).
