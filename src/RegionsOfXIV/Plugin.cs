@@ -43,6 +43,7 @@ public sealed class Plugin : IDalamudPlugin
         this.gate = new NotificationGate(this.config);
         this.fonts = new FontService(this.config);
         this.nativeUiSuppressor = new NativeUiSuppressor(this.config);
+        this.nativeUiSuppressor.AreaTextDetected += OnAreaTextDetected;
 
         this.fonts.Rebuild(this.config.DisplayFontSize, this.config.HeaderFontSize);
 
@@ -95,6 +96,7 @@ public sealed class Plugin : IDalamudPlugin
         this.configWindow.Dispose();
         this.overlay.Dispose();
 
+        this.nativeUiSuppressor.AreaTextDetected -= OnAreaTextDetected;
         this.nativeUiSuppressor.Dispose();
         this.fonts.Dispose();
     }
@@ -157,6 +159,14 @@ public sealed class Plugin : IDalamudPlugin
     private void ToggleConfigUi() => this.configWindow.Toggle();
 
     private void OnLogout(int type, int code) => this.gate.Reset();
+
+    // Fires when the game's _AreaText addon shows a new area name. We read the
+    // text straight from the addon, so this is the game's own data re-rendered
+    // in our style.
+    private void OnAreaTextDetected(string text)
+    {
+        this.overlay.Push(null, text);
+    }
 
     private void RebuildFonts() =>
         this.fonts.Rebuild(this.config.DisplayFontSize, this.config.HeaderFontSize);
