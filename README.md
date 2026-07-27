@@ -10,9 +10,10 @@ surfaces those transitions, and lets you restyle zone announcements to taste.
 Inspired by [Nekres' *Regions of Tyria*](https://blishhud.com/modules/?module=Nekres.Regions_Of_Tyria)
 for Guild Wars 2.
 
-> **Status: in development.** Detection, naming, the notification pipeline and the
-> Eorzean reveal effect are all confirmed working in game. Remaining: polish and
-> release packaging.
+> **Status: unreleased.** Detection, naming, the notification pipeline and the
+> Eorzean reveal effect are all confirmed working in game. The suppression rules
+> are covered by tests. Remaining: a pass in game over the settings added since,
+> then a first tagged release and a D17 submission.
 
 ## How it decides what to show
 
