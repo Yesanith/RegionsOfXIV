@@ -210,8 +210,8 @@ internal sealed class ConfigWindow : Window, IDisposable
         var changed = false;
 
         ImGui.TextWrapped(
-            "FFXIV already announces zone changes on screen. Sub-area changes it keeps to " +
-            "itself, which is where this plugin earns its keep.");
+            "This plugin replaces the game's own location text rather than drawing alongside " +
+            "it. If you turn the suppression below off, the game's version comes back.");
         ImGui.Separator();
 
         var zone = this.config.ZoneNotificationEnabled;

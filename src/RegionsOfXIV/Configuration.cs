@@ -34,11 +34,10 @@ public class Configuration : IPluginConfiguration
     // Bump when the shape changes, and migrate on load.
     public int Version { get; set; } = 1;
 
-    // Which tiers to announce.
-    // Zone is off by default: FFXIV already announces zone changes on screen, so
-    // enabling it is for people who prefer this plugin's styling to the native
-    // title. Sub-area is the headline feature — the game never announces those.
-    public bool ZoneNotificationEnabled { get; set; } = false;
+    // Which tiers to announce. All three on: the plugin now hides the game's own
+    // zone title rather than sitting alongside it, so leaving the zone tier off
+    // would mean a zone change announced by nobody.
+    public bool ZoneNotificationEnabled { get; set; } = true;
 
     public bool AreaNotificationEnabled { get; set; } = true;
 
@@ -58,9 +57,11 @@ public class Configuration : IPluginConfiguration
     // VerticalPosition is a percentage of viewport height.
     public float VerticalPosition { get; set; } = 25f;
 
-    // Under every game face's ceiling except Jupiter's, which it sits exactly on.
-    // Irrelevant at the default font, which is vector and has no ceiling at all.
-    public float DisplayFontSize { get; set; } = 61f;
+    // Large enough to read as a title rather than as a label. No ceiling applies
+    // at the default font, which is vector; and 91 px is exactly TrumpGothic's
+    // ceiling, so switching to the FFXIV display face keeps it sharp too. Jupiter
+    // and Axis run out well below this and will say so.
+    public float DisplayFontSize { get; set; } = 91f;
 
     public float HeaderFontSize { get; set; } = 24f;
 
@@ -71,7 +72,7 @@ public class Configuration : IPluginConfiguration
 
     public bool UnderlineHeader { get; set; } = true;
 
-    public bool OverlapHeader { get; set; } = false;
+    public bool OverlapHeader { get; set; } = true;
 
     // Eorzean -> Latin decode during the reveal. Silently inert when no font is
     // bundled, or when the text falls outside the font's Latin coverage.
@@ -94,12 +95,19 @@ public class Configuration : IPluginConfiguration
 
     public TimeSpan FadeOutDuration { get; set; } = TimeSpan.FromSeconds(2);
 
-    // Suppression.
-    // HideInDuty defaults on, unlike the GW2 original: FFXIV instance content has
-    // sub-areas and players are busy.
-    public bool HideInCombat { get; set; } = true;
+    // Suppression, both off.
+    //
+    // These made sense while the plugin drew on top of the game's own notices —
+    // silencing it still left the native text. Now that it replaces that text,
+    // suppressing here means no location feedback at all, which is worse than the
+    // distraction it was guarding against. Combat and duties are also exactly when
+    // sub-areas change most.
+    //
+    // Cutscenes, PvP and gpose remain suppressed unconditionally; those are not
+    // negotiable and are handled in NotificationGate rather than here.
+    public bool HideInCombat { get; set; } = false;
 
-    public bool HideInDuty { get; set; } = true;
+    public bool HideInDuty { get; set; } = false;
 
     public void Save() => Plugin.PluginInterface.SavePluginConfig(this);
 }

@@ -2,7 +2,7 @@
   "Author": "Yesanith",
   "Name": "Regions of XIV",
   "Punchline": "A beautiful area notification as you walk in and out of zones.",
-  "Description": "Announces the region, zone, area and sub-area you walk into with a styled, animated on-screen notification.\n\nFinal Fantasy XIV changes your sub-area silently, with no on-screen feedback beyond the small text above the minimap. Regions of XIV surfaces those transitions, and lets you restyle zone announcements to taste.\n\nInspired by Nekres' \"Regions of Tyria\" for Guild Wars 2.\n\nOpen settings with /regions.",
+  "Description": "Announces the region, zone, area and sub-area you walk into with a styled, animated on-screen notification.\n\nInspired by Nekres' \"Regions of Tyria\" for Guild Wars 2.\n\nOpen settings with /regions.",
   "ApplicableVersion": "any",
   "RepoUrl": "https://github.com/Yesanith/RegionsOfXIV",
   "Tags": [
