@@ -94,8 +94,12 @@ run Dalamud at least once.
 dotnet build RegionsOfXIV.sln -c Release
 ```
 
-Output lands in `src/RegionsOfXIV/bin/x64/Release/RegionsOfXIV/`, packaged and ready
-to point Dalamud's **Dev Plugin Locations** at.
+Two things come out of that, and they are easy to mix up:
+
+| Path | What it is |
+| --- | --- |
+| `src/RegionsOfXIV/bin/x64/Release/` | the plugin itself — DLL, `Fonts/`, `images/`. Point Dalamud's **Dev Plugin Locations** here |
+| `src/RegionsOfXIV/bin/x64/Release/RegionsOfXIV/` | the packaged layout — `latest.zip`, manifest and icon, for a repo listing or a D17 submission. No DLL, so dev-loading from here finds nothing |
 
 The tests need neither the game nor Dalamud, so they run anywhere the SDK does:
 
