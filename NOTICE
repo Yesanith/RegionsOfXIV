@@ -44,11 +44,24 @@ FontCreator. Its own metadata records:
                   by Square Enix. Many thanks to www.eorzeapedia.com and
                   www.ffxivmaps.com for reference materials.
 
-It carries no licence field. The alphabet is Square Enix's design. This
-project claims no rights in it, grants no rights in it to anyone, and includes
-it only so that the decode effect can render the in-game script. Anyone
-redistributing or forking this project should reach their own view on whether
-to carry the file.
+Read carefully, that metadata describes two separate things:
+
+  The alphabet    Square Enix's design, as used in FINAL FANTASY XIV. The
+                  copyright line is scoped to the "Original" - it credits the
+                  source of the letterforms.
+
+  This TTF file   Drawn by a fan from public reference material, using
+                  FontCreator. It is not a game asset and contains no data
+                  extracted from the game.
+
+The font's name table has no Designer (id 9) or Manufacturer (id 8) record,
+so its author is not identified in the file, and no LicenseDesc (id 13) or
+LicenseURL (id 14) record, so no terms are stated by anyone.
+
+This project therefore claims no rights in either layer and grants none to
+anyone. The file is included solely so the decode effect can render the
+in-game script. Anyone redistributing or forking this project should reach
+their own view on whether to carry it.
 
 It is not required. FontService.TryBuildEorzean treats a missing font as a
 normal condition, and the reveal falls back to a plain fade — so deleting it
