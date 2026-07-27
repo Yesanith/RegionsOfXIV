@@ -5,75 +5,79 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace RegionsOfXIV.Services;
 
-// Intercepts the game's "_AreaText" addon — the native in-world area flash.
-// Reads the text the game was about to display, hides the native element, and
-// raises AreaTextDetected so the plugin can re-render it in its own style.
+// Hides the game's own location text where this plugin stands in for it:
+//
+//   "_AreaText"           the in-world area flash, replaced from TerritoryInfo
+//                         by way of LocationTracker.
+//   "_LocationTitle"      the loading-screen title, replaced from the
+//   "_LocationTitleShort" IClientState.ZoneInit event.
+//
+// Both replacements are driven by game data rather than by reading these addons,
+// so this class only suppresses — nothing downstream depends on it for content.
+//
+// Neither addon has a dedicated FFXIVClientStructs struct; both are plain
+// AtkUnitBase, so setting IsVisible is enough.
 internal sealed class NativeUiSuppressor : IDisposable
 {
     private static readonly string[] AreaTextAddons = ["_AreaText"];
 
+    private static readonly string[] LoadingTitleAddons = ["_LocationTitle", "_LocationTitleShort"];
+
     private readonly Configuration config;
 
-    private string? lastDetectedText;
-
-    // Raised with the area name the game was about to display.
-    public event Action<string>? AreaTextDetected;
+    // Raised when the game puts up its own area text, carrying whatever it was
+    // about to display. Primarily a signal that an announcement is due; the text
+    // is the tie-breaker for when TerritoryInfo disagrees or has nothing.
+    public event Action<string?>? AreaTextShown;
 
     public NativeUiSuppressor(Configuration config)
     {
         this.config = config;
 
-        // PostSetup fires once when the addon is created; PostRefresh fires when
-        // its content changes (new area). Both are good moments to read the text.
-        // PreDraw keeps it hidden frame-by-frame.
-        Plugin.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, AreaTextAddons, OnAreaTextContent);
-        Plugin.AddonLifecycle.RegisterListener(AddonEvent.PostRefresh, AreaTextAddons, OnAreaTextContent);
-        Plugin.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, AreaTextAddons, OnAreaTextDraw);
+        // PostSetup hides an addon before it ever paints. PreDraw catches it
+        // re-showing itself partway through its own timeline, and only fires while
+        // the addon is drawing, so it costs nothing the rest of the time.
+        Plugin.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, AreaTextAddons, OnAreaText);
+        Plugin.AddonLifecycle.RegisterListener(AddonEvent.PostRefresh, AreaTextAddons, OnAreaText);
+        Plugin.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, AreaTextAddons, OnAreaText);
+
+        Plugin.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, LoadingTitleAddons, OnLoadingTitle);
+        Plugin.AddonLifecycle.RegisterListener(AddonEvent.PostRefresh, LoadingTitleAddons, OnLoadingTitle);
+        Plugin.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, LoadingTitleAddons, OnLoadingTitle);
     }
 
     public void Dispose()
     {
-        Plugin.AddonLifecycle.UnregisterListener(OnAreaTextContent, OnAreaTextDraw);
+        Plugin.AddonLifecycle.UnregisterListener(OnAreaText, OnLoadingTitle);
+
         SetVisible(AreaTextAddons, true);
+        SetVisible(LoadingTitleAddons, true);
     }
 
-    // Called when the config setting is switched off, so the game's own text
-    // returns without needing a reload.
+    // Called when a setting is switched off, so the game's own text returns
+    // without needing a reload.
     public void RestoreAreaText() => SetVisible(AreaTextAddons, true);
 
-    // Read the text, hide the addon, raise the event.
-    private unsafe void OnAreaTextContent(AddonEvent type, AddonArgs args)
+    public void RestoreLoadingTitle() => SetVisible(LoadingTitleAddons, true);
+
+    private unsafe void OnAreaText(AddonEvent type, AddonArgs args)
     {
-        var addon = (AtkUnitBase*)args.Addon.Address;
-        if (addon == null)
-            return;
-
-        var text = ReadAreaText(addon);
-
-        if (this.config.HideNativeAreaText)
-            addon->IsVisible = false;
-
-        // Dedup: don't fire again if the game re-raises for the same text.
-        if (string.IsNullOrWhiteSpace(text) || text == this.lastDetectedText)
-            return;
-
-        this.lastDetectedText = text;
-        AreaTextDetected?.Invoke(text!);
-    }
-
-    // Keep it hidden on every draw frame while the setting is on.
-    private unsafe void OnAreaTextDraw(AddonEvent type, AddonArgs args)
-    {
-        if (!this.config.HideNativeAreaText)
-            return;
+        // PreDraw fires every frame the addon is up, so only the content events
+        // count as "the game has decided to announce something".
+        var isContentEvent = type != AddonEvent.PreDraw;
 
         var addon = (AtkUnitBase*)args.Addon.Address;
-        if (addon != null)
-            addon->IsVisible = false;
+        var text = isContentEvent && addon != null ? ReadLargestText(addon) : null;
+
+        Suppress(type, args, this.config.HideNativeAreaText);
+
+        if (isContentEvent)
+            AreaTextShown?.Invoke(text);
     }
 
-    // Walk the addon's node list for the first text node with content.
-    private static unsafe string? ReadAreaText(AtkUnitBase* addon)
+    // Walk the node list for the first text node with content. Read before the
+    // addon is hidden, though hiding does not clear the node text either way.
+    private static unsafe string? ReadLargestText(AtkUnitBase* addon)
     {
         for (var i = 0; i < addon->UldManager.NodeListCount; i++)
         {
@@ -81,13 +85,25 @@ internal sealed class NativeUiSuppressor : IDisposable
             if (node == null || node->Type != NodeType.Text)
                 continue;
 
-            var textNode = (AtkTextNode*)node;
-            var text = textNode->NodeText.ToString();
+            var text = ((AtkTextNode*)node)->NodeText.ToString();
             if (!string.IsNullOrWhiteSpace(text))
-                return text;
+                return text.Trim();
         }
 
         return null;
+    }
+
+    private void OnLoadingTitle(AddonEvent type, AddonArgs args) =>
+        Suppress(type, args, this.config.HideNativeLoadingTitle);
+
+    private static unsafe void Suppress(AddonEvent type, AddonArgs args, bool enabled)
+    {
+        if (!enabled)
+            return;
+
+        var addon = (AtkUnitBase*)args.Addon.Address;
+        if (addon != null)
+            addon->IsVisible = false;
     }
 
     private static unsafe void SetVisible(string[] names, bool visible)

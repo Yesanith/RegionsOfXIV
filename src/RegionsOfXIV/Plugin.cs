@@ -5,13 +5,14 @@ using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
-using Lumina.Excel.Sheets;
-using RegionsOfXIV.Models;
 using RegionsOfXIV.Services;
 using RegionsOfXIV.UI;
 
 namespace RegionsOfXIV;
 
+// Entry point and composition root. Constructs the services, wires the Dalamud
+// lifecycle, and handles the command — nothing here decides what gets announced;
+// that is AnnouncementCoordinator's job.
 public sealed class Plugin : IDalamudPlugin
 {
     private const string CommandName = "/regions";
@@ -29,45 +30,40 @@ public sealed class Plugin : IDalamudPlugin
     private readonly WindowSystem windowSystem = new("RegionsOfXIV");
 
     private readonly Configuration config;
-    private readonly LocationTracker tracker;
-    private readonly NotificationGate gate;
     private readonly FontService fonts;
     private readonly NativeUiSuppressor nativeUiSuppressor;
     private readonly NotificationOverlay overlay;
     private readonly ConfigWindow configWindow;
+    private readonly AnnouncementCoordinator coordinator;
 
     public Plugin()
     {
         this.config = LoadConfiguration();
 
-        this.gate = new NotificationGate(this.config);
         this.fonts = new FontService(this.config);
         this.nativeUiSuppressor = new NativeUiSuppressor(this.config);
-        this.nativeUiSuppressor.AreaTextDetected += OnAreaTextDetected;
 
+        // Before the overlay, which takes the handles.
         this.fonts.Rebuild(this.config.DisplayFontSize, this.config.HeaderFontSize);
 
         this.overlay = new NotificationOverlay(this.config, this.fonts);
+        this.coordinator = new AnnouncementCoordinator(this.config, this.nativeUiSuppressor, this.overlay);
+
         this.configWindow = new ConfigWindow(
             this.config,
             new ConfigActions(
                 this.overlay.Push,
                 RebuildFonts,
                 this.nativeUiSuppressor.RestoreAreaText,
-                () => this.fonts.EffectiveCeilingPx));
+                this.nativeUiSuppressor.RestoreLoadingTitle));
 
         this.windowSystem.AddWindow(this.overlay);
         this.windowSystem.AddWindow(this.configWindow);
-
-        this.tracker = new LocationTracker();
-        this.tracker.LocationChanged += OnLocationChanged;
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
             HelpMessage = "Open the Regions of XIV settings. \"/regions test\" fires a sample notification.",
         });
-
-        ClientState.Logout += OnLogout;
 
         PluginInterface.UiBuilder.Draw += this.windowSystem.Draw;
         PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUi;
@@ -77,6 +73,8 @@ public sealed class Plugin : IDalamudPlugin
         Log.Information("Regions of XIV loaded.");
     }
 
+    // Reverse construction order: the coordinator unsubscribes from the suppressor,
+    // so it has to go first.
     public void Dispose()
     {
         PluginInterface.UiBuilder.Draw -= this.windowSystem.Draw;
@@ -84,19 +82,14 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.OpenMainUi -= ToggleConfigUi;
         PluginInterface.UiBuilder.DefaultGlobalScaleChanged -= RebuildFonts;
 
-        ClientState.Logout -= OnLogout;
-
         CommandManager.RemoveHandler(CommandName);
 
-        this.tracker.LocationChanged -= OnLocationChanged;
-        this.tracker.Dispose();
+        this.coordinator.Dispose();
 
         this.windowSystem.RemoveAllWindows();
-
         this.configWindow.Dispose();
         this.overlay.Dispose();
 
-        this.nativeUiSuppressor.AreaTextDetected -= OnAreaTextDetected;
         this.nativeUiSuppressor.Dispose();
         this.fonts.Dispose();
     }
@@ -145,11 +138,7 @@ public sealed class Plugin : IDalamudPlugin
     {
         if (args.Trim().Equals("test", StringComparison.OrdinalIgnoreCase))
         {
-            // Bypasses the gate deliberately: this is for checking the visuals,
-            // not the suppression rules.
-            var names = ResolveLocation(this.tracker.Current);
-            this.overlay.Push(names.Area ?? names.Place ?? "Middle La Noscea",
-                              names.SubArea ?? names.Area ?? "Summerford Farms");
+            this.coordinator.PushPreview();
             return;
         }
 
@@ -158,87 +147,6 @@ public sealed class Plugin : IDalamudPlugin
 
     private void ToggleConfigUi() => this.configWindow.Toggle();
 
-    private void OnLogout(int type, int code) => this.gate.Reset();
-
-    // Fires when the game's _AreaText addon shows a new area name. We read the
-    // text straight from the addon, so this is the game's own data re-rendered
-    // in our style.
-    private void OnAreaTextDetected(string text)
-    {
-        this.overlay.Push(null, text);
-    }
-
     private void RebuildFonts() =>
         this.fonts.Rebuild(this.config.DisplayFontSize, this.config.HeaderFontSize);
-
-    // Runs on the framework thread — LocationTracker polls from IFramework.Update,
-    // so reading game state here is safe.
-    private void OnLocationChanged(LocationSnapshot previous, LocationSnapshot current)
-    {
-        var tier = current.DiffTier(previous);
-        var names = ResolveLocation(current);
-
-        Log.Debug(
-            $"Location changed [{tier}]: {names.Region} / {names.Zone} / {names.Place} " +
-            $"/ {names.Area} / {names.SubArea}");
-
-        if (!this.gate.ShouldAnnounce(previous, current, tier))
-            return;
-
-        var (header, text) = BuildNotificationText(tier, names);
-        if (string.IsNullOrWhiteSpace(text))
-            return;
-
-        this.overlay.Push(header, text);
-        this.gate.MarkAnnounced(current, tier, this.overlay.EstimatedDuration);
-    }
-
-    private (string? Header, string Text) BuildNotificationText(LocationTier tier, in ResolvedLocation names)
-    {
-        var (header, text) = tier switch
-        {
-            LocationTier.SubArea => (names.Area ?? names.Place, names.SubArea),
-            LocationTier.Area => (names.Place, names.Area),
-            _ => (names.Region, names.Place ?? names.Zone),
-        };
-
-        if (!this.config.IncludeParentTierAsHeader)
-            header = null;
-
-        if (header is not null && string.Equals(header, text, StringComparison.OrdinalIgnoreCase))
-            header = null;
-
-        return (header, text ?? string.Empty);
-    }
-
-    // --- Name resolution (inlined from PlaceNameResolver) ------------------
-
-    private static string? ResolvePlaceName(uint placeNameRowId)
-    {
-        if (placeNameRowId == 0)
-            return null;
-
-        if (!DataManager.GetExcelSheet<PlaceName>().TryGetRow(placeNameRowId, out var row))
-            return null;
-
-        // Name is a ReadOnlySeString. ToString() strips payloads, which is what we
-        // want for display; ToMacroString() is the one to reach for when debugging
-        // an odd-looking name.
-        var name = row.Name.ToString();
-        return string.IsNullOrWhiteSpace(name) ? null : name.Trim();
-    }
-
-    private static ResolvedLocation ResolveLocation(in LocationSnapshot snapshot) => new(
-        ResolvePlaceName(snapshot.RegionPlaceNameId),
-        ResolvePlaceName(snapshot.ZonePlaceNameId),
-        ResolvePlaceName(snapshot.PlacePlaceNameId),
-        ResolvePlaceName(snapshot.AreaPlaceNameId),
-        ResolvePlaceName(snapshot.SubAreaPlaceNameId));
-
-    private readonly record struct ResolvedLocation(
-        string? Region,
-        string? Zone,
-        string? Place,
-        string? Area,
-        string? SubArea);
 }

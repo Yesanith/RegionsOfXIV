@@ -75,11 +75,6 @@ internal sealed class AreaNotification
 
     public bool IsDone => Phase == NotificationPhase.Done;
 
-    public event Action? VanishStarted;
-
-    public TimeSpan TotalDuration =>
-        this.fadeIn.Duration + HoldDuration + this.reveal.Duration + this.showDuration + this.fadeOut.Duration;
-
     public void Update()
     {
         var elapsed = DateTime.UtcNow - this.phaseStartedAt;
@@ -123,7 +118,6 @@ internal sealed class AreaNotification
                 {
                     this.fadeOut.Start();
                     Advance(NotificationPhase.FadeOut);
-                    VanishStarted?.Invoke();
                 }
 
                 break;
