@@ -10,10 +10,10 @@ surfaces those transitions, and lets you restyle zone announcements to taste.
 Inspired by [Nekres' *Regions of Tyria*](https://blishhud.com/modules/?module=Nekres.Regions_Of_Tyria)
 for Guild Wars 2.
 
-> **Status: unreleased.** Detection, naming, the notification pipeline and the
-> Eorzean reveal effect are all confirmed working in game. The suppression rules
-> are covered by tests. Remaining: a pass in game over the settings added since,
-> then a first tagged release and a D17 submission.
+> **Status: 0.1.0.0.** Confirmed working in game. Not yet on Dalamud's plugin
+> installer — a D17 submission is the next step — so for now it installs from the
+> [latest release](https://github.com/Yesanith/RegionsOfXIV/releases/latest) or
+> from a local build.
 
 ## How it decides what to show
 
