@@ -1,10 +1,12 @@
-# Build & Output directories
+# Build & output
 bin/
 obj/
-[Bb]in/
-[Oo]bj/
+artifacts/
+TestResults/
+*.binlog
+*.log
 
-# IDE & Tooling
+# IDE & tooling
 .vs/
 .idea/
 .vscode/
@@ -12,12 +14,23 @@ obj/
 *.user
 *.userprefs
 *.suo
+*.cache
 
-# Markdown documentation files
+# Markdown documentation.
+#
+# Ignored by default: notes, roadmaps and generated references are working
+# material, not part of what ships.
+#
+# Both exceptions are anchored with a leading slash. Without it, "README.md"
+# matches at ANY depth, which silently re-includes assets/*/README.md as well —
+# that is what the previous version of this file did.
+#
+# LICENSE.md is excepted deliberately: the AGPL requires the licence text to
+# travel with the source, so it must not fall under the blanket *.md rule.
 *.md
-!README.md
+!/README.md
+!/LICENSE.md
 
 # System files
 .DS_Store
 Thumbs.db
-
