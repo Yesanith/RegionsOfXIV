@@ -12,7 +12,7 @@ namespace RegionsOfXIV.UI;
 // Full-screen, input-transparent draw surface for notifications. Registered with
 // WindowSystem, which is both a D17 approval criterion and what gets us correct
 // behaviour when the user hides the UI.
-internal sealed class NotificationOverlay : Window, IDisposable
+internal sealed class NotificationOverlay : Window, IDisposable, INotificationSink
 {
     private const float StackSpacing = 46f;
 

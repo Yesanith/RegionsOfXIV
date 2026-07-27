@@ -11,8 +11,8 @@ Inspired by [Nekres' *Regions of Tyria*](https://github.com/agaertner/bhm-zone-d
 for Guild Wars 2.
 
 > **Status: in development.** Detection, naming, the notification pipeline and the
-> Eorzean reveal effect all work in game. Remaining: release packaging, and the
-> long tail of edge cases in [ROADMAP.md](ROADMAP.md) Phase 9.
+> Eorzean reveal effect are all confirmed working in game. Remaining: polish and
+> release packaging.
 
 ## How it decides what to show
 
@@ -43,25 +43,33 @@ names as blank boxes.
 
 ```
 src/RegionsOfXIV/
-├─ Plugin.cs                  entrypoint, wiring, name resolution, announcements
-├─ Configuration.cs           IPluginConfiguration
+├─ Plugin.cs                       composition root: services, lifecycle, command
+├─ Configuration.cs                IPluginConfiguration
 ├─ Models/
-│  └─ LocationSnapshot.cs     the five naming tiers, as row IDs
+│  ├─ LocationSnapshot.cs          the five naming tiers, as row IDs
+│  └─ ResolvedLocation.cs          the same five, as display strings
 ├─ Services/
-│  ├─ LocationTracker.cs      polls TerritoryInfo; location + sanctuary changes
-│  ├─ NotificationGate.cs     cooldown / ping-pong / game-state suppression
-│  ├─ NativeUiSuppressor.cs   hides _AreaText and the loading-screen title
-│  ├─ AddonNodeDump.cs        diagnostic node-tree logger ("/regions dump")
-│  └─ FontService.cs          game + bundled font handles, size ceilings
+│  ├─ AnnouncementCoordinator.cs   decides what is announced, and when
+│  ├─ LocationTracker.cs           polls TerritoryInfo; location + sanctuary changes
+│  ├─ NotificationGate.cs          cooldown / ping-pong / game-state suppression
+│  ├─ NativeUiSuppressor.cs        hides _AreaText and the loading-screen title
+│  ├─ PlaceNameResolver.cs         row IDs -> display strings, via Lumina
+│  ├─ INotificationSink.cs         where a decided announcement goes
+│  └─ FontService.cs               font handles and their size ceilings
 └─ UI/
-   ├─ NotificationOverlay.cs  full-screen draw surface, stroked text, decode effect
-   ├─ AreaNotification.cs     one notification + its animation state
-   └─ ConfigWindow.cs         settings
+   ├─ NotificationOverlay.cs       full-screen draw surface, stroked text, decode
+   ├─ AreaNotification.cs          one notification + its animation state
+   └─ ConfigWindow.cs              settings
 
 assets/
-├─ fonts/    bundled fonts (Eorzean only — see the README there)
+├─ fonts/    Eorzea.ttf, for the decode effect — see NOTICE
 └─ images/   installer icon + preview shots (not compiled)
 ```
+
+`Plugin` builds the services and owns the Dalamud lifecycle; it decides nothing.
+`AnnouncementCoordinator` holds the announcement rules and reaches the screen only
+through `INotificationSink`, so those rules can be exercised without an ImGui
+context.
 
 ## Building
 
@@ -82,10 +90,10 @@ to point Dalamud's **Dev Plugin Locations** at.
 | `/regions` | open the settings |
 | `/regions test` | fire a sample notification, bypassing the suppression rules |
 
-## Documentation
+## Feedback
 
-- [ROADMAP.md](ROADMAP.md) — analysis of the GW2 original and the phased build plan
-- [DALAMUD_PLUGIN_GUIDE.md](DALAMUD_PLUGIN_GUIDE.md) — full Dalamud API 15 reference
+Issues and suggestions are welcome at
+[github.com/Yesanith/RegionsOfXIV](https://github.com/Yesanith/RegionsOfXIV).
 
 ## License
 
