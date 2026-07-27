@@ -31,6 +31,14 @@ TestResults/
 !/README.md
 !/LICENSE.md
 
+# Local-only development files.
+#
+# Kept on disk, deliberately out of the repository. AddonNodeDump logs an addon's
+# node tree to the plugin log and is wired to nothing — it exists to answer
+# questions about what the game actually puts in _AreaText and the loading-screen
+# title, and should not ship as dead code.
+src/RegionsOfXIV/Services/AddonNodeDump.cs
+
 # System files
 .DS_Store
 Thumbs.db
