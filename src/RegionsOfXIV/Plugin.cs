@@ -35,6 +35,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly NotificationOverlay overlay;
     private readonly ConfigWindow configWindow;
     private readonly AnnouncementCoordinator coordinator;
+    private readonly LoadingScreenUiGuard loadingScreenUiGuard;
 
     public Plugin()
     {
@@ -43,6 +44,7 @@ public sealed class Plugin : IDalamudPlugin
 
         this.fonts = new FontService(this.config);
         this.nativeUiSuppressor = new NativeUiSuppressor(this.config);
+        this.loadingScreenUiGuard = new LoadingScreenUiGuard();
 
         // Before the overlay, which takes the handles.
         this.fonts.Rebuild(this.config.DisplayFontSize, this.config.HeaderFontSize);
@@ -106,6 +108,7 @@ public sealed class Plugin : IDalamudPlugin
         this.configWindow.Dispose();
         this.overlay.Dispose();
 
+        this.loadingScreenUiGuard.Dispose();
         this.nativeUiSuppressor.Dispose();
         this.fonts.Dispose();
     }
