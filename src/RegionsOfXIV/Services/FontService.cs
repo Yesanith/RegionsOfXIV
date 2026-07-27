@@ -10,8 +10,8 @@ namespace RegionsOfXIV.Services;
 // The game's own UI fonts are never bundled — Dalamud builds ImGui fonts straight
 // from the game files via GameFontFamily (Axis is the general UI face,
 // TrumpGothic the narrow title face). Only fonts we ship ourselves, i.e. the
-// Eorzean alphabet used by the reveal effect, are loaded from disk.
-// See assets/fonts/README.md for the full family list.
+// Eorzean alphabet used by the reveal effect, are loaded from disk — see NOTICE
+// for where that one came from and why it is not under this project's licence.
 internal sealed class FontService : IDisposable
 {
     private readonly IFontAtlas atlas;

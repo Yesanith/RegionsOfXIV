@@ -8,9 +8,11 @@ using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
 
-// TODO(Phase 8): live preview while dragging position/size sliders. The GW2
-// original pops a sample notification that auto-disposes 250ms after the last
-// change — without it those sliders are pure guesswork.
+// TODO: live preview while dragging the position/size sliders. The GW2 original
+// pops a sample notification that auto-disposes 250 ms after the last change —
+// without it those sliders are pure guesswork, and the Preview button below is
+// only a partial stand-in.
+
 // Side effects the window needs to trigger, kept together so the constructor does
 // not grow an Action parameter per setting.
 internal readonly record struct ConfigActions(

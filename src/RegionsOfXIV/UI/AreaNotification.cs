@@ -30,6 +30,11 @@ internal sealed class AreaNotification
 
     private DateTime phaseStartedAt;
 
+    // What the fade-out counts down from. One by default, because the ordinary
+    // route into FadeOut is the end of Show, where the notification is fully
+    // opaque. Dismiss() is the exception — see there.
+    private float fadeOutFrom = 1f;
+
     public AreaNotification(
         string? header,
         string text,
@@ -124,7 +129,7 @@ internal sealed class AreaNotification
 
             case NotificationPhase.FadeOut:
                 this.fadeOut.Update();
-                Opacity = 1f - (float)this.fadeOut.ValueClamped;
+                Opacity = this.fadeOutFrom * (1f - (float)this.fadeOut.ValueClamped);
                 if (this.fadeOut.IsDone)
                 {
                     Opacity = 0f;
@@ -136,11 +141,17 @@ internal sealed class AreaNotification
     }
 
     // Cut short when a newer notification supersedes this one.
+    //
+    // This can land mid fade-in, at any opacity. Fading out from wherever we got to
+    // rather than from full is what keeps that from reading as a flash: two quick
+    // announcements — or two clicks of the config window's Preview button — would
+    // otherwise brighten the outgoing one on its way off screen.
     public void Dismiss()
     {
         if (Phase is NotificationPhase.FadeOut or NotificationPhase.Done)
             return;
 
+        this.fadeOutFrom = Opacity;
         this.fadeOut.Start();
         Advance(NotificationPhase.FadeOut);
     }

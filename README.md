@@ -63,7 +63,7 @@ src/RegionsOfXIV/
 
 assets/
 ├─ fonts/    Eorzea.ttf, for the decode effect — see NOTICE
-└─ images/   installer icon + preview shots (not compiled)
+└─ images/   icon.png, copied to images/ beside the DLL for Dalamud's installer
 ```
 
 `Plugin` builds the services and owns the Dalamud lifecycle; it decides nothing.

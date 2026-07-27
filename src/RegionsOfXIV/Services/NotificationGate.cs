@@ -5,7 +5,13 @@ using RegionsOfXIV.Models;
 namespace RegionsOfXIV.Services;
 
 // Decides whether a location change deserves an on-screen notification.
-// See ROADMAP Phase 9 for the full suppression matrix.
+//
+// Three kinds of rule, in the order they are applied: what the user asked for
+// (the per-tier toggles), what the game is doing (IsBlockedByGameState), and what
+// is already on screen (the cooldown, the coarse/fine suppression windows and the
+// ping-pong check). Each entry point below applies the subset that can be
+// answered at the moment it is called — the zone-entry path notably cannot read
+// game state at all, and says why.
 internal sealed class NotificationGate
 {
     private static readonly TimeSpan GlobalCooldown = TimeSpan.FromMilliseconds(2000);
@@ -144,9 +150,9 @@ internal sealed class NotificationGate
             (current == this.lastAnnounced || current == this.secondLastAnnounced))
             return false;
 
-        // TODO(Phase 9): "moving too fast" guard. GW2 reads speed off the Mumble
-        // link; here it would come from IObjectTable.LocalPlayer.Position deltas,
-        // or simply from mount/sprint state.
+        // TODO: "moving too fast" guard. GW2 reads speed off the Mumble link; here
+        // it would come from IObjectTable.LocalPlayer.Position deltas, or simply
+        // from mount/sprint state.
 
         return true;
     }
