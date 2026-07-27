@@ -13,19 +13,20 @@ out a phased build plan.
 
 | Phase | State |
 | --- | --- |
-| 1 — Detection core | **Done.** `LocationTracker` polls `TerritoryInfo` at 200 ms. |
-| 2 — Name resolution | **Done.** `PlaceNameResolver`, all five tiers, client language. |
+| 1 — Detection core | **Done.** Four sources; see §3.1. |
+| 2 — Name resolution | **Done.** All five tiers, client language. Inlined into `Plugin.cs` — it was ~40 lines and had one caller. |
 | 3 — Minimal renderer | **Done.** `NotificationOverlay` + `AreaNotification`, easing chain. |
-| 4 — Typography | **Partial.** Stroke, underline, overlap, game fonts with a JP-safe fallback. Colour pickers and per-tier font sizing still to do. |
+| 4 — Typography | **Partial.** Stroke, underline, overlap, colour pickers, and a four-way display font choice — Noto Sans CJK (Dalamud-shipped, vector, no ceiling, every language) as the default, with the game's Trump Gothic, Jupiter and Axis alongside it. Each game face warns when the size passes its bitmap ceiling; the two Latin-only faces warn in red on a Japanese client, where they render place names as blank boxes rather than merely soft. Per-tier font sizing outstanding. |
 | 5 — Reveal effect | **Done.** Per-glyph Eorzean → Latin swap. Polish listed below. |
-| 6 — Sound | **Done.** Game UI sounds via `UIGlobals.PlaySoundEffect`, off by default. |
-| 7 — Minimap label | **Stub.** Blocked on the Phase 0 `_NaviMap` check. |
+| 6 — Sound | **Dropped.** Built on `UIGlobals.PlaySoundEffect`, then cut — a zone notification does not need audio, and the settings were dead weight. |
+| 7 — Minimap label | **Dropped.** See §3.2. |
 | 8 — Config & preview | **Partial.** Four tabs wired; live drag-preview outstanding. |
-| 9 — Edge cases | **Partial.** Suppression matrix implemented; needs real in-game data. |
+| 9 — Edge cases | **Partial.** Suppression matrix implemented. Sanctuaries handled; the rest of the list needs play-testing data. |
 | 10 — Release | Not started. |
 
-**Ready to run in game.** Phase 9 is the next real work, and it needs play-testing
-data rather than more code.
+Plus one thing the original had no equivalent for, since GW2 has no native zone
+banner to displace: **the native-UI takeover** (§3.3). That is what most of the
+recent work went into.
 
 ---
 
@@ -201,47 +202,91 @@ pre-clearance needed.
 
 ## Part 3 — Target architecture
 
+As built:
+
 ```
-RegionsOfXIV/
-├─ Plugin.cs                    entrypoint, [PluginService]s, command, lifecycle
+src/RegionsOfXIV/
+├─ Plugin.cs                    entrypoint, [PluginService]s, command, lifecycle,
+│                               name resolution, and the announcement decisions
 ├─ Configuration.cs             IPluginConfiguration
+├─ Models/
+│  └─ LocationSnapshot.cs       the five ids + DiffTier
 ├─ Services/
-│  ├─ LocationTracker.cs        polls TerritoryInfo, raises LocationChanged
-│  ├─ PlaceNameResolver.cs      Lumina lookups + display-name filtering
-│  ├─ NotificationQueue.cs      debounce/cooldown/suppression state machine
-│  ├─ SoundService.cs           UIGlobals.PlaySoundEffect wrapper
-│  └─ NaviMapAnchor.cs          reads _NaviMap position/scale/visibility
-├─ UI/
-│  ├─ NotificationOverlay.cs    the full-screen ImGui draw surface
-│  ├─ AreaNotification.cs       one notification instance + its animation state
-│  ├─ TextPainter.cs            stroked/underlined/centred text helpers
-│  ├─ CompassLabel.cs           minimap-anchored sub-area label
-│  └─ ConfigWindow.cs           settings (Dalamud Windowing API)
-└─ Data/
-   ├─ fonts/                    display font(s)
-   └─ icon.png                  1:1, 64–512 px
+│  ├─ LocationTracker.cs        polls TerritoryInfo; LocationChanged + SanctuaryChanged
+│  ├─ NotificationGate.cs       debounce/cooldown/suppression state machine
+│  ├─ NativeUiSuppressor.cs     hides _AreaText and the loading-screen title
+│  ├─ AddonNodeDump.cs          diagnostic; "/regions dump"
+│  └─ FontService.cs            game + Eorzean font handles, size ceilings
+└─ UI/
+   ├─ NotificationOverlay.cs    the full-screen ImGui draw surface
+   ├─ AreaNotification.cs       one notification instance + its animation state
+   └─ ConfigWindow.cs           settings (Dalamud Windowing API)
 ```
+
+`assets/fonts/` and `assets/images/` sit outside `src/`; the `.csproj` links the
+fonts to `Fonts/` beside the built DLL.
 
 ### 3.1 Core data flow
 
+Four sources feed one overlay. Each answers a question the others cannot:
+
 ```
-IFramework.Update
-   └─> LocationTracker.Tick()
-         reads TerritoryInfo.Instance()->{AreaPlaceNameId, SubAreaPlaceNameId}
-         + IClientState.TerritoryType
-         └─> on change: LocationChanged(LocationSnapshot)
+IClientState.ZoneInit                          the zone being ENTERED, while the
+   └─> TerritoryType sheet                     loading screen is still up —
+         └─> Push(region, place)               TerritoryType has not caught up yet
 
-IClientState.TerritoryChanged / ZoneInit
-   └─> LocationChanged(LocationSnapshot { IsZoneChange = true })
+_AreaText addon (PostSetup/PostRefresh)        the game deciding an announcement
+   ├─> read its text, hide the addon           is due, in world
+   └─> LocationTracker.Poll()
+         └─> reconcile: TerritoryInfo if it agrees, the addon's string if not
 
-LocationChanged
-   └─> PlaceNameResolver: ids -> display strings (Lumina, current ClientLanguage)
-         └─> NotificationQueue: apply suppression matrix
-               ├─> NotificationOverlay.Push(header, text)   // transient popup
-               └─> CompassLabel.Set(text)                   // persistent label
+LocationTracker.SanctuaryChanged               settlements and inns, which the
+   └─> TerritoryInfo.InSanctuary edge          place-name ids do not reliably name
+         └─> Push(area, subArea ?? last flash)
+
+IFramework.Update @ 200 ms                     backstop for sub-area changes the
+   └─> TerritoryInfo place-name ids            game never flashes — the feature
+         └─> on change: LocationChanged        FFXIV itself does not offer
+
+                    ↓ all four ↓
+              NotificationGate          cooldown, ping-pong, tier enable,
+                    ↓                   coarse/fine mutual suppression
+           NotificationOverlay.Push(header, text)
 ```
 
-### 3.2 The location snapshot
+The gate's dedup is what keeps overlapping sources from double-announcing: whichever
+arrives second sees its own snapshot already in `lastAnnounced` and stays quiet.
+
+### 3.2 Why the minimap label was dropped
+
+`CompassLabel` and `NaviMapAnchor` were built, then removed. Anchoring to `_NaviMap`
+meant tracking its position, scale, visibility, HUD-layout edits and the user
+dragging it — a lot of surface area for a default-off feature that duplicates what
+the notification already says. The DTR bar (§7) remains the better idea if a
+persistent readout is ever wanted.
+
+### 3.3 The native-UI takeover
+
+FFXIV already announces locations, so this plugin has to displace the game's own UI
+rather than fill a void. Two addons, both plain `AtkUnitBase`, both suppressed by
+setting `IsVisible = false` from `IAddonLifecycle`:
+
+| Addon | What it is | Replaced from |
+| --- | --- | --- |
+| `_AreaText` | in-world area flash | `TerritoryInfo`, reconciled against the addon's own text |
+| `_LocationTitle`, `_LocationTitleShort` | loading-screen title | `ZoneInit` |
+
+`PostSetup` hides an addon before it first paints; `PreDraw` catches it re-showing
+itself partway through its own timeline. Each suppression is paired with its
+replacement in config — `ShouldAnnounceZoneEntry` refuses to draw unless
+`HideNativeLoadingTitle` is on, so the two can never disagree.
+
+Reading text out of `_AreaText` is deliberately a *tie-breaker*, not the primary
+source: structured ids give the parent tier for the header and are correct in every
+client language. The addon's string wins only when `TerritoryInfo` disagrees with it
+or has nothing — which is what sanctuaries appear to do.
+
+### 3.4 The location snapshot
 
 ```csharp
 public readonly record struct LocationSnapshot(
@@ -273,17 +318,13 @@ plugin; 4–7 make it feel good; 8–10 make it releasable.
       Do it now; it can never change after publication.
 - [ ] **Prior-art search.** Check `/xlplugins` and the Dalamud Discord for existing
       zone-notification plugins. If one exists, decide: differentiate or contribute.
-- [x] **Identify the native zone-title addon.** It is **`_AreaText`** (confirmed
-      in game — my `_LocationTitle` guess was wrong). It has no dedicated
-      FFXIVClientStructs struct; it is a plain `AtkUnitBase`, so
-      `addon->IsVisible = false` suppresses it. Handled by
-      `Services/NativeAreaTextHider.cs`, on by default since it renders underneath
-      this plugin's notification and covers the same ground.
-- [ ] **Find the minimap sub-area text node.** In `/xldata` → UiDebug, inspect
-      `_NaviMap` and locate the text node that shows the current area, plus its node
-      ID. `AddonNaviMap` in ClientStructs exposes `Coords`, `CoordsText`, `MapBase`,
-      `LockNorthCheckbox`, `ZoomIn/OutButton` — but *not* the area label, so you'll
-      need the node ID by inspection.
+- [x] **Identify the native location addons.** There are two, and they are
+      different addons for different moments — the original single-addon
+      assumption was wrong. **`_AreaText`** is the in-world area flash;
+      **`_LocationTitle`** and **`_LocationTitleShort`** carry the loading-screen
+      title. None has a dedicated FFXIVClientStructs struct; all are plain
+      `AtkUnitBase`, so `addon->IsVisible = false` suppresses them. See §3.3.
+- [x] **Minimap sub-area text node.** Moot — the minimap label was dropped (§3.2).
 - [ ] **Decide the visual identity.** GW2's gold-on-black Stowe Titling is
       unmistakably GW2. FFXIV's equivalent is its own display typography. Decide
       whether to (a) mimic FFXIV's native zone title, (b) invent something, or
@@ -485,9 +526,14 @@ should not block a release.
 
 ---
 
-### Phase 6 — Sound *(1 day)*
+### Phase 6 — Sound — **DROPPED**
 
-**Deliverable:** optional reveal/vanish sounds.
+Built, shipped behind an off-by-default toggle, then removed along with its four
+config properties and its settings tab. A zone notification is a glance-and-forget
+thing; audio on every sub-area crossing is noise, and "off by default" settings
+nobody turns on are just surface area. The notes below stand if it is ever revived.
+
+**Was:** optional reveal/vanish sounds.
 
 Dalamud has no audio service. Two paths:
 
@@ -513,10 +559,17 @@ Dalamud has no audio service. Two paths:
 
 ---
 
-### Phase 7 — Minimap companion label *(2 days)*
+### Phase 7 — Minimap companion label — **DROPPED**
 
-**Deliverable:** persistent sub-area name anchored to the minimap — the
-`CompassService` equivalent.
+**Was:** persistent sub-area name anchored to the minimap, the `CompassService`
+equivalent. Built as `CompassLabel` + `NaviMapAnchor`, then removed (§3.2).
+
+The warning below turned out to be the right instinct, and it applied more broadly
+than expected: `_NaviMap` already shows the current area, so the label restyled
+existing information rather than adding any — while costing a running subscription
+to the minimap's position, scale, visibility and HUD-layout state. The rest of this
+section is kept for whoever revisits the idea; §7 argues the DTR bar is the better
+shape for it.
 
 ⚠️ **Check first whether this is redundant.** `_NaviMap` may already show the
 current area. If so, the feature becomes *restyling* or *showing a different tier*
@@ -551,7 +604,7 @@ Port the setting groups:
 | Group | Settings |
 | --- | --- |
 | **General** | reveal effect on/off, underline header, overlap header, vertical position, font size, hide in combat |
-| **Sound** | reveal volume, vanish volume, mute reveal, mute vanish |
+| ~~**Sound**~~ | ~~reveal volume, vanish volume, mute reveal, mute vanish~~ — dropped |
 | **Durations** | show, fade-in, fade-out, effect |
 | **Zone notification** | enabled, include region |
 | **Area notification** | enabled, include zone |
@@ -643,8 +696,8 @@ should be indistinguishable from zero.
 | 3 | Minimal renderer | 2–3 d | low |
 | 4 | Typography | 2–3 d | medium |
 | 5 | Reveal effect | ~1 d remaining | low |
-| 6 | Sound | 1 d | low |
-| 7 | Minimap label | 2 d | medium |
+| 6 | ~~Sound~~ | dropped | — |
+| 7 | ~~Minimap label~~ | dropped | — |
 | 8 | Config & preview | 1–2 d | low |
 | 9 | Edge cases | 2–3 d | medium |
 | 10 | Release | 1–2 d | low |

@@ -42,11 +42,17 @@ atlas.NewGameFontHandle(new GameFontStyle(GameFontFamily.TrumpGothic, sizePx));
 | `MiedingerMid` | Wide sans for gauge names | Latin only |
 | `JupiterNumeric` | Digits for flying text | Digits |
 
-> **`Axis` is the only family with Japanese glyphs.** Anything rendering
-> user-visible game text must either use it or fall back to it — a Latin-only face
-> renders Japanese place names as tofu. `FontService.ResolveDisplayFamily` handles
-> this: the `Auto` setting picks TrumpGothic for Latin clients and Axis for
-> Japanese ones, and the header line uses Axis unconditionally.
+> **`Axis` is the only game family with Japanese glyphs.** TrumpGothic and Jupiter
+> render Japanese place names as blank boxes — not soft, absent. `ConfigWindow`
+> warns about this in red when either is selected on a Japanese client, which is a
+> louder treatment than the amber upscaling warning precisely because it is a
+> different kind of failure.
+>
+> `FontService.IsLatinOnly` is the single source of that fact; it lives beside the
+> fonts rather than in the UI, because it describes the font and not the window.
+>
+> The default display font sidesteps the question entirely — see below. The header
+> line is always Axis; at that size the narrow display faces buy nothing.
 
 ### These are bitmap fonts, and that constrains size
 
@@ -68,11 +74,43 @@ which visibly softens the glyphs. Largest native size per family:
 size — `AXIS_96` is 9.6 pt and `TrumpGothic_184` is 18.4 pt, both high-resolution
 atlases for *small* text.
 
-**Consequence for this plugin:** the default 76 px display size is a downscale for
-TrumpGothic (sharp) but a 1.58× upscale for Axis (soft). `FontService.NativeCeilingPx`
-exposes these limits and the config window warns when the chosen size exceeds them.
-The `Dalamud` font choice sidesteps the issue entirely — it is a vector face and
-stays sharp at any size.
+**Consequence for this plugin:** `FontService.NativeCeilingPx` holds one ceiling
+per choice, and `ConfigWindow` warns in amber when the chosen size passes it. The
+61 px default clears TrumpGothic's, sits exactly on Jupiter's, and is over Axis's.
+
+### The default is Noto Sans CJK, which has no ceiling at all
+
+Dalamud ships `DalamudAsset.NotoSansCjkMedium` (confirmed present in
+Dalamud.NET.Sdk 15.0.0 — the name is unchanged from earlier versions). It is
+**vector**, so it is crisp at any size, and it covers every language rather than
+just the client's. `NativeCeilingPx` reports `float.PositiveInfinity` for it, which
+is what makes the amber warning go quiet without the UI special-casing anything.
+
+The three game faces remain selectable for anyone who wants the FFXIV look and is
+willing to keep an eye on the size.
+
+#### Bounding the glyph range is not optional
+
+`SafeFontConfig.GlyphRanges` left null means *"all the glyphs from the font that is
+in the range of UCS-2"*. Noto Sans CJK holds tens of thousands — rasterised at
+display size, and rebuilt **every time the size slider moves**. That is a very
+large texture and a visible stutter, landing on new users by default and on the one
+interaction where it is most noticeable.
+
+`FontService.JapaneseGlyphRanges()` bounds it using ImGui's own
+`GetGlyphRangesJapanese()`: Latin, kana, the ~3000 common-use kanji and the
+fullwidth forms, well short of the whole of CJK Unified Ideographs. Reusing that
+table beats maintaining a Unicode range list by hand. ImGui returns a `ushort*`
+into static memory while `SafeFontConfig` wants a `ushort[]`, so the helper copies
+it once and caches the result.
+
+> **Do not "simplify" that to `GlyphRanges = null`.** It will look like it works,
+> because the font is correct — the cost is in atlas build time and texture size,
+> which is invisible until someone drags the size slider.
+
+Untested at time of writing: whether ImGui's common-use kanji set covers every
+kanji appearing in FFXIV place names. If one renders blank on a JP client, the fix
+is an additional range, not removing the bound.
 
 Underneath, these are the `common/font/*.fdt` files in the game data
 (`AXIS_12/14/18/36/96`, `Jupiter_16/20/23/45/46/90`, `TrumpGothic_23/34/68/184`,
