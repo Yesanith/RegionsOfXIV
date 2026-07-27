@@ -1,0 +1,67 @@
+Regions of XIV
+Copyright (C) 2026 Yesanith
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version. See LICENSE.md for the full text.
+
+The licence above covers this project's own source code. It does not — and
+cannot — extend to the third-party material described below.
+
+
+FINAL FANTASY XIV
+-----------------
+FINAL FANTASY XIV (C) SQUARE ENIX CO., LTD. All rights reserved.
+
+This is an unofficial project. It is not affiliated with, endorsed by, or in
+any way associated with Square Enix. No game data is redistributed here or in
+the released plugin.
+
+Every place name this plugin displays is read at runtime from the player's own
+installed copy of the game.
+
+
+Game UI fonts - AXIS, Trump Gothic, Jupiter
+-------------------------------------------
+Not bundled. Dalamud builds these at runtime from the font files in the user's
+own game installation, so no font data from the game is contained in this
+repository or in the released plugin. These typefaces are commercial faces
+licensed by Square Enix for use in the game and are not redistributable.
+
+
+Eorzean alphabet font
+---------------------
+NOT INCLUDED, and deliberately so.
+
+The plugin's decode effect can render text in the Eorzean alphabet if a font
+for it is present, but no such font is shipped. The fan-made TTF in common
+circulation records, in its own metadata:
+
+    Copyright     (C) Eorzea font was created by Square Enix
+    Copyright     Original (C) Square Enix.
+    Description   Eorzea Font from Final Fantasy XIV. Font originally created
+                  by Square Enix.
+
+It carries no licence field and grants no rights, so it cannot be
+redistributed under the GPL or any other licence this project could offer.
+
+The effect degrades gracefully in its absence: FontService.TryBuildEorzean
+treats a missing font as normal and the reveal falls back to a plain fade.
+Users who hold such a font may place it in a "Fonts" folder beside the plugin
+DLL, where FontService.FindBundledFont will pick it up.
+
+
+Noto Sans CJK
+-------------
+Shipped as part of Dalamud, not by this project, and used through
+DalamudAsset.NotoSansCjkMedium. It carries its own licence from its own
+authors.
+
+
+Dalamud and FFXIVClientStructs
+------------------------------
+This plugin builds against Dalamud (AGPL-3.0) and FFXIVClientStructs (MIT).
+Neither is redistributed here. GPL-3.0 was chosen partly for compatibility:
+AGPL-3.0 section 13 and GPL-3.0 section 13 expressly permit works under the
+two licences to be combined.
