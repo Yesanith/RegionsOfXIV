@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Dalamud.Configuration;
+using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV;
 
@@ -28,8 +29,11 @@ public enum DisplayFontChoice
     NotoSansCjk,
 }
 
+// IGateSettings is satisfied by the properties below as they already stand; it
+// names the subset NotificationGate reads so the gate can be built without this
+// class. See Services/IGateSettings.cs.
 [Serializable]
-public class Configuration : IPluginConfiguration
+public class Configuration : IPluginConfiguration, IGateSettings
 {
     // The shape this build understands.
     //

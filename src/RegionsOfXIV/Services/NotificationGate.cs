@@ -1,5 +1,4 @@
 using System;
-using Dalamud.Game.ClientState.Conditions;
 using RegionsOfXIV.Models;
 
 namespace RegionsOfXIV.Services;
@@ -30,7 +29,12 @@ internal sealed class NotificationGate
     // where the names stream past for places the player never touched.
     private const float TravellingSpeed = 20f;
 
-    private readonly Configuration config;
+    private readonly IGateSettings config;
+    private readonly IGameState game;
+
+    // Injected so the cooldown and suppression windows can be driven forward
+    // without waiting them out in real time.
+    private readonly Func<DateTime> now;
 
     private DateTime lastNotification = DateTime.MinValue;
 
@@ -48,7 +52,12 @@ internal sealed class NotificationGate
     private LocationSnapshot lastAnnounced = LocationSnapshot.Empty;
     private LocationSnapshot secondLastAnnounced = LocationSnapshot.Empty;
 
-    public NotificationGate(Configuration config) => this.config = config;
+    public NotificationGate(IGateSettings config, IGameState game, Func<DateTime>? clock = null)
+    {
+        this.config = config;
+        this.game = game;
+        this.now = clock ?? (() => DateTime.UtcNow);
+    }
 
     public void Reset()
     {
@@ -95,7 +104,7 @@ internal sealed class NotificationGate
         if (IsBlockedByGameState())
             return false;
 
-        var now = DateTime.UtcNow;
+        var now = this.now();
 
         if (now - this.lastNotification < GlobalCooldown)
             return false;
@@ -118,19 +127,20 @@ internal sealed class NotificationGate
         if (IsBlockedByGameState())
             return false;
 
-        return DateTime.UtcNow - this.lastNotification >= GlobalCooldown;
+        return this.now() - this.lastNotification >= GlobalCooldown;
     }
 
     public void MarkZoneAnnounced(TimeSpan onScreenDuration)
     {
-        var now = DateTime.UtcNow;
+        var now = this.now();
 
         this.lastNotification = now;
         this.suppressFinerUntil = now + onScreenDuration;
         this.suppressCoarseUntil = now + onScreenDuration;
     }
 
-    // Framework thread only: reads ICondition and IClientState.
+    // Framework thread only in practice — DalamudGameState reads ICondition and
+    // IClientState behind IGameState, and those throw off-thread.
     //
     // Speed comes in as a parameter rather than being read here: LocationTracker
     // already samples the player's position on the same tick, so measuring it
@@ -147,7 +157,7 @@ internal sealed class NotificationGate
         if (IsBlockedByGameState())
             return false;
 
-        var now = DateTime.UtcNow;
+        var now = this.now();
 
         if (now - this.lastNotification < GlobalCooldown)
             return false;
@@ -177,12 +187,12 @@ internal sealed class NotificationGate
 
     public void MarkAnnounced(in LocationSnapshot announced, LocationTier tier, TimeSpan onScreenDuration)
     {
-        this.lastNotification = DateTime.UtcNow;
+        this.lastNotification = this.now();
         this.secondLastAnnounced = this.lastAnnounced;
         this.lastAnnounced = announced;
 
         if (tier <= LocationTier.Place)
-            this.suppressFinerUntil = DateTime.UtcNow + onScreenDuration;
+            this.suppressFinerUntil = this.now() + onScreenDuration;
     }
 
     private bool IsTierEnabled(LocationTier tier) => tier switch
@@ -196,30 +206,29 @@ internal sealed class NotificationGate
 
     private bool IsBlockedByGameState()
     {
-        if (!Plugin.ClientState.IsLoggedIn)
+        if (!this.game.IsLoggedIn)
             return true;
 
         // Mid-loading-screen. FFXIV-specific; no GW2 equivalent.
-        if (Plugin.Condition[ConditionFlag.BetweenAreas] ||
-            Plugin.Condition[ConditionFlag.BetweenAreas51])
+        if (this.game.IsBetweenAreas)
             return true;
 
-        if (Plugin.Condition[ConditionFlag.OccupiedInCutSceneEvent] ||
-            Plugin.Condition[ConditionFlag.WatchingCutscene] ||
-            Plugin.Condition[ConditionFlag.WatchingCutscene78])
+        if (this.game.IsInCutscene)
             return true;
 
         // Never in PvP — nothing that could read as an advantage.
-        if (Plugin.ClientState.IsPvP)
+        if (this.game.IsPvP)
             return true;
 
-        if (Plugin.ClientState.IsGPosing)
+        if (this.game.IsGPosing)
             return true;
 
-        if (this.config.HideInCombat && Plugin.Condition[ConditionFlag.InCombat])
+        // The last two are the only ones the user has a say in. Everything above
+        // is unconditional.
+        if (this.config.HideInCombat && this.game.IsInCombat)
             return true;
 
-        if (this.config.HideInDuty && Plugin.Condition[ConditionFlag.BoundByDuty])
+        if (this.config.HideInDuty && this.game.IsBoundByDuty)
             return true;
 
         return false;

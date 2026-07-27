@@ -10,6 +10,14 @@
   </PropertyGroup>
 
   <!--
+    The services are internal, and making them public purely to be tested would
+    widen the plugin's surface to say something about its build layout.
+  -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="RegionsOfXIV.Tests" />
+  </ItemGroup>
+
+  <!--
     Bundled assets. The game's own fonts (AXIS / Jupiter / TrumpGothic / Meidinger)
     do NOT go here - Dalamud loads those straight out of the game's files at
     runtime. Only fonts we ship ourselves (e.g. the Eorzean alphabet) belong in

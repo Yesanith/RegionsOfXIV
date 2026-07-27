@@ -50,8 +50,10 @@ src/RegionsOfXIV/
 │  └─ ResolvedLocation.cs          the same five, as display strings
 ├─ Services/
 │  ├─ AnnouncementCoordinator.cs   decides what is announced, and when
-│  ├─ LocationTracker.cs           polls TerritoryInfo; location + sanctuary changes
+│  ├─ LocationTracker.cs           polls TerritoryInfo; location, sanctuary, speed
 │  ├─ NotificationGate.cs          cooldown / ping-pong / game-state suppression
+│  ├─ IGateSettings.cs             the settings the gate reads, and only those
+│  ├─ IGameState.cs                the game-state questions the gate asks
 │  ├─ NativeUiSuppressor.cs        hides _AreaText and the loading-screen title
 │  ├─ PlaceNameResolver.cs         row IDs -> display strings, via Lumina
 │  ├─ INotificationSink.cs         where a decided announcement goes
@@ -60,6 +62,11 @@ src/RegionsOfXIV/
    ├─ NotificationOverlay.cs       full-screen draw surface, stroked text, decode
    ├─ AreaNotification.cs          one notification + its animation state
    └─ ConfigWindow.cs              settings
+
+tests/RegionsOfXIV.Tests/
+├─ NotificationGateTests.cs        the suppression matrix
+├─ LocationSnapshotTests.cs        which tier a change is reported at
+└─ Fakes.cs                        settings, game state and a clock
 
 assets/
 ├─ fonts/    Eorzea.ttf, for the decode effect — see NOTICE
@@ -70,6 +77,12 @@ assets/
 `AnnouncementCoordinator` holds the announcement rules and reaches the screen only
 through `INotificationSink`, so those rules can be exercised without an ImGui
 context.
+
+`NotificationGate` goes further and touches no Dalamud type at all: it reads the
+game through `IGameState`, the settings through `IGateSettings`, and the clock
+through an injected delegate. That is what lets the suppression matrix be tested
+without a game running — cooldowns are stepped over rather than waited out, and a
+cutscene is one line rather than a trip to one.
 
 ## Building
 
@@ -82,6 +95,12 @@ dotnet build RegionsOfXIV.sln -c Release
 
 Output lands in `src/RegionsOfXIV/bin/x64/Release/RegionsOfXIV/`, packaged and ready
 to point Dalamud's **Dev Plugin Locations** at.
+
+The tests need neither the game nor Dalamud, so they run anywhere the SDK does:
+
+```sh
+dotnet test RegionsOfXIV.sln -c Release
+```
 
 ## Usage
 
