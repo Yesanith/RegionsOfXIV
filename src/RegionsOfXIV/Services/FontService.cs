@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Dalamud.Game;
+using Dalamud;
+using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.GameFonts;
 using Dalamud.Interface.ManagedFontAtlas;
 
@@ -19,12 +20,10 @@ internal sealed class FontService : IDisposable
     private IFontHandle? displayFont;
     private IFontHandle? headerFont;
     private IFontHandle? eorzeanDisplayFont;
-    private IFontHandle? eorzeanHeaderFont;
 
     private float builtDisplaySize;
     private float builtHeaderSize;
-    private GameFontFamily builtDisplayFamily;
-    private bool builtDalamudFace;
+    private DisplayFontChoice builtDisplayChoice;
 
     public FontService(Configuration config)
     {
@@ -36,82 +35,117 @@ internal sealed class FontService : IDisposable
 
     public IFontHandle Header => this.headerFont ?? Plugin.PluginInterface.UiBuilder.DefaultFontHandle;
 
+    // Only the display line decodes; the header is small enough that the effect
+    // would not read, so no Eorzean handle is built at header size.
     public IFontHandle? EorzeanDisplay => this.eorzeanDisplayFont;
-
-    public IFontHandle? EorzeanHeader => this.eorzeanHeaderFont;
-
-    public bool HasEorzeanFont => this.eorzeanDisplayFont != null;
 
     // Game fonts are bitmap atlases baked at fixed sizes; asking for more than the
     // largest one upscales the bitmap and softens the result. These are the
     // ceilings in pixels, derived from the largest .fdt each family ships
     // (GameFontStyle converts px to pt as px * 3/4, so px = pt * 4/3).
+    //
+    // Noto is vector and has no ceiling at all. Infinity rather than a large
+    // number, so the caller's "size > ceiling" test can never fire for it without
+    // the UI needing to know which fonts are special.
+    //
+    // The default arm matters: a config written by an older build can hold a value
+    // no longer in the enum, and Newtonsoft deserializes that without complaint.
     public static float NativeCeilingPx(DisplayFontChoice choice) => choice switch
     {
-        DisplayFontChoice.Axis => 36f * 4f / 3f,          // AXIS_36  -> 48 px
-        DisplayFontChoice.Jupiter => 46f * 4f / 3f,       // Jupiter_46 -> ~61 px
-        DisplayFontChoice.TrumpGothic => 68f * 4f / 3f,   // TrumpGothic_68 -> ~91 px
-        DisplayFontChoice.Dalamud => float.MaxValue,      // vector, no ceiling
-        _ => float.MaxValue,
+        DisplayFontChoice.NotoSansCjk => float.PositiveInfinity,
+        DisplayFontChoice.Jupiter => 46f * 4f / 3f,   // Jupiter_46 -> ~61 px
+        DisplayFontChoice.Axis => 36f * 4f / 3f,      // AXIS_36 -> 48 px
+        _ => 68f * 4f / 3f,                           // TrumpGothic_68 -> ~91 px
     };
 
-    // The ceiling for whatever Auto currently resolves to.
-    public float EffectiveCeilingPx => NativeCeilingPx(
-        this.config.DisplayFont == DisplayFontChoice.Auto
-            ? (ResolveDisplayFamily() == GameFontFamily.Axis
-                ? DisplayFontChoice.Axis
-                : DisplayFontChoice.TrumpGothic)
-            : this.config.DisplayFont);
+    public float EffectiveCeilingPx => NativeCeilingPx(this.config.DisplayFont);
+
+    // Whether a face will render Japanese as blank boxes. A fact about the font
+    // rather than a UI concern, so it belongs here — the config window only decides
+    // how loudly to say it.
+    public static bool IsLatinOnly(DisplayFontChoice choice) =>
+        choice is DisplayFontChoice.TrumpGothic or DisplayFontChoice.Jupiter;
 
     // Rebuilds the atlas handles. Never call from the draw path.
     public void Rebuild(float displaySizePx, float headerSizePx)
     {
-        var family = ResolveDisplayFamily();
-        var useDalamudFace = this.config.DisplayFont == DisplayFontChoice.Dalamud;
+        var choice = this.config.DisplayFont;
 
         if (Math.Abs(displaySizePx - this.builtDisplaySize) < 0.5f &&
             Math.Abs(headerSizePx - this.builtHeaderSize) < 0.5f &&
-            family == this.builtDisplayFamily &&
-            useDalamudFace == this.builtDalamudFace)
+            choice == this.builtDisplayChoice)
             return;
 
         this.builtDisplaySize = displaySizePx;
         this.builtHeaderSize = headerSizePx;
-        this.builtDisplayFamily = family;
-        this.builtDalamudFace = useDalamudFace;
+        this.builtDisplayChoice = choice;
 
         DisposeHandles();
 
-        this.displayFont = useDalamudFace
-            ? this.atlas.NewDelegateFontHandle(
-                e => e.OnPreBuild(tk => tk.AddDalamudDefaultFont(displaySizePx)))
-            : this.atlas.NewGameFontHandle(new GameFontStyle(family, displaySizePx));
+        this.displayFont = BuildDisplayFont(choice, displaySizePx);
 
-        // Axis for the header regardless — it is the only family with Japanese
-        // glyphs, and the header is small enough that the narrow display faces
-        // buy nothing.
+        // Axis for the header regardless — it is the only game family with Japanese
+        // glyphs, and the header is small enough that the display faces buy nothing.
         this.headerFont = this.atlas.NewGameFontHandle(
             new GameFontStyle(GameFontFamily.Axis, headerSizePx));
 
-        TryBuildEorzean(displaySizePx, headerSizePx);
+        TryBuildEorzean(displaySizePx);
     }
 
-    // TrumpGothic and Jupiter are Latin-only. Picking either on a Japanese client
-    // renders the zone name as tofu, so Auto falls back to Axis there.
-    private GameFontFamily ResolveDisplayFamily() => this.config.DisplayFont switch
+    // Noto comes from Dalamud's shipped assets and is vector, so it is crisp at any
+    // size and covers every language. The other three are the game's own bitmap
+    // atlases: they look like FFXIV, at the cost of a ceiling apiece.
+    private IFontHandle BuildDisplayFont(DisplayFontChoice choice, float sizePx) =>
+        choice == DisplayFontChoice.NotoSansCjk
+            ? this.atlas.NewDelegateFontHandle(e => e.OnPreBuild(tk =>
+                tk.AddDalamudAssetFont(
+                    DalamudAsset.NotoSansCjkMedium,
+                    new SafeFontConfig { SizePx = sizePx, GlyphRanges = JapaneseGlyphRanges() })))
+            : this.atlas.NewGameFontHandle(new GameFontStyle(ResolveGameFamily(choice), sizePx));
+
+    private static GameFontFamily ResolveGameFamily(DisplayFontChoice choice) => choice switch
     {
-        DisplayFontChoice.TrumpGothic => GameFontFamily.TrumpGothic,
         DisplayFontChoice.Jupiter => GameFontFamily.Jupiter,
         DisplayFontChoice.Axis => GameFontFamily.Axis,
-        DisplayFontChoice.Dalamud => GameFontFamily.Undefined,
-        _ => Plugin.ClientState.ClientLanguage == ClientLanguage.Japanese
-            ? GameFontFamily.Axis
-            : GameFontFamily.TrumpGothic,
+        _ => GameFontFamily.TrumpGothic,
     };
+
+    // Bounding the range is not optional. SafeFontConfig.GlyphRanges left null
+    // means "every glyph in the file within UCS-2", and Noto Sans CJK holds tens of
+    // thousands — rasterised at display size, and rebuilt every time the size
+    // slider moves. That is a very large texture and a visible stutter on the one
+    // interaction where it would be most noticed.
+    //
+    // ImGui already curates exactly the subset wanted here: Latin, kana, the ~3000
+    // common-use kanji and the fullwidth forms, well short of the whole of CJK
+    // Unified Ideographs. Reusing its table beats maintaining a Unicode range list
+    // by hand. It hands back a pointer into static ImGui memory, so this copies it
+    // once into the managed array SafeFontConfig wants, and caches the result.
+    private static ushort[]? CachedJapaneseGlyphRanges;
+
+    private static unsafe ushort[] JapaneseGlyphRanges()
+    {
+        if (CachedJapaneseGlyphRanges != null)
+            return CachedJapaneseGlyphRanges;
+
+        var source = ImGui.GetIO().Fonts.GetGlyphRangesJapanese();
+
+        // A zero-terminated run of inclusive from/to pairs.
+        var length = 0;
+        while (source[length] != 0)
+            length++;
+
+        // One longer than the payload, leaving the terminating zero in place.
+        var ranges = new ushort[length + 1];
+        for (var i = 0; i < length; i++)
+            ranges[i] = source[i];
+
+        return CachedJapaneseGlyphRanges = ranges;
+    }
 
     // Absence of a bundled font is not an error — the reveal effect degrades to a
     // plain fade.
-    private void TryBuildEorzean(float displaySizePx, float headerSizePx)
+    private void TryBuildEorzean(float displaySizePx)
     {
         var path = FindBundledFont();
         if (path == null)
@@ -124,8 +158,6 @@ internal sealed class FontService : IDisposable
         {
             this.eorzeanDisplayFont = this.atlas.NewDelegateFontHandle(
                 e => e.OnPreBuild(tk => tk.AddFontFromFile(path, new SafeFontConfig { SizePx = displaySizePx })));
-            this.eorzeanHeaderFont = this.atlas.NewDelegateFontHandle(
-                e => e.OnPreBuild(tk => tk.AddFontFromFile(path, new SafeFontConfig { SizePx = headerSizePx })));
 
             Plugin.Log.Information($"Loaded Eorzean font from {path}");
         }
@@ -133,7 +165,6 @@ internal sealed class FontService : IDisposable
         {
             Plugin.Log.Error(ex, $"Failed to load bundled Eorzean font from {path}");
             this.eorzeanDisplayFont = null;
-            this.eorzeanHeaderFont = null;
         }
     }
 
@@ -164,12 +195,10 @@ internal sealed class FontService : IDisposable
         this.displayFont?.Dispose();
         this.headerFont?.Dispose();
         this.eorzeanDisplayFont?.Dispose();
-        this.eorzeanHeaderFont?.Dispose();
 
         this.displayFont = null;
         this.headerFont = null;
         this.eorzeanDisplayFont = null;
-        this.eorzeanHeaderFont = null;
     }
 
     public void Dispose() => DisposeHandles();

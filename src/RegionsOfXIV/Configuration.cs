@@ -4,19 +4,28 @@ using Dalamud.Configuration;
 
 namespace RegionsOfXIV;
 
-// Of the game's font families only Axis carries Japanese glyphs; TrumpGothic and
-// Jupiter are Latin-only, so Auto has to fall back for a JP client.
+// The game's fonts are bitmap atlases baked at fixed sizes rather than vector
+// outlines, so any size above a family's largest native size is an upscale and
+// visibly softens. Each game face therefore comes with a ceiling:
 //
-// The game's fonts are bitmap atlases baked at fixed sizes, not vector outlines,
-// so any size above a family's largest native size is an upscale and softens.
-// Dalamud is the escape hatch: a vector face that stays sharp at any size.
+//   TrumpGothic  ~91 px   the narrow title face. Latin only.
+//   Jupiter      ~61 px   the serif face. Latin only.
+//   Axis          48 px   the general UI face, and the only game family carrying
+//                         Japanese glyphs. Lowest ceiling of the three.
+//   NotoSansCjk    none   shipped with Dalamud, and vector rather than bitmap, so
+//                         it is crisp at any size and covers every language.
+//
+// Appended in that order deliberately: the numeric values are what land in the
+// saved config, so new faces go on the end. NotoSansCjk is last for that reason
+// alone — it is the default for new configs despite being added most recently, and
+// renumbering to put it first would silently reassign every existing user's choice
+// (a stored 0 would stop meaning TrumpGothic).
 public enum DisplayFontChoice
 {
-    Auto,
     TrumpGothic,
     Jupiter,
     Axis,
-    Dalamud,
+    NotoSansCjk,
 }
 
 [Serializable]
@@ -41,18 +50,24 @@ public class Configuration : IPluginConfiguration
     // renders underneath it. On by default, since showing both is never wanted.
     public bool HideNativeAreaText { get; set; } = true;
 
-    // Suppresses the loading-screen title ("_Image") during zone transitions.
+    // Suppresses the loading-screen zone title, which the game splits across two
+    // addons: "_LocationTitle" and "_LocationTitleShort".
     public bool HideNativeLoadingTitle { get; set; } = true;
 
     // Layout and style.
     // VerticalPosition is a percentage of viewport height.
     public float VerticalPosition { get; set; } = 25f;
 
-    public float DisplayFontSize { get; set; } = 76f;
+    // Under every game face's ceiling except Jupiter's, which it sits exactly on.
+    // Irrelevant at the default font, which is vector and has no ceiling at all.
+    public float DisplayFontSize { get; set; } = 61f;
 
     public float HeaderFontSize { get; set; } = 24f;
 
-    public DisplayFontChoice DisplayFont { get; set; } = DisplayFontChoice.Auto;
+    // Noto by default: it is the only choice that needs no caveat, being sharp at
+    // any size and carrying glyphs for every language the client can display. The
+    // three game faces look more like FFXIV and are a click away.
+    public DisplayFontChoice DisplayFont { get; set; } = DisplayFontChoice.NotoSansCjk;
 
     public bool UnderlineHeader { get; set; } = true;
 
@@ -85,15 +100,6 @@ public class Configuration : IPluginConfiguration
     public bool HideInCombat { get; set; } = true;
 
     public bool HideInDuty { get; set; } = true;
-
-    // Sound. Off by default.
-    public bool RevealSoundEnabled { get; set; } = false;
-
-    public uint RevealSoundEffectId { get; set; } = 1;
-
-    public bool VanishSoundEnabled { get; set; } = false;
-
-    public uint VanishSoundEffectId { get; set; } = 2;
 
     public void Save() => Plugin.PluginInterface.SavePluginConfig(this);
 }

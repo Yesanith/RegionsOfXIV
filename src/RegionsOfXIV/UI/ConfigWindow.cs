@@ -1,8 +1,10 @@
 using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Game;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
+using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
 
@@ -15,7 +17,7 @@ internal readonly record struct ConfigActions(
     Action<string?, string> Preview,
     Action RebuildFonts,
     Action RestoreNativeAreaText,
-    Func<float> DisplayFontCeilingPx);
+    Action RestoreNativeLoadingTitle);
 
 internal sealed class ConfigWindow : Window, IDisposable
 {
@@ -45,7 +47,6 @@ internal sealed class ConfigWindow : Window, IDisposable
         DrawGeneralTab();
         DrawNotificationsTab();
         DrawDurationsTab();
-        DrawSoundTab();
     }
 
     private void DrawGeneralTab()
@@ -69,13 +70,13 @@ internal sealed class ConfigWindow : Window, IDisposable
             changed = true;
         }
 
-        using (var combo = ImRaii.Combo("Font", this.config.DisplayFont.ToString()))
+        using (var combo = ImRaii.Combo("Font", Label(this.config.DisplayFont)))
         {
             if (combo)
             {
                 foreach (var choice in Enum.GetValues<DisplayFontChoice>())
                 {
-                    if (!ImGui.Selectable(choice.ToString(), choice == this.config.DisplayFont))
+                    if (!ImGui.Selectable(Label(choice), choice == this.config.DisplayFont))
                         continue;
 
                     this.config.DisplayFont = choice;
@@ -87,23 +88,42 @@ internal sealed class ConfigWindow : Window, IDisposable
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip(
-                "Trump Gothic and Jupiter cover Latin only.\n" +
-                "Auto switches to Axis on a Japanese client.\n\n" +
-                "The game's fonts are bitmaps baked at fixed sizes, so they soften\n" +
-                "above their largest one. Dalamud's face is vector and stays sharp\n" +
-                "at any size.");
+                "Noto Sans CJK — shipped with Dalamud. Vector rather than bitmap, so it is\n" +
+                "                crisp at any size, and it carries every language.\n\n" +
+                "The game's own faces look more like FFXIV, but are bitmaps baked at fixed\n" +
+                "sizes, so each softens past its own ceiling:\n\n" +
+                "Trump Gothic — the narrow title face. Latin only. Sharp to ~91 px.\n" +
+                "Jupiter — the serif face. Latin only. Sharp to ~61 px.\n" +
+                "Axis — the general UI face. The only game font with Japanese glyphs,\n" +
+                "       but sharp only to 48 px.");
         }
 
-        // The game ships no large Axis bitmap, so asking for a big size upscales it.
-        // Say so rather than leaving the user to wonder why it looks soft.
-        var ceiling = this.actions.DisplayFontCeilingPx();
+        // Latin-only faces do not merely look wrong on a Japanese client, they render
+        // nothing at all. That is a different severity from the softening warning
+        // below, so it gets its own colour and goes first.
+        if (FontService.IsLatinOnly(this.config.DisplayFont) &&
+            Plugin.ClientState.ClientLanguage == ClientLanguage.Japanese)
+        {
+            using (ImRaii.PushColor(ImGuiCol.Text, new Vector4(1f, 0.35f, 0.35f, 1f)))
+            {
+                ImGui.TextWrapped(
+                    $"{Label(this.config.DisplayFont)} has no Japanese glyphs. On this client that " +
+                    "means place names will render as blank boxes, not just look soft. " +
+                    "Choose Axis or Noto Sans CJK instead.");
+            }
+        }
+
+        // Bitmap faces soften past their ceiling. Noto reports an infinite ceiling
+        // rather than being special-cased here, so this simply never fires for it.
+        var ceiling = FontService.NativeCeilingPx(this.config.DisplayFont);
         if (this.config.DisplayFontSize > ceiling)
         {
             using (ImRaii.PushColor(ImGuiCol.Text, new Vector4(1f, 0.78f, 0.35f, 1f)))
             {
                 ImGui.TextWrapped(
-                    $"This font has no bitmap above {ceiling:F0} px, so at {this.config.DisplayFontSize:F0} px " +
-                    "it is being upscaled and will look soft. Lower the size, or pick Dalamud.");
+                    $"This font has no bitmap above {ceiling:F0} px, so at " +
+                    $"{this.config.DisplayFontSize:F0} px it is being upscaled and will look soft. " +
+                    "Lower the size, or switch to Noto Sans CJK, which stays sharp at any size.");
             }
         }
 
@@ -237,6 +257,24 @@ internal sealed class ConfigWindow : Window, IDisposable
         if (ImGui.IsItemHovered())
             ImGui.SetTooltip("Suppresses the native \"_AreaText\" flash, which draws underneath this plugin.");
 
+        var hideLoadingTitle = this.config.HideNativeLoadingTitle;
+        if (ImGui.Checkbox("Hide the loading-screen zone title", ref hideLoadingTitle))
+        {
+            this.config.HideNativeLoadingTitle = hideLoadingTitle;
+            changed = true;
+
+            if (!hideLoadingTitle)
+                this.actions.RestoreNativeLoadingTitle();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                "Suppresses \"_LocationTitle\" and \"_LocationTitleShort\", the gold title\n" +
+                "drawn over the loading screen, and shows the same names in this\n" +
+                "plugin's style instead.");
+        }
+
         if (changed)
             this.config.Save();
     }
@@ -257,49 +295,16 @@ internal sealed class ConfigWindow : Window, IDisposable
             this.config.Save();
     }
 
-    private void DrawSoundTab()
+    // The enum names are identifiers, not labels. "Noto Sans CJK" carries the
+    // recommendation inline so the default explains itself without a tooltip.
+    private static string Label(DisplayFontChoice choice) => choice switch
     {
-        using var tab = ImRaii.TabItem("Sound");
-        if (!tab) return;
-
-        var changed = false;
-
-        ImGui.TextWrapped("Uses the game's own UI sound effects. Off by default.");
-        ImGui.Separator();
-
-        var reveal = this.config.RevealSoundEnabled;
-        if (ImGui.Checkbox("Play a sound on reveal", ref reveal))
-        {
-            this.config.RevealSoundEnabled = reveal;
-            changed = true;
-        }
-
-        var revealId = (int)this.config.RevealSoundEffectId;
-        if (ImGui.InputInt("Reveal sound ID", ref revealId))
-        {
-            this.config.RevealSoundEffectId = (uint)Math.Clamp(revealId, 0, 100);
-            changed = true;
-        }
-
-        ImGui.Separator();
-
-        var vanish = this.config.VanishSoundEnabled;
-        if (ImGui.Checkbox("Play a sound on fade-out", ref vanish))
-        {
-            this.config.VanishSoundEnabled = vanish;
-            changed = true;
-        }
-
-        var vanishId = (int)this.config.VanishSoundEffectId;
-        if (ImGui.InputInt("Fade-out sound ID", ref vanishId))
-        {
-            this.config.VanishSoundEffectId = (uint)Math.Clamp(vanishId, 0, 100);
-            changed = true;
-        }
-
-        if (changed)
-            this.config.Save();
-    }
+        DisplayFontChoice.NotoSansCjk => "Noto Sans CJK (recommended)",
+        DisplayFontChoice.TrumpGothic => "Trump Gothic",
+        DisplayFontChoice.Jupiter => "Jupiter",
+        DisplayFontChoice.Axis => "Axis",
+        _ => choice.ToString(),
+    };
 
     private static bool DrawSeconds(string label, Func<TimeSpan> get, Action<TimeSpan> set, float min, float max)
     {

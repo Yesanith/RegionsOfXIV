@@ -5,7 +5,6 @@ using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.ManagedFontAtlas;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
-using FFXIVClientStructs.FFXIV.Client.UI;
 using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
@@ -78,10 +77,7 @@ internal sealed class NotificationOverlay : Window, IDisposable
             this.config.ShowDuration,
             this.config.FadeOutDuration);
 
-        notification.VanishStarted += PlayVanish;
-
         this.active.Add(notification);
-        PlayReveal();
     }
 
     public TimeSpan EstimatedDuration =>
@@ -117,25 +113,6 @@ internal sealed class NotificationOverlay : Window, IDisposable
 
             DrawOne(notification);
         }
-    }
-
-    // --- Sound (inlined from SoundService) ---------------------------------
-    // Dalamud has no audio service. Rather than bundling audio and taking on NAudio
-    // plus our own volume/device handling, we borrow the game's own UI sounds.
-    // Off by default — unexpected audio is the fastest route to a one-star review.
-
-    private unsafe void PlayReveal()
-    {
-        if (!this.config.RevealSoundEnabled || this.config.RevealSoundEffectId == 0)
-            return;
-        UIGlobals.PlaySoundEffect(this.config.RevealSoundEffectId);
-    }
-
-    private unsafe void PlayVanish()
-    {
-        if (!this.config.VanishSoundEnabled || this.config.VanishSoundEffectId == 0)
-            return;
-        UIGlobals.PlaySoundEffect(this.config.VanishSoundEffectId);
     }
 
     // --- Text rendering (inlined from TextPainter) -------------------------
@@ -247,21 +224,22 @@ internal sealed class NotificationOverlay : Window, IDisposable
         DrawDecodingLine(drawList, centerX, top, notification.Text, notification.RevealProgress, fill, stroke);
     }
 
-    // Eorzean -> Latin decode, the same trick the GW2 original uses: the bundled
-    // font substitutes Latin codepoints 1:1, so the identical string renders as
-    // Eorzean script in one font and plain text in the other.
+    // Eorzean -> readable decode, the same trick the GW2 original uses.
+    //
+    // For Latin the bundled font substitutes codepoints 1:1, so the identical
+    // string renders as Eorzean script in one font and plain text in the other.
+    // Japanese has no such luxury — the font holds 240 Latin glyphs and nothing
+    // else — so the undecoded half is drawn from a stand-in string instead. The
+    // effect never depended on the scrambled glyph *being* the same character,
+    // only on it being unreadable and resolving into the right one.
     //
     // Glyphs swap individually rather than cross-fading, which avoids two
-    // overlapping glyph shapes turning to mush; positions come from the Latin
-    // layout so the line never shifts as it decodes.
+    // overlapping glyph shapes turning to mush.
     private void DrawDecodingLine(
         ImDrawListPtr drawList, float centerX, float top, string text, float progress, uint fill, uint stroke)
     {
         var eorzean = this.fonts.EorzeanDisplay;
-        var useDecode = this.config.DecodeEffectEnabled
-                        && eorzean != null
-                        && progress < 1f
-                        && IsCoveredByEorzeanFont(text);
+        var useDecode = this.config.DecodeEffectEnabled && eorzean != null && progress < 1f;
 
         if (!useDecode)
         {
@@ -274,27 +252,54 @@ internal sealed class NotificationOverlay : Window, IDisposable
             return;
         }
 
+        var cipher = BuildCipher(text);
+
         // The two faces have very different advance widths — the display face is
-        // condensed, the Eorzean one is not — so laying Eorzean glyphs out on Latin
-        // advances alone crowds them into each other. Measure both layouts and
-        // interpolate: the line starts on Eorzean metrics and settles onto Latin
-        // ones as it decodes. Both are centred, so it never drifts off-centre.
-        var runes = MeasureGlyphs(eorzean!, text, centerX);
-        var latin = MeasureGlyphs(this.fonts.Display, text, centerX);
+        // condensed, the Eorzean one is not, and a full-width Japanese glyph is
+        // wider than either — so laying one out on the other's advances crowds or
+        // strands the glyphs. Measure both layouts and interpolate: the line starts
+        // on Eorzean metrics and settles onto the real ones as it decodes. Both are
+        // centred, so it grows symmetrically rather than drifting.
+        var runes = MeasureGlyphs(eorzean!, cipher, centerX);
+        var plain = MeasureGlyphs(this.fonts.Display, text, centerX);
 
         var decoded = (int)MathF.Round(progress * text.Length);
 
         using (eorzean!.Push())
         {
             for (var i = decoded; i < text.Length; i++)
-                DrawGlyph(drawList, Lerp(runes[i], latin[i], progress), top, text[i], fill, stroke);
+                DrawGlyph(drawList, Lerp(runes[i], plain[i], progress), top, cipher[i], fill, stroke);
         }
 
         using (this.fonts.Display.Push())
         {
             for (var i = 0; i < decoded && i < text.Length; i++)
-                DrawGlyph(drawList, Lerp(runes[i], latin[i], progress), top, text[i], fill, stroke);
+                DrawGlyph(drawList, Lerp(runes[i], plain[i], progress), top, text[i], fill, stroke);
         }
+    }
+
+    // What the Eorzean half draws: the text itself wherever the font covers it, and
+    // a stand-in letter wherever it does not. Same length as the input, so the two
+    // layouts stay index-aligned and a glyph's scrambled and resolved forms occupy
+    // the same slot.
+    //
+    // The substitution is derived from the character and its position rather than
+    // from a random source, so it is stable frame to frame. A fresh draw would make
+    // the undecoded half flicker, which reads as a rendering fault rather than as
+    // an effect.
+    private static string BuildCipher(string text)
+    {
+        Span<char> cipher = text.Length <= 128 ? stackalloc char[text.Length] : new char[text.Length];
+
+        for (var i = 0; i < text.Length; i++)
+        {
+            var c = text[i];
+            cipher[i] = IsCoveredByEorzeanFont(c)
+                ? c
+                : CipherAlphabet[((c * 31) + i) % CipherAlphabet.Length];
+        }
+
+        return new string(cipher);
     }
 
     // Absolute X of every glyph, laid out in the given font and centred on centerX.
@@ -329,16 +334,17 @@ internal sealed class NotificationOverlay : Window, IDisposable
             drawList, new Vector2(x, y), glyph.ToString(), fill, stroke, ImGuiHelpers.GlobalScale);
     }
 
-    // The font covers Latin and its accented forms only — no CJK. Skip the effect
-    // rather than render a line of missing-glyph boxes on a JP/CN/KR client.
-    private static bool IsCoveredByEorzeanFont(string text)
-    {
-        foreach (var c in text)
-        {
-            if (c > 'ɏ')
-                return false;
-        }
+    // U+024F, the last codepoint of Latin Extended-B, and the end of the bundled
+    // Eorzean font's coverage. Its 240 glyphs run from ASCII through the accented
+    // Latin forms and stop there — no CJK, no Cyrillic, no Greek. Anything past
+    // this point has no Eorzean form and needs a stand-in during the reveal.
+    private const char EorzeanCoverageEnd = 'ɏ';
 
-        return true;
-    }
+    // Letters the stand-in is drawn from. Uppercase only: the Eorzean uppercase
+    // forms are the more ornate ones, and they are closer in width to a full-width
+    // Japanese glyph than the lowercase, which keeps the line from having to grow
+    // too far as it decodes.
+    private const string CipherAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    private static bool IsCoveredByEorzeanFont(char c) => c <= EorzeanCoverageEnd;
 }
