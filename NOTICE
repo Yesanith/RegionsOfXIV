@@ -6,8 +6,8 @@ the terms of the GNU Affero General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your option) any
 later version. See LICENSE.md for the full text.
 
-The licence above covers this project's own source code. It does not — and
-cannot — extend to the third-party material described below.
+The licence above covers this project's own source code. It does not (and
+cannot) extend to the third-party material described below.
 
 
 FINAL FANTASY XIV
@@ -64,7 +64,7 @@ in-game script. Anyone redistributing or forking this project should reach
 their own view on whether to carry it.
 
 It is not required. FontService.TryBuildEorzean treats a missing font as a
-normal condition, and the reveal falls back to a plain fade — so deleting it
+normal condition, and the reveal falls back to a plain fade so deleting it
 costs the effect and nothing else.
 
 
