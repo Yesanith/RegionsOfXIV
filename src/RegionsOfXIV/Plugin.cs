@@ -38,7 +38,8 @@ public sealed class Plugin : IDalamudPlugin
 
     public Plugin()
     {
-        this.config = LoadConfiguration();
+        var (loaded, isFirstRun) = LoadConfiguration();
+        this.config = loaded;
 
         this.fonts = new FontService(this.config);
         this.nativeUiSuppressor = new NativeUiSuppressor(this.config);
@@ -59,6 +60,21 @@ public sealed class Plugin : IDalamudPlugin
 
         this.windowSystem.AddWindow(this.overlay);
         this.windowSystem.AddWindow(this.configWindow);
+
+        // Nothing on screen announces that a freshly installed plugin has settings,
+        // and this one's defaults change what the game itself draws — it hides the
+        // native area text and the loading-screen title out of the box. Showing the
+        // window once makes that discoverable and reversible.
+        //
+        // Saving immediately is what makes it once: the config file's absence is the
+        // first-run signal, so writing it now is what stops this repeating on every
+        // load. Deleting the config to reset therefore also brings the window back,
+        // which is the behaviour you would want.
+        if (isFirstRun)
+        {
+            this.configWindow.IsOpen = true;
+            this.config.Save();
+        }
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
@@ -99,17 +115,24 @@ public sealed class Plugin : IDalamudPlugin
     // unhandled that bricks the plugin on every subsequent load with no recovery
     // path short of the user finding the file in AppData themselves, so preserve
     // the bad config and carry on with defaults.
-    private static Configuration LoadConfiguration()
+    //
+    // Returns whether this looks like a first install: no stored config at all.
+    // Recovering from an unreadable one does not count — the user has had this
+    // plugin for a while and does not need introducing to it.
+    private static (Configuration Config, bool IsFirstRun) LoadConfiguration()
     {
         try
         {
-            return PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            if (PluginInterface.GetPluginConfig() is Configuration stored)
+                return (stored, false);
+
+            return (new Configuration(), true);
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Could not read the stored configuration; falling back to defaults.");
             QuarantineBrokenConfig();
-            return new Configuration();
+            return (new Configuration(), false);
         }
     }
 
