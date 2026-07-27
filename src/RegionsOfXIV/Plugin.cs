@@ -22,6 +22,7 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IClientState ClientState { get; private set; } = null!;
     [PluginService] internal static ICondition Condition { get; private set; } = null!;
     [PluginService] internal static IDataManager DataManager { get; private set; } = null!;
+    [PluginService] internal static IObjectTable ObjectTable { get; private set; } = null!;
     [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
     [PluginService] internal static IGameGui GameGui { get; private set; } = null!;
     [PluginService] internal static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
@@ -56,6 +57,7 @@ public sealed class Plugin : IDalamudPlugin
             this.config,
             new ConfigActions(
                 this.overlay.Push,
+                this.overlay.TouchPreview,
                 RebuildFonts,
                 this.nativeUiSuppressor.RestoreAreaText,
                 this.nativeUiSuppressor.RestoreLoadingTitle));
@@ -127,7 +129,15 @@ public sealed class Plugin : IDalamudPlugin
         try
         {
             if (PluginInterface.GetPluginConfig() is Configuration stored)
+            {
+                // Written back immediately, so the migration is paid once rather
+                // than on every load until some unrelated setting happens to be
+                // changed.
+                if (stored.Migrate())
+                    stored.Save();
+
                 return (stored, false);
+            }
 
             return (new Configuration(), true);
         }

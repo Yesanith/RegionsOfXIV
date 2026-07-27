@@ -8,15 +8,16 @@ using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
 
-// TODO: live preview while dragging the position/size sliders. The GW2 original
-// pops a sample notification that auto-disposes 250 ms after the last change —
-// without it those sliders are pure guesswork, and the Preview button below is
-// only a partial stand-in.
-
 // Side effects the window needs to trigger, kept together so the constructor does
 // not grow an Action parameter per setting.
+//
+// Preview fires a fresh notification start to finish, which is what the button
+// wants. LivePreview keeps one on screen for as long as the settings are moving,
+// which is what the sliders want — dragging with the former would restart the
+// animation every frame.
 internal readonly record struct ConfigActions(
     Action<string?, string> Preview,
+    Action<string?, string> LivePreview,
     Action RebuildFonts,
     Action RestoreNativeAreaText,
     Action RestoreNativeLoadingTitle);
@@ -190,10 +191,25 @@ internal sealed class ConfigWindow : Window, IDisposable
             changed = true;
         }
 
+        var hideWhileTravelling = this.config.HideWhileTravellingFast;
+        if (ImGui.Checkbox("Skip sub-areas while travelling quickly", ref hideWhileTravelling))
+        {
+            this.config.HideWhileTravellingFast = hideWhileTravelling;
+            changed = true;
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                "Only affects sub-areas, and only above a speed no ground travel reaches,\n" +
+                "so it comes into play when flying. Zone and area changes are always\n" +
+                "announced however fast you are moving.");
+        }
+
         ImGui.Separator();
 
         if (ImGui.Button("Preview"))
-            this.actions.Preview("Middle La Noscea", "Summerford Farms");
+            this.actions.Preview(SampleHeader, SampleText);
 
         if (changed)
         {
@@ -201,6 +217,12 @@ internal sealed class ConfigWindow : Window, IDisposable
             // the rebuild off the draw path.
             this.actions.RebuildFonts();
             this.config.Save();
+
+            // After the rebuild, so the sample is drawn with the size and family
+            // just chosen rather than the previous one. Everything on this tab
+            // changes how a notification looks, so every change earns a preview —
+            // that is the whole point of the tab.
+            this.actions.LivePreview(SampleHeader, SampleText);
         }
     }
 
@@ -296,6 +318,11 @@ internal sealed class ConfigWindow : Window, IDisposable
         if (changed)
             this.config.Save();
     }
+
+    // A parent/child pair from the starting zones, so the sample exercises both
+    // lines and the decode effect has real Latin text to work on.
+    private const string SampleHeader = "Middle La Noscea";
+    private const string SampleText = "Summerford Farms";
 
     // The enum names are identifiers, not labels. "Noto Sans CJK" carries the
     // recommendation inline so the default explains itself without a tooltip.

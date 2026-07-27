@@ -31,6 +31,14 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
 
     private readonly List<AreaNotification> active = [];
 
+    // How long the live preview outlives the last settings change before it is let
+    // go. Long enough to bridge the gap between two drags of a slider, short
+    // enough that it reads as a response to what you just did.
+    private static readonly TimeSpan PreviewLinger = TimeSpan.FromMilliseconds(250);
+
+    private AreaNotification? preview;
+    private DateTime previewTouchedAt;
+
     public NotificationOverlay(Configuration config, FontService fonts)
         : base("##RegionsOfXIVOverlay")
     {
@@ -55,12 +63,21 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         IsOpen = true;
     }
 
-    public void Dispose() => this.active.Clear();
+    public void Dispose()
+    {
+        this.active.Clear();
+        this.preview = null;
+    }
 
     public void Push(string? header, string text)
     {
         if (string.IsNullOrWhiteSpace(text) && string.IsNullOrWhiteSpace(header))
             return;
+
+        // Anything arriving supersedes the preview like any other notification, so
+        // stop tracking it — the next settings change starts a fresh one rather
+        // than trying to revive one already on its way off screen.
+        this.preview = null;
 
         // A newer notification supersedes older ones: they slide down and fade.
         foreach (var existing in this.active)
@@ -78,6 +95,52 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             this.config.FadeOutDuration);
 
         this.active.Add(notification);
+    }
+
+    // Keeps a sample notification on screen while the user is changing settings.
+    //
+    // DrawOne reads position, colour and the font handles out of the config on
+    // every frame, so a notification already on screen follows the sliders by
+    // itself. The only thing missing is one being there — and not timing out
+    // halfway through a drag, which is what pinning prevents.
+    public void TouchPreview(string? header, string text)
+    {
+        this.previewTouchedAt = DateTime.UtcNow;
+
+        if (this.preview is { IsDone: false } existing)
+        {
+            existing.IsPinned = true;
+            return;
+        }
+
+        Push(header, text);
+
+        // Push clears the field and appends, in that order, so the new
+        // notification is both the last entry and safe to claim as the preview.
+        this.preview = this.active[^1];
+        this.preview.IsPinned = true;
+    }
+
+    // Lets the preview go once the settings have been still for a moment. Unpinned
+    // rather than dismissed: it has been sitting fully revealed with its Show phase
+    // long since elapsed, so releasing it drops it straight into the same fade-out
+    // any other notification gets.
+    private void ReleasePreviewIfIdle()
+    {
+        if (this.preview is not { } current)
+            return;
+
+        if (current.IsDone)
+        {
+            this.preview = null;
+            return;
+        }
+
+        if (DateTime.UtcNow - this.previewTouchedAt < PreviewLinger)
+            return;
+
+        current.IsPinned = false;
+        this.preview = null;
     }
 
     public TimeSpan EstimatedDuration =>
@@ -100,6 +163,8 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
 
     public override void Draw()
     {
+        ReleasePreviewIfIdle();
+
         for (var i = this.active.Count - 1; i >= 0; i--)
         {
             var notification = this.active[i];

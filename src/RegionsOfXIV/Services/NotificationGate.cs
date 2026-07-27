@@ -21,6 +21,15 @@ internal sealed class NotificationGate
     // later; bounding it keeps the anti-strobe behaviour without that.
     private static readonly TimeSpan PingPongWindow = TimeSpan.FromSeconds(30);
 
+    // Yalms per second past which a sub-area is treated as flown over rather than
+    // arrived at.
+    //
+    // Deliberately high. Running is around 6 and sprinting around 9; ground mounts
+    // sit in the low teens, and crossing sub-areas on one is ordinary play that
+    // should still be announced. Only flight clears 20, and flight is the case
+    // where the names stream past for places the player never touched.
+    private const float TravellingSpeed = 20f;
+
     private readonly Configuration config;
 
     private DateTime lastNotification = DateTime.MinValue;
@@ -122,7 +131,12 @@ internal sealed class NotificationGate
     }
 
     // Framework thread only: reads ICondition and IClientState.
-    public bool ShouldAnnounce(in LocationSnapshot previous, in LocationSnapshot current, LocationTier tier)
+    //
+    // Speed comes in as a parameter rather than being read here: LocationTracker
+    // already samples the player's position on the same tick, so measuring it
+    // twice would only invite the two to disagree.
+    public bool ShouldAnnounce(
+        in LocationSnapshot previous, in LocationSnapshot current, LocationTier tier, float speed)
     {
         if (tier == LocationTier.None)
             return false;
@@ -150,9 +164,13 @@ internal sealed class NotificationGate
             (current == this.lastAnnounced || current == this.secondLastAnnounced))
             return false;
 
-        // TODO: "moving too fast" guard. GW2 reads speed off the Mumble link; here
-        // it would come from IObjectTable.LocalPlayer.Position deltas, or simply
-        // from mount/sprint state.
+        // Flown over rather than arrived at. Only the finest tier is held back:
+        // a zone or an area crossed at speed is still somewhere the player went,
+        // and it is the sub-area names that stream past several to the second.
+        if (tier == LocationTier.SubArea &&
+            this.config.HideWhileTravellingFast &&
+            speed >= TravellingSpeed)
+            return false;
 
         return true;
     }

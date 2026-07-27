@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using Dalamud.Game.ClientState.Conditions;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using RegionsOfXIV.Models;
@@ -26,7 +27,15 @@ internal sealed unsafe class LocationTracker : IDisposable
 
     public bool InSanctuary { get; private set; }
 
+    // Yalms per second, averaged across the last sample interval. Zero whenever
+    // there is nothing sensible to report — no player, the first sample after a
+    // loading screen, or a jump too large to be movement.
+    public float Speed { get; private set; }
+
     private bool wasLoading;
+
+    private Vector3? lastPosition;
+    private DateTime lastPositionAt;
 
     public LocationTracker()
     {
@@ -46,6 +55,7 @@ internal sealed unsafe class LocationTracker : IDisposable
         Current = LocationSnapshot.Empty;
         InSanctuary = false;
         this.wasLoading = false;
+        ForgetPosition();
     }
 
     // Read now rather than waiting out the interval, for when something else has
@@ -72,7 +82,10 @@ internal sealed unsafe class LocationTracker : IDisposable
     private void Sample()
     {
         if (!Plugin.ClientState.IsLoggedIn)
+        {
+            ForgetPosition();
             return;
+        }
 
         // TerritoryInfo is not worth reading mid-transition: it describes the zone
         // being left and flips partway through, so sampling here would produce a
@@ -81,11 +94,20 @@ internal sealed unsafe class LocationTracker : IDisposable
             Plugin.Condition[ConditionFlag.BetweenAreas51])
         {
             this.wasLoading = true;
+            ForgetPosition();
             return;
         }
 
         var justLoadedIn = this.wasLoading;
         this.wasLoading = false;
+
+        // Across a loading screen the old position describes another zone
+        // entirely, so the first sample on the far side establishes a new baseline
+        // rather than measuring against it.
+        if (justLoadedIn)
+            ForgetPosition();
+
+        SampleSpeed();
 
         // Loading straight into a sanctuary is not a crossing as far as this
         // tracker is concerned — and neither is teleporting from one sanctuary to
@@ -110,6 +132,59 @@ internal sealed unsafe class LocationTracker : IDisposable
             InSanctuary = sanctuary;
             SanctuaryChanged?.Invoke(sanctuary);
         }
+    }
+
+    // Anything above this in a single interval is not movement. A teleport, a
+    // return, a duty finder pull — the position simply appears somewhere else, and
+    // dividing by the interval would report thousands of yalms per second. Well
+    // clear of the fastest flying mount, so nothing legitimate reaches it.
+    private const float ImplausibleSpeed = 200f;
+
+    // Below this the interval is too short for the difference between two
+    // positions to mean anything, so the previous reading stands rather than being
+    // replaced by noise. Poll() can fire at any time — the game raising its own
+    // area text is enough — so intervals are not reliably the poll interval.
+    private const float MinimumInterval = 0.05f;
+
+    private void SampleSpeed()
+    {
+        var now = DateTime.UtcNow;
+        var player = Plugin.ObjectTable.LocalPlayer;
+
+        if (player is null)
+        {
+            ForgetPosition();
+            return;
+        }
+
+        var position = player.Position;
+
+        if (this.lastPosition is not { } previous)
+        {
+            this.lastPosition = position;
+            this.lastPositionAt = now;
+            Speed = 0f;
+            return;
+        }
+
+        var seconds = (float)(now - this.lastPositionAt).TotalSeconds;
+        if (seconds < MinimumInterval)
+            return;
+
+        this.lastPosition = position;
+        this.lastPositionAt = now;
+
+        // Full 3D distance rather than ground plane: a flying mount climbing is
+        // travelling, and that is exactly the case this measurement is for.
+        var speed = Vector3.Distance(previous, position) / seconds;
+
+        Speed = speed >= ImplausibleSpeed ? 0f : speed;
+    }
+
+    private void ForgetPosition()
+    {
+        this.lastPosition = null;
+        Speed = 0f;
     }
 
     // Framework thread only: TerritoryInfo is raw game memory, and IClientState

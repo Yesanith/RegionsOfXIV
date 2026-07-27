@@ -78,6 +78,13 @@ internal sealed class AreaNotification
     // Vertical offset in px, applied when a newer notification pushes this down.
     public float StackOffset { get; set; }
 
+    // While set, the Show phase does not time out. The config window's live
+    // preview holds a notification open this way for as long as settings are
+    // changing, then unpins it — see NotificationOverlay.TouchPreview. Every other
+    // phase runs normally, so a pinned notification still fades in, reveals, and
+    // can still be dismissed by a real announcement arriving on top of it.
+    public bool IsPinned { get; set; }
+
     public bool IsDone => Phase == NotificationPhase.Done;
 
     public void Update()
@@ -119,7 +126,7 @@ internal sealed class AreaNotification
                 break;
 
             case NotificationPhase.Show:
-                if (elapsed >= this.showDuration)
+                if (!IsPinned && elapsed >= this.showDuration)
                 {
                     this.fadeOut.Start();
                     Advance(NotificationPhase.FadeOut);

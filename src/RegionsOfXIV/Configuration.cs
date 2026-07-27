@@ -31,8 +31,15 @@ public enum DisplayFontChoice
 [Serializable]
 public class Configuration : IPluginConfiguration
 {
-    // Bump when the shape changes, and migrate on load.
-    public int Version { get; set; } = 1;
+    // The shape this build understands.
+    //
+    // Adding a property does not need a bump: an absent field leaves the property
+    // at the default its initializer gave it, which is the right answer for a new
+    // setting. It is renames, retypes and changes of *meaning* that need one —
+    // those are the cases where a file reads cleanly but says the wrong thing.
+    public const int CurrentVersion = 1;
+
+    public int Version { get; set; } = CurrentVersion;
 
     // Which tiers to announce. All three on: the plugin now hides the game's own
     // zone title rather than sitting alongside it, so leaving the zone tier off
@@ -108,6 +115,54 @@ public class Configuration : IPluginConfiguration
     public bool HideInCombat { get; set; } = false;
 
     public bool HideInDuty { get; set; } = false;
+
+    // Sub-areas only, and only above a speed no ground travel reaches — see
+    // NotificationGate.TravellingSpeed. On by default: flying across a zone
+    // otherwise announces a string of places the player passed over rather than
+    // visited, which is the one case where the announcements become noise.
+    public bool HideWhileTravellingFast { get; set; } = true;
+
+    // Carries a stored configuration forward to CurrentVersion, reporting whether
+    // anything actually moved — i.e. whether the result is worth writing back.
+    //
+    // Migration steps go here as a ladder, oldest first, each covering one hop:
+    //
+    //     if (Version < 2) { NewSetting = OldSetting ? 1f : 0f; Version = 2; }
+    //     if (Version < 3) { ...; Version = 3; }
+    //
+    // A ladder rather than a switch, so a file several versions old runs every
+    // step between it and the present, in order, and each step only has to
+    // describe its own hop.
+    //
+    // There are no steps yet: version 1 is the first shape to ship. What this does
+    // do today is notice the one case that is already reachable — a config written
+    // by a newer build than this one.
+    public bool Migrate()
+    {
+        if (Version == CurrentVersion)
+            return false;
+
+        // Downgrade. Nothing here can know what a later shape meant, and rewriting
+        // the file would discard whatever that build stored without being able to
+        // put it back if the user upgrades again. Deserialization has already
+        // filled anything unreadable with defaults, so run with what we got and
+        // leave the file alone.
+        if (Version > CurrentVersion)
+        {
+            Plugin.Log.Warning(
+                $"The stored configuration is version {Version}, newer than this build understands " +
+                $"({CurrentVersion}). Reading what applies and leaving the file as it is.");
+            return false;
+        }
+
+        var from = Version;
+
+        // (no steps yet)
+
+        Version = CurrentVersion;
+        Plugin.Log.Information($"Migrated the configuration from version {from} to {CurrentVersion}.");
+        return true;
+    }
 
     public void Save() => Plugin.PluginInterface.SavePluginConfig(this);
 }

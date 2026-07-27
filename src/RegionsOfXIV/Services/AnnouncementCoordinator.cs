@@ -197,7 +197,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
             $"[ids {current.TerritoryTypeId}/{current.RegionPlaceNameId}/{current.ZonePlaceNameId}" +
             $"/{current.PlacePlaceNameId}/{current.AreaPlaceNameId}/{current.SubAreaPlaceNameId}]");
 
-        if (!this.gate.ShouldAnnounce(previous, current, tier))
+        if (!this.gate.ShouldAnnounce(previous, current, tier, this.tracker.Speed))
             return;
 
         var (header, text) = BuildNotificationText(tier, names);
