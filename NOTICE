@@ -2,9 +2,9 @@ Regions of XIV
 Copyright (C) 2026 Yesanith
 
 This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version. See LICENSE.md for the full text.
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version. See LICENSE.md for the full text.
 
 The licence above covers this project's own source code. It does not — and
 cannot — extend to the third-party material described below.
@@ -33,7 +33,7 @@ licensed by Square Enix for use in the game and are not redistributable.
 Eorzean alphabet font - assets/fonts/Eorzea.ttf
 -----------------------------------------------
 Included in this repository and in the released plugin, and expressly NOT
-covered by the GPL above.
+covered by the AGPL above.
 
 The file is a fan-made TrueType recreation of the Eorzean alphabet, built with
 FontCreator. Its own metadata records:
@@ -78,6 +78,9 @@ authors.
 Dalamud and FFXIVClientStructs
 ------------------------------
 This plugin builds against Dalamud (AGPL-3.0) and FFXIVClientStructs (MIT).
-Neither is redistributed here. GPL-3.0 was chosen partly for compatibility:
-AGPL-3.0 section 13 and GPL-3.0 section 13 expressly permit works under the
-two licences to be combined.
+Neither is redistributed here.
+
+Matching Dalamud's own AGPL-3.0 is the simplest position: identical terms on
+both sides leave no combination question to answer at all. AGPL's network
+clause has no practical effect on a desktop game plugin, which interacts with
+no one over a network, so it costs nothing to carry.

@@ -97,7 +97,7 @@ Issues and suggestions are welcome at
 
 ## License
 
-GPL-3.0-or-later. See [LICENSE.md](LICENSE.md).
+AGPL-3.0-or-later. See [LICENSE.md](LICENSE.md).
 
 The licence covers this project's own source. It does **not** extend to third-party
 material the plugin uses or references — see [NOTICE](NOTICE).
