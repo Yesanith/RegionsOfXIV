@@ -42,8 +42,3 @@ src/RegionsOfXIV/Services/AddonNodeDump.cs
 # System files
 .DS_Store
 Thumbs.db
-
-# The Eorzean font is Square Enix copyright with no licence grant - see NOTICE.
-# Kept on disk so local builds still have the decode effect; never committed.
-assets/fonts/*.ttf
-assets/fonts/*.otf

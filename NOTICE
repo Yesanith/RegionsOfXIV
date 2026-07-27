@@ -30,26 +30,29 @@ repository or in the released plugin. These typefaces are commercial faces
 licensed by Square Enix for use in the game and are not redistributable.
 
 
-Eorzean alphabet font
----------------------
-NOT INCLUDED, and deliberately so.
+Eorzean alphabet font - assets/fonts/Eorzea.ttf
+-----------------------------------------------
+Included in this repository and in the released plugin, and expressly NOT
+covered by the GPL above.
 
-The plugin's decode effect can render text in the Eorzean alphabet if a font
-for it is present, but no such font is shipped. The fan-made TTF in common
-circulation records, in its own metadata:
+The file is a fan-made TrueType recreation of the Eorzean alphabet, built with
+FontCreator. Its own metadata records:
 
     Copyright     (C) Eorzea font was created by Square Enix
     Copyright     Original (C) Square Enix.
     Description   Eorzea Font from Final Fantasy XIV. Font originally created
-                  by Square Enix.
+                  by Square Enix. Many thanks to www.eorzeapedia.com and
+                  www.ffxivmaps.com for reference materials.
 
-It carries no licence field and grants no rights, so it cannot be
-redistributed under the GPL or any other licence this project could offer.
+It carries no licence field. The alphabet is Square Enix's design. This
+project claims no rights in it, grants no rights in it to anyone, and includes
+it only so that the decode effect can render the in-game script. Anyone
+redistributing or forking this project should reach their own view on whether
+to carry the file.
 
-The effect degrades gracefully in its absence: FontService.TryBuildEorzean
-treats a missing font as normal and the reveal falls back to a plain fade.
-Users who hold such a font may place it in a "Fonts" folder beside the plugin
-DLL, where FontService.FindBundledFont will pick it up.
+It is not required. FontService.TryBuildEorzean treats a missing font as a
+normal condition, and the reveal falls back to a plain fade — so deleting it
+costs the effect and nothing else.
 
 
 Noto Sans CJK
