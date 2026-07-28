@@ -50,6 +50,7 @@ src/RegionsOfXIV/
 │  ├─ IGateSettings.cs             the settings the gate reads, and only those
 │  ├─ IGameState.cs                the game-state questions the gate asks
 │  ├─ NativeUiSuppressor.cs        hides _AreaText and the loading-screen title
+│  ├─ UiVisibilityGuard.cs         when we may draw against Dalamud's auto-hide
 │  ├─ PlaceNameResolver.cs         row IDs -> display strings, via Lumina
 │  ├─ INotificationSink.cs         where a decided announcement goes
 │  └─ FontService.cs               font handles and their size ceilings
