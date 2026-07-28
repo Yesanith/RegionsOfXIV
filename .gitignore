@@ -30,6 +30,7 @@ TestResults/
 *.md
 !/README.md
 !/LICENSE.md
+!/ARCHITECTURE.md
 
 # Local-only development files.
 #
