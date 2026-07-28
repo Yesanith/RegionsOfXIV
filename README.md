@@ -1,5 +1,17 @@
 # Regions of XIV
 
+[![release](https://img.shields.io/github/v/release/Yesanith/RegionsOfXIV?color=blue)](https://github.com/Yesanith/RegionsOfXIV/releases/latest)
+[![build](https://img.shields.io/github/actions/workflow/status/Yesanith/RegionsOfXIV/pr-build.yml?branch=master)](https://github.com/Yesanith/RegionsOfXIV/actions/workflows/pr-build.yml)
+[![license](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue)](LICENSE.md)
+
+<!--
+  Live install count from Dalamud's own backend. Uncomment once the plugin is
+  listed — until then the badge honestly reports "no result", because the name
+  is not in that endpoint yet.
+
+[![downloads](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fkamori.goats.dev%2FPlugin%2FDownloadCounts&query=%24.RegionsOfXIV&label=downloads&color=blue)](https://github.com/Yesanith/RegionsOfXIV)
+-->
+
 A Dalamud plugin that announces the region, zone, area and sub-area you walk into
 with a styled, animated on-screen notification.
 
