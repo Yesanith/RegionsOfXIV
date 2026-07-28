@@ -42,8 +42,10 @@ internal sealed class AnnouncementCoordinator : IDisposable
         this.suppressor = suppressor;
         this.sink = sink;
 
-        this.gate = new NotificationGate(config, new DalamudGameState());
-        this.tracker = new LocationTracker();
+        var game = new DalamudGameState();
+
+        this.gate = new NotificationGate(config, game);
+        this.tracker = new LocationTracker(game);
 
         this.tracker.LocationChanged += OnLocationChanged;
         this.tracker.SanctuaryChanged += OnSanctuaryChanged;

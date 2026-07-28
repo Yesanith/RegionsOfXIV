@@ -1,6 +1,5 @@
 using System;
 using System.Numerics;
-using Dalamud.Game.ClientState.Conditions;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using RegionsOfXIV.Models;
 using Lumina.Excel.Sheets;
@@ -37,8 +36,15 @@ internal sealed unsafe class LocationTracker : IDisposable
     private Vector3? lastPosition;
     private DateTime lastPositionAt;
 
-    public LocationTracker()
+    // The same instance the gate judges with, so the two cannot disagree about
+    // whether a cutscene is running — one holding this tracker still while the
+    // other decides the moment has passed would lose the arrival either way.
+    private readonly IGameState game;
+
+    public LocationTracker(IGameState game)
     {
+        this.game = game;
+
         Plugin.Framework.Update += OnFrameworkUpdate;
         Plugin.ClientState.Logout += OnLogout;
     }
@@ -81,7 +87,7 @@ internal sealed unsafe class LocationTracker : IDisposable
 
     private void Sample()
     {
-        if (!Plugin.ClientState.IsLoggedIn)
+        if (!this.game.IsLoggedIn)
         {
             ForgetPosition();
             return;
@@ -90,10 +96,29 @@ internal sealed unsafe class LocationTracker : IDisposable
         // TerritoryInfo is not worth reading mid-transition: it describes the zone
         // being left and flips partway through, so sampling here would produce a
         // change event for a place the player never saw.
-        if (Plugin.Condition[ConditionFlag.BetweenAreas] ||
-            Plugin.Condition[ConditionFlag.BetweenAreas51])
+        if (this.game.IsBetweenAreas)
         {
             this.wasLoading = true;
+            ForgetPosition();
+            return;
+        }
+
+        // Cutscenes and gpose are suppressed periods, and sampling through one
+        // loses the arrival rather than merely delaying it: Current would advance
+        // to a place nothing was allowed to announce, and once it has advanced the
+        // next sample sees no change to report. The transition is then gone for
+        // good. A dungeon is where this bites — you load in, a cutscene starts at
+        // once, and it moves you.
+        //
+        // Holding Current still instead means the change is simply noticed late,
+        // the moment the cutscene ends.
+        //
+        // Only the unconditional suppressions belong here. Combat and duty are the
+        // user's own choice and are deliberately still sampled, so "hide in
+        // combat" stays quiet rather than turning into amnesia about everywhere
+        // you went while fighting.
+        if (this.game.IsInCutscene || this.game.IsGPosing)
+        {
             ForgetPosition();
             return;
         }
