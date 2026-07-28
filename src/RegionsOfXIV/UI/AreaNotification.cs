@@ -68,7 +68,9 @@ internal sealed class AreaNotification
 
     public string Text { get; }
 
-    public NotificationPhase Phase { get; private set; } = NotificationPhase.FadeIn;
+    // Private: the phase is this class's own bookkeeping, and IsDone is the only
+    // question anyone outside has ever needed to ask about it.
+    private NotificationPhase Phase { get; set; } = NotificationPhase.FadeIn;
 
     public float Opacity { get; private set; }
 

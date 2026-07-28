@@ -58,8 +58,6 @@ internal sealed class FontService : IDisposable
         _ => 68f * 4f / 3f,                           // TrumpGothic_68 -> ~91 px
     };
 
-    public float EffectiveCeilingPx => NativeCeilingPx(this.config.DisplayFont);
-
     // Whether a face will render Japanese as blank boxes. A fact about the font
     // rather than a UI concern, so it belongs here — the config window only decides
     // how loudly to say it.
