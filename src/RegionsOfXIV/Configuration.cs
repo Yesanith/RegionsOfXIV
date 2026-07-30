@@ -184,7 +184,18 @@ public class Configuration : IPluginConfiguration, IGateSettings
     // Durations.
     public TimeSpan FadeInDuration { get; set; } = TimeSpan.FromSeconds(0.9);
 
-    public TimeSpan RevealDuration { get; set; } = TimeSpan.FromSeconds(0.9);
+    // The motion, which runs first and on its own: the line arrives in Eorzean
+    // script, lands, and only then decodes. Long enough that a rise or a burn is
+    // something you watch rather than something you catch the end of.
+    //
+    // Inert when the motion is None, and skipped outright — the notification does
+    // not sit through a stage with nothing to show.
+    public TimeSpan MotionDuration { get; set; } = TimeSpan.FromSeconds(1.1);
+
+    // The decode, which follows it. Slower than the 0.9s this shipped with: with
+    // the motion no longer running at the same time, the decode is the only thing
+    // happening and reads better given room.
+    public TimeSpan RevealDuration { get; set; } = TimeSpan.FromSeconds(1.3);
 
     public TimeSpan ShowDuration { get; set; } = TimeSpan.FromSeconds(4);
 

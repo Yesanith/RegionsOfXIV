@@ -113,32 +113,6 @@ public class GlyphAnimatorTests
         }
     }
 
-    // --- what the decode rides on -------------------------------------------
-    //
-    // With a motion running, NotificationOverlay stops flipping glyphs out of
-    // Eorzean on a count of its own and asks the stagger instead: a glyph has
-    // resolved once it is past the midpoint of its own animation. These pin the
-    // two properties that rule has to have.
-
-    [Fact]
-    public void EveryGlyphIsPastTheMidpointByTheEnd()
-    {
-        // One still short of it would be swapped from scrambled to readable in a
-        // single frame when the overlay hands over to the plain run.
-        foreach (var count in new[] { 1, 2, 7, 40 })
-        {
-            for (var i = 0; i < count; i++)
-                Assert.True(GlyphAnimator.LocalProgress(i, count, 1f) > 0.5f, $"glyph {i} of {count}");
-        }
-    }
-
-    [Fact]
-    public void NoGlyphIsPastTheMidpointAtTheStart()
-    {
-        for (var i = 0; i < 20; i++)
-            Assert.False(GlyphAnimator.LocalProgress(i, 20, 0f) > 0.5f, $"glyph {i}");
-    }
-
     // --- individual effects -------------------------------------------------
 
     [Fact]

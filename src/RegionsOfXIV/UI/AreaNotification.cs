@@ -18,12 +18,24 @@ internal enum NotificationPhase
 //   fade in -> hold -> reveal -> show -> fade out -> done
 // The pause before the reveal is what makes it read as deliberate rather than
 // twitchy; keep it even if the visuals change.
+//
+// The motion runs inside the fade-in stage, and the decode is the reveal that
+// follows it. They are deliberately consecutive rather than simultaneous: the
+// line arrives in Eorzean script, lands, pauses, and only then resolves into
+// something readable. Run at once they compete, and each is over before it has
+// been seen.
+//
+// Either can be absent. A notification built with no motion is the plugin as it
+// shipped — fade in, hold, decode — and one built with no decode simply ends its
+// reveal before it starts. Both are expressed as a zero duration by the caller,
+// which knows what the config says and whether the Eorzean font actually loaded.
 internal sealed class AreaNotification
 {
     private static readonly TimeSpan HoldDuration = TimeSpan.FromMilliseconds(200);
 
     private readonly Easing fadeIn;
-    private readonly Easing reveal;
+    private readonly Easing? motion;
+    private readonly Easing? reveal;
     private readonly Easing fadeOut;
 
     private readonly TimeSpan showDuration;
@@ -39,6 +51,7 @@ internal sealed class AreaNotification
         string? header,
         string text,
         TimeSpan fadeInDuration,
+        TimeSpan motionDuration,
         TimeSpan revealDuration,
         TimeSpan showDuration,
         TimeSpan fadeOutDuration)
@@ -57,11 +70,24 @@ internal sealed class AreaNotification
         this.showDuration = showDuration;
 
         this.fadeIn = new OutCubic(fadeInDuration);
-        this.reveal = new InOutCubic(revealDuration);
         this.fadeOut = new InCubic(fadeOutDuration);
+
+        // A stage with no duration is a stage that does not happen, and its
+        // progress starts where it would have ended: nothing downstream then has
+        // to ask whether it ran.
+        if (motionDuration > TimeSpan.Zero)
+            this.motion = new OutCubic(motionDuration);
+        else
+            MotionProgress = 1f;
+
+        if (revealDuration > TimeSpan.Zero)
+            this.reveal = new InOutCubic(revealDuration);
+        else
+            RevealProgress = 1f;
 
         this.phaseStartedAt = DateTime.UtcNow;
         this.fadeIn.Start();
+        this.motion?.Start();
     }
 
     public string? Header { get; }
@@ -74,7 +100,12 @@ internal sealed class AreaNotification
 
     public float Opacity { get; private set; }
 
-    // 0..1, drives the decode/wipe effect.
+    // 0..1, drives the motion: where each glyph is on its way in. Runs first, and
+    // is already 1 when there is no motion to run.
+    public float MotionProgress { get; private set; }
+
+    // 0..1, drives the decode. Starts only once the motion has finished, so the
+    // two never overlap.
     public float RevealProgress { get; private set; }
 
     // Vertical offset in px, applied when a newer notification pushes this down.
@@ -105,12 +136,22 @@ internal sealed class AreaNotification
 
         switch (Phase)
         {
+            // The fade and the motion run together and the stage ends when both
+            // are done, so a motion longer than the fade is not cut short by it.
             case NotificationPhase.FadeIn:
                 this.fadeIn.Update();
                 Opacity = (float)this.fadeIn.ValueClamped;
-                if (this.fadeIn.IsDone)
+
+                if (this.motion is { } arriving)
+                {
+                    arriving.Update();
+                    MotionProgress = (float)arriving.ValueClamped;
+                }
+
+                if (this.fadeIn.IsDone && this.motion is not { IsDone: false })
                 {
                     Opacity = 1f;
+                    MotionProgress = 1f;
                     Advance(NotificationPhase.Hold);
                 }
 
@@ -120,14 +161,23 @@ internal sealed class AreaNotification
                 Opacity = 1f;
                 if (elapsed >= HoldDuration)
                 {
-                    this.reveal.Start();
-                    Advance(NotificationPhase.Reveal);
+                    // Nothing to decode: the line has already arrived readable,
+                    // so it goes straight to being held on screen.
+                    if (this.reveal is { } decoding)
+                    {
+                        decoding.Start();
+                        Advance(NotificationPhase.Reveal);
+                    }
+                    else
+                    {
+                        Advance(NotificationPhase.Show);
+                    }
                 }
 
                 break;
 
             case NotificationPhase.Reveal:
-                this.reveal.Update();
+                this.reveal!.Update();
                 RevealProgress = (float)this.reveal.ValueClamped;
                 if (this.reveal.IsDone)
                 {
