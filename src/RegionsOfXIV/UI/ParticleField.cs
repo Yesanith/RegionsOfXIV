@@ -66,7 +66,12 @@ internal sealed class ParticleField
             particle.Age += dt;
             if (particle.Age >= particle.Life)
             {
-                this.particles.RemoveAt(i);
+                // Swapped with the last entry rather than removed in place, which
+                // would shift everything after it. Order carries no meaning here —
+                // they are a cloud, not a list — and the walk is backwards, so the
+                // entry moved into this slot has already been dealt with.
+                this.particles[i] = this.particles[^1];
+                this.particles.RemoveAt(this.particles.Count - 1);
                 continue;
             }
 

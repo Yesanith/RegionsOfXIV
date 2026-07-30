@@ -130,6 +130,53 @@ internal sealed class AreaNotification
     // their own, and nothing needs cleaning up when one ends.
     public ParticleField Particles { get; } = new();
 
+    // --- what the draw path would otherwise rebuild every frame -------------
+    //
+    // All of it derives from Text, Header and one setting, so all of it is the
+    // same answer on frame two as on frame one. Held here rather than in the
+    // overlay because it is per notification, and the overlay draws several.
+
+    // The Eorzean stand-in, built from the cased text. Null until the decode
+    // first asks for one, and dropped when the casing changes underneath it.
+    public string? Cipher { get; set; }
+
+    // Glyph positions, one cache per line per font. The header keeps its own
+    // because it is a different face at a third the size.
+    public LineLayout DisplayLayout { get; } = new();
+
+    public LineLayout CipherLayout { get; } = new();
+
+    public LineLayout HeaderLayout { get; } = new();
+
+    private bool casedAsUpper;
+    private bool everCased;
+    private string casedText = string.Empty;
+    private string casedHeader = string.Empty;
+
+    // ToUpperInvariant allocates, and the answer only moves when the checkbox
+    // does — which it can do mid-flight, since the config window's live preview
+    // is a notification like any other.
+    public void ApplyCasing(bool uppercase)
+    {
+        if (this.everCased && this.casedAsUpper == uppercase)
+            return;
+
+        this.everCased = true;
+        this.casedAsUpper = uppercase;
+
+        this.casedText = uppercase ? Text.ToUpperInvariant() : Text;
+        this.casedHeader = Header == null
+            ? string.Empty
+            : uppercase ? Header.ToUpperInvariant() : Header;
+
+        // Built from the text that just changed, so it no longer matches.
+        Cipher = null;
+    }
+
+    public string CasedText => this.casedText;
+
+    public string CasedHeader => this.casedHeader;
+
     public void Update()
     {
         var elapsed = DateTime.UtcNow - this.phaseStartedAt;
