@@ -48,6 +48,7 @@ internal sealed class ConfigWindow : Window, IDisposable
         if (!tabs) return;
 
         DrawGeneralTab();
+        DrawEffectsTab();
         DrawNotificationsTab();
         DrawDurationsTab();
     }
@@ -166,16 +167,6 @@ internal sealed class ConfigWindow : Window, IDisposable
             changed = true;
         }
 
-        var decode = this.config.DecodeEffectEnabled;
-        if (ImGui.Checkbox("Decode from Eorzean script", ref decode))
-        {
-            this.config.DecodeEffectEnabled = decode;
-            changed = true;
-        }
-
-        if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Requires a bundled Eorzean font. Latin text only.");
-
         var textColor = this.config.TextColor;
         if (ImGui.ColorEdit4("Text colour", ref textColor, ImGuiColorEditFlags.NoInputs))
         {
@@ -268,6 +259,115 @@ internal sealed class ConfigWindow : Window, IDisposable
             // just chosen rather than the previous one. Everything on this tab
             // changes how a notification looks, so every change earns a preview —
             // that is the whole point of the tab.
+            this.actions.LivePreview(SampleHeader, SampleText);
+        }
+    }
+
+    private void DrawEffectsTab()
+    {
+        using var tab = ImRaii.TabItem("Effects");
+        if (!tab) return;
+
+        var changed = false;
+
+        ImGui.TextWrapped("How the text arrives.");
+
+        using (var combo = ImRaii.Combo("Reveal", Label(this.config.Reveal)))
+        {
+            if (combo)
+            {
+                foreach (var choice in Enum.GetValues<RevealEffect>())
+                {
+                    if (!ImGui.Selectable(Label(choice), choice == this.config.Reveal))
+                        continue;
+
+                    this.config.Reveal = choice;
+                    changed = true;
+                }
+            }
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                "Decode — resolves out of the Eorzean alphabet, glyph by glyph.\n" +
+                "Plain — no reveal; the notification still fades in and out.\n" +
+                "Typewriter — one letter at a time, no fade.\n" +
+                "Rise — letters lift into place from below.\n" +
+                "Wave — letters ride a wave through the line as it appears.\n" +
+                "Burn — letters catch alight and cool into their colour.");
+        }
+
+        // The decode is the one reveal with a dependency, and it fails quietly:
+        // no bundled font means it plays as Plain. Better said here than
+        // discovered as "the effect does not work".
+        if (this.config.Reveal == RevealEffect.Decode)
+        {
+            ImGui.TextWrapped(
+                "Needs the bundled Eorzean font, and only Latin text has Eorzean forms. " +
+                "Without either it plays as Plain.");
+        }
+
+        ImGui.Separator();
+        ImGui.TextWrapped("What plays around it, for as long as it is on screen.");
+
+        using (var combo = ImRaii.Combo("Particles", Label(this.config.Particles)))
+        {
+            if (combo)
+            {
+                foreach (var choice in Enum.GetValues<ParticleEffect>())
+                {
+                    if (!ImGui.Selectable(Label(choice), choice == this.config.Particles))
+                        continue;
+
+                    this.config.Particles = choice;
+                    changed = true;
+                }
+            }
+        }
+
+        // The rest of the section is dead weight with nothing to configure, so it
+        // only appears once an effect is chosen.
+        if (this.config.Particles != ParticleEffect.None)
+        {
+            var density = this.config.ParticleDensity;
+            if (ImGui.SliderFloat("Density", ref density, 0.2f, 3f, "%.1fx"))
+            {
+                this.config.ParticleDensity = density;
+                changed = true;
+            }
+
+            var particleColor = this.config.ParticleColor;
+            if (ImGui.ColorEdit4("Particle colour", ref particleColor, ImGuiColorEditFlags.NoInputs))
+            {
+                this.config.ParticleColor = particleColor;
+                changed = true;
+            }
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(
+                    "The default amber suits embers and sparkles. Hearts and petals\n" +
+                    "want moving towards pink.");
+            }
+
+            // Embers under a burn is the pairing these were built for, but the two
+            // are independent settings and neither implies the other.
+            if (this.config.Particles == ParticleEffect.Embers && this.config.Reveal != RevealEffect.Burn)
+                ImGui.TextWrapped("Embers go with the Burn reveal, but they do not need it.");
+        }
+
+        ImGui.Separator();
+
+        if (ImGui.Button("Preview"))
+            this.actions.Preview(SampleHeader, SampleText);
+
+        if (changed)
+        {
+            this.config.Save();
+
+            // Every setting on this tab is something you have to watch to judge,
+            // so each change earns a sample — same reasoning as the General tab.
             this.actions.LivePreview(SampleHeader, SampleText);
         }
     }
@@ -379,6 +479,30 @@ internal sealed class ConfigWindow : Window, IDisposable
         DisplayFontChoice.Jupiter => "Jupiter",
         DisplayFontChoice.Axis => "Axis",
         _ => choice.ToString(),
+    };
+
+    // The enum names read well enough for these two, so the labels exist to name
+    // the default and to keep an unknown value — a config from a newer build —
+    // from showing as nothing at all.
+    private static string Label(RevealEffect effect) => effect switch
+    {
+        RevealEffect.Decode => "Decode from Eorzean (default)",
+        RevealEffect.Plain => "Plain",
+        RevealEffect.Typewriter => "Typewriter",
+        RevealEffect.Rise => "Rise",
+        RevealEffect.Wave => "Wave",
+        RevealEffect.Burn => "Burn",
+        _ => effect.ToString(),
+    };
+
+    private static string Label(ParticleEffect effect) => effect switch
+    {
+        ParticleEffect.None => "None",
+        ParticleEffect.Hearts => "Hearts",
+        ParticleEffect.Embers => "Embers",
+        ParticleEffect.Sparkles => "Sparkles",
+        ParticleEffect.Petals => "Petals",
+        _ => effect.ToString(),
     };
 
     private static bool DrawSeconds(string label, Func<TimeSpan> get, Action<TimeSpan> set, float min, float max)

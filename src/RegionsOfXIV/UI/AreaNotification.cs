@@ -89,6 +89,16 @@ internal sealed class AreaNotification
 
     public bool IsDone => Phase == NotificationPhase.Done;
 
+    // Whether the notification is on its way out. The particle field asks, so it
+    // can stop spawning while letting what is already in the air finish drifting:
+    // fresh hearts appearing under text that is fading reads as a glitch.
+    public bool IsFadingOut => Phase == NotificationPhase.FadeOut;
+
+    // The ambient particles playing around this notification. Owned here so they
+    // live and die with it — two notifications overlapping during a handover keep
+    // their own, and nothing needs cleaning up when one ends.
+    public ParticleField Particles { get; } = new();
+
     public void Update()
     {
         var elapsed = DateTime.UtcNow - this.phaseStartedAt;

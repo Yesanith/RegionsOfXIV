@@ -29,6 +29,40 @@ public enum DisplayFontChoice
     NotoSansCjk,
 }
 
+// How the text arrives. Same append-only rule as DisplayFontChoice above: the
+// numeric value is what lands in the saved config, so new effects go on the end.
+//
+// Decode leads because it is the default and the one the plugin was built around.
+// Plain is not "no effect" in the sense of nothing happening — the notification
+// still fades in, holds and fades out; it is the reveal itself that is skipped.
+public enum RevealEffect
+{
+    Decode,
+    Plain,
+    Typewriter,
+    Rise,
+    Wave,
+    Burn,
+}
+
+// Ambient particles, drawn around the text for as long as it is on screen. A
+// separate axis from RevealEffect deliberately: embers under a burn is the
+// obvious pairing, but nothing stops hearts under a decode, and keeping the two
+// orthogonal is both less code and more combinations.
+//
+// Every one of these is drawn from primitives — circles, triangles, quads —
+// rather than from a glyph or a sprite. A "♥" character would render as a blank
+// box under Trump Gothic and Jupiter, which are Latin-only, and a sprite sheet
+// would be the first art asset this plugin has ever needed.
+public enum ParticleEffect
+{
+    None,
+    Hearts,
+    Embers,
+    Sparkles,
+    Petals,
+}
+
 // IGateSettings is satisfied by the properties below as they already stand; it
 // names the subset NotificationGate reads so the gate can be built without this
 // class. See Services/IGateSettings.cs.
@@ -41,7 +75,11 @@ public class Configuration : IPluginConfiguration, IGateSettings
     // at the default its initializer gave it, which is the right answer for a new
     // setting. It is renames, retypes and changes of *meaning* that need one —
     // those are the cases where a file reads cleanly but says the wrong thing.
-    public const int CurrentVersion = 1;
+    // 2: DecodeEffectEnabled (bool) became Reveal (RevealEffect). A rename and a
+    //    retype of an existing setting, which is exactly the case a version bump
+    //    is for — the old field reads cleanly and would otherwise say the wrong
+    //    thing, since a stored "false" means Plain rather than "default Decode".
+    public const int CurrentVersion = 2;
 
     public int Version { get; set; } = CurrentVersion;
 
@@ -105,9 +143,31 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
     public bool OverlapHeader { get; set; } = true;
 
-    // Eorzean -> Latin decode during the reveal. Silently inert when no font is
-    // bundled, or when the text falls outside the font's Latin coverage.
+    // Legacy, version 1 only. Superseded by Reveal below, and kept solely so the
+    // v1 -> v2 migration can read what the user had chosen: delete the property
+    // and the stored field has nothing to deserialize into, so everyone who had
+    // turned the decode off would silently get it back.
+    //
+    // Nothing reads this outside Migrate().
     public bool DecodeEffectEnabled { get; set; } = true;
+
+    // How the text arrives. Decode is the effect the plugin shipped with, and is
+    // silently inert when no Eorzean font is bundled, or when the text falls
+    // outside that font's Latin coverage — in which case it plays as Plain.
+    public RevealEffect Reveal { get; set; } = RevealEffect.Decode;
+
+    // Ambient particles. Off by default: this is a location notification first,
+    // and hearts drifting off every sub-area change is a taste, not a default.
+    public ParticleEffect Particles { get; set; } = ParticleEffect.None;
+
+    // Multiplies the spawn rate. The per-effect rates are chosen so that 1 reads
+    // as "a few", not as weather.
+    public float ParticleDensity { get; set; } = 1f;
+
+    // One colour for whichever effect is on. A warm amber suits embers and
+    // sparkles, which are the two that look wrong in an arbitrary hue; hearts and
+    // petals want to be moved towards pink, and the config window says so.
+    public Vector4 ParticleColor { get; set; } = new(1f, 0.72f, 0.35f, 1f);
 
     // Vector4 rather than a packed uint: it is what ImGui's colour pickers take,
     // and it stays legible if anyone opens the config file.
@@ -187,7 +247,15 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
         var from = Version;
 
-        // (no steps yet)
+        // A bool that meant "decode, or nothing" becomes one choice among several.
+        // Only the off case carries information: everyone else was on Decode,
+        // which is the property's own default, so the true branch is written out
+        // for what it says rather than for what it changes.
+        if (Version < 2)
+        {
+            Reveal = DecodeEffectEnabled ? RevealEffect.Decode : RevealEffect.Plain;
+            Version = 2;
+        }
 
         Version = CurrentVersion;
         Plugin.Log.Information($"Migrated the configuration from version {from} to {CurrentVersion}.");

@@ -326,10 +326,117 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             }
         }
 
-        DrawDecodingLine(
-            drawList, centerX, top, Cased(notification.Text), notification.RevealProgress,
-            fill, stroke, strokeDistance);
+        var text = Cased(notification.Text);
+
+        // What the particles play around: the middle of the display line, and how
+        // far it reaches in each direction. Measured under the display font, since
+        // that is what determines both.
+        Vector2 center;
+        Vector2 extent;
+        using (this.fonts.Display.Push())
+        {
+            var lineHeight = ImGui.GetTextLineHeight();
+            center = new Vector2(centerX, top + (lineHeight / 2f));
+            extent = new Vector2(RunWidth(text, Tracking()) / 2f, lineHeight / 2f);
+        }
+
+        // Updated and drawn unconditionally: with no effect selected both calls
+        // fall straight out, and a field left holding particles from an effect
+        // just switched off still needs its contents aged away.
+        //
+        // Before the text, so glyphs stay legible with particles behind them.
+        notification.Particles.Update(
+            this.config.Particles,
+            this.config.ParticleDensity,
+            ImGui.GetIO().DeltaTime,
+            center,
+            extent,
+            spawning: !notification.IsFadingOut);
+
+        notification.Particles.Draw(
+            drawList, this.config.Particles, this.config.ParticleColor, notification.Opacity);
+
+        DrawTextLine(
+            drawList, centerX, top, text, notification.RevealProgress, notification.Opacity, strokeDistance);
     }
+
+    // Picks the reveal, and handles the two cases every effect shares: a finished
+    // reveal, and a decode with no bundled font to decode from. Both draw the
+    // line plainly, which is also the cheapest path — one AddText per stroke
+    // stamp instead of one per glyph.
+    private void DrawTextLine(
+        ImDrawListPtr drawList, float centerX, float top, string text, float progress, float opacity,
+        float strokeDistance)
+    {
+        var fill = Packed(this.config.TextColor, opacity);
+        var stroke = Packed(this.config.StrokeColor, opacity);
+        var effect = this.config.Reveal;
+
+        if (effect == RevealEffect.Decode && this.fonts.EorzeanDisplay != null && progress < 1f)
+        {
+            DrawDecodingLine(drawList, centerX, top, text, progress, fill, stroke, strokeDistance);
+            return;
+        }
+
+        // Settled, or nothing to animate. An animated effect at full progress has
+        // every glyph at its final position, alpha and colour, so the plain run
+        // draws the identical result — the two layouts agree glyph for glyph,
+        // since both walk the same advances plus the same tracking.
+        if (progress >= 1f || effect is RevealEffect.Decode or RevealEffect.Plain)
+        {
+            using (this.fonts.Display.Push())
+            {
+                DrawStrokedCentered(
+                    drawList, centerX, top, text, fill, stroke, strokeDistance, Tracking());
+            }
+
+            return;
+        }
+
+        DrawAnimatedLine(drawList, centerX, top, text, progress, opacity, strokeDistance, effect);
+    }
+
+    // The per-glyph reveals: rise, wave, typewriter, burn. GlyphAnimator decides
+    // what each glyph is doing; this places it and picks its colour.
+    private void DrawAnimatedLine(
+        ImDrawListPtr drawList, float centerX, float top, string text, float progress, float opacity,
+        float strokeDistance, RevealEffect effect)
+    {
+        using (this.fonts.Display.Push())
+        {
+            var tracking = Tracking();
+            var fontSize = ImGui.GetTextLineHeight();
+            var xs = GlyphPositions(text, centerX, tracking);
+
+            for (var i = 0; i < text.Length; i++)
+            {
+                var state = GlyphAnimator.For(effect, i, text.Length, progress, fontSize);
+
+                if (state.Alpha <= 0f)
+                    continue;
+
+                // Heat is the burn's only colour work: from the ember towards the
+                // configured colour as the glyph cools. Every other effect leaves
+                // it at zero and takes the configured colour untouched.
+                var color = state.Heat > 0f
+                    ? Vector4.Lerp(this.config.TextColor, EmberColor, state.Heat)
+                    : this.config.TextColor;
+
+                DrawGlyph(
+                    drawList,
+                    xs[i],
+                    top + state.OffsetY,
+                    text[i],
+                    Packed(color, opacity * state.Alpha),
+                    Packed(this.config.StrokeColor, opacity * state.Alpha),
+                    strokeDistance);
+            }
+        }
+    }
+
+    // What a glyph is at the moment it catches: hot, and well clear of any colour
+    // a player is likely to have chosen for the text itself.
+    private static readonly Vector4 EmberColor = new(1f, 0.55f, 0.15f, 1f);
 
     // ToUpperInvariant rather than ToUpper — see Configuration.UppercaseText for
     // why the culture-sensitive one is the wrong tool here.
@@ -369,19 +476,8 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         ImDrawListPtr drawList, float centerX, float top, string text, float progress, uint fill, uint stroke,
         float strokeDistance)
     {
-        var eorzean = this.fonts.EorzeanDisplay;
-        var useDecode = this.config.DecodeEffectEnabled && eorzean != null && progress < 1f;
-
-        if (!useDecode)
-        {
-            using (this.fonts.Display.Push())
-            {
-                DrawStrokedCentered(
-                    drawList, centerX, top, text, fill, stroke, strokeDistance, Tracking());
-            }
-
-            return;
-        }
+        // Non-null and mid-reveal, both established by the caller.
+        var eorzean = this.fonts.EorzeanDisplay!;
 
         var cipher = BuildCipher(text);
 
@@ -398,12 +494,12 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         // strands the glyphs. Measure both layouts and interpolate: the line starts
         // on Eorzean metrics and settles onto the real ones as it decodes. Both are
         // centred, so it grows symmetrically rather than drifting.
-        var runes = MeasureGlyphs(eorzean!, cipher, centerX, tracking);
+        var runes = MeasureGlyphs(eorzean, cipher, centerX, tracking);
         var plain = MeasureGlyphs(this.fonts.Display, text, centerX, tracking);
 
         var decoded = (int)MathF.Round(progress * text.Length);
 
-        using (eorzean!.Push())
+        using (eorzean.Push())
         {
             for (var i = decoded; i < text.Length; i++)
                 DrawGlyph(drawList, Lerp(runes[i], plain[i], progress), top, cipher[i], fill, stroke, strokeDistance);
@@ -445,17 +541,27 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     private static float[] MeasureGlyphs(IFontHandle font, string text, float centerX, float tracking)
     {
         using (font.Push())
-        {
-            var xs = new float[text.Length];
-            for (var i = 0; i < text.Length; i++)
-                xs[i] = ImGui.CalcTextSize(text[..i]).X + (tracking * i);
+            return GlyphPositions(text, centerX, tracking);
+    }
 
-            var left = centerX - (RunWidth(text, tracking) / 2f);
-            for (var i = 0; i < xs.Length; i++)
-                xs[i] += left;
+    // The same, under whatever font is already pushed.
+    //
+    // Walking prefixes rather than accumulating single glyphs so this agrees to
+    // the pixel with DrawStrokedCentered's untracked path, which hands ImGui the
+    // whole string: both come out of CalcTextSize on the same characters. That
+    // agreement is what lets an animated reveal hand over to the plain run at
+    // full progress without the line shifting.
+    private static float[] GlyphPositions(string text, float centerX, float tracking)
+    {
+        var xs = new float[text.Length];
+        for (var i = 0; i < text.Length; i++)
+            xs[i] = ImGui.CalcTextSize(text[..i]).X + (tracking * i);
 
-            return xs;
-        }
+        var left = centerX - (RunWidth(text, tracking) / 2f);
+        for (var i = 0; i < xs.Length; i++)
+            xs[i] += left;
+
+        return xs;
     }
 
     private static float Lerp(float from, float to, float t) => from + ((to - from) * t);

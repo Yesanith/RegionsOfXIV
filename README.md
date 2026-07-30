@@ -45,7 +45,11 @@ for Guild Wars 2.
 - **Replaces rather than stacks.** Hides the game's own area flash and
   loading-screen title and draws in their place, so an arrival reads as one
   notice instead of two. Both are a checkbox away from coming back.
-- **Decodes from the Eorzean alphabet** as it reveals, glyph by glyph.
+- **Decodes from the Eorzean alphabet** as it reveals, glyph by glyph — or
+  types, rises, waves, or catches alight instead.
+- **Hearts, embers, sparkles or petals** drifting around the text, if that is
+  your sort of thing. Drawn from primitives, so they cost no download and work
+  under every font.
 - **Correct in every language.** Names come from game data rather than from the
   screen, and the default font carries glyphs for every language the client can
   display.
