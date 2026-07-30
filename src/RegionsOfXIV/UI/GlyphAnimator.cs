@@ -10,7 +10,7 @@ namespace RegionsOfXIV.UI;
 // would put the config's palette inside a maths helper.
 internal readonly record struct GlyphState(float OffsetY, float Alpha, float Heat);
 
-// Per-glyph animation for the reveal effects.
+// Per-glyph animation for the motion effects.
 //
 // Every effect is driven from one number — the notification's RevealProgress,
 // 0..1 — turned into a *per-glyph* progress by staggering the start times. That
@@ -28,35 +28,36 @@ internal static class GlyphAnimator
     // would make the line snap in glyph by glyph with visible gaps between.
     private const float GlyphWindow = 0.45f;
 
-    public static GlyphState For(RevealEffect effect, int index, int count, float progress, float fontSize)
+    public static GlyphState For(MotionEffect effect, int index, int count, float progress, float fontSize)
     {
         var local = LocalProgress(index, count, progress);
 
         return effect switch
         {
             // A hard cut, no fade: the glyph is either typed or it is not.
-            RevealEffect.Typewriter => new GlyphState(0f, local > 0f ? 1f : 0f, 0f),
+            MotionEffect.Typewriter => new GlyphState(0f, local > 0f ? 1f : 0f, 0f),
 
             // Up from below, overshooting slightly and settling back — see OutBack.
-            RevealEffect.Rise => new GlyphState((1f - OutBack(local)) * fontSize * 0.5f, local, 0f),
+            MotionEffect.Rise => new GlyphState((1f - OutBack(local)) * fontSize * 0.5f, local, 0f),
 
             // A single bump that returns to the baseline. Travelling, because the
             // stagger puts each glyph at a different point of its own bump.
             //
             // Alpha runs three times faster than the bump so the glyph is visible
             // for nearly all of its ride rather than fading in through it.
-            RevealEffect.Wave => new GlyphState(
+            MotionEffect.Wave => new GlyphState(
                 -MathF.Sin(local * MathF.PI) * fontSize * 0.18f,
                 Clamp01(local * 3f),
                 0f),
 
             // Heat runs the other way from progress: 1 at ignition, 0 once the
             // glyph has cooled into the configured colour.
-            RevealEffect.Burn => new GlyphState(0f, local, 1f - local),
+            MotionEffect.Burn => new GlyphState(0f, local, 1f - local),
 
-            // Decode and Plain do not animate glyphs individually. Decode has its
-            // own path in the overlay — it interpolates between two font layouts,
-            // which is a different kind of per-glyph work than this.
+            // None: every glyph sits where it belongs, fully opaque, from the
+            // first frame. The decode may still be running over the top of that —
+            // it is a substitution rather than a displacement, and has its own
+            // path in the overlay.
             _ => new GlyphState(0f, 1f, 0f),
         };
     }

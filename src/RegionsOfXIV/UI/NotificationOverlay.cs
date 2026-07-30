@@ -360,47 +360,53 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             drawList, centerX, top, text, notification.RevealProgress, notification.Opacity, strokeDistance);
     }
 
-    // Picks the reveal, and handles the two cases every effect shares: a finished
-    // reveal, and a decode with no bundled font to decode from. Both draw the
-    // line plainly, which is also the cheapest path — one AddText per stroke
-    // stamp instead of one per glyph.
+    // Routes between the three ways a line can be drawn.
+    //
+    // Decode and motion are independent, so both can be on at once and the decode
+    // path carries the motion through with it. What they share is the ending: at
+    // full progress every glyph is resolved, at rest and at full alpha, so the
+    // line is drawn as one run — cheaper than either per-glyph path, and identical
+    // in result because both layouts walk the same advances plus the same
+    // tracking.
     private void DrawTextLine(
         ImDrawListPtr drawList, float centerX, float top, string text, float progress, float opacity,
         float strokeDistance)
     {
-        var fill = Packed(this.config.TextColor, opacity);
-        var stroke = Packed(this.config.StrokeColor, opacity);
-        var effect = this.config.Reveal;
+        var motion = this.config.Motion;
+        var decoding = this.config.DecodeEffectEnabled && this.fonts.EorzeanDisplay != null;
 
-        if (effect == RevealEffect.Decode && this.fonts.EorzeanDisplay != null && progress < 1f)
-        {
-            DrawDecodingLine(drawList, centerX, top, text, progress, fill, stroke, strokeDistance);
-            return;
-        }
-
-        // Settled, or nothing to animate. An animated effect at full progress has
-        // every glyph at its final position, alpha and colour, so the plain run
-        // draws the identical result — the two layouts agree glyph for glyph,
-        // since both walk the same advances plus the same tracking.
-        if (progress >= 1f || effect is RevealEffect.Decode or RevealEffect.Plain)
+        if (progress >= 1f || (!decoding && motion == MotionEffect.None))
         {
             using (this.fonts.Display.Push())
             {
                 DrawStrokedCentered(
-                    drawList, centerX, top, text, fill, stroke, strokeDistance, Tracking());
+                    drawList,
+                    centerX,
+                    top,
+                    text,
+                    Packed(this.config.TextColor, opacity),
+                    Packed(this.config.StrokeColor, opacity),
+                    strokeDistance,
+                    Tracking());
             }
 
             return;
         }
 
-        DrawAnimatedLine(drawList, centerX, top, text, progress, opacity, strokeDistance, effect);
+        if (decoding)
+        {
+            DrawDecodingLine(drawList, centerX, top, text, progress, opacity, strokeDistance, motion);
+            return;
+        }
+
+        DrawAnimatedLine(drawList, centerX, top, text, progress, opacity, strokeDistance, motion);
     }
 
-    // The per-glyph reveals: rise, wave, typewriter, burn. GlyphAnimator decides
-    // what each glyph is doing; this places it and picks its colour.
+    // Motion without a decode. GlyphAnimator decides what each glyph is doing;
+    // this places it and picks its colour.
     private void DrawAnimatedLine(
         ImDrawListPtr drawList, float centerX, float top, string text, float progress, float opacity,
-        float strokeDistance, RevealEffect effect)
+        float strokeDistance, MotionEffect effect)
     {
         using (this.fonts.Display.Push())
         {
@@ -472,9 +478,13 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     //
     // Glyphs swap individually rather than cross-fading, which avoids two
     // overlapping glyph shapes turning to mush.
+    //
+    // A motion rides along on top: the substitution is what the decode does, and
+    // where the glyph sits while it happens is the motion's business, so the two
+    // compose without either needing to know about the other.
     private void DrawDecodingLine(
-        ImDrawListPtr drawList, float centerX, float top, string text, float progress, uint fill, uint stroke,
-        float strokeDistance)
+        ImDrawListPtr drawList, float centerX, float top, string text, float progress, float opacity,
+        float strokeDistance, MotionEffect motion)
     {
         // Non-null and mid-reveal, both established by the caller.
         var eorzean = this.fonts.EorzeanDisplay!;
@@ -485,8 +495,12 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         // both layouts — which it has to, or the interpolation below would be
         // sliding between two differently-spaced lines.
         float tracking;
+        float fontSize;
         using (this.fonts.Display.Push())
+        {
             tracking = Tracking();
+            fontSize = ImGui.GetTextLineHeight();
+        }
 
         // The two faces have very different advance widths — the display face is
         // condensed, the Eorzean one is not, and a full-width Japanese glyph is
@@ -497,19 +511,54 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         var runes = MeasureGlyphs(eorzean, cipher, centerX, tracking);
         var plain = MeasureGlyphs(this.fonts.Display, text, centerX, tracking);
 
+        // When a glyph stops being scrambled.
+        //
+        // With no motion this is the order that shipped: a count of glyphs taken
+        // straight off the reveal's progress. With a motion it follows the
+        // motion's own stagger instead, so a letter resolves as it arrives rather
+        // than beating its own animation into place — run on separate clocks, the
+        // two visibly disagree.
         var decoded = (int)MathF.Round(progress * text.Length);
 
-        using (eorzean.Push())
+        bool Resolved(int index) => motion == MotionEffect.None
+            ? index < decoded
+            : GlyphAnimator.LocalProgress(index, text.Length, progress) > 0.5f;
+
+        // Still one pass per font rather than one push per glyph: which half a
+        // glyph belongs to is no longer a contiguous range once the stagger
+        // decides it, but that only means each pass skips the glyphs that are not
+        // its own.
+        void DrawPass(bool resolvedPass)
         {
-            for (var i = decoded; i < text.Length; i++)
-                DrawGlyph(drawList, Lerp(runes[i], plain[i], progress), top, cipher[i], fill, stroke, strokeDistance);
+            for (var i = 0; i < text.Length; i++)
+            {
+                if (Resolved(i) != resolvedPass)
+                    continue;
+
+                var state = GlyphAnimator.For(motion, i, text.Length, progress, fontSize);
+                if (state.Alpha <= 0f)
+                    continue;
+
+                var color = state.Heat > 0f
+                    ? Vector4.Lerp(this.config.TextColor, EmberColor, state.Heat)
+                    : this.config.TextColor;
+
+                DrawGlyph(
+                    drawList,
+                    Lerp(runes[i], plain[i], progress),
+                    top + state.OffsetY,
+                    resolvedPass ? text[i] : cipher[i],
+                    Packed(color, opacity * state.Alpha),
+                    Packed(this.config.StrokeColor, opacity * state.Alpha),
+                    strokeDistance);
+            }
         }
 
+        using (eorzean.Push())
+            DrawPass(resolvedPass: false);
+
         using (this.fonts.Display.Push())
-        {
-            for (var i = 0; i < decoded && i < text.Length; i++)
-                DrawGlyph(drawList, Lerp(runes[i], plain[i], progress), top, text[i], fill, stroke, strokeDistance);
-        }
+            DrawPass(resolvedPass: true);
     }
 
     // What the Eorzean half draws: the text itself wherever the font covers it, and

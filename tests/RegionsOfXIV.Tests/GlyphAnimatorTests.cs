@@ -3,7 +3,7 @@ using RegionsOfXIV.UI;
 
 namespace RegionsOfXIV.Tests;
 
-// The reveal effects, which are otherwise judged by watching them. What is
+// The motion effects, which are otherwise judged by watching them. What is
 // checked here is not how they look — that is a matter of taste and a running
 // game — but the handful of properties that make them safe to hand back to the
 // plain renderer, and that would show up in game as a flicker or a jump rather
@@ -15,17 +15,17 @@ public class GlyphAnimatorTests
 {
     private const float FontSize = 91f;
 
-    private static readonly RevealEffect[] Animated =
+    private static readonly MotionEffect[] Animated =
     [
-        RevealEffect.Typewriter,
-        RevealEffect.Rise,
-        RevealEffect.Wave,
-        RevealEffect.Burn,
+        MotionEffect.Typewriter,
+        MotionEffect.Rise,
+        MotionEffect.Wave,
+        MotionEffect.Burn,
     ];
 
-    public static TheoryData<RevealEffect> AnimatedEffects()
+    public static TheoryData<MotionEffect> AnimatedEffects()
     {
-        var data = new TheoryData<RevealEffect>();
+        var data = new TheoryData<MotionEffect>();
         foreach (var effect in Animated)
             data.Add(effect);
 
@@ -38,7 +38,7 @@ public class GlyphAnimatorTests
     // jumps.
     [Theory]
     [MemberData(nameof(AnimatedEffects))]
-    public void EveryEffectIsAtRestWhenTheRevealCompletes(RevealEffect effect)
+    public void EveryEffectIsAtRestWhenTheRevealCompletes(MotionEffect effect)
     {
         foreach (var count in new[] { 1, 2, 7, 40 })
         {
@@ -55,14 +55,14 @@ public class GlyphAnimatorTests
 
     [Theory]
     [MemberData(nameof(AnimatedEffects))]
-    public void NothingIsDrawnBeforeTheRevealStarts(RevealEffect effect)
+    public void NothingIsDrawnBeforeTheRevealStarts(MotionEffect effect)
     {
         Assert.Equal(0f, GlyphAnimator.For(effect, 0, 12, 0f, FontSize).Alpha);
     }
 
     [Theory]
     [MemberData(nameof(AnimatedEffects))]
-    public void AlphaStaysWithinRange(RevealEffect effect)
+    public void AlphaStaysWithinRange(MotionEffect effect)
     {
         for (var i = 0; i < 20; i++)
         {
@@ -113,18 +113,44 @@ public class GlyphAnimatorTests
         }
     }
 
+    // --- what the decode rides on -------------------------------------------
+    //
+    // With a motion running, NotificationOverlay stops flipping glyphs out of
+    // Eorzean on a count of its own and asks the stagger instead: a glyph has
+    // resolved once it is past the midpoint of its own animation. These pin the
+    // two properties that rule has to have.
+
+    [Fact]
+    public void EveryGlyphIsPastTheMidpointByTheEnd()
+    {
+        // One still short of it would be swapped from scrambled to readable in a
+        // single frame when the overlay hands over to the plain run.
+        foreach (var count in new[] { 1, 2, 7, 40 })
+        {
+            for (var i = 0; i < count; i++)
+                Assert.True(GlyphAnimator.LocalProgress(i, count, 1f) > 0.5f, $"glyph {i} of {count}");
+        }
+    }
+
+    [Fact]
+    public void NoGlyphIsPastTheMidpointAtTheStart()
+    {
+        for (var i = 0; i < 20; i++)
+            Assert.False(GlyphAnimator.LocalProgress(i, 20, 0f) > 0.5f, $"glyph {i}");
+    }
+
     // --- individual effects -------------------------------------------------
 
     [Fact]
     public void RiseComesUpFromBelowAndOvershoots()
     {
-        Assert.True(GlyphAnimator.For(RevealEffect.Rise, 0, 12, 0f, FontSize).OffsetY > 0f);
+        Assert.True(GlyphAnimator.For(MotionEffect.Rise, 0, 12, 0f, FontSize).OffsetY > 0f);
 
         // Somewhere in the middle it must pass its target and come back, which is
         // what separates this from a plain ease-out.
         var highest = 0f;
         for (var step = 0; step <= 100; step++)
-            highest = MathF.Min(highest, GlyphAnimator.For(RevealEffect.Rise, 0, 1, step / 100f, FontSize).OffsetY);
+            highest = MathF.Min(highest, GlyphAnimator.For(MotionEffect.Rise, 0, 1, step / 100f, FontSize).OffsetY);
 
         Assert.True(highest < 0f, "Rise never overshot its target");
     }
@@ -132,8 +158,8 @@ public class GlyphAnimatorTests
     [Fact]
     public void WaveRestsAtBothEndsOfItsBump()
     {
-        Assert.Equal(0f, GlyphAnimator.For(RevealEffect.Wave, 0, 12, 0f, FontSize).OffsetY, 5);
-        Assert.Equal(0f, GlyphAnimator.For(RevealEffect.Wave, 0, 12, 1f, FontSize).OffsetY, 5);
+        Assert.Equal(0f, GlyphAnimator.For(MotionEffect.Wave, 0, 12, 0f, FontSize).OffsetY, 5);
+        Assert.Equal(0f, GlyphAnimator.For(MotionEffect.Wave, 0, 12, 1f, FontSize).OffsetY, 5);
     }
 
     [Fact]
@@ -143,13 +169,13 @@ public class GlyphAnimatorTests
 
         for (var step = 0; step <= 100; step++)
         {
-            var heat = GlyphAnimator.For(RevealEffect.Burn, 3, 12, step / 100f, FontSize).Heat;
+            var heat = GlyphAnimator.For(MotionEffect.Burn, 3, 12, step / 100f, FontSize).Heat;
 
             Assert.True(heat <= previous, $"heat rose again at {step}%");
             previous = heat;
         }
 
-        Assert.Equal(1f, GlyphAnimator.For(RevealEffect.Burn, 3, 12, 0f, FontSize).Heat, 5);
+        Assert.Equal(1f, GlyphAnimator.For(MotionEffect.Burn, 3, 12, 0f, FontSize).Heat, 5);
     }
 
     // Typewriter is the one effect with no in-between: a glyph is typed or it is
@@ -159,7 +185,7 @@ public class GlyphAnimatorTests
     {
         for (var step = 0; step <= 100; step++)
         {
-            var alpha = GlyphAnimator.For(RevealEffect.Typewriter, 5, 12, step / 100f, FontSize).Alpha;
+            var alpha = GlyphAnimator.For(MotionEffect.Typewriter, 5, 12, step / 100f, FontSize).Alpha;
 
             Assert.True(alpha is 0f or 1f, $"alpha was {alpha} at {step}%");
         }

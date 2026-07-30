@@ -29,16 +29,18 @@ public enum DisplayFontChoice
     NotoSansCjk,
 }
 
-// How the text arrives. Same append-only rule as DisplayFontChoice above: the
-// numeric value is what lands in the saved config, so new effects go on the end.
+// How the glyphs move as the text arrives. Same append-only rule as
+// DisplayFontChoice above: the numeric value is what lands in the saved config,
+// so new motions go on the end.
 //
-// Decode leads because it is the default and the one the plugin was built around.
-// Plain is not "no effect" in the sense of nothing happening — the notification
-// still fades in, holds and fades out; it is the reveal itself that is skipped.
-public enum RevealEffect
+// A separate axis from the decode, not a replacement for it. The decode is a
+// substitution — Eorzean forms resolving into readable ones — and a motion is a
+// displacement, so the two compose: letters can rise into place while they
+// resolve. None is the default, which is the plugin as it shipped: a decode and
+// no movement.
+public enum MotionEffect
 {
-    Decode,
-    Plain,
+    None,
     Typewriter,
     Rise,
     Wave,
@@ -46,7 +48,7 @@ public enum RevealEffect
 }
 
 // Ambient particles, drawn around the text for as long as it is on screen. A
-// separate axis from RevealEffect deliberately: embers under a burn is the
+// separate axis from MotionEffect deliberately: embers under a burn is the
 // obvious pairing, but nothing stops hearts under a decode, and keeping the two
 // orthogonal is both less code and more combinations.
 //
@@ -75,11 +77,7 @@ public class Configuration : IPluginConfiguration, IGateSettings
     // at the default its initializer gave it, which is the right answer for a new
     // setting. It is renames, retypes and changes of *meaning* that need one —
     // those are the cases where a file reads cleanly but says the wrong thing.
-    // 2: DecodeEffectEnabled (bool) became Reveal (RevealEffect). A rename and a
-    //    retype of an existing setting, which is exactly the case a version bump
-    //    is for — the old field reads cleanly and would otherwise say the wrong
-    //    thing, since a stored "false" means Plain rather than "default Decode".
-    public const int CurrentVersion = 2;
+    public const int CurrentVersion = 1;
 
     public int Version { get; set; } = CurrentVersion;
 
@@ -143,18 +141,18 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
     public bool OverlapHeader { get; set; } = true;
 
-    // Legacy, version 1 only. Superseded by Reveal below, and kept solely so the
-    // v1 -> v2 migration can read what the user had chosen: delete the property
-    // and the stored field has nothing to deserialize into, so everyone who had
-    // turned the decode off would silently get it back.
+    // Eorzean -> Latin decode during the reveal. Silently inert when no font is
+    // bundled, or when the text falls outside the font's Latin coverage.
     //
-    // Nothing reads this outside Migrate().
+    // Kept as its own switch rather than folded in as one value of MotionEffect:
+    // the decode is what the plugin is *for*, it composes with every motion
+    // rather than competing with them, and presets deliberately leave it alone so
+    // that turning it off stays one decision made in one place.
     public bool DecodeEffectEnabled { get; set; } = true;
 
-    // How the text arrives. Decode is the effect the plugin shipped with, and is
-    // silently inert when no Eorzean font is bundled, or when the text falls
-    // outside that font's Latin coverage — in which case it plays as Plain.
-    public RevealEffect Reveal { get; set; } = RevealEffect.Decode;
+    // How the glyphs move while that happens. None by default — a decode and no
+    // movement is the plugin as it shipped.
+    public MotionEffect Motion { get; set; } = MotionEffect.None;
 
     // Ambient particles. Off by default: this is a location notification first,
     // and hearts drifting off every sub-area change is a taste, not a default.
@@ -247,15 +245,7 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
         var from = Version;
 
-        // A bool that meant "decode, or nothing" becomes one choice among several.
-        // Only the off case carries information: everyone else was on Decode,
-        // which is the property's own default, so the true branch is written out
-        // for what it says rather than for what it changes.
-        if (Version < 2)
-        {
-            Reveal = DecodeEffectEnabled ? RevealEffect.Decode : RevealEffect.Plain;
-            Version = 2;
-        }
+        // (no steps yet)
 
         Version = CurrentVersion;
         Plugin.Log.Information($"Migrated the configuration from version {from} to {CurrentVersion}.");

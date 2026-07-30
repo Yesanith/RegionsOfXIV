@@ -167,6 +167,22 @@ internal sealed class ConfigWindow : Window, IDisposable
             changed = true;
         }
 
+        var decode = this.config.DecodeEffectEnabled;
+        if (ImGui.Checkbox("Decode from Eorzean script", ref decode))
+        {
+            this.config.DecodeEffectEnabled = decode;
+            changed = true;
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                "Requires a bundled Eorzean font. Latin text only.\n\n" +
+                "Independent of the motion on the Effects tab — letters can resolve\n" +
+                "out of Eorzean while they rise, wave or burn. Presets leave this\n" +
+                "alone, so turning it off here turns it off for all of them.");
+        }
+
         var textColor = this.config.TextColor;
         if (ImGui.ColorEdit4("Text colour", ref textColor, ImGuiColorEditFlags.NoInputs))
         {
@@ -270,18 +286,52 @@ internal sealed class ConfigWindow : Window, IDisposable
 
         var changed = false;
 
-        ImGui.TextWrapped("How the text arrives.");
+        // Presets first: they are the fastest way to a look worth keeping, and
+        // everything below them is how you adjust one afterwards.
+        ImGui.TextWrapped("Start from a look, then change anything you like.");
 
-        using (var combo = ImRaii.Combo("Reveal", Label(this.config.Reveal)))
+        // Laid out as a wrapping row of buttons rather than a combo, because a
+        // preset is an action and not a stored state — nothing here is "current",
+        // and a combo would imply otherwise.
+        var available = ImGui.GetContentRegionAvail().X;
+        var spent = 0f;
+
+        foreach (var preset in Presets.All)
+        {
+            var width = ImGui.CalcTextSize(preset.Name).X + (ImGui.GetStyle().FramePadding.X * 2f);
+
+            if (spent > 0f && spent + width < available)
+                ImGui.SameLine();
+            else
+                spent = 0f;
+
+            spent += width + ImGui.GetStyle().ItemSpacing.X;
+
+            if (ImGui.Button(preset.Name))
+            {
+                preset.Apply(this.config);
+                changed = true;
+            }
+
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip(preset.Description);
+        }
+
+        ImGui.TextDisabled("Presets set motion, particles and colours. They leave the decode, font and position as you have them.");
+
+        ImGui.Separator();
+        ImGui.TextWrapped("How the letters move as they arrive.");
+
+        using (var combo = ImRaii.Combo("Motion", Label(this.config.Motion)))
         {
             if (combo)
             {
-                foreach (var choice in Enum.GetValues<RevealEffect>())
+                foreach (var choice in Enum.GetValues<MotionEffect>())
                 {
-                    if (!ImGui.Selectable(Label(choice), choice == this.config.Reveal))
+                    if (!ImGui.Selectable(Label(choice), choice == this.config.Motion))
                         continue;
 
-                    this.config.Reveal = choice;
+                    this.config.Motion = choice;
                     changed = true;
                 }
             }
@@ -290,22 +340,12 @@ internal sealed class ConfigWindow : Window, IDisposable
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip(
-                "Decode — resolves out of the Eorzean alphabet, glyph by glyph.\n" +
-                "Plain — no reveal; the notification still fades in and out.\n" +
+                "None — the letters simply appear where they belong.\n" +
                 "Typewriter — one letter at a time, no fade.\n" +
                 "Rise — letters lift into place from below.\n" +
                 "Wave — letters ride a wave through the line as it appears.\n" +
-                "Burn — letters catch alight and cool into their colour.");
-        }
-
-        // The decode is the one reveal with a dependency, and it fails quietly:
-        // no bundled font means it plays as Plain. Better said here than
-        // discovered as "the effect does not work".
-        if (this.config.Reveal == RevealEffect.Decode)
-        {
-            ImGui.TextWrapped(
-                "Needs the bundled Eorzean font, and only Latin text has Eorzean forms. " +
-                "Without either it plays as Plain.");
+                "Burn — letters catch alight and cool into their colour.\n\n" +
+                "Runs alongside the Eorzean decode rather than instead of it.");
         }
 
         ImGui.Separator();
@@ -353,8 +393,8 @@ internal sealed class ConfigWindow : Window, IDisposable
 
             // Embers under a burn is the pairing these were built for, but the two
             // are independent settings and neither implies the other.
-            if (this.config.Particles == ParticleEffect.Embers && this.config.Reveal != RevealEffect.Burn)
-                ImGui.TextWrapped("Embers go with the Burn reveal, but they do not need it.");
+            if (this.config.Particles == ParticleEffect.Embers && this.config.Motion != MotionEffect.Burn)
+                ImGui.TextWrapped("Embers go with the Burn motion, but they do not need it.");
         }
 
         ImGui.Separator();
@@ -484,14 +524,13 @@ internal sealed class ConfigWindow : Window, IDisposable
     // The enum names read well enough for these two, so the labels exist to name
     // the default and to keep an unknown value — a config from a newer build —
     // from showing as nothing at all.
-    private static string Label(RevealEffect effect) => effect switch
+    private static string Label(MotionEffect effect) => effect switch
     {
-        RevealEffect.Decode => "Decode from Eorzean (default)",
-        RevealEffect.Plain => "Plain",
-        RevealEffect.Typewriter => "Typewriter",
-        RevealEffect.Rise => "Rise",
-        RevealEffect.Wave => "Wave",
-        RevealEffect.Burn => "Burn",
+        MotionEffect.None => "None",
+        MotionEffect.Typewriter => "Typewriter",
+        MotionEffect.Rise => "Rise",
+        MotionEffect.Wave => "Wave",
+        MotionEffect.Burn => "Burn",
         _ => effect.ToString(),
     };
 
