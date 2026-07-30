@@ -146,12 +146,6 @@ internal sealed class ParticleField
         }
     }
 
-    public void Clear()
-    {
-        this.particles.Clear();
-        this.pending = 0f;
-    }
-
     // Per-second spawn rates at density 1. Sparkles are the densest because they
     // are the smallest and the shortest-lived; hearts the sparsest because they
     // are the most conspicuous and a crowd of them reads as spam rather than as

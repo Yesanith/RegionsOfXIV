@@ -15,16 +15,6 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
 {
     private const float StackSpacing = 46f;
 
-    // ImGui has no text outline, so the stroke is built by stamping the glyph run
-    // around the origin before drawing the fill on top. 8-way gives a cleaner edge
-    // than 4-way.
-    private static readonly Vector2[] StrokeOffsets =
-    [
-        new(-1, -1), new(0, -1), new(1, -1),
-        new(-1, 0), new(1, 0),
-        new(-1, 1), new(0, 1), new(1, 1),
-    ];
-
     private readonly Configuration config;
     private readonly FontService fonts;
 
@@ -195,108 +185,6 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         }
     }
 
-    // --- Text rendering (inlined from TextPainter) -------------------------
-
-    private static void DrawStroked(
-        ImDrawListPtr drawList,
-        Vector2 position,
-        string text,
-        uint fillColor,
-        uint strokeColor,
-        float strokeDistance)
-    {
-        if (string.IsNullOrEmpty(text))
-            return;
-
-        if (strokeDistance > 0f)
-        {
-            foreach (var offset in StrokeOffsets)
-                drawList.AddText(position + (offset * strokeDistance), strokeColor, text);
-        }
-
-        drawList.AddText(position, fillColor, text);
-    }
-
-    // Width of a glyph run under the font currently pushed, tracking included.
-    // The gap belongs *between* glyphs, so N of them carry N-1 gaps and the run
-    // ends at the last glyph's own edge rather than a space past it — otherwise a
-    // tracked line would sit visibly left of centre.
-    private static float RunWidth(string text, float tracking)
-    {
-        var width = ImGui.CalcTextSize(text).X;
-
-        return tracking > 0f && text.Length > 1
-            ? width + (tracking * (text.Length - 1))
-            : width;
-    }
-
-    // The whole line in one run, centred. Untracked only: ImGui lays a string out
-    // on the font's own advances and has no letter spacing to ask for, so this is
-    // the path for when none was asked for. Also the cheapest by a wide margin —
-    // one AddText per stroke stamp rather than one per glyph.
-    private static void DrawCentered(
-        ImDrawListPtr drawList,
-        float centerX,
-        float top,
-        string text,
-        uint fillColor,
-        uint strokeColor,
-        float strokeDistance)
-    {
-        if (string.IsNullOrEmpty(text))
-            return;
-
-        var left = centerX - (ImGui.CalcTextSize(text).X / 2f);
-
-        DrawStroked(drawList, new Vector2(left, top), text, fillColor, strokeColor, strokeDistance);
-    }
-
-    // A line placed glyph by glyph, at positions worked out once and remembered.
-    //
-    // Splitting the run does not change how it renders: ImGui applies no kerning
-    // pairs, so a glyph draws the same alone as it does in company.
-    private static void DrawRun(
-        ImDrawListPtr drawList,
-        float[] positions,
-        string text,
-        float top,
-        uint fillColor,
-        uint strokeColor,
-        float strokeDistance)
-    {
-        for (var i = 0; i < text.Length; i++)
-            DrawGlyph(drawList, positions[i], top, text[i], fillColor, strokeColor, strokeDistance);
-    }
-
-    // Drawn as two halves so it can animate outward from the centre, and drawn
-    // before the header text so descenders and serifs are not overdrawn.
-    private static void DrawUnderline(
-        ImDrawListPtr drawList,
-        float centerX,
-        float y,
-        float fullWidth,
-        float progress,
-        uint fillColor,
-        uint borderColor,
-        float thickness = 2f)
-    {
-        var width = fullWidth * float.Clamp(progress, 0f, 1f);
-        if (width <= 0f)
-            return;
-
-        var half = width / 2f;
-
-        drawList.AddRectFilled(
-            new Vector2(centerX - half - 1, y - 1),
-            new Vector2(centerX + half + 1, y + thickness + 1),
-            borderColor);
-
-        drawList.AddRectFilled(
-            new Vector2(centerX - half, y),
-            new Vector2(centerX + half, y + thickness),
-            fillColor);
-    }
-
     // --- Notification rendering --------------------------------------------
 
     private void DrawOne(AreaNotification notification)
@@ -309,9 +197,8 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
                   + (viewport.Size.Y * (this.config.VerticalPosition / 100f))
                   + (notification.StackOffset * ImGuiHelpers.GlobalScale);
 
-        var fill = Packed(this.config.TextColor, notification.Opacity);
-        var headerFill = Packed(this.config.HeaderColor, notification.Opacity);
-        var stroke = Packed(this.config.StrokeColor, notification.Opacity);
+        var headerFill = GlyphPainter.Packed(this.config.HeaderColor, notification.Opacity);
+        var stroke = GlyphPainter.Packed(this.config.StrokeColor, notification.Opacity);
         var strokeDistance = ImGuiHelpers.GlobalScale * this.config.StrokeThickness;
 
         // Cased here rather than when the notification was built, so toggling the
@@ -327,26 +214,25 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             using (this.fonts.Header.Push())
             {
                 var tracking = Tracking();
-                var headerWidth = RunWidth(header, tracking);
 
                 if (this.config.UnderlineHeader)
                 {
                     var underlineY = top + ImGui.GetTextLineHeight() + (4f * ImGuiHelpers.GlobalScale);
-                    DrawUnderline(
-                        drawList, centerX, underlineY, headerWidth,
+                    GlyphPainter.DrawUnderline(
+                        drawList, centerX, underlineY, GlyphPainter.RunWidth(header, tracking),
                         notification.RevealProgress, headerFill, stroke,
                         2f * ImGuiHelpers.GlobalScale);
                 }
 
                 if (tracking > 0f)
                 {
-                    DrawRun(
+                    GlyphPainter.DrawRun(
                         drawList, Positions(notification.HeaderLayout, header, tracking, centerX),
                         header, top, headerFill, stroke, strokeDistance);
                 }
                 else
                 {
-                    DrawCentered(drawList, centerX, top, header, headerFill, stroke, strokeDistance);
+                    GlyphPainter.DrawCentered(drawList, centerX, top, header, headerFill, stroke, strokeDistance);
                 }
 
                 top += ImGui.GetTextLineHeight() * (this.config.OverlapHeader ? 1.1f : 1.6f);
@@ -370,7 +256,7 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             {
                 var lineHeight = ImGui.GetTextLineHeight();
                 center = new Vector2(centerX, top + (lineHeight / 2f));
-                extent = new Vector2(RunWidth(text, Tracking()) / 2f, lineHeight / 2f);
+                extent = new Vector2(GlyphPainter.RunWidth(text, Tracking()) / 2f, lineHeight / 2f);
             }
 
             // Before the text, so glyphs stay legible with particles behind them.
@@ -435,8 +321,8 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
                 top,
                 text,
                 revealProgress,
-                Packed(this.config.TextColor, opacity),
-                Packed(this.config.StrokeColor, opacity),
+                GlyphPainter.Packed(this.config.TextColor, opacity),
+                GlyphPainter.Packed(this.config.StrokeColor, opacity),
                 strokeDistance);
 
             return;
@@ -447,19 +333,19 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         // motion and the decode together.
         using (this.fonts.Display.Push())
         {
-            var fill = Packed(this.config.TextColor, opacity);
-            var stroke = Packed(this.config.StrokeColor, opacity);
+            var fill = GlyphPainter.Packed(this.config.TextColor, opacity);
+            var stroke = GlyphPainter.Packed(this.config.StrokeColor, opacity);
             var tracking = Tracking();
 
             if (tracking > 0f)
             {
-                DrawRun(
+                GlyphPainter.DrawRun(
                     drawList, Positions(notification.DisplayLayout, text, tracking, centerX),
                     text, top, fill, stroke, strokeDistance);
             }
             else
             {
-                DrawCentered(drawList, centerX, top, text, fill, stroke, strokeDistance);
+                GlyphPainter.DrawCentered(drawList, centerX, top, text, fill, stroke, strokeDistance);
             }
         }
     }
@@ -477,7 +363,7 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         float opacity, float strokeDistance, MotionEffect motion)
     {
         var eorzean = this.fonts.EorzeanDisplay!;
-        var cipher = notification.Cipher ??= BuildCipher(notification.CasedText);
+        var cipher = notification.Cipher ??= EorzeanCipher.Build(notification.CasedText);
 
         float tracking;
         float fontSize;
@@ -487,12 +373,10 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             fontSize = ImGui.GetTextLineHeight();
         }
 
-        float[] xs;
-        using (eorzean.Push())
-            xs = Positions(notification.CipherLayout, cipher, tracking, centerX);
-
         using (eorzean.Push())
         {
+            var xs = Positions(notification.CipherLayout, cipher, tracking, centerX);
+
             for (var i = 0; i < cipher.Length; i++)
             {
                 var state = GlyphAnimator.For(motion, i, cipher.Length, progress, fontSize);
@@ -504,13 +388,13 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
                     ? Vector4.Lerp(this.config.TextColor, EmberColor, state.Heat)
                     : this.config.TextColor;
 
-                DrawGlyph(
+                GlyphPainter.DrawGlyph(
                     drawList,
                     xs[i],
                     top + state.OffsetY,
                     cipher[i],
-                    Packed(color, opacity * state.Alpha),
-                    Packed(this.config.StrokeColor, opacity * state.Alpha),
+                    GlyphPainter.Packed(color, opacity * state.Alpha),
+                    GlyphPainter.Packed(this.config.StrokeColor, opacity * state.Alpha),
                     strokeDistance);
             }
         }
@@ -542,16 +426,29 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
                     ? Vector4.Lerp(this.config.TextColor, EmberColor, state.Heat)
                     : this.config.TextColor;
 
-                DrawGlyph(
+                GlyphPainter.DrawGlyph(
                     drawList,
                     xs[i],
                     top + state.OffsetY,
                     text[i],
-                    Packed(color, opacity * state.Alpha),
-                    Packed(this.config.StrokeColor, opacity * state.Alpha),
+                    GlyphPainter.Packed(color, opacity * state.Alpha),
+                    GlyphPainter.Packed(this.config.StrokeColor, opacity * state.Alpha),
                     strokeDistance);
             }
         }
+    }
+
+    // Glyph positions for a line, from the cache when it still holds and worked
+    // out afresh when it does not. The font must already be pushed: what is being
+    // remembered is a measurement against it, which is also why the font's
+    // generation is part of the key.
+    private float[] Positions(LineLayout cache, string text, float tracking, float centerX)
+    {
+        var generation = this.fonts.Generation;
+
+        return cache.IsCurrent(text, tracking, centerX, generation)
+            ? cache.Positions
+            : cache.Store(text, tracking, centerX, generation, GlyphPainter.GlyphPositions(text, centerX, tracking));
     }
 
     // What a glyph is at the moment it catches: hot, and well clear of any colour
@@ -588,7 +485,7 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         // Non-null and mid-reveal, both established by the caller.
         var eorzean = this.fonts.EorzeanDisplay!;
 
-        var cipher = notification.Cipher ??= BuildCipher(text);
+        var cipher = notification.Cipher ??= EorzeanCipher.Build(text);
 
         // Both handles are built at the display size, so one tracking value serves
         // both layouts — which it has to, or the interpolation below would be
@@ -616,120 +513,14 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         using (eorzean.Push())
         {
             for (var i = decoded; i < text.Length; i++)
-                DrawGlyph(drawList, Lerp(runes[i], plain[i], progress), top, cipher[i], fill, stroke, strokeDistance);
+                GlyphPainter.DrawGlyph(drawList, GlyphPainter.Lerp(runes[i], plain[i], progress), top, cipher[i], fill, stroke, strokeDistance);
         }
 
         using (this.fonts.Display.Push())
         {
             for (var i = 0; i < decoded && i < text.Length; i++)
-                DrawGlyph(drawList, Lerp(runes[i], plain[i], progress), top, text[i], fill, stroke, strokeDistance);
+                GlyphPainter.DrawGlyph(drawList, GlyphPainter.Lerp(runes[i], plain[i], progress), top, text[i], fill, stroke, strokeDistance);
         }
     }
 
-    // What the Eorzean half draws: the text itself wherever the font covers it, and
-    // a stand-in letter wherever it does not. Same length as the input, so the two
-    // layouts stay index-aligned and a glyph's scrambled and resolved forms occupy
-    // the same slot.
-    //
-    // The substitution is derived from the character and its position rather than
-    // from a random source, so it is stable frame to frame. A fresh draw would make
-    // the undecoded half flicker, which reads as a rendering fault rather than as
-    // an effect.
-    private static string BuildCipher(string text)
-    {
-        Span<char> cipher = text.Length <= 128 ? stackalloc char[text.Length] : new char[text.Length];
-
-        for (var i = 0; i < text.Length; i++)
-        {
-            var c = text[i];
-            cipher[i] = IsCoveredByEorzeanFont(c)
-                ? c
-                : CipherAlphabet[((c * 31) + i) % CipherAlphabet.Length];
-        }
-
-        return new string(cipher);
-    }
-
-    // Glyph positions for a line, from the cache when it still holds and worked
-    // out afresh when it does not. The font must already be pushed: what is being
-    // remembered is a measurement against it, which is also why the font's
-    // generation is part of the key.
-    private float[] Positions(LineLayout cache, string text, float tracking, float centerX)
-    {
-        var generation = this.fonts.Generation;
-
-        return cache.IsCurrent(text, tracking, centerX, generation)
-            ? cache.Positions
-            : cache.Store(text, tracking, centerX, generation, GlyphPositions(text, centerX, tracking));
-    }
-
-    // Absolute X of every glyph under whatever font is pushed, with the given
-    // tracking, centred on centerX.
-    //
-    // Walking prefixes rather than accumulating single glyphs so this agrees to
-    // the pixel with DrawStrokedCentered's untracked path, which hands ImGui the
-    // whole string: both come out of CalcTextSize on the same characters. That
-    // agreement is what lets an animated reveal hand over to the plain run at
-    // full progress without the line shifting.
-    private static float[] GlyphPositions(string text, float centerX, float tracking)
-    {
-        var xs = new float[text.Length];
-        for (var i = 0; i < text.Length; i++)
-            xs[i] = ImGui.CalcTextSize(text[..i]).X + (tracking * i);
-
-        var left = centerX - (RunWidth(text, tracking) / 2f);
-        for (var i = 0; i < xs.Length; i++)
-            xs[i] += left;
-
-        return xs;
-    }
-
-    private static float Lerp(float from, float to, float t) => from + ((to - from) * t);
-
-    private static uint Packed(Vector4 color, float alpha) =>
-        ImGui.ColorConvertFloat4ToU32(color with { W = color.W * alpha });
-
-    private static void DrawGlyph(
-        ImDrawListPtr drawList, float x, float y, char glyph, uint fill, uint stroke, float strokeDistance)
-    {
-        if (glyph == ' ')
-            return;
-
-        DrawStroked(drawList, new Vector2(x, y), Single(glyph), fill, stroke, strokeDistance);
-    }
-
-    // ImDrawList.AddText wants a string, and a char is not one. Building that
-    // string per glyph per frame is an allocation for every letter of every line
-    // sixty times a second, so the ones that recur are made once.
-    //
-    // ASCII only: it covers every English, French and German place name in the
-    // game and the whole of the Eorzean cipher, and a table over every char would
-    // be 64k entries to serve the handful of Japanese lines that miss.
-    private static readonly string[] AsciiGlyphs = BuildAsciiGlyphs();
-
-    private static string[] BuildAsciiGlyphs()
-    {
-        var glyphs = new string[128];
-        for (var i = 0; i < glyphs.Length; i++)
-            glyphs[i] = ((char)i).ToString();
-
-        return glyphs;
-    }
-
-    private static string Single(char glyph) =>
-        glyph < AsciiGlyphs.Length ? AsciiGlyphs[glyph] : glyph.ToString();
-
-    // U+024F, the last codepoint of Latin Extended-B, and the end of the bundled
-    // Eorzean font's coverage. Its 240 glyphs run from ASCII through the accented
-    // Latin forms and stop there — no CJK, no Cyrillic, no Greek. Anything past
-    // this point has no Eorzean form and needs a stand-in during the reveal.
-    private const char EorzeanCoverageEnd = 'ɏ';
-
-    // Letters the stand-in is drawn from. Uppercase only: the Eorzean uppercase
-    // forms are the more ornate ones, and they are closer in width to a full-width
-    // Japanese glyph than the lowercase, which keeps the line from having to grow
-    // too far as it decodes.
-    private const string CipherAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-    private static bool IsCoveredByEorzeanFont(char c) => c <= EorzeanCoverageEnd;
 }
