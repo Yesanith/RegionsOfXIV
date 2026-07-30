@@ -28,7 +28,7 @@ internal sealed class NativeUiSuppressor : IDisposable
     // Raised when the game puts up its own area text, carrying whatever it was
     // about to display. Primarily a signal that an announcement is due; the text
     // is the tie-breaker for when TerritoryInfo disagrees or has nothing.
-    public event Action<string?>? AreaTextShown;
+    public event Action<string?>? OnAreaTextShown;
 
     public NativeUiSuppressor(Configuration config)
     {
@@ -72,7 +72,7 @@ internal sealed class NativeUiSuppressor : IDisposable
         Suppress(type, args, this.config.HideNativeAreaText);
 
         if (isContentEvent)
-            AreaTextShown?.Invoke(text);
+            OnAreaTextShown?.Invoke(text);
     }
 
     // Walk the node list for the first text node with content. Read before the
