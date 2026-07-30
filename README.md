@@ -67,7 +67,7 @@ for Guild Wars 2.
 
 ## Installing
 
-> **0.1.0.0** — confirmed working in game, but not yet on Dalamud's plugin
+> **0.1.1.0** — confirmed working in game, but not yet on Dalamud's plugin
 > installer. A [D17](https://github.com/goatcorp/DalamudPluginsD17) submission is
 > the next step; until it lands, install it yourself:
 
@@ -111,8 +111,8 @@ The tests need neither the game nor Dalamud, so they run anywhere the SDK does:
 dotnet test RegionsOfXIV.sln -c Release
 ```
 
-How the four detection sources fit together, and where each piece lives, is in
-[ARCHITECTURE.md](ARCHITECTURE.md).
+How the four detection sources fit together, and where each piece lives, is
+documented in the source itself — start at `Services/AnnouncementCoordinator.cs`.
 
 ## Feedback
 

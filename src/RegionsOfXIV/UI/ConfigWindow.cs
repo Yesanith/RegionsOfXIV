@@ -60,6 +60,10 @@ internal sealed class ConfigWindow : Window, IDisposable
 
         var changed = false;
 
+        // See the Effects tab: turning the decode on or off changes what the
+        // reveal does, and a sample already on screen has finished revealing.
+        var restart = false;
+
         var verticalPosition = this.config.VerticalPosition;
         if (ImGui.SliderFloat("Vertical position", ref verticalPosition, 0f, 100f, "%.0f%%"))
         {
@@ -171,16 +175,17 @@ internal sealed class ConfigWindow : Window, IDisposable
         if (ImGui.Checkbox("Decode from Eorzean script", ref decode))
         {
             this.config.DecodeEffectEnabled = decode;
-            changed = true;
+            restart = true;
         }
 
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip(
                 "Requires a bundled Eorzean font. Latin text only.\n\n" +
-                "Independent of the motion on the Effects tab — letters can resolve\n" +
-                "out of Eorzean while they rise, wave or burn. Presets leave this\n" +
-                "alone, so turning it off here turns it off for all of them.");
+                "Runs after the motion on the Effects tab rather than alongside it:\n" +
+                "the line arrives in Eorzean, lands, then resolves. Turned off, it\n" +
+                "arrives already readable. Presets leave this alone, so switching it\n" +
+                "off here switches it off for all of them.");
         }
 
         var textColor = this.config.TextColor;
@@ -264,7 +269,7 @@ internal sealed class ConfigWindow : Window, IDisposable
         if (ImGui.Button("Preview"))
             this.actions.Preview(SampleHeader, SampleText);
 
-        if (changed)
+        if (changed || restart)
         {
             // Size and family changes need new atlas handles; doing it here keeps
             // the rebuild off the draw path.
@@ -275,7 +280,10 @@ internal sealed class ConfigWindow : Window, IDisposable
             // just chosen rather than the previous one. Everything on this tab
             // changes how a notification looks, so every change earns a preview —
             // that is the whole point of the tab.
-            this.actions.LivePreview(SampleHeader, SampleText);
+            if (restart)
+                this.actions.Preview(SampleHeader, SampleText);
+            else
+                this.actions.LivePreview(SampleHeader, SampleText);
         }
     }
 
@@ -285,6 +293,11 @@ internal sealed class ConfigWindow : Window, IDisposable
         if (!tab) return;
 
         var changed = false;
+
+        // Changes that alter the animation itself rather than how it looks. A
+        // sample already on screen is past its motion stage, so keeping it alive
+        // would show nothing: these have to start a fresh one to be seen at all.
+        var restart = false;
 
         // Presets first: they are the fastest way to a look worth keeping, and
         // everything below them is how you adjust one afterwards.
@@ -310,7 +323,7 @@ internal sealed class ConfigWindow : Window, IDisposable
             if (ImGui.Button(preset.Name))
             {
                 preset.Apply(this.config);
-                changed = true;
+                restart = true;
             }
 
             if (ImGui.IsItemHovered())
@@ -332,7 +345,7 @@ internal sealed class ConfigWindow : Window, IDisposable
                         continue;
 
                     this.config.Motion = choice;
-                    changed = true;
+                    restart = true;
                 }
             }
         }
@@ -361,7 +374,7 @@ internal sealed class ConfigWindow : Window, IDisposable
                         continue;
 
                     this.config.Particles = choice;
-                    changed = true;
+                    restart = true;
                 }
             }
         }
@@ -402,13 +415,18 @@ internal sealed class ConfigWindow : Window, IDisposable
         if (ImGui.Button("Preview"))
             this.actions.Preview(SampleHeader, SampleText);
 
-        if (changed)
+        if (changed || restart)
         {
             this.config.Save();
 
             // Every setting on this tab is something you have to watch to judge,
             // so each change earns a sample — same reasoning as the General tab.
-            this.actions.LivePreview(SampleHeader, SampleText);
+            // Which kind of sample is the difference between seeing your choice
+            // and wondering whether it did anything.
+            if (restart)
+                this.actions.Preview(SampleHeader, SampleText);
+            else
+                this.actions.LivePreview(SampleHeader, SampleText);
         }
     }
 
