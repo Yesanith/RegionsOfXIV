@@ -66,6 +66,20 @@ internal sealed class ConfigWindow : Window, IDisposable
             changed = true;
         }
 
+        var horizontalPosition = this.config.HorizontalPosition;
+        if (ImGui.SliderFloat("Horizontal position", ref horizontalPosition, 0f, 100f, "%.0f%%"))
+        {
+            this.config.HorizontalPosition = horizontalPosition;
+            changed = true;
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                "The text is centred on this point, so 50% is the middle of the screen.\n" +
+                "A long place name set near either end will reach past it.");
+        }
+
         var fontSize = this.config.DisplayFontSize;
         if (ImGui.SliderFloat("Font size", ref fontSize, 24f, 140f, "%.0f px"))
         {
@@ -130,6 +144,28 @@ internal sealed class ConfigWindow : Window, IDisposable
             }
         }
 
+        var letterSpacing = this.config.LetterSpacing;
+        if (ImGui.SliderFloat("Letter spacing", ref letterSpacing, 0f, 30f, "%.0f%%"))
+        {
+            this.config.LetterSpacing = letterSpacing;
+            changed = true;
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                "Extra space between letters, as a percentage of the font size, so it keeps\n" +
+                "its proportions when the size changes and the header gets its own share.\n" +
+                "Wide spacing is much of what gives the Guild Wars 2 original its look.");
+        }
+
+        var uppercase = this.config.UppercaseText;
+        if (ImGui.Checkbox("Uppercase", ref uppercase))
+        {
+            this.config.UppercaseText = uppercase;
+            changed = true;
+        }
+
         var decode = this.config.DecodeEffectEnabled;
         if (ImGui.Checkbox("Decode from Eorzean script", ref decode))
         {
@@ -160,6 +196,16 @@ internal sealed class ConfigWindow : Window, IDisposable
             this.config.StrokeColor = strokeColor;
             changed = true;
         }
+
+        var strokeThickness = this.config.StrokeThickness;
+        if (ImGui.SliderFloat("Outline thickness", ref strokeThickness, 0f, 4f, "%.1f px"))
+        {
+            this.config.StrokeThickness = strokeThickness;
+            changed = true;
+        }
+
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip("Zero turns the outline off.");
 
         var underline = this.config.UnderlineHeader;
         if (ImGui.Checkbox("Underline header", ref underline))

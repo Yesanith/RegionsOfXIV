@@ -68,6 +68,13 @@ public class Configuration : IPluginConfiguration, IGateSettings
     // VerticalPosition is a percentage of viewport height.
     public float VerticalPosition { get; set; } = 25f;
 
+    // The same, across the viewport's width. The text is centred on this point
+    // rather than starting at it, so the value is an anchor and not a left edge —
+    // a long place name at 15% still reaches back past the anchor, and off screen
+    // if it is long enough. Left as a plain percentage for that reason: an
+    // alignment enum would promise an edge-safety this does not have.
+    public float HorizontalPosition { get; set; } = 50f;
+
     // Large enough to read as a title rather than as a label. No ceiling applies
     // at the default font, which is vector; and 91 px is exactly TrumpGothic's
     // ceiling, so switching to the FFXIV display face keeps it sharp too. Jupiter
@@ -80,6 +87,19 @@ public class Configuration : IPluginConfiguration, IGateSettings
     // any size and carrying glyphs for every language the client can display. The
     // three game faces look more like FFXIV and are a click away.
     public DisplayFontChoice DisplayFont { get; set; } = DisplayFontChoice.NotoSansCjk;
+
+    // Extra space between glyphs, as a percentage of the font's own size rather
+    // than a count of pixels. One value therefore tracks both lines despite the
+    // header being a third the size, and stays in proportion when the size slider
+    // moves. Zero is ImGui's own spacing, which is what a config written before
+    // this setting existed gets by leaving it absent.
+    public float LetterSpacing { get; set; } = 0f;
+
+    // Cased with ToUpperInvariant, never ToUpper: on a Turkish system the
+    // culture-sensitive form turns "i" into "İ", so "Limsa Lominsa" would upcase
+    // differently for those players alone. Place names come out of the game's own
+    // data and should not shift with the operating system's locale.
+    public bool UppercaseText { get; set; } = false;
 
     public bool UnderlineHeader { get; set; } = true;
 
@@ -96,6 +116,12 @@ public class Configuration : IPluginConfiguration, IGateSettings
     public Vector4 HeaderColor { get; set; } = new(0.698f, 0.627f, 0.569f, 1f);
 
     public Vector4 StrokeColor { get; set; } = new(0f, 0f, 0f, 0.8f);
+
+    // Multiplies how far the 8-way stroke is stamped from the glyph. 1 is the
+    // weight that shipped. Zero drops the stroke entirely rather than drawing it
+    // at zero distance, so turning the outline off costs no draw calls and needs
+    // no separate checkbox.
+    public float StrokeThickness { get; set; } = 1f;
 
     // Durations.
     public TimeSpan FadeInDuration { get; set; } = TimeSpan.FromSeconds(0.9);

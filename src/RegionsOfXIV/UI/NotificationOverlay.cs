@@ -188,7 +188,7 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         string text,
         uint fillColor,
         uint strokeColor,
-        float strokeDistance = 1f)
+        float strokeDistance)
     {
         if (string.IsNullOrEmpty(text))
             return;
@@ -202,6 +202,19 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         drawList.AddText(position, fillColor, text);
     }
 
+    // Width of a glyph run under the font currently pushed, tracking included.
+    // The gap belongs *between* glyphs, so N of them carry N-1 gaps and the run
+    // ends at the last glyph's own edge rather than a space past it — otherwise a
+    // tracked line would sit visibly left of centre.
+    private static float RunWidth(string text, float tracking)
+    {
+        var width = ImGui.CalcTextSize(text).X;
+
+        return tracking > 0f && text.Length > 1
+            ? width + (tracking * (text.Length - 1))
+            : width;
+    }
+
     private static void DrawStrokedCentered(
         ImDrawListPtr drawList,
         float centerX,
@@ -209,13 +222,34 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         string text,
         uint fillColor,
         uint strokeColor,
-        float strokeDistance = 1f)
+        float strokeDistance,
+        float tracking)
     {
         if (string.IsNullOrEmpty(text))
             return;
 
-        var size = ImGui.CalcTextSize(text);
-        DrawStroked(drawList, new Vector2(centerX - (size.X / 2f), top), text, fillColor, strokeColor, strokeDistance);
+        var left = centerX - (RunWidth(text, tracking) / 2f);
+
+        // Untracked, the whole run is one AddText per stroke stamp, which is both
+        // cheaper and exactly what shipped.
+        if (tracking <= 0f)
+        {
+            DrawStroked(drawList, new Vector2(left, top), text, fillColor, strokeColor, strokeDistance);
+            return;
+        }
+
+        // Tracked, the glyphs have to be placed individually: ImGui lays a string
+        // out on its font's own advances and has no letter spacing to ask for.
+        // Splitting the run does not change how it renders, because ImGui applies
+        // no kerning pairs either — a glyph draws the same alone as it does in
+        // company.
+        var x = left;
+        foreach (var c in text)
+        {
+            var glyph = c.ToString();
+            DrawStroked(drawList, new Vector2(x, top), glyph, fillColor, strokeColor, strokeDistance);
+            x += ImGui.CalcTextSize(glyph).X + tracking;
+        }
     }
 
     // Drawn as two halves so it can animate outward from the centre, and drawn
@@ -254,7 +288,7 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         var drawList = ImGui.GetWindowDrawList();
         var viewport = ImGui.GetMainViewport();
 
-        var centerX = viewport.Pos.X + (viewport.Size.X / 2f);
+        var centerX = viewport.Pos.X + (viewport.Size.X * (this.config.HorizontalPosition / 100f));
         var top = viewport.Pos.Y
                   + (viewport.Size.Y * (this.config.VerticalPosition / 100f))
                   + (notification.StackOffset * ImGuiHelpers.GlobalScale);
@@ -262,12 +296,19 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         var fill = Packed(this.config.TextColor, notification.Opacity);
         var headerFill = Packed(this.config.HeaderColor, notification.Opacity);
         var stroke = Packed(this.config.StrokeColor, notification.Opacity);
+        var strokeDistance = ImGuiHelpers.GlobalScale * this.config.StrokeThickness;
 
-        if (!string.IsNullOrWhiteSpace(notification.Header))
+        // Cased here rather than when the notification was built, so toggling the
+        // setting reaches the one already on screen — which is what makes the
+        // config window's live preview answer the checkbox immediately.
+        var header = Cased(notification.Header);
+
+        if (!string.IsNullOrWhiteSpace(header))
         {
             using (this.fonts.Header.Push())
             {
-                var headerWidth = ImGui.CalcTextSize(notification.Header).X;
+                var tracking = Tracking();
+                var headerWidth = RunWidth(header, tracking);
 
                 if (this.config.UnderlineHeader)
                 {
@@ -279,15 +320,39 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
                 }
 
                 DrawStrokedCentered(
-                    drawList, centerX, top, notification.Header!, headerFill, stroke,
-                    ImGuiHelpers.GlobalScale);
+                    drawList, centerX, top, header, headerFill, stroke, strokeDistance, tracking);
 
                 top += ImGui.GetTextLineHeight() * (this.config.OverlapHeader ? 1.1f : 1.6f);
             }
         }
 
-        DrawDecodingLine(drawList, centerX, top, notification.Text, notification.RevealProgress, fill, stroke);
+        DrawDecodingLine(
+            drawList, centerX, top, Cased(notification.Text), notification.RevealProgress,
+            fill, stroke, strokeDistance);
     }
+
+    // ToUpperInvariant rather than ToUpper — see Configuration.UppercaseText for
+    // why the culture-sensitive one is the wrong tool here.
+    //
+    // Hands back an empty string for a missing header rather than null, so the
+    // caller's existing IsNullOrWhiteSpace check still decides whether there is a
+    // header line to draw.
+    private string Cased(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return string.Empty;
+
+        return this.config.UppercaseText ? text.ToUpperInvariant() : text;
+    }
+
+    // Extra advance between glyphs, in pixels, for whichever font is pushed right
+    // now. Read from ImGui rather than from the configured size so the header —
+    // built at its own size, from a different family — gets its own proportional
+    // share of the one setting.
+    //
+    // GetTextLineHeight is the font's size: ImGui returns the same field from
+    // both, and this file already leans on it for the line advance below.
+    private float Tracking() => ImGui.GetTextLineHeight() * (this.config.LetterSpacing / 100f);
 
     // Eorzean -> readable decode, the same trick the GW2 original uses.
     //
@@ -301,7 +366,8 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     // Glyphs swap individually rather than cross-fading, which avoids two
     // overlapping glyph shapes turning to mush.
     private void DrawDecodingLine(
-        ImDrawListPtr drawList, float centerX, float top, string text, float progress, uint fill, uint stroke)
+        ImDrawListPtr drawList, float centerX, float top, string text, float progress, uint fill, uint stroke,
+        float strokeDistance)
     {
         var eorzean = this.fonts.EorzeanDisplay;
         var useDecode = this.config.DecodeEffectEnabled && eorzean != null && progress < 1f;
@@ -311,7 +377,7 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             using (this.fonts.Display.Push())
             {
                 DrawStrokedCentered(
-                    drawList, centerX, top, text, fill, stroke, ImGuiHelpers.GlobalScale);
+                    drawList, centerX, top, text, fill, stroke, strokeDistance, Tracking());
             }
 
             return;
@@ -319,27 +385,34 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
 
         var cipher = BuildCipher(text);
 
+        // Both handles are built at the display size, so one tracking value serves
+        // both layouts — which it has to, or the interpolation below would be
+        // sliding between two differently-spaced lines.
+        float tracking;
+        using (this.fonts.Display.Push())
+            tracking = Tracking();
+
         // The two faces have very different advance widths — the display face is
         // condensed, the Eorzean one is not, and a full-width Japanese glyph is
         // wider than either — so laying one out on the other's advances crowds or
         // strands the glyphs. Measure both layouts and interpolate: the line starts
         // on Eorzean metrics and settles onto the real ones as it decodes. Both are
         // centred, so it grows symmetrically rather than drifting.
-        var runes = MeasureGlyphs(eorzean!, cipher, centerX);
-        var plain = MeasureGlyphs(this.fonts.Display, text, centerX);
+        var runes = MeasureGlyphs(eorzean!, cipher, centerX, tracking);
+        var plain = MeasureGlyphs(this.fonts.Display, text, centerX, tracking);
 
         var decoded = (int)MathF.Round(progress * text.Length);
 
         using (eorzean!.Push())
         {
             for (var i = decoded; i < text.Length; i++)
-                DrawGlyph(drawList, Lerp(runes[i], plain[i], progress), top, cipher[i], fill, stroke);
+                DrawGlyph(drawList, Lerp(runes[i], plain[i], progress), top, cipher[i], fill, stroke, strokeDistance);
         }
 
         using (this.fonts.Display.Push())
         {
             for (var i = 0; i < decoded && i < text.Length; i++)
-                DrawGlyph(drawList, Lerp(runes[i], plain[i], progress), top, text[i], fill, stroke);
+                DrawGlyph(drawList, Lerp(runes[i], plain[i], progress), top, text[i], fill, stroke, strokeDistance);
         }
     }
 
@@ -367,16 +440,17 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         return new string(cipher);
     }
 
-    // Absolute X of every glyph, laid out in the given font and centred on centerX.
-    private static float[] MeasureGlyphs(IFontHandle font, string text, float centerX)
+    // Absolute X of every glyph, laid out in the given font with the given tracking
+    // and centred on centerX.
+    private static float[] MeasureGlyphs(IFontHandle font, string text, float centerX, float tracking)
     {
         using (font.Push())
         {
             var xs = new float[text.Length];
             for (var i = 0; i < text.Length; i++)
-                xs[i] = ImGui.CalcTextSize(text[..i]).X;
+                xs[i] = ImGui.CalcTextSize(text[..i]).X + (tracking * i);
 
-            var left = centerX - (ImGui.CalcTextSize(text).X / 2f);
+            var left = centerX - (RunWidth(text, tracking) / 2f);
             for (var i = 0; i < xs.Length; i++)
                 xs[i] += left;
 
@@ -390,13 +464,12 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         ImGui.ColorConvertFloat4ToU32(color with { W = color.W * alpha });
 
     private static void DrawGlyph(
-        ImDrawListPtr drawList, float x, float y, char glyph, uint fill, uint stroke)
+        ImDrawListPtr drawList, float x, float y, char glyph, uint fill, uint stroke, float strokeDistance)
     {
         if (glyph == ' ')
             return;
 
-        DrawStroked(
-            drawList, new Vector2(x, y), glyph.ToString(), fill, stroke, ImGuiHelpers.GlobalScale);
+        DrawStroked(drawList, new Vector2(x, y), glyph.ToString(), fill, stroke, strokeDistance);
     }
 
     // U+024F, the last codepoint of Latin Extended-B, and the end of the bundled

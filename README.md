@@ -49,6 +49,9 @@ for Guild Wars 2.
 - **Correct in every language.** Names come from game data rather than from the
   screen, and the default font carries glyphs for every language the client can
   display.
+- **Styled to taste.** Place it anywhere on screen, in one of the game's own
+  faces or Dalamud's Noto, with your own colours, letter spacing, casing and
+  outline weight.
 - **Live preview.** Drag the position, size and colour sliders and a sample
   notification follows them as you go.
 - **Knows when to stay quiet.** Silent through cutscenes, PvP and gpose; through
