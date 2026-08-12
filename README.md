@@ -66,7 +66,7 @@ In game: `/xlsettings` → **Experimental** → paste into **Custom Plugin
 Repositories**:
 
 ```
-https://raw.githubusercontent.com/Yesanith/RegionsOfXIV/master/repo.json
+https://raw.githubusercontent.com/Yesanith/DalamudPlugins/main/repo.json
 ```
 
 Tick **Enabled**, click **+**, then **Save and Close**. Open `/xlplugins` →
