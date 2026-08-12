@@ -57,9 +57,25 @@ for Guild Wars 2.
 
 ## Installing
 
-> **0.1.0.0** — confirmed working in game, but not yet on Dalamud's plugin
-> installer. A [D17](https://github.com/goatcorp/DalamudPluginsD17) submission is
-> the next step; until it lands, install it yourself:
+> Not on Dalamud's official plugin installer yet — a
+> [D17](https://github.com/goatcorp/DalamudPluginsD17) submission is open. Until
+> it lands, the custom repository below is the way in, and it updates itself
+> like any other plugin.
+
+In game: `/xlsettings` → **Experimental** → paste into **Custom Plugin
+Repositories**:
+
+```
+https://raw.githubusercontent.com/Yesanith/RegionsOfXIV/master/repo.json
+```
+
+Tick **Enabled**, click **+**, then **Save and Close**. Open `/xlplugins` →
+**All Plugins**, search for **Regions of XIV**, and install.
+
+Then `/regions` opens the settings.
+
+<details>
+<summary>Or install it by hand</summary>
 
 1. Download `latest.zip` from the
    [latest release](https://github.com/Yesanith/RegionsOfXIV/releases/latest).
@@ -67,7 +83,10 @@ for Guild Wars 2.
 3. In Dalamud settings, add that folder to **Dev Plugin Locations**, then enable
    the plugin.
 
-Or build it from source — see [Building](#building).
+This does not auto-update. Building from source works the same way — see
+[Building](#building).
+
+</details>
 
 ## Usage
 
@@ -101,8 +120,9 @@ The tests need neither the game nor Dalamud, so they run anywhere the SDK does:
 dotnet test RegionsOfXIV.sln -c Release
 ```
 
-How the four detection sources fit together, and where each piece lives, is in
-[ARCHITECTURE.md](ARCHITECTURE.md).
+The services are commented with the reasoning behind them — how the four
+detection sources fit together, and why the notification gate is split the way
+it is.
 
 ## Feedback
 
