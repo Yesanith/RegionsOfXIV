@@ -15,12 +15,12 @@ internal sealed unsafe class LocationTracker : IDisposable
     private DateTime nextPoll = DateTime.MinValue;
 
     // Raised on the framework thread with (previous, current).
-    public event Action<LocationSnapshot, LocationSnapshot>? LocationChanged;
+    public event Action<LocationSnapshot, LocationSnapshot>? OnLocationChanged;
 
     // Raised when the player crosses into or out of a sanctuary. Separate from
-    // LocationChanged because the two do not always coincide: settlements can be
+    // OnLocationChanged because the two do not always coincide: settlements can be
     // entered without any TerritoryInfo place name moving.
-    public event Action<bool>? SanctuaryChanged;
+    public event Action<bool>? OnSanctuaryChanged;
 
     public LocationSnapshot Current { get; private set; } = LocationSnapshot.Empty;
 
@@ -146,7 +146,7 @@ internal sealed unsafe class LocationTracker : IDisposable
         {
             var previous = Current;
             Current = snapshot;
-            LocationChanged?.Invoke(previous, snapshot);
+            OnLocationChanged?.Invoke(previous, snapshot);
         }
 
         var info = TerritoryInfo.Instance();
@@ -155,7 +155,7 @@ internal sealed unsafe class LocationTracker : IDisposable
         if (sanctuary != InSanctuary)
         {
             InSanctuary = sanctuary;
-            SanctuaryChanged?.Invoke(sanctuary);
+            OnSanctuaryChanged?.Invoke(sanctuary);
         }
     }
 

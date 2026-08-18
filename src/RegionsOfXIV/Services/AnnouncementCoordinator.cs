@@ -47,9 +47,9 @@ internal sealed class AnnouncementCoordinator : IDisposable
         this.gate = new NotificationGate(config, game);
         this.tracker = new LocationTracker(game);
 
-        this.tracker.LocationChanged += OnLocationChanged;
-        this.tracker.SanctuaryChanged += OnSanctuaryChanged;
-        this.suppressor.AreaTextShown += OnAreaTextShown;
+        this.tracker.OnLocationChanged += HandleLocationChanged;
+        this.tracker.OnSanctuaryChanged += HandleSanctuaryChanged;
+        this.suppressor.OnAreaTextShown += HandleAreaTextShown;
 
         Plugin.ClientState.Logout += OnLogout;
         Plugin.ClientState.ZoneInit += OnZoneInit;
@@ -60,9 +60,9 @@ internal sealed class AnnouncementCoordinator : IDisposable
         Plugin.ClientState.Logout -= OnLogout;
         Plugin.ClientState.ZoneInit -= OnZoneInit;
 
-        this.suppressor.AreaTextShown -= OnAreaTextShown;
-        this.tracker.SanctuaryChanged -= OnSanctuaryChanged;
-        this.tracker.LocationChanged -= OnLocationChanged;
+        this.suppressor.OnAreaTextShown -= HandleAreaTextShown;
+        this.tracker.OnSanctuaryChanged -= HandleSanctuaryChanged;
+        this.tracker.OnLocationChanged -= HandleLocationChanged;
 
         this.tracker.Dispose();
     }
@@ -120,7 +120,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
     //
     // The poll stays running underneath as a backstop for sub-area changes the
     // game never flashes; the gate's dedup keeps whichever arrives second quiet.
-    private void OnAreaTextShown(string? nativeText)
+    private void HandleAreaTextShown(string? nativeText)
     {
         if (string.IsNullOrWhiteSpace(nativeText))
         {
@@ -132,7 +132,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
         this.lastNativeAreaText = nativeText;
         try
         {
-            // Raises LocationChanged inline when TerritoryInfo moved, which clears
+            // Raises OnLocationChanged inline when TerritoryInfo moved, which clears
             // the pending text by way of ReconcileWithNative.
             this.tracker.Poll();
 
@@ -157,7 +157,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
     //
     // On the way out there is no flash from the game at all, so TerritoryInfo is
     // the only source, and the area we have stepped into is what to announce.
-    private void OnSanctuaryChanged(bool inSanctuary)
+    private void HandleSanctuaryChanged(bool inSanctuary)
     {
         if (!this.gate.ShouldAnnounceSanctuary())
             return;
@@ -185,7 +185,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
 
     // Runs on the framework thread — LocationTracker polls from IFramework.Update,
     // so reading game state here is safe.
-    private void OnLocationChanged(LocationSnapshot previous, LocationSnapshot current)
+    private void HandleLocationChanged(LocationSnapshot previous, LocationSnapshot current)
     {
         var tier = current.DiffTier(previous);
         var names = PlaceNameResolver.Resolve(current);

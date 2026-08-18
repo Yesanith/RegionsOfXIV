@@ -31,6 +31,14 @@ internal sealed class FontService : IDisposable
         this.atlas = Plugin.PluginInterface.UiBuilder.FontAtlas;
     }
 
+    // Bumped whenever the handles are replaced.
+    //
+    // Anything that caches a measurement needs to know when the thing it measured
+    // against stopped existing. The size alone will not do: two families at one
+    // size measure differently, so a cache keyed on size would happily keep
+    // Jupiter's advances after a switch to Axis.
+    public int Generation { get; private set; }
+
     public IFontHandle Display => this.displayFont ?? Plugin.PluginInterface.UiBuilder.DefaultFontHandle;
 
     public IFontHandle Header => this.headerFont ?? Plugin.PluginInterface.UiBuilder.DefaultFontHandle;
@@ -77,6 +85,10 @@ internal sealed class FontService : IDisposable
         this.builtDisplaySize = displaySizePx;
         this.builtHeaderSize = headerSizePx;
         this.builtDisplayChoice = choice;
+
+        // After the early-out above, so a call that changes nothing does not
+        // invalidate every cached measurement in the plugin.
+        Generation++;
 
         DisposeHandles();
 

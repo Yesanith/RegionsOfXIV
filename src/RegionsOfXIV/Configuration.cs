@@ -29,6 +29,42 @@ public enum DisplayFontChoice
     NotoSansCjk,
 }
 
+// How the glyphs move as the text arrives. Same append-only rule as
+// DisplayFontChoice above: the numeric value is what lands in the saved config,
+// so new motions go on the end.
+//
+// A separate axis from the decode, not a replacement for it. The decode is a
+// substitution — Eorzean forms resolving into readable ones — and a motion is a
+// displacement, so the two compose: letters can rise into place while they
+// resolve. None is the default, which is the plugin as it shipped: a decode and
+// no movement.
+public enum MotionEffect
+{
+    None,
+    Typewriter,
+    Rise,
+    Wave,
+    Burn,
+}
+
+// Ambient particles, drawn around the text for as long as it is on screen. A
+// separate axis from MotionEffect deliberately: embers under a burn is the
+// obvious pairing, but nothing stops hearts under a decode, and keeping the two
+// orthogonal is both less code and more combinations.
+//
+// Every one of these is drawn from primitives — circles, triangles, quads —
+// rather than from a glyph or a sprite. A "♥" character would render as a blank
+// box under Trump Gothic and Jupiter, which are Latin-only, and a sprite sheet
+// would be the first art asset this plugin has ever needed.
+public enum ParticleEffect
+{
+    None,
+    Hearts,
+    Embers,
+    Sparkles,
+    Petals,
+}
+
 // IGateSettings is satisfied by the properties below as they already stand; it
 // names the subset NotificationGate reads so the gate can be built without this
 // class. See Services/IGateSettings.cs.
@@ -68,6 +104,13 @@ public class Configuration : IPluginConfiguration, IGateSettings
     // VerticalPosition is a percentage of viewport height.
     public float VerticalPosition { get; set; } = 25f;
 
+    // The same, across the viewport's width. The text is centred on this point
+    // rather than starting at it, so the value is an anchor and not a left edge —
+    // a long place name at 15% still reaches back past the anchor, and off screen
+    // if it is long enough. Left as a plain percentage for that reason: an
+    // alignment enum would promise an edge-safety this does not have.
+    public float HorizontalPosition { get; set; } = 50f;
+
     // Large enough to read as a title rather than as a label. No ceiling applies
     // at the default font, which is vector; and 91 px is exactly TrumpGothic's
     // ceiling, so switching to the FFXIV display face keeps it sharp too. Jupiter
@@ -81,13 +124,48 @@ public class Configuration : IPluginConfiguration, IGateSettings
     // three game faces look more like FFXIV and are a click away.
     public DisplayFontChoice DisplayFont { get; set; } = DisplayFontChoice.NotoSansCjk;
 
+    // Extra space between glyphs, as a percentage of the font's own size rather
+    // than a count of pixels. One value therefore tracks both lines despite the
+    // header being a third the size, and stays in proportion when the size slider
+    // moves. Zero is ImGui's own spacing, which is what a config written before
+    // this setting existed gets by leaving it absent.
+    public float LetterSpacing { get; set; } = 0f;
+
+    // Cased with ToUpperInvariant, never ToUpper: on a Turkish system the
+    // culture-sensitive form turns "i" into "İ", so "Limsa Lominsa" would upcase
+    // differently for those players alone. Place names come out of the game's own
+    // data and should not shift with the operating system's locale.
+    public bool UppercaseText { get; set; } = false;
+
     public bool UnderlineHeader { get; set; } = true;
 
     public bool OverlapHeader { get; set; } = true;
 
     // Eorzean -> Latin decode during the reveal. Silently inert when no font is
     // bundled, or when the text falls outside the font's Latin coverage.
+    //
+    // Kept as its own switch rather than folded in as one value of MotionEffect:
+    // the decode is what the plugin is *for*, it composes with every motion
+    // rather than competing with them, and presets deliberately leave it alone so
+    // that turning it off stays one decision made in one place.
     public bool DecodeEffectEnabled { get; set; } = true;
+
+    // How the glyphs move while that happens. None by default — a decode and no
+    // movement is the plugin as it shipped.
+    public MotionEffect Motion { get; set; } = MotionEffect.None;
+
+    // Ambient particles. Off by default: this is a location notification first,
+    // and hearts drifting off every sub-area change is a taste, not a default.
+    public ParticleEffect Particles { get; set; } = ParticleEffect.None;
+
+    // Multiplies the spawn rate. The per-effect rates are chosen so that 1 reads
+    // as "a few", not as weather.
+    public float ParticleDensity { get; set; } = 1f;
+
+    // One colour for whichever effect is on. A warm amber suits embers and
+    // sparkles, which are the two that look wrong in an arbitrary hue; hearts and
+    // petals want to be moved towards pink, and the config window says so.
+    public Vector4 ParticleColor { get; set; } = new(1f, 0.72f, 0.35f, 1f);
 
     // Vector4 rather than a packed uint: it is what ImGui's colour pickers take,
     // and it stays legible if anyone opens the config file.
@@ -97,10 +175,27 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
     public Vector4 StrokeColor { get; set; } = new(0f, 0f, 0f, 0.8f);
 
+    // Multiplies how far the 8-way stroke is stamped from the glyph. 1 is the
+    // weight that shipped. Zero drops the stroke entirely rather than drawing it
+    // at zero distance, so turning the outline off costs no draw calls and needs
+    // no separate checkbox.
+    public float StrokeThickness { get; set; } = 1f;
+
     // Durations.
     public TimeSpan FadeInDuration { get; set; } = TimeSpan.FromSeconds(0.9);
 
-    public TimeSpan RevealDuration { get; set; } = TimeSpan.FromSeconds(0.9);
+    // The motion, which runs first and on its own: the line arrives in Eorzean
+    // script, lands, and only then decodes. Long enough that a rise or a burn is
+    // something you watch rather than something you catch the end of.
+    //
+    // Inert when the motion is None, and skipped outright — the notification does
+    // not sit through a stage with nothing to show.
+    public TimeSpan MotionDuration { get; set; } = TimeSpan.FromSeconds(1.1);
+
+    // The decode, which follows it. Slower than the 0.9s this shipped with: with
+    // the motion no longer running at the same time, the decode is the only thing
+    // happening and reads better given room.
+    public TimeSpan RevealDuration { get; set; } = TimeSpan.FromSeconds(1.3);
 
     public TimeSpan ShowDuration { get; set; } = TimeSpan.FromSeconds(4);
 

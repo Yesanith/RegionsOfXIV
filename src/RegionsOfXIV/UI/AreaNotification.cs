@@ -18,12 +18,24 @@ internal enum NotificationPhase
 //   fade in -> hold -> reveal -> show -> fade out -> done
 // The pause before the reveal is what makes it read as deliberate rather than
 // twitchy; keep it even if the visuals change.
+//
+// The motion runs inside the fade-in stage, and the decode is the reveal that
+// follows it. They are deliberately consecutive rather than simultaneous: the
+// line arrives in Eorzean script, lands, pauses, and only then resolves into
+// something readable. Run at once they compete, and each is over before it has
+// been seen.
+//
+// Either can be absent. A notification built with no motion is the plugin as it
+// shipped — fade in, hold, decode — and one built with no decode simply ends its
+// reveal before it starts. Both are expressed as a zero duration by the caller,
+// which knows what the config says and whether the Eorzean font actually loaded.
 internal sealed class AreaNotification
 {
     private static readonly TimeSpan HoldDuration = TimeSpan.FromMilliseconds(200);
 
     private readonly Easing fadeIn;
-    private readonly Easing reveal;
+    private readonly Easing? motion;
+    private readonly Easing? reveal;
     private readonly Easing fadeOut;
 
     private readonly TimeSpan showDuration;
@@ -39,6 +51,7 @@ internal sealed class AreaNotification
         string? header,
         string text,
         TimeSpan fadeInDuration,
+        TimeSpan motionDuration,
         TimeSpan revealDuration,
         TimeSpan showDuration,
         TimeSpan fadeOutDuration)
@@ -57,11 +70,24 @@ internal sealed class AreaNotification
         this.showDuration = showDuration;
 
         this.fadeIn = new OutCubic(fadeInDuration);
-        this.reveal = new InOutCubic(revealDuration);
         this.fadeOut = new InCubic(fadeOutDuration);
+
+        // A stage with no duration is a stage that does not happen, and its
+        // progress starts where it would have ended: nothing downstream then has
+        // to ask whether it ran.
+        if (motionDuration > TimeSpan.Zero)
+            this.motion = new OutCubic(motionDuration);
+        else
+            MotionProgress = 1f;
+
+        if (revealDuration > TimeSpan.Zero)
+            this.reveal = new InOutCubic(revealDuration);
+        else
+            RevealProgress = 1f;
 
         this.phaseStartedAt = DateTime.UtcNow;
         this.fadeIn.Start();
+        this.motion?.Start();
     }
 
     public string? Header { get; }
@@ -74,7 +100,12 @@ internal sealed class AreaNotification
 
     public float Opacity { get; private set; }
 
-    // 0..1, drives the decode/wipe effect.
+    // 0..1, drives the motion: where each glyph is on its way in. Runs first, and
+    // is already 1 when there is no motion to run.
+    public float MotionProgress { get; private set; }
+
+    // 0..1, drives the decode. Starts only once the motion has finished, so the
+    // two never overlap.
     public float RevealProgress { get; private set; }
 
     // Vertical offset in px, applied when a newer notification pushes this down.
@@ -89,18 +120,85 @@ internal sealed class AreaNotification
 
     public bool IsDone => Phase == NotificationPhase.Done;
 
+    // Whether the notification is on its way out. The particle field asks, so it
+    // can stop spawning while letting what is already in the air finish drifting:
+    // fresh hearts appearing under text that is fading reads as a glitch.
+    public bool IsFadingOut => Phase == NotificationPhase.FadeOut;
+
+    // The ambient particles playing around this notification. Owned here so they
+    // live and die with it — two notifications overlapping during a handover keep
+    // their own, and nothing needs cleaning up when one ends.
+    public ParticleField Particles { get; } = new();
+
+    // --- what the draw path would otherwise rebuild every frame -------------
+    //
+    // All of it derives from Text, Header and one setting, so all of it is the
+    // same answer on frame two as on frame one. Held here rather than in the
+    // overlay because it is per notification, and the overlay draws several.
+
+    // The Eorzean stand-in, built from the cased text. Null until the decode
+    // first asks for one, and dropped when the casing changes underneath it.
+    public string? Cipher { get; set; }
+
+    // Glyph positions, one cache per line per font. The header keeps its own
+    // because it is a different face at a third the size.
+    public LineLayout DisplayLayout { get; } = new();
+
+    public LineLayout CipherLayout { get; } = new();
+
+    public LineLayout HeaderLayout { get; } = new();
+
+    private bool casedAsUpper;
+    private bool everCased;
+    private string casedText = string.Empty;
+    private string casedHeader = string.Empty;
+
+    // ToUpperInvariant allocates, and the answer only moves when the checkbox
+    // does — which it can do mid-flight, since the config window's live preview
+    // is a notification like any other.
+    public void ApplyCasing(bool uppercase)
+    {
+        if (this.everCased && this.casedAsUpper == uppercase)
+            return;
+
+        this.everCased = true;
+        this.casedAsUpper = uppercase;
+
+        this.casedText = uppercase ? Text.ToUpperInvariant() : Text;
+        this.casedHeader = Header == null
+            ? string.Empty
+            : uppercase ? Header.ToUpperInvariant() : Header;
+
+        // Built from the text that just changed, so it no longer matches.
+        Cipher = null;
+    }
+
+    public string CasedText => this.casedText;
+
+    public string CasedHeader => this.casedHeader;
+
     public void Update()
     {
         var elapsed = DateTime.UtcNow - this.phaseStartedAt;
 
         switch (Phase)
         {
+            // The fade and the motion run together and the stage ends when both
+            // are done, so a motion longer than the fade is not cut short by it.
             case NotificationPhase.FadeIn:
                 this.fadeIn.Update();
                 Opacity = (float)this.fadeIn.ValueClamped;
-                if (this.fadeIn.IsDone)
+
+                if (this.motion is { } arriving)
+                {
+                    arriving.Update();
+                    MotionProgress = (float)arriving.ValueClamped;
+                }
+
+                if (this.fadeIn.IsDone && this.motion is not { IsDone: false })
                 {
                     Opacity = 1f;
+                    MotionProgress = 1f;
                     Advance(NotificationPhase.Hold);
                 }
 
@@ -110,14 +208,23 @@ internal sealed class AreaNotification
                 Opacity = 1f;
                 if (elapsed >= HoldDuration)
                 {
-                    this.reveal.Start();
-                    Advance(NotificationPhase.Reveal);
+                    // Nothing to decode: the line has already arrived readable,
+                    // so it goes straight to being held on screen.
+                    if (this.reveal is { } decoding)
+                    {
+                        decoding.Start();
+                        Advance(NotificationPhase.Reveal);
+                    }
+                    else
+                    {
+                        Advance(NotificationPhase.Show);
+                    }
                 }
 
                 break;
 
             case NotificationPhase.Reveal:
-                this.reveal.Update();
+                this.reveal!.Update();
                 RevealProgress = (float)this.reveal.ValueClamped;
                 if (this.reveal.IsDone)
                 {
