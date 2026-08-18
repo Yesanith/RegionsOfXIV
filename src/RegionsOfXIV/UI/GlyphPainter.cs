@@ -129,8 +129,8 @@ internal static class GlyphPainter
     // tracking, centred on centerX.
     //
     // Walking prefixes rather than accumulating single glyphs so this agrees to
-    // the pixel with DrawStrokedCentered's untracked path, which hands ImGui the
-    // whole string: both come out of CalcTextSize on the same characters. That
+    // the pixel with DrawCentered, which hands ImGui the whole string: both come
+    // out of CalcTextSize on the same characters. That
     // agreement is what lets an animated reveal hand over to the plain run at
     // full progress without the line shifting.
     public static float[] GlyphPositions(string text, float centerX, float tracking)

@@ -72,7 +72,7 @@ internal sealed class FontService : IDisposable
     public static bool IsLatinOnly(DisplayFontChoice choice) =>
         choice is DisplayFontChoice.TrumpGothic or DisplayFontChoice.Jupiter;
 
-    // Rebuilds the atlas handles. Never call from the draw path.
+    // Never call from the draw path: this replaces the atlas handles.
     public void Rebuild(float displaySizePx, float headerSizePx)
     {
         var choice = this.config.DisplayFont;

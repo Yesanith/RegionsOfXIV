@@ -90,6 +90,27 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         _ => effect.ToString(),
     };
 
+    // --- controls -----------------------------------------------------------
+    //
+    // ImGui's widgets take a ref and report whether they moved, which on its own
+    // means three lines of local variable per setting before anything is decided.
+    // These wrap that into one expression per setting, each returning whether it
+    // changed so a tab can accumulate with |=.
+    //
+    // Getters and setters rather than a ref to the property: an auto-property has
+    // no address to take.
+
+    private static bool Slider(
+        string label, Func<float> get, Action<float> set, float min, float max, string format)
+    {
+        var value = get();
+        if (!ImGui.SliderFloat(label, ref value, min, max, format))
+            return false;
+
+        set(value);
+        return true;
+    }
+
     private static bool DrawSeconds(string label, Func<TimeSpan> get, Action<TimeSpan> set, float min, float max)
     {
         var seconds = (float)get().TotalSeconds;
@@ -98,5 +119,55 @@ internal sealed partial class ConfigWindow : Window, IDisposable
 
         set(TimeSpan.FromSeconds(seconds));
         return true;
+    }
+
+    private static bool Checkbox(string label, Func<bool> get, Action<bool> set)
+    {
+        var value = get();
+        if (!ImGui.Checkbox(label, ref value))
+            return false;
+
+        set(value);
+        return true;
+    }
+
+    private static bool ColorPicker(string label, Func<Vector4> get, Action<Vector4> set)
+    {
+        var value = get();
+        if (!ImGui.ColorEdit4(label, ref value, ImGuiColorEditFlags.NoInputs))
+            return false;
+
+        set(value);
+        return true;
+    }
+
+    // The combo is closed before this returns, so a Tooltip call after it still
+    // attaches to the combo itself rather than to its last item.
+    private static bool Choice<T>(string label, Func<T> get, Action<T> set, Func<T, string> name)
+        where T : struct, Enum
+    {
+        var current = get();
+        var changed = false;
+
+        using var combo = ImRaii.Combo(label, name(current));
+        if (!combo)
+            return false;
+
+        foreach (var option in Enum.GetValues<T>())
+        {
+            if (!ImGui.Selectable(name(option), option.Equals(current)))
+                continue;
+
+            set(option);
+            changed = true;
+        }
+
+        return changed;
+    }
+
+    private static void Tooltip(string text)
+    {
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip(text);
     }
 }

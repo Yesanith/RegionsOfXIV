@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.ManagedFontAtlas;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using RegionsOfXIV.Services;
@@ -15,15 +16,19 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
 {
     private const float StackSpacing = 46f;
 
-    private readonly Configuration config;
-    private readonly FontService fonts;
-
-    private readonly List<AreaNotification> active = [];
-
     // How long the live preview outlives the last settings change before it is let
     // go. Long enough to bridge the gap between two drags of a slider, short
     // enough that it reads as a response to what you just did.
     private static readonly TimeSpan PreviewLinger = TimeSpan.FromMilliseconds(250);
+
+    // What a glyph is at the moment it catches: hot, and well clear of any colour
+    // a player is likely to have chosen for the text itself.
+    private static readonly Vector4 EmberColor = new(1f, 0.55f, 0.15f, 1f);
+
+    private readonly Configuration config;
+    private readonly FontService fonts;
+
+    private readonly List<AreaNotification> active = [];
 
     private AreaNotification? preview;
     private DateTime previewTouchedAt;
@@ -68,7 +73,6 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         // than trying to revive one already on its way off screen.
         this.preview = null;
 
-        // A newer notification supersedes older ones: they slide down and fade.
         foreach (var existing in this.active)
         {
             existing.StackOffset += StackSpacing;
@@ -79,17 +83,26 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         // rather than as time spent showing something that is not happening. The
         // decode also depends on a font that may not have loaded, which is
         // knowable here and not inside the notification.
-        var notification = new AreaNotification(
+        this.active.Add(new AreaNotification(
             header,
             text,
             this.config.FadeInDuration,
             this.config.Motion == MotionEffect.None ? TimeSpan.Zero : this.config.MotionDuration,
             IsDecoding ? this.config.RevealDuration : TimeSpan.Zero,
             this.config.ShowDuration,
-            this.config.FadeOutDuration);
-
-        this.active.Add(notification);
+            this.config.FadeOutDuration));
     }
+
+    // The fade and the motion share a stage, so that stage lasts as long as the
+    // longer of them; the decode follows, and only if there is one.
+    public TimeSpan EstimatedDuration =>
+        (this.config.Motion == MotionEffect.None
+            ? this.config.FadeInDuration
+            : Longer(this.config.FadeInDuration, this.config.MotionDuration))
+        + TimeSpan.FromMilliseconds(200)
+        + (IsDecoding ? this.config.RevealDuration : TimeSpan.Zero)
+        + this.config.ShowDuration
+        + this.config.FadeOutDuration;
 
     // Keeps a sample notification on screen while the user is changing settings.
     //
@@ -114,46 +127,6 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         this.preview = this.active[^1];
         this.preview.IsPinned = true;
     }
-
-    // Lets the preview go once the settings have been still for a moment. Unpinned
-    // rather than dismissed: it has been sitting fully revealed with its Show phase
-    // long since elapsed, so releasing it drops it straight into the same fade-out
-    // any other notification gets.
-    private void ReleasePreviewIfIdle()
-    {
-        if (this.preview is not { } current)
-            return;
-
-        if (current.IsDone)
-        {
-            this.preview = null;
-            return;
-        }
-
-        if (DateTime.UtcNow - this.previewTouchedAt < PreviewLinger)
-            return;
-
-        current.IsPinned = false;
-        this.preview = null;
-    }
-
-    // Whether a decode will actually happen: asked for, and with a font able to
-    // answer. Both halves matter — a missing bundled font is not an error, it just
-    // means there is nothing to decode from.
-    private bool IsDecoding => this.config.DecodeEffectEnabled && this.fonts.EorzeanDisplay != null;
-
-    // The fade and the motion share a stage, so that stage lasts as long as the
-    // longer of them; the decode follows, and only if there is one.
-    public TimeSpan EstimatedDuration =>
-        (this.config.Motion == MotionEffect.None
-            ? this.config.FadeInDuration
-            : Longer(this.config.FadeInDuration, this.config.MotionDuration))
-        + TimeSpan.FromMilliseconds(200)
-        + (IsDecoding ? this.config.RevealDuration : TimeSpan.Zero)
-        + this.config.ShowDuration
-        + this.config.FadeOutDuration;
-
-    private static TimeSpan Longer(TimeSpan a, TimeSpan b) => a > b ? a : b;
 
     public override bool DrawConditions() => this.active.Count > 0;
 
@@ -185,6 +158,35 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         }
     }
 
+    // Lets the preview go once the settings have been still for a moment. Unpinned
+    // rather than dismissed: it has been sitting fully revealed with its Show phase
+    // long since elapsed, so releasing it drops it straight into the same fade-out
+    // any other notification gets.
+    private void ReleasePreviewIfIdle()
+    {
+        if (this.preview is not { } current)
+            return;
+
+        if (current.IsDone)
+        {
+            this.preview = null;
+            return;
+        }
+
+        if (DateTime.UtcNow - this.previewTouchedAt < PreviewLinger)
+            return;
+
+        current.IsPinned = false;
+        this.preview = null;
+    }
+
+    // Whether a decode will actually happen: asked for, and with a font able to
+    // answer. Both halves matter — a missing bundled font is not an error, it just
+    // means there is nothing to decode from.
+    private bool IsDecoding => this.config.DecodeEffectEnabled && this.fonts.EorzeanDisplay != null;
+
+    private static TimeSpan Longer(TimeSpan a, TimeSpan b) => a > b ? a : b;
+
     // --- Notification rendering --------------------------------------------
 
     private void DrawOne(AreaNotification notification)
@@ -197,7 +199,6 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
                   + (viewport.Size.Y * (this.config.VerticalPosition / 100f))
                   + (notification.StackOffset * ImGuiHelpers.GlobalScale);
 
-        var headerFill = GlyphPainter.Packed(this.config.HeaderColor, notification.Opacity);
         var stroke = GlyphPainter.Packed(this.config.StrokeColor, notification.Opacity);
         var strokeDistance = ImGuiHelpers.GlobalScale * this.config.StrokeThickness;
 
@@ -207,81 +208,73 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         // notification remembers the result; this only tells it what to hold.
         notification.ApplyCasing(this.config.UppercaseText);
 
+        top = DrawHeader(notification, drawList, centerX, top, stroke, strokeDistance);
+
+        DrawParticles(notification, drawList, centerX, top);
+
+        DrawTextLine(notification, drawList, centerX, top, strokeDistance);
+    }
+
+    // Returns where the display line starts, which is below the header when there
+    // is one and unchanged when there is not.
+    private float DrawHeader(
+        AreaNotification notification, ImDrawListPtr drawList, float centerX, float top,
+        uint stroke, float strokeDistance)
+    {
         var header = notification.CasedHeader;
+        if (string.IsNullOrWhiteSpace(header))
+            return top;
 
-        if (!string.IsNullOrWhiteSpace(header))
+        var fill = GlyphPainter.Packed(this.config.HeaderColor, notification.Opacity);
+
+        using (this.fonts.Header.Push())
         {
-            using (this.fonts.Header.Push())
+            var tracking = Tracking();
+
+            if (this.config.UnderlineHeader)
             {
-                var tracking = Tracking();
-
-                if (this.config.UnderlineHeader)
-                {
-                    var underlineY = top + ImGui.GetTextLineHeight() + (4f * ImGuiHelpers.GlobalScale);
-                    GlyphPainter.DrawUnderline(
-                        drawList, centerX, underlineY, GlyphPainter.RunWidth(header, tracking),
-                        notification.RevealProgress, headerFill, stroke,
-                        2f * ImGuiHelpers.GlobalScale);
-                }
-
-                if (tracking > 0f)
-                {
-                    GlyphPainter.DrawRun(
-                        drawList, Positions(notification.HeaderLayout, header, tracking, centerX),
-                        header, top, headerFill, stroke, strokeDistance);
-                }
-                else
-                {
-                    GlyphPainter.DrawCentered(drawList, centerX, top, header, headerFill, stroke, strokeDistance);
-                }
-
-                top += ImGui.GetTextLineHeight() * (this.config.OverlapHeader ? 1.1f : 1.6f);
-            }
-        }
-
-        var text = notification.CasedText;
-        var particles = this.config.Particles;
-
-        // Skipped outright when there is nothing playing and nothing left over
-        // from an effect just switched off. It is only a measurement and a font
-        // push, but it is one of each on every frame of every notification, spent
-        // on a feature that is off by default.
-        if (particles != ParticleEffect.None || !notification.Particles.IsEmpty)
-        {
-            // What the particles play around: the middle of the display line, and
-            // how far it reaches either way.
-            Vector2 center;
-            Vector2 extent;
-            using (this.fonts.Display.Push())
-            {
-                var lineHeight = ImGui.GetTextLineHeight();
-                center = new Vector2(centerX, top + (lineHeight / 2f));
-                extent = new Vector2(GlyphPainter.RunWidth(text, Tracking()) / 2f, lineHeight / 2f);
+                var underlineY = top + ImGui.GetTextLineHeight() + (4f * ImGuiHelpers.GlobalScale);
+                GlyphPainter.DrawUnderline(
+                    drawList, centerX, underlineY, GlyphPainter.RunWidth(header, tracking),
+                    notification.RevealProgress, fill, stroke,
+                    2f * ImGuiHelpers.GlobalScale);
             }
 
-            // Before the text, so glyphs stay legible with particles behind them.
-            notification.Particles.Update(
-                particles,
-                this.config.ParticleDensity,
-                ImGui.GetIO().DeltaTime,
-                center,
-                extent,
-                spawning: !notification.IsFadingOut);
+            DrawStaticRun(drawList, notification.HeaderLayout, header, centerX, top, tracking, fill, stroke, strokeDistance);
 
-            notification.Particles.Draw(
-                drawList, particles, this.config.ParticleColor, notification.Opacity);
+            return top + (ImGui.GetTextLineHeight() * (this.config.OverlapHeader ? 1.1f : 1.6f));
+        }
+    }
+
+    // Skipped outright when there is nothing playing and nothing left over from an
+    // effect just switched off. It is only a measurement and a font push, but it is
+    // one of each on every frame of every notification, spent on a feature that is
+    // off by default.
+    private void DrawParticles(AreaNotification notification, ImDrawListPtr drawList, float centerX, float top)
+    {
+        var effect = this.config.Particles;
+        if (effect == ParticleEffect.None && notification.Particles.IsEmpty)
+            return;
+
+        Vector2 center;
+        Vector2 extent;
+        using (this.fonts.Display.Push())
+        {
+            var lineHeight = ImGui.GetTextLineHeight();
+            center = new Vector2(centerX, top + (lineHeight / 2f));
+            extent = new Vector2(GlyphPainter.RunWidth(notification.CasedText, Tracking()) / 2f, lineHeight / 2f);
         }
 
-        DrawTextLine(
-            notification,
-            drawList,
-            centerX,
-            top,
-            text,
-            notification.MotionProgress,
-            notification.RevealProgress,
-            notification.Opacity,
-            strokeDistance);
+        // Drawn before the text, so glyphs stay legible with particles behind them.
+        notification.Particles.Update(
+            effect,
+            this.config.ParticleDensity,
+            ImGui.GetIO().DeltaTime,
+            center,
+            extent,
+            spawning: !notification.IsFadingOut);
+
+        notification.Particles.Draw(drawList, effect, this.config.ParticleColor, notification.Opacity);
     }
 
     // The line's three stages, in the order they happen.
@@ -296,75 +289,62 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     // decode's interpolation begins; the decode ends at the display layout, which
     // is what the settled run draws. Neither seam moves a glyph.
     private void DrawTextLine(
-        AreaNotification notification, ImDrawListPtr drawList, float centerX, float top, string text,
-        float motionProgress, float revealProgress, float opacity, float strokeDistance)
+        AreaNotification notification, ImDrawListPtr drawList, float centerX, float top, float strokeDistance)
     {
+        var text = notification.CasedText;
+        var opacity = notification.Opacity;
+        var fill = GlyphPainter.Packed(this.config.TextColor, opacity);
+        var stroke = GlyphPainter.Packed(this.config.StrokeColor, opacity);
+
         var motion = this.config.Motion;
         var decoding = IsDecoding;
 
-        if (motion != MotionEffect.None && motionProgress < 1f)
+        if (motion != MotionEffect.None && notification.MotionProgress < 1f)
         {
-            if (decoding)
-                DrawArrivingCipher(notification, drawList, centerX, top, motionProgress, opacity, strokeDistance, motion);
-            else
-                DrawAnimatedLine(notification, drawList, centerX, top, text, motionProgress, opacity, strokeDistance, motion);
+            // With a decode still to come the glyphs that fly in are the cipher, on
+            // the Eorzean font's own advances. Those advances are the reason the
+            // font is a parameter: the Eorzean face is far wider than the display
+            // one, and landing the cipher on display metrics would leave the decode
+            // nothing to interpolate — the line would arrive already at its final
+            // width and then resolve in place, which is the flat version of the
+            // effect.
+            var glyphs = decoding ? notification.Cipher ??= EorzeanCipher.Build(text) : text;
 
-            return;
-        }
-
-        if (decoding && revealProgress < 1f)
-        {
-            DrawDecodingLine(
-                notification,
+            DrawMovingRun(
                 drawList,
-                centerX,
-                top,
-                text,
-                revealProgress,
-                GlyphPainter.Packed(this.config.TextColor, opacity),
-                GlyphPainter.Packed(this.config.StrokeColor, opacity),
-                strokeDistance);
+                decoding ? this.fonts.EorzeanDisplay! : this.fonts.Display,
+                decoding ? notification.CipherLayout : notification.DisplayLayout,
+                glyphs, centerX, top, motion, notification.MotionProgress, opacity, strokeDistance);
 
             return;
         }
 
-        // Settled. The one path with no per-glyph work at all, and the one a
+        if (decoding && notification.RevealProgress < 1f)
+        {
+            DrawDecodingRun(
+                notification, drawList, centerX, top, text,
+                notification.RevealProgress, fill, stroke, strokeDistance);
+
+            return;
+        }
+
+        // Settled: the one path with no per-glyph work at all, and the one a
         // notification spends most of its life on — the hold is longer than the
         // motion and the decode together.
         using (this.fonts.Display.Push())
-        {
-            var fill = GlyphPainter.Packed(this.config.TextColor, opacity);
-            var stroke = GlyphPainter.Packed(this.config.StrokeColor, opacity);
-            var tracking = Tracking();
-
-            if (tracking > 0f)
-            {
-                GlyphPainter.DrawRun(
-                    drawList, Positions(notification.DisplayLayout, text, tracking, centerX),
-                    text, top, fill, stroke, strokeDistance);
-            }
-            else
-            {
-                GlyphPainter.DrawCentered(drawList, centerX, top, text, fill, stroke, strokeDistance);
-            }
-        }
+            DrawStaticRun(drawList, notification.DisplayLayout, text, centerX, top, Tracking(), fill, stroke, strokeDistance);
     }
 
-    // The motion, with a decode still to come: the glyphs that fly in are the
-    // Eorzean cipher, laid out on the Eorzean font's own advances.
+    // One run of glyphs mid-motion. GlyphAnimator decides what each glyph is doing;
+    // this places it and picks its colour.
     //
-    // Those advances are what makes this its own method rather than a flag on
-    // DrawAnimatedLine. The Eorzean face is far wider than the display one, and
-    // landing the cipher on display metrics would leave the decode nothing to
-    // interpolate — the line would arrive already at its final width and then
-    // resolve in place, which is the flat version of the effect.
-    private void DrawArrivingCipher(
-        AreaNotification notification, ImDrawListPtr drawList, float centerX, float top, float progress,
-        float opacity, float strokeDistance, MotionEffect motion)
+    // Tracking and the font size are measured against the display face even when
+    // the glyphs are drawn in the Eorzean one, so the two stages agree about how
+    // far apart the glyphs sit and how far they travel.
+    private void DrawMovingRun(
+        ImDrawListPtr drawList, IFontHandle font, LineLayout cache, string glyphs,
+        float centerX, float top, MotionEffect motion, float progress, float opacity, float strokeDistance)
     {
-        var eorzean = this.fonts.EorzeanDisplay!;
-        var cipher = notification.Cipher ??= EorzeanCipher.Build(notification.CasedText);
-
         float tracking;
         float fontSize;
         using (this.fonts.Display.Push())
@@ -373,48 +353,13 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             fontSize = ImGui.GetTextLineHeight();
         }
 
-        using (eorzean.Push())
+        using (font.Push())
         {
-            var xs = Positions(notification.CipherLayout, cipher, tracking, centerX);
+            var xs = Positions(cache, glyphs, tracking, centerX);
 
-            for (var i = 0; i < cipher.Length; i++)
+            for (var i = 0; i < glyphs.Length; i++)
             {
-                var state = GlyphAnimator.For(motion, i, cipher.Length, progress, fontSize);
-
-                if (state.Alpha <= 0f)
-                    continue;
-
-                var color = state.Heat > 0f
-                    ? Vector4.Lerp(this.config.TextColor, EmberColor, state.Heat)
-                    : this.config.TextColor;
-
-                GlyphPainter.DrawGlyph(
-                    drawList,
-                    xs[i],
-                    top + state.OffsetY,
-                    cipher[i],
-                    GlyphPainter.Packed(color, opacity * state.Alpha),
-                    GlyphPainter.Packed(this.config.StrokeColor, opacity * state.Alpha),
-                    strokeDistance);
-            }
-        }
-    }
-
-    // Motion without a decode. GlyphAnimator decides what each glyph is doing;
-    // this places it and picks its colour.
-    private void DrawAnimatedLine(
-        AreaNotification notification, ImDrawListPtr drawList, float centerX, float top, string text, float progress,
-        float opacity, float strokeDistance, MotionEffect effect)
-    {
-        using (this.fonts.Display.Push())
-        {
-            var tracking = Tracking();
-            var fontSize = ImGui.GetTextLineHeight();
-            var xs = Positions(notification.DisplayLayout, text, tracking, centerX);
-
-            for (var i = 0; i < text.Length; i++)
-            {
-                var state = GlyphAnimator.For(effect, i, text.Length, progress, fontSize);
+                var state = GlyphAnimator.For(motion, i, glyphs.Length, progress, fontSize);
 
                 if (state.Alpha <= 0f)
                     continue;
@@ -430,39 +375,13 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
                     drawList,
                     xs[i],
                     top + state.OffsetY,
-                    text[i],
+                    glyphs[i],
                     GlyphPainter.Packed(color, opacity * state.Alpha),
                     GlyphPainter.Packed(this.config.StrokeColor, opacity * state.Alpha),
                     strokeDistance);
             }
         }
     }
-
-    // Glyph positions for a line, from the cache when it still holds and worked
-    // out afresh when it does not. The font must already be pushed: what is being
-    // remembered is a measurement against it, which is also why the font's
-    // generation is part of the key.
-    private float[] Positions(LineLayout cache, string text, float tracking, float centerX)
-    {
-        var generation = this.fonts.Generation;
-
-        return cache.IsCurrent(text, tracking, centerX, generation)
-            ? cache.Positions
-            : cache.Store(text, tracking, centerX, generation, GlyphPainter.GlyphPositions(text, centerX, tracking));
-    }
-
-    // What a glyph is at the moment it catches: hot, and well clear of any colour
-    // a player is likely to have chosen for the text itself.
-    private static readonly Vector4 EmberColor = new(1f, 0.55f, 0.15f, 1f);
-
-    // Extra advance between glyphs, in pixels, for whichever font is pushed right
-    // now. Read from ImGui rather than from the configured size so the header —
-    // built at its own size, from a different family — gets its own proportional
-    // share of the one setting.
-    //
-    // GetTextLineHeight is the font's size: ImGui returns the same field from
-    // both, and this file already leans on it for the line advance below.
-    private float Tracking() => ImGui.GetTextLineHeight() * (this.config.LetterSpacing / 100f);
 
     // Eorzean -> readable decode, the same trick the GW2 original uses.
     //
@@ -478,13 +397,12 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     //
     // Runs after any motion has finished, so the glyphs are already at rest and
     // this only has to substitute them.
-    private void DrawDecodingLine(
-        AreaNotification notification, ImDrawListPtr drawList, float centerX, float top, string text, float progress,
-        uint fill, uint stroke, float strokeDistance)
+    private void DrawDecodingRun(
+        AreaNotification notification, ImDrawListPtr drawList, float centerX, float top, string text,
+        float progress, uint fill, uint stroke, float strokeDistance)
     {
         // Non-null and mid-reveal, both established by the caller.
         var eorzean = this.fonts.EorzeanDisplay!;
-
         var cipher = notification.Cipher ??= EorzeanCipher.Build(text);
 
         // Both handles are built at the display size, so one tracking value serves
@@ -513,14 +431,50 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         using (eorzean.Push())
         {
             for (var i = decoded; i < text.Length; i++)
-                GlyphPainter.DrawGlyph(drawList, GlyphPainter.Lerp(runes[i], plain[i], progress), top, cipher[i], fill, stroke, strokeDistance);
+                GlyphPainter.DrawGlyph(
+                    drawList, GlyphPainter.Lerp(runes[i], plain[i], progress), top, cipher[i], fill, stroke, strokeDistance);
         }
 
         using (this.fonts.Display.Push())
         {
             for (var i = 0; i < decoded && i < text.Length; i++)
-                GlyphPainter.DrawGlyph(drawList, GlyphPainter.Lerp(runes[i], plain[i], progress), top, text[i], fill, stroke, strokeDistance);
+                GlyphPainter.DrawGlyph(
+                    drawList, GlyphPainter.Lerp(runes[i], plain[i], progress), top, text[i], fill, stroke, strokeDistance);
         }
     }
 
+    // A line at rest. Letter spacing is what decides how: without it ImGui can draw
+    // the whole string in one call, and with it every glyph has to be placed.
+    // The font must already be pushed.
+    private void DrawStaticRun(
+        ImDrawListPtr drawList, LineLayout cache, string text, float centerX, float top,
+        float tracking, uint fill, uint stroke, float strokeDistance)
+    {
+        if (tracking > 0f)
+            GlyphPainter.DrawRun(drawList, Positions(cache, text, tracking, centerX), text, top, fill, stroke, strokeDistance);
+        else
+            GlyphPainter.DrawCentered(drawList, centerX, top, text, fill, stroke, strokeDistance);
+    }
+
+    // Glyph positions for a line, from the cache when it still holds and worked
+    // out afresh when it does not. The font must already be pushed: what is being
+    // remembered is a measurement against it, which is also why the font's
+    // generation is part of the key.
+    private float[] Positions(LineLayout cache, string text, float tracking, float centerX)
+    {
+        var generation = this.fonts.Generation;
+
+        return cache.IsCurrent(text, tracking, centerX, generation)
+            ? cache.Positions
+            : cache.Store(text, tracking, centerX, generation, GlyphPainter.GlyphPositions(text, centerX, tracking));
+    }
+
+    // Extra advance between glyphs, in pixels, for whichever font is pushed right
+    // now. Read from ImGui rather than from the configured size so the header —
+    // built at its own size, from a different family — gets its own proportional
+    // share of the one setting.
+    //
+    // GetTextLineHeight is the font's size: ImGui returns the same field from
+    // both, and this file already leans on it for the line advance.
+    private float Tracking() => ImGui.GetTextLineHeight() * (this.config.LetterSpacing / 100f);
 }

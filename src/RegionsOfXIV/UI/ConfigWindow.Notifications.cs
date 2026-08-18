@@ -11,73 +11,52 @@ internal sealed partial class ConfigWindow
         using var tab = ImRaii.TabItem("Notifications");
         if (!tab) return;
 
-        var changed = false;
-
         ImGui.TextWrapped(
             "This plugin replaces the game's own location text rather than drawing alongside " +
             "it. If you turn the suppression below off, the game's version comes back.");
         ImGui.Separator();
 
-        var zone = this.config.ZoneNotificationEnabled;
-        if (ImGui.Checkbox("Zone changes", ref zone))
-        {
-            this.config.ZoneNotificationEnabled = zone;
-            changed = true;
-        }
+        var changed = Checkbox("Zone changes",
+            () => this.config.ZoneNotificationEnabled, v => this.config.ZoneNotificationEnabled = v);
 
-        var area = this.config.AreaNotificationEnabled;
-        if (ImGui.Checkbox("Area changes", ref area))
-        {
-            this.config.AreaNotificationEnabled = area;
-            changed = true;
-        }
+        changed |= Checkbox("Area changes",
+            () => this.config.AreaNotificationEnabled, v => this.config.AreaNotificationEnabled = v);
 
-        var subArea = this.config.SubAreaNotificationEnabled;
-        if (ImGui.Checkbox("Sub-area changes", ref subArea))
-        {
-            this.config.SubAreaNotificationEnabled = subArea;
-            changed = true;
-        }
+        changed |= Checkbox("Sub-area changes",
+            () => this.config.SubAreaNotificationEnabled, v => this.config.SubAreaNotificationEnabled = v);
 
         ImGui.Separator();
 
-        var includeParent = this.config.IncludeParentTierAsHeader;
-        if (ImGui.Checkbox("Show the parent tier as a header", ref includeParent))
-        {
-            this.config.IncludeParentTierAsHeader = includeParent;
-            changed = true;
-        }
+        changed |= Checkbox("Show the parent tier as a header",
+            () => this.config.IncludeParentTierAsHeader, v => this.config.IncludeParentTierAsHeader = v);
 
-        var hideNative = this.config.HideNativeAreaText;
-        if (ImGui.Checkbox("Hide the game's own area text", ref hideNative))
+        // Switching suppression off puts the game's own text back immediately,
+        // rather than at the next reload — the addon is already on screen and only
+        // needs showing again.
+        if (Checkbox("Hide the game's own area text",
+                () => this.config.HideNativeAreaText, v => this.config.HideNativeAreaText = v))
         {
-            this.config.HideNativeAreaText = hideNative;
             changed = true;
 
-            if (!hideNative)
+            if (!this.config.HideNativeAreaText)
                 this.actions.RestoreNativeAreaText();
         }
 
-        if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Suppresses the native \"_AreaText\" flash, which draws underneath this plugin.");
+        Tooltip("Suppresses the native \"_AreaText\" flash, which draws underneath this plugin.");
 
-        var hideLoadingTitle = this.config.HideNativeLoadingTitle;
-        if (ImGui.Checkbox("Hide the loading-screen zone title", ref hideLoadingTitle))
+        if (Checkbox("Hide the loading-screen zone title",
+                () => this.config.HideNativeLoadingTitle, v => this.config.HideNativeLoadingTitle = v))
         {
-            this.config.HideNativeLoadingTitle = hideLoadingTitle;
             changed = true;
 
-            if (!hideLoadingTitle)
+            if (!this.config.HideNativeLoadingTitle)
                 this.actions.RestoreNativeLoadingTitle();
         }
 
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip(
-                "Suppresses \"_LocationTitle\" and \"_LocationTitleShort\", the gold title\n" +
-                "drawn over the loading screen, and shows the same names in this\n" +
-                "plugin's style instead.");
-        }
+        Tooltip(
+            "Suppresses \"_LocationTitle\" and \"_LocationTitleShort\", the gold title\n" +
+            "drawn over the loading screen, and shows the same names in this\n" +
+            "plugin's style instead.");
 
         if (changed)
             this.config.Save();
