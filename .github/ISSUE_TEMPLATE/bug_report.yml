@@ -1,0 +1,123 @@
+name: Bug report
+description: Something the plugin does wrong, or does not do at all.
+title: "[Bug]: "
+labels: ["bug"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. The fields below are the ones that usually
+        decide whether a problem can be reproduced — the version and the place
+        it happened matter more than anything else, because most of what this
+        plugin does depends on where you are standing.
+
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version
+      description: >-
+        Shown next to the plugin in `/xlplugins`, or at the bottom of the
+        settings window.
+      placeholder: "0.2.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install it?
+      description: >-
+        Worth asking, because a manual install does not update itself — an old
+        build is a common explanation for something already fixed.
+      options:
+        - Custom plugin repository
+        - Manually, from a release zip
+        - Built it from source
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you saw, and what you expected instead.
+      placeholder: >-
+        Walked from Summerford into Summerford Farms and no notification
+        appeared. Zone changes still announce normally.
+    validations:
+      required: true
+
+  - type: textarea
+    id: where
+    attributes:
+      label: Where did it happen?
+      description: >-
+        Zone, area or sub-area, and whether you were in a duty, a cutscene, a
+        settlement or flying. This plugin behaves differently in all of those,
+        so it is usually the fastest route to reproducing it.
+      placeholder: "Central Thanalan, on a flying mount"
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: If you can make it happen on demand, how?
+      placeholder: |
+        1. Teleport to ...
+        2. Walk south until ...
+        3. Nothing appears
+    validations:
+      required: false
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Log output
+      description: >-
+        Open `/xllog` and look for lines mentioning RegionsOfXIV, or any errors
+        around the time it happened. Paste what you find — this box formats it
+        as code automatically, no backticks needed.
+      render: text
+    validations:
+      required: false
+
+  - type: dropdown
+    id: language
+    attributes:
+      label: Client language
+      description: >-
+        Place names and fonts are language-dependent, so this matters for
+        anything involving missing, blank or wrongly rendered text.
+      options:
+        - English
+        - Japanese
+        - German
+        - French
+        - Other
+    validations:
+      required: false
+
+  - type: textarea
+    id: settings
+    attributes:
+      label: Anything non-default in the settings?
+      description: >-
+        Font, preset, motion or particle effect, and whether you have changed
+        the suppression options. Only relevant for visual problems, so skip it
+        if the plugin simply said nothing.
+      placeholder: "Trump Gothic at 110px, Inferno preset, particles on"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I am on the latest version, or have said above which one I am on.
+          required: true
+        - label: I searched the existing issues.
+          required: false
