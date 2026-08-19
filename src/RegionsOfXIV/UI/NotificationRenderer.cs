@@ -18,6 +18,9 @@ internal sealed class NotificationRenderer(Configuration config, FontService fon
 
     private const float IconGap = 0.25f;
 
+    /// <summary>Least room between the weather line and the block when an underline divides them.</summary>
+    private const float UnderlinedWeatherGap = 1.7f;
+
     public bool IsDecoding => config.DecodeEffectEnabled && fonts.EorzeanDisplay != null;
 
     public void Draw(AreaNotification notification)
@@ -60,11 +63,14 @@ internal sealed class NotificationRenderer(Configuration config, FontService fon
         var stroke = GlyphPainter.Packed(config.StrokeColor, notification.Opacity);
         var strokeDistance = ImGuiHelpers.GlobalScale * config.StrokeThickness;
 
+        float top;
+        float textCenterX;
+
         using (fonts.Header.Push())
         {
-            // One header line above the block, matching the gap the header keeps
-            // from the name below it. Outgoing lines drift up, away from the block.
-            var top = anchor - HeaderGap() - (notification.StackOffset * ImGuiHelpers.GlobalScale);
+            // Above the block by roughly the gap the header keeps from the name below
+            // it. Outgoing lines drift up, away from the block.
+            top = anchor - WeatherGap() - (notification.StackOffset * ImGuiHelpers.GlobalScale);
 
             var lineHeight = ImGui.GetTextLineHeight();
 
@@ -75,15 +81,14 @@ internal sealed class NotificationRenderer(Configuration config, FontService fon
 
             // The icon and the text are centred as one group, so the text shifts right
             // by half the room the icon takes up.
-            var textCenterX = centerX + (iconWidth / 2f);
+            textCenterX = centerX + (iconWidth / 2f);
 
-            var tracking = Tracking();
-            var layout = Layout(notification.DisplayLayout, text, tracking, textCenterX);
+            var width = Layout(notification.DisplayLayout, text, Tracking(), textCenterX).Width;
 
             if (hasIcon && WeatherIcon(notification.IconId) is { } icon)
             {
                 var size = lineHeight * IconScale;
-                var left = textCenterX - (layout.Width / 2f) - iconWidth;
+                var left = textCenterX - (width / 2f) - iconWidth;
                 var iconTop = top + ((lineHeight - size) / 2f);
 
                 drawList.AddImage(
@@ -95,8 +100,32 @@ internal sealed class NotificationRenderer(Configuration config, FontService fon
                     GlyphPainter.Packed(Vector4.One, notification.Opacity));
             }
 
-            DrawRun(drawList, layout, text, textCenterX, top, tracking, fill, stroke, strokeDistance);
+            if (config.UnderlineHeader)
+            {
+                var underlineY = top + lineHeight + (4f * ImGuiHelpers.GlobalScale);
+                GlyphPainter.DrawUnderline(
+                    drawList, centerX, underlineY, iconWidth + width,
+                    notification.RevealProgress, fill, stroke,
+                    2f * ImGuiHelpers.GlobalScale);
+            }
         }
+
+        DrawAnimatedText(
+            notification, drawList, new FontPair(fonts.Header, fonts.EorzeanHeader),
+            text, config.HeaderColor, textCenterX, top, strokeDistance);
+    }
+
+    /// <summary>
+    /// How far the weather line sits above the block. An underline needs room to breathe
+    /// on both sides, which the overlapped header spacing does not leave on its own.
+    /// </summary>
+    private float WeatherGap()
+    {
+        var gap = HeaderGap();
+
+        return config.UnderlineHeader
+            ? MathF.Max(gap, ImGui.GetTextLineHeight() * UnderlinedWeatherGap)
+            : gap;
     }
 
     /// <summary>The game's own icon for a weather, or null while it is still loading.</summary>
@@ -175,9 +204,18 @@ internal sealed class NotificationRenderer(Configuration config, FontService fon
     private void DrawTextLine(
         AreaNotification notification, ImDrawListPtr drawList, float centerX, float top, float strokeDistance)
     {
-        var text = notification.CasedText;
+        DrawAnimatedText(
+            notification, drawList, new FontPair(fonts.Display, fonts.EorzeanDisplay),
+            notification.CasedText, config.TextColor, centerX, top, strokeDistance);
+    }
+
+    /// <summary>Draws one line through whichever stage it is in: moving, decoding, or settled.</summary>
+    private void DrawAnimatedText(
+        AreaNotification notification, ImDrawListPtr drawList, in FontPair fontPair,
+        string text, Vector4 color, float centerX, float top, float strokeDistance)
+    {
         var opacity = notification.Opacity;
-        var decoding = IsDecoding;
+        var decoding = config.DecodeEffectEnabled && fontPair.Eorzean != null;
 
         if (config.Motion != MotionEffect.None && notification.MotionProgress < 1f)
         {
@@ -185,26 +223,27 @@ internal sealed class NotificationRenderer(Configuration config, FontService fon
 
             DrawMovingRun(
                 drawList,
-                decoding ? fonts.EorzeanDisplay! : fonts.Display,
+                fontPair,
+                decoding ? fontPair.Eorzean! : fontPair.Plain,
                 decoding ? notification.CipherLayout : notification.DisplayLayout,
-                glyphs, centerX, top, config.Motion, notification.MotionProgress, opacity, strokeDistance);
+                glyphs, color, centerX, top, notification.MotionProgress, opacity, strokeDistance);
 
             return;
         }
 
-        var fill = GlyphPainter.Packed(config.TextColor, opacity);
+        var fill = GlyphPainter.Packed(color, opacity);
         var stroke = GlyphPainter.Packed(config.StrokeColor, opacity);
 
         if (decoding && notification.RevealProgress < 1f)
         {
             DrawDecodingRun(
-                notification, drawList, centerX, top, text,
+                notification, drawList, fontPair, centerX, top, text,
                 notification.RevealProgress, fill, stroke, strokeDistance);
 
             return;
         }
 
-        using (fonts.Display.Push())
+        using (fontPair.Plain.Push())
         {
             var tracking = Tracking();
             DrawRun(drawList, Layout(notification.DisplayLayout, text, tracking, centerX),
@@ -213,12 +252,12 @@ internal sealed class NotificationRenderer(Configuration config, FontService fon
     }
 
     private void DrawMovingRun(
-        ImDrawListPtr drawList, IFontHandle font, LineLayout cache, string glyphs,
-        float centerX, float top, MotionEffect motion, float progress, float opacity, float strokeDistance)
+        ImDrawListPtr drawList, in FontPair fontPair, IFontHandle font, LineLayout cache, string glyphs,
+        Vector4 color, float centerX, float top, float progress, float opacity, float strokeDistance)
     {
         float tracking;
         float fontSize;
-        using (fonts.Display.Push())
+        using (fontPair.Plain.Push())
         {
             tracking = Tracking();
             fontSize = ImGui.GetTextLineHeight();
@@ -230,21 +269,21 @@ internal sealed class NotificationRenderer(Configuration config, FontService fon
 
             for (var i = 0; i < glyphs.Length; i++)
             {
-                var state = GlyphAnimator.For(motion, i, glyphs.Length, progress, fontSize);
+                var state = GlyphAnimator.For(config.Motion, i, glyphs.Length, progress, fontSize);
 
                 if (state.Alpha <= 0f)
                     continue;
 
-                var color = state.Heat > 0f
-                    ? Vector4.Lerp(config.TextColor, EmberColor, state.Heat)
-                    : config.TextColor;
+                var glyphColor = state.Heat > 0f
+                    ? Vector4.Lerp(color, EmberColor, state.Heat)
+                    : color;
 
                 GlyphPainter.DrawGlyph(
                     drawList,
                     xs[i],
                     top + state.OffsetY,
                     glyphs[i],
-                    GlyphPainter.Packed(color, opacity * state.Alpha),
+                    GlyphPainter.Packed(glyphColor, opacity * state.Alpha),
                     GlyphPainter.Packed(config.StrokeColor, opacity * state.Alpha),
                     strokeDistance);
             }
@@ -252,16 +291,17 @@ internal sealed class NotificationRenderer(Configuration config, FontService fon
     }
 
     private void DrawDecodingRun(
-        AreaNotification notification, ImDrawListPtr drawList, float centerX, float top, string text,
+        AreaNotification notification, ImDrawListPtr drawList, in FontPair fontPair,
+        float centerX, float top, string text,
         float progress, uint fill, uint stroke, float strokeDistance)
     {
-        var eorzean = fonts.EorzeanDisplay!;
+        var eorzean = fontPair.Eorzean!;
         var cipher = notification.Cipher ??= EorzeanCipher.Build(text);
         var decoded = (int)MathF.Round(progress * text.Length);
 
         float tracking;
         float[] plain;
-        using (fonts.Display.Push())
+        using (fontPair.Plain.Push())
         {
             tracking = Tracking();
             plain = Layout(notification.DisplayLayout, text, tracking, centerX).Positions;
@@ -277,13 +317,16 @@ internal sealed class NotificationRenderer(Configuration config, FontService fon
                     drawList, GlyphPainter.Lerp(runes[i], plain[i], progress), top, cipher[i], fill, stroke, strokeDistance);
         }
 
-        using (fonts.Display.Push())
+        using (fontPair.Plain.Push())
         {
             for (var i = 0; i < decoded && i < text.Length; i++)
                 GlyphPainter.DrawGlyph(
                     drawList, GlyphPainter.Lerp(runes[i], plain[i], progress), top, text[i], fill, stroke, strokeDistance);
         }
     }
+
+    /// <summary>A line font, plus the runes it decodes from when the effect is on.</summary>
+    private readonly record struct FontPair(IFontHandle Plain, IFontHandle? Eorzean);
 
     private static void DrawRun(
         ImDrawListPtr drawList, LineLayout layout, string text, float centerX, float top,

@@ -27,8 +27,8 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         this.config = config;
         this.renderer = new NotificationRenderer(config, fonts);
 
-        this.locations = new Lane(this.renderer.Draw, animated: true);
-        this.weather = new Lane(this.renderer.DrawWeather, animated: false);
+        this.locations = new Lane(this.renderer.Draw);
+        this.weather = new Lane(this.renderer.DrawWeather);
 
         Flags = ImGuiWindowFlags.NoDecoration
                 | ImGuiWindowFlags.NoInputs
@@ -188,10 +188,8 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             line.Header,
             line.Text,
             this.config.FadeInDuration,
-            lane.Animated && this.config.Motion != MotionEffect.None
-                ? this.config.MotionDuration
-                : TimeSpan.Zero,
-            lane.Animated && this.renderer.IsDecoding ? this.config.RevealDuration : TimeSpan.Zero,
+            this.config.Motion != MotionEffect.None ? this.config.MotionDuration : TimeSpan.Zero,
+            this.renderer.IsDecoding ? this.config.RevealDuration : TimeSpan.Zero,
             this.config.ShowDuration,
             this.config.FadeOutDuration)
         {
@@ -302,13 +300,11 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     /// <summary>What one notification says. A null Line means the lane has nothing to show.</summary>
     private readonly record struct Line(string? Header, string Text, uint Icon = 0);
 
-    private sealed class Lane(Action<AreaNotification> draw, bool animated)
+    private sealed class Lane(Action<AreaNotification> draw)
     {
         public readonly List<AreaNotification> Items = [];
 
         public readonly Action<AreaNotification> Draw = draw;
-
-        public readonly bool Animated = animated;
 
         public AreaNotification? Preview;
 
