@@ -15,9 +15,14 @@ namespace RegionsOfXIV;
 // defaults — and then layers its own look on top.
 internal static class ConfigurationCopy
 {
-    // Version says which shape the file is in, not what the user prefers, and a
-    // preset holding the preset list would nest without end.
-    private static readonly string[] NotCopied = ["Version", "UserPresets"];
+    // None of these three is a preference.
+    //
+    // Version says which shape the file is in. A preset holding the preset list
+    // would nest without end. LastSeenVersion records which changelog this player
+    // has read — carrying it would let an imported preset either re-show the
+    // changelog or suppress the next one, depending on whose machine the code came
+    // from.
+    private static readonly string[] NotCopied = ["Version", "UserPresets", "LastSeenVersion"];
 
     // Every property that counts as a setting, resolved once. The set cannot change
     // at runtime, and nothing here runs in the draw path, but there is no reason to

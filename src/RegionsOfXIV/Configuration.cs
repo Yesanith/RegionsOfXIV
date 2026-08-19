@@ -25,6 +25,15 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
     public int Version { get; set; } = CurrentVersion;
 
+    // The plugin release whose changelog this player has already been shown, as
+    // "0.2.2.0". Null on a config written before the changelog window existed.
+    //
+    // Nothing to do with Version above, which is the shape of this file. This one
+    // tracks the plugin's own release number, and is not a preference — see
+    // ConfigurationCopy, which excludes it from presets and share codes so that
+    // importing somebody else's look cannot make the changelog reappear or vanish.
+    public string? LastSeenVersion { get; set; }
+
     // --- what gets announced -----------------------------------------------
 
     // All three on: the plugin hides the game's own zone title rather than
