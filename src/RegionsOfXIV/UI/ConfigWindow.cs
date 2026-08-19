@@ -186,9 +186,17 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         return changed;
     }
 
+    private const float TooltipWidthInEm = 35f;
+
     private static void Tooltip(string text)
     {
-        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-            ImGui.SetTooltip(text);
+        if (!ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+            return;
+
+        using var tooltip = ImRaii.Tooltip();
+
+        ImGui.PushTextWrapPos(ImGui.GetFontSize() * TooltipWidthInEm);
+        ImGui.TextUnformatted(text);
+        ImGui.PopTextWrapPos();
     }
 }

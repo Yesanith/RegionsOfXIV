@@ -30,14 +30,11 @@ internal sealed partial class ConfigWindow
         changed |= Choice("Font",
             () => this.config.DisplayFont, v => this.config.DisplayFont = v, Label);
         Tooltip(
-            "Noto Sans CJK — shipped with Dalamud. Vector rather than bitmap, so it is\n" +
-            "                crisp at any size, and it carries every language.\n\n" +
-            "The game's own faces look more like FFXIV, but are bitmaps baked at fixed\n" +
-            "sizes, so each softens past its own ceiling:\n\n" +
-            "Trump Gothic — the narrow title face. Latin only. Sharp to ~91 px.\n" +
-            "Jupiter — the serif face. Latin only. Sharp to ~61 px.\n" +
-            "Axis — the general UI face. The only game font with Japanese glyphs,\n" +
-            "       but sharp only to 48 px.");
+            "Noto Sans CJK is vector — sharp at any size, and it covers every language.\n\n"
+            + "The game's own faces suit FFXIV better, but each is a bitmap with a ceiling:\n"
+            + "Trump Gothic — Latin only, to 91 px.\n"
+            + "Jupiter — Latin only, to 61 px.\n"
+            + "Axis — to 48 px, the only one with Japanese glyphs.");
 
         DrawFontWarnings();
 
