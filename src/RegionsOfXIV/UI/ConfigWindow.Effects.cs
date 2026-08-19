@@ -19,13 +19,6 @@ internal sealed partial class ConfigWindow
         // would show nothing: these have to start a fresh one to be seen at all.
         var restart = false;
 
-        // Presets first: they are the fastest way to a look worth keeping, and
-        // everything below them is how you adjust one afterwards.
-        ImGui.TextWrapped("Start from a look, then change anything you like.");
-        restart |= DrawPresetButtons();
-        ImGui.TextDisabled("Presets set motion, particles and colours. They leave the decode, font and position as you have them.");
-
-        ImGui.Separator();
         ImGui.TextWrapped("How the letters move as they arrive.");
 
         restart |= Choice("Motion", () => this.config.Motion, v => this.config.Motion = v, Label);
@@ -81,37 +74,4 @@ internal sealed partial class ConfigWindow
             this.actions.LivePreview(SampleHeader, SampleText);
     }
 
-    // Laid out as a wrapping row of buttons rather than a combo, because a preset
-    // is an action and not a stored state — nothing here is "current", and a combo
-    // would imply otherwise.
-    private bool DrawPresetButtons()
-    {
-        var available = ImGui.GetContentRegionAvail().X;
-        var spacing = ImGui.GetStyle().ItemSpacing.X;
-        var padding = ImGui.GetStyle().FramePadding.X * 2f;
-        var spent = 0f;
-        var applied = false;
-
-        foreach (var preset in Presets.All)
-        {
-            var width = ImGui.CalcTextSize(preset.Name).X + padding;
-
-            if (spent > 0f && spent + width < available)
-                ImGui.SameLine();
-            else
-                spent = 0f;
-
-            spent += width + spacing;
-
-            if (ImGui.Button(preset.Name))
-            {
-                preset.Apply(this.config);
-                applied = true;
-            }
-
-            Tooltip(preset.Description);
-        }
-
-        return applied;
-    }
 }

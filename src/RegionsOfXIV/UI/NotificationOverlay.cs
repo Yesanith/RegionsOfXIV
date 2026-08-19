@@ -33,6 +33,14 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     private AreaNotification? preview;
     private DateTime previewTouchedAt;
 
+    // Editing mode. While set, exactly one notification is on screen at any time —
+    // the preview, pinned open indefinitely — and nothing is allowed to stack on
+    // it. The sample it shows is remembered so the mode can put it back after a
+    // restart, which is the one thing that legitimately ends it.
+    private bool previewHeld;
+    private string? heldHeader;
+    private string heldText = string.Empty;
+
     public NotificationOverlay(Configuration config, FontService fonts)
         : base("##RegionsOfXIVOverlay")
     {
@@ -61,12 +69,31 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     {
         this.active.Clear();
         this.preview = null;
+        this.previewHeld = false;
     }
 
     public void Push(string? header, string text)
     {
-        if (string.IsNullOrWhiteSpace(text) && string.IsNullOrWhiteSpace(header))
+        // Editing mode owns the screen. Stacking an announcement on the held
+        // preview is exactly the pile-up the mode exists to prevent, and letting it
+        // through would dismiss the preview and leave the mode showing nothing.
+        //
+        // Dropped rather than queued: the mode is only on while someone is sitting
+        // in the config window with the checkbox ticked, and a zone announcement
+        // replayed on the way out would arrive with no idea what it referred to.
+        if (this.previewHeld)
             return;
+
+        Spawn(header, text);
+    }
+
+    // Appends a notification and sweeps whatever was on screen out from under it.
+    // The common ground between a real announcement and a preview, which differ
+    // only in what happens after.
+    private AreaNotification? Spawn(string? header, string text)
+    {
+        if (string.IsNullOrWhiteSpace(text) && string.IsNullOrWhiteSpace(header))
+            return null;
 
         // Anything arriving supersedes the preview like any other notification, so
         // stop tracking it — the next settings change starts a fresh one rather
@@ -83,14 +110,17 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         // rather than as time spent showing something that is not happening. The
         // decode also depends on a font that may not have loaded, which is
         // knowable here and not inside the notification.
-        this.active.Add(new AreaNotification(
+        var notification = new AreaNotification(
             header,
             text,
             this.config.FadeInDuration,
             this.config.Motion == MotionEffect.None ? TimeSpan.Zero : this.config.MotionDuration,
             IsDecoding ? this.config.RevealDuration : TimeSpan.Zero,
             this.config.ShowDuration,
-            this.config.FadeOutDuration));
+            this.config.FadeOutDuration);
+
+        this.active.Add(notification);
+        return notification;
     }
 
     // The fade and the motion share a stage, so that stage lasts as long as the
@@ -120,12 +150,68 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             return;
         }
 
-        Push(header, text);
+        SpawnPreview(header, text);
+    }
 
-        // Push clears the field and appends, in that order, so the new
-        // notification is both the last entry and safe to claim as the preview.
-        this.preview = this.active[^1];
+    // One sample, start to finish. What the Preview buttons and an applied preset
+    // ask for: not "keep something on screen" but "play it again".
+    //
+    // In editing mode the replay happens in place. The preview already on screen is
+    // removed outright rather than dismissed, so the restart costs nothing on
+    // screen — no outgoing copy sliding down behind the new one, which is what
+    // makes clicking through seven presets in a row read as spam.
+    public void PreviewOnce(string? header, string text)
+    {
+        if (!this.previewHeld)
+        {
+            Spawn(header, text);
+            return;
+        }
+
+        if (this.preview is { } current)
+            this.active.Remove(current);
+
+        SpawnPreview(this.heldHeader, this.heldText);
+    }
+
+    // Enters or leaves editing mode.
+    //
+    // The one preview it holds is an ordinary notification, pinned: it fades in,
+    // runs its motion and decode, and then sits in its Show phase indefinitely
+    // because pinning is exactly what stops that phase timing out. Everything it
+    // draws with is read from the config per frame, so it tracks every setting
+    // as it moves without being restarted.
+    public void HoldPreview(bool held, string? header, string text)
+    {
+        this.previewHeld = held;
+
+        if (!held)
+        {
+            // Unpinned rather than removed: it has long since finished revealing,
+            // so letting go drops it into the same fade-out every notification
+            // gets, and leaving the mode looks like a notification ending.
+            if (this.preview is { } current)
+                current.IsPinned = false;
+
+            this.preview = null;
+            return;
+        }
+
+        this.heldHeader = header;
+        this.heldText = text;
+
+        if (this.preview is not { IsDone: false })
+            SpawnPreview(header, text);
+    }
+
+    private void SpawnPreview(string? header, string text)
+    {
+        if (Spawn(header, text) is not { } notification)
+            return;
+
+        this.preview = notification;
         this.preview.IsPinned = true;
+        this.previewTouchedAt = DateTime.UtcNow;
     }
 
     public override bool DrawConditions() => this.active.Count > 0;
@@ -164,6 +250,11 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     // any other notification gets.
     private void ReleasePreviewIfIdle()
     {
+        // Editing mode is the user saying when it ends, so the idle timer does not
+        // get a vote.
+        if (this.previewHeld)
+            return;
+
         if (this.preview is not { } current)
             return;
 

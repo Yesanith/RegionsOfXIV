@@ -3,47 +3,50 @@ using System.Numerics;
 
 namespace RegionsOfXIV;
 
-// A named starting point: motion, particles and a palette that were chosen to go
-// together.
+// A named look, as a complete configuration.
+//
+// Look holds only the settings that make this preset what it is; ApplyTo puts
+// everything else back to its default first, so a built-in is a whole
+// configuration and not a diff against whatever happened to be there. Two players
+// who click "Inferno" see the same notification, whatever either had changed
+// beforehand — which is what a named preset has to mean to be worth naming.
 //
 // Applied and then forgotten. Nothing records which preset a config came from,
 // and the settings a preset writes are the same ones the tabs edit, so there is
 // no such thing as "leaving" one — you pick a look and then adjust it. The
 // alternative, tracking an active preset and flipping it to "Custom" the moment
 // anything is touched, buys a label at the cost of bookkeeping in every setter.
-internal readonly record struct Preset(string Name, string Description, Action<Configuration> Apply);
+internal readonly record struct Preset(string Name, string Description, Action<Configuration> Look)
+{
+    public void ApplyTo(Configuration config)
+    {
+        ConfigurationCopy.ResetToDefaults(config);
+        this.Look(config);
+    }
+}
 
 internal static class Presets
 {
-    // What every preset deliberately does not touch:
+    // Each Look below writes only what distinguishes it. Size, position, font,
+    // durations, which tiers announce, the decode, when to stay quiet — all of it
+    // arrives from the defaults by way of ResetToDefaults, so nothing here has to
+    // list a setting merely to be complete, and a setting added to Configuration
+    // later is covered the moment it has a default.
     //
-    //   DecodeEffectEnabled  — one decision, made once, in General. A preset that
-    //                          silently switched the decode back on would undo a
-    //                          choice the user made about the whole plugin.
-    //   font, size, position — where the notification sits and how big it is are
-    //                          about the player's screen, not about a look.
-    //   durations            — pacing is a preference; several of these motions
-    //                          read fine fast or slow.
-    //
-    // So a preset is exactly: motion, particles, palette, spacing, casing.
+    // Note this reaches the decode switch too. A preset used to leave
+    // DecodeEffectEnabled alone on the grounds that it was a decision about the
+    // whole plugin; now that applying one is understood as a full reset, carving
+    // out a single setting would be the surprising behaviour rather than the safe
+    // one.
     public static readonly Preset[] All =
     [
+        // Nothing to write: this *is* the defaults, so the reset has already done
+        // the whole job. Kept as a preset because "put it all back" is exactly what
+        // someone reaches for after experimenting.
         new(
             "Classic",
             "The plugin as it ships: a decode, no movement, no particles.",
-            config =>
-            {
-                config.Motion = MotionEffect.None;
-                config.Particles = ParticleEffect.None;
-                config.LetterSpacing = 0f;
-                config.UppercaseText = false;
-                config.TextColor = new Vector4(0.875f, 0.761f, 0.584f, 1f);
-                config.HeaderColor = new Vector4(0.698f, 0.627f, 0.569f, 1f);
-                config.StrokeColor = new Vector4(0f, 0f, 0f, 0.8f);
-                config.StrokeThickness = 1f;
-                config.ParticleDensity = 1f;
-                config.ParticleColor = new Vector4(1f, 0.72f, 0.35f, 1f);
-            }),
+            _ => { }),
 
         new(
             "Inferno",

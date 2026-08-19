@@ -35,6 +35,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly NativeUiSuppressor nativeUiSuppressor;
     private readonly NotificationOverlay overlay;
     private readonly ConfigWindow configWindow;
+    private readonly ChangelogWindow changelogWindow;
     private readonly AnnouncementCoordinator coordinator;
     private readonly UiVisibilityGuard uiVisibilityGuard;
 
@@ -56,14 +57,18 @@ public sealed class Plugin : IDalamudPlugin
         this.configWindow = new ConfigWindow(
             this.config,
             new ConfigActions(
-                this.overlay.Push,
+                this.overlay.PreviewOnce,
                 this.overlay.TouchPreview,
+                this.overlay.HoldPreview,
                 RebuildFonts,
                 this.nativeUiSuppressor.RestoreAreaText,
                 this.nativeUiSuppressor.RestoreLoadingTitle));
 
+        this.changelogWindow = new ChangelogWindow();
+
         this.windowSystem.AddWindow(this.overlay);
         this.windowSystem.AddWindow(this.configWindow);
+        this.windowSystem.AddWindow(this.changelogWindow);
 
         // Nothing on screen announces that a freshly installed plugin has settings,
         // and this one's defaults change what the game itself draws — it hides the
@@ -75,14 +80,16 @@ public sealed class Plugin : IDalamudPlugin
         // load. Deleting the config to reset therefore also brings the window back,
         // which is the behaviour you would want.
         if (isFirstRun)
-        {
             this.configWindow.IsOpen = true;
-            this.config.Save();
-        }
+
+        // Saves in both cases — see below for why that is what makes each of them
+        // happen once rather than every load.
+        SettleVersion(isFirstRun);
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
-            HelpMessage = "Open the Regions of XIV settings. \"/regions test\" fires a sample notification.",
+            HelpMessage = "Open the Regions of XIV settings. \"/regions test\" fires a sample notification, "
+                          + "\"/regions changelog\" shows what has changed.",
         });
 
         PluginInterface.UiBuilder.Draw += this.windowSystem.Draw;
@@ -91,6 +98,41 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.DefaultGlobalScaleChanged += RebuildFonts;
 
         Log.Information("Regions of XIV loaded.");
+    }
+
+    // Decides whether this load has a changelog to show, and records the version
+    // either way.
+    //
+    // Recording is what makes it once. The window is opened here and the version
+    // written in the same breath, rather than when the player closes the window —
+    // otherwise a reload with it still open would show it again, and quitting the
+    // game without closing it would mean it never stopped.
+    //
+    // A first install is stamped but shown nothing. Somebody who has never run this
+    // plugin has not missed anything, and the config window is already opening in
+    // front of them; two unrequested windows at once is one too many.
+    private void SettleVersion(bool isFirstRun)
+    {
+        var current = Changelog.Current.ToString();
+
+        // The ordinary case, every load after the first on a given build.
+        if (this.config.LastSeenVersion == current)
+            return;
+
+        if (!isFirstRun)
+        {
+            this.changelogWindow.ShowSince(Changelog.Parse(this.config.LastSeenVersion));
+
+            if (this.changelogWindow.IsOpen)
+                Log.Information($"Updated from {this.config.LastSeenVersion ?? "an earlier build"} to {current}.");
+        }
+
+        // Reached whether or not anything was shown, which is the point: a build
+        // that adds no changelog entry still moves the marker, so the release after
+        // it is not compared against a version two behind. It also writes the file
+        // that makes a first install a first install exactly once.
+        this.config.LastSeenVersion = current;
+        this.config.Save();
     }
 
     // Reverse construction order: the coordinator unsubscribes from the suppressor,
@@ -107,6 +149,7 @@ public sealed class Plugin : IDalamudPlugin
         this.coordinator.Dispose();
 
         this.windowSystem.RemoveAllWindows();
+        this.changelogWindow.Dispose();
         this.configWindow.Dispose();
         this.overlay.Dispose();
 
@@ -172,9 +215,21 @@ public sealed class Plugin : IDalamudPlugin
 
     private void OnCommand(string command, string args)
     {
-        if (args.Trim().Equals("test", StringComparison.OrdinalIgnoreCase))
+        var argument = args.Trim();
+
+        if (argument.Equals("test", StringComparison.OrdinalIgnoreCase))
         {
             this.coordinator.PushPreview();
+            return;
+        }
+
+        // On demand, because the automatic showing is deliberately once and there is
+        // otherwise no way back to it — the version is stamped the moment the window
+        // opens, so by the time anyone thinks "what did that say?" it is unreachable
+        // short of hand-editing the config file.
+        if (argument.Equals("changelog", StringComparison.OrdinalIgnoreCase))
+        {
+            this.changelogWindow.ShowAll();
             return;
         }
 

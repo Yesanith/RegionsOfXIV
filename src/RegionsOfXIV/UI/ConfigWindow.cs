@@ -1,8 +1,10 @@
 using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
+using Dalamud.Utility;
 
 namespace RegionsOfXIV.UI;
 
@@ -12,10 +14,12 @@ namespace RegionsOfXIV.UI;
 // Preview fires a fresh notification start to finish, which is what the button
 // wants. LivePreview keeps one on screen for as long as the settings are moving,
 // which is what the sliders want — dragging with the former would restart the
-// animation every frame.
+// animation every frame. HoldPreview turns editing mode on and off, under which
+// both of the above collapse onto a single notification that never leaves.
 internal readonly record struct ConfigActions(
     Action<string?, string> Preview,
     Action<string?, string> LivePreview,
+    Action<bool, string?, string> HoldPreview,
     Action RebuildFonts,
     Action RestoreNativeAreaText,
     Action RestoreNativeLoadingTitle);
@@ -24,6 +28,12 @@ internal sealed partial class ConfigWindow : Window, IDisposable
 {
     private readonly Configuration config;
     private readonly ConfigActions actions;
+
+    // Editing mode, held here rather than in Configuration: it describes what the
+    // player is doing this minute, not what they prefer, and a saved one would
+    // come back after a restart as a notification stuck on screen with nothing
+    // obvious switching it off.
+    private bool editing;
 
     public ConfigWindow(Configuration config, ConfigActions actions)
         : base("Regions of XIV###RegionsOfXIVConfig")
@@ -36,25 +46,83 @@ internal sealed partial class ConfigWindow : Window, IDisposable
             MinimumSize = new Vector2(420, 380),
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue),
         };
+
+        // Comments, not Discord. The enum has a Discord member, but its glyph lives
+        // in FontAwesome's Brands set and Dalamud only loads Free Solid — asking for
+        // it draws a blank box. A speech bubble is the honest Solid stand-in.
+        TitleBarButtons.Add(new TitleBarButton
+        {
+            Icon = FontAwesomeIcon.Comments,
+            IconOffset = new Vector2(1.5f, 1f),
+            Click = _ => Util.OpenLink(DiscordInvite),
+            ShowTooltip = () => ImGui.SetTooltip($"Join the Discord\n{DiscordInvite}"),
+        });
     }
 
     public void Dispose() { }
 
+    // Closing the window is the other way out of editing mode, and the one people
+    // will reach for without thinking about it. Without this the sample would stay
+    // on screen with the only switch for it now hidden.
+    public override void OnClose() => SetEditing(false);
+
     public override void Draw()
     {
+        DrawEditingToggle();
+
         using var tabs = ImRaii.TabBar("##RegionsOfXIVTabs");
         if (!tabs) return;
 
         DrawGeneralTab();
         DrawEffectsTab();
+        DrawPresetsTab();
         DrawNotificationsTab();
         DrawDurationsTab();
+    }
+
+    // Above the tab bar rather than on a tab: it changes what every tab's controls
+    // do, so it has to be visible and reachable from all of them.
+    private void DrawEditingToggle()
+    {
+        // The return value is the only one on this window that goes unused: the
+        // setter is where the work happens, because leaving the mode has to reach
+        // the overlay from OnClose too, where no widget was clicked.
+        Checkbox("Editing mode", () => this.editing, SetEditing);
+
+        Tooltip(
+            "Keeps one sample notification on screen while you work, instead of\n" +
+            "starting a new one every time you change something.\n\n" +
+            "Zone announcements are held back while this is on. It switches itself\n" +
+            "off when you close this window.");
+
+        ImGui.Separator();
+    }
+
+    private void SetEditing(bool on)
+    {
+        this.editing = on;
+        this.actions.HoldPreview(on, SampleHeader, SampleText);
     }
 
     // A parent/child pair from the starting zones, so the sample exercises both
     // lines and the decode effect has real Latin text to work on.
     private const string SampleHeader = "Middle La Noscea";
     private const string SampleText = "Summerford Farms";
+
+    // Reachable two ways, deliberately, because they answer different questions.
+    // The title-bar button is the conventional Dalamud spot for "where do I go with
+    // this plugin", available whichever tab you are on. The one on the Presets tab
+    // is about the presets themselves — a saved preset is a thing you would want to
+    // hand someone, and the tab is where that occurs to you.
+    private const string DiscordInvite = "https://discord.com/invite/ax2gsRqvpa";
+
+    private static void DrawDiscordLink(string label, string tooltip)
+    {
+        if (ImGui.Button(label))
+            Util.OpenLink(DiscordInvite);
+
+        Tooltip($"{tooltip}\n\nOpens {DiscordInvite} in your browser.");
+    }
 
     // The enum names are identifiers, not labels. "Noto Sans CJK" carries the
     // recommendation inline so the default explains itself without a tooltip.
@@ -165,9 +233,13 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         return changed;
     }
 
+    // AllowWhenDisabled, because a greyed-out control is exactly the one whose
+    // tooltip is load-bearing: it is the only thing that says what would re-enable
+    // it. ImGui suppresses hover on disabled items by default, so without this flag
+    // the explanation is unreachable precisely when it is needed.
     private static void Tooltip(string text)
     {
-        if (ImGui.IsItemHovered())
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
             ImGui.SetTooltip(text);
     }
 }
