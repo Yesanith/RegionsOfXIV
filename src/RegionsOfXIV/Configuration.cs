@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Configuration;
 using RegionsOfXIV.Services;
@@ -132,6 +133,16 @@ public class Configuration : IPluginConfiguration, IGateSettings
     // at zero distance, so turning the outline off costs no draw calls and needs
     // no separate checkbox.
     public float StrokeThickness { get; set; } = 1f;
+
+    // --- saved presets -------------------------------------------------------
+
+    // Looks the user saved, in the order they created them.
+    //
+    // Kept alongside the built-ins in Presets.All rather than merged with them:
+    // the built-ins are code and cannot be edited or removed, these are data and
+    // can be both. Applying either writes the same ten settings, so once applied
+    // there is no way to tell — and nothing needs to.
+    public List<UserPreset> UserPresets { get; set; } = [];
 
     // --- durations ----------------------------------------------------------
 

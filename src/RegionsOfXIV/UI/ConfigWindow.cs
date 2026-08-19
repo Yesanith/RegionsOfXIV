@@ -47,6 +47,7 @@ internal sealed partial class ConfigWindow : Window, IDisposable
 
         DrawGeneralTab();
         DrawEffectsTab();
+        DrawPresetsTab();
         DrawNotificationsTab();
         DrawDurationsTab();
     }
