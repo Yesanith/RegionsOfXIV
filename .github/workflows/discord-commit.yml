@@ -16,6 +16,10 @@ jobs:
         run: |
           REPO_NAME="${{ github.event.repository.name }}"
           BRANCH_NAME="${{ github.ref_name }}"
+          PUSHER_NAME="${{ github.event.pusher.name }}"
+          PUSHER_AVATAR="${{ github.event.sender.avatar_url }}"
+          COMMIT_COUNT=$(echo "$COMMITS_JSON" | jq 'length')
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
           # Build a GitHub-style commit list:
           # [`hash`](url) message - author
@@ -24,17 +28,43 @@ jobs:
             | join("\n")
           ')
 
+          if [ "$COMMIT_COUNT" -eq 1 ]; then
+            TITLE_TEXT="1 new commit pushed to ${BRANCH_NAME}"
+          else
+            TITLE_TEXT="${COMMIT_COUNT} new commits pushed to ${BRANCH_NAME}"
+          fi
+
           # Build the final JSON payload safely with jq (handles escaping for us)
           PAYLOAD=$(jq -n \
-            --arg title "New commits on ${REPO_NAME} (${BRANCH_NAME})" \
+            --arg username "$REPO_NAME" \
+            --arg avatar "$PUSHER_AVATAR" \
+            --arg title "$TITLE_TEXT" \
             --arg desc "$DESCRIPTION" \
             --arg url "${{ github.event.compare }}" \
+            --arg authorName "$PUSHER_NAME" \
+            --arg authorIcon "$PUSHER_AVATAR" \
+            --arg footer "${REPO_NAME} · GitHub Actions" \
+            --arg timestamp "$TIMESTAMP" \
             '{
+              username: $username,
+              avatar_url: $avatar,
               embeds: [{
                 title: $title,
                 description: $desc,
                 url: $url,
-                color: 3447003
+                color: 10181046,
+                author: {
+                  name: $authorName,
+                  icon_url: $authorIcon
+                },
+                thumbnail: {
+                  url: "https://raw.githubusercontent.com/Yesanith/RegionsOfXIV/master/assets/images/icon.png"
+                },
+                footer: {
+                  text: $footer,
+                  icon_url: "https://github.githubassets.com/favicons/favicon.png"
+                },
+                timestamp: $timestamp
               }]
             }')
 
