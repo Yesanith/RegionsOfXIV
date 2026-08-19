@@ -1,17 +1,21 @@
-using System;
+﻿using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using Dalamud.Utility;
+using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
 
+internal readonly record struct PreviewSample(
+    string? Header, string Text, string Weather, uint WeatherIcon);
+
 internal readonly record struct ConfigActions(
-    Action<string?, string> Preview,
-    Action<string?, string> LivePreview,
-    Action<bool, string?, string> HoldPreview,
+    Action<PreviewSample> Preview,
+    Action<PreviewSample> LivePreview,
+    Action<bool, PreviewSample> HoldPreview,
     Action RebuildFonts,
     Action RestoreNativeAreaText,
     Action RestoreNativeLoadingTitle);
@@ -78,11 +82,24 @@ internal sealed partial class ConfigWindow : Window, IDisposable
     private void SetEditing(bool on)
     {
         this.editing = on;
-        this.actions.HoldPreview(on, SampleHeader, SampleText);
+        this.actions.HoldPreview(on, Sample);
     }
 
-    private const string SampleHeader = "Middle La Noscea";
-    private const string SampleText = "Summerford Farms";
+    private static readonly PreviewSample Sample = BuildSample();
+
+    /// <summary>The sample shown while configuring, using the client's own words for the weather.</summary>
+    private static PreviewSample BuildSample()
+    {
+        var weather = WeatherNameResolver.Resolve(FairWeather);
+
+        return new PreviewSample(
+            "Middle La Noscea",
+            "Summerford Farms",
+            weather?.Name ?? "Fair Skies",
+            weather?.IconId ?? 0u);
+    }
+
+    private const uint FairWeather = 2;
 
     private const string DiscordInvite = "https://discord.com/invite/ax2gsRqvpa";
 

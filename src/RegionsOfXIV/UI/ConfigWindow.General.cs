@@ -94,7 +94,7 @@ internal sealed partial class ConfigWindow
         ImGui.Separator();
 
         if (ImGui.Button("Preview"))
-            this.actions.Preview(SampleHeader, SampleText);
+            this.actions.Preview(Sample);
 
         if (!changed && !restart)
             return;
@@ -103,9 +103,9 @@ internal sealed partial class ConfigWindow
         this.config.Save();
 
         if (restart)
-            this.actions.Preview(SampleHeader, SampleText);
+            this.actions.Preview(Sample);
         else
-            this.actions.LivePreview(SampleHeader, SampleText);
+            this.actions.LivePreview(Sample);
     }
 
     private void DrawFontWarnings()

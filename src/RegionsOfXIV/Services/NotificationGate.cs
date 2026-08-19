@@ -145,6 +145,14 @@ internal sealed class NotificationGate
         _ => false,
     };
 
+    public bool ShouldAnnounceWeather()
+    {
+        if (!this.config.WeatherNotificationEnabled)
+            return false;
+
+        return !IsBlockedByGameState();
+    }
+
     private bool IsBlockedByGameState()
     {
         if (!this.game.IsLoggedIn)

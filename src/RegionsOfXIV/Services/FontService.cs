@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using Dalamud;
 using Dalamud.Bindings.ImGui;
@@ -15,6 +15,7 @@ internal sealed class FontService : IDisposable
     private IFontHandle? displayFont;
     private IFontHandle? headerFont;
     private IFontHandle? eorzeanDisplayFont;
+    private IFontHandle? eorzeanHeaderFont;
 
     private float builtDisplaySize;
     private float builtHeaderSize;
@@ -33,6 +34,8 @@ internal sealed class FontService : IDisposable
     public IFontHandle Header => this.headerFont ?? Plugin.PluginInterface.UiBuilder.DefaultFontHandle;
 
     public IFontHandle? EorzeanDisplay => this.eorzeanDisplayFont;
+
+    public IFontHandle? EorzeanHeader => this.eorzeanHeaderFont;
 
     public static float NativeCeilingPx(DisplayFontChoice choice) => choice switch
     {
@@ -67,7 +70,7 @@ internal sealed class FontService : IDisposable
         this.headerFont = this.atlas.NewGameFontHandle(
             new GameFontStyle(GameFontFamily.Axis, headerSizePx));
 
-        TryBuildEorzean(displaySizePx);
+        TryBuildEorzean(displaySizePx, headerSizePx);
     }
 
     private IFontHandle BuildDisplayFont(DisplayFontChoice choice, float sizePx) =>
@@ -105,7 +108,7 @@ internal sealed class FontService : IDisposable
         return CachedJapaneseGlyphRanges = ranges;
     }
 
-    private void TryBuildEorzean(float displaySizePx)
+    private void TryBuildEorzean(float displaySizePx, float headerSizePx)
     {
         var path = FindBundledFont();
         if (path == null)
@@ -116,17 +119,24 @@ internal sealed class FontService : IDisposable
 
         try
         {
-            this.eorzeanDisplayFont = this.atlas.NewDelegateFontHandle(
-                e => e.OnPreBuild(tk => tk.AddFontFromFile(path, new SafeFontConfig { SizePx = displaySizePx })));
+            // Two sizes: the place name decodes at display size, the weather line at header size.
+            this.eorzeanDisplayFont = BuildEorzean(path, displaySizePx);
+            this.eorzeanHeaderFont = BuildEorzean(path, headerSizePx);
 
             Plugin.Log.Information($"Loaded Eorzean font from {path}");
         }
         catch (Exception ex)
         {
             Plugin.Log.Error(ex, $"Failed to load bundled Eorzean font from {path}");
+
             this.eorzeanDisplayFont = null;
+            this.eorzeanHeaderFont = null;
         }
     }
+
+    private IFontHandle BuildEorzean(string path, float sizePx) =>
+        this.atlas.NewDelegateFontHandle(
+            e => e.OnPreBuild(tk => tk.AddFontFromFile(path, new SafeFontConfig { SizePx = sizePx })));
 
     private static string? FindBundledFont()
     {
@@ -153,10 +163,12 @@ internal sealed class FontService : IDisposable
         this.displayFont?.Dispose();
         this.headerFont?.Dispose();
         this.eorzeanDisplayFont?.Dispose();
+        this.eorzeanHeaderFont?.Dispose();
 
         this.displayFont = null;
         this.headerFont = null;
         this.eorzeanDisplayFont = null;
+        this.eorzeanHeaderFont = null;
     }
 
     public void Dispose() => DisposeHandles();

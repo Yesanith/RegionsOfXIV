@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Dalamud.Game.ClientState;
 using RegionsOfXIV.Models;
 
@@ -11,6 +11,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
     private readonly INotificationSink sink;
     private readonly NotificationGate gate;
     private readonly LocationTracker tracker;
+    private readonly WeatherTracker weatherTracker;
 
     private string? pendingNativeAreaText;
 
@@ -27,7 +28,10 @@ internal sealed class AnnouncementCoordinator : IDisposable
 
         this.gate = new NotificationGate(config, game);
         this.tracker = new LocationTracker(game);
+        this.weatherTracker = new WeatherTracker(game);
+        this.weatherTracker.Start();
 
+        this.weatherTracker.OnWeatherChanged += HandleWeatherChanged;
         this.tracker.OnLocationChanged += HandleLocationChanged;
         this.tracker.OnSanctuaryChanged += HandleSanctuaryChanged;
         this.suppressor.OnAreaTextShown += HandleAreaTextShown;
@@ -44,7 +48,9 @@ internal sealed class AnnouncementCoordinator : IDisposable
         this.suppressor.OnAreaTextShown -= HandleAreaTextShown;
         this.tracker.OnSanctuaryChanged -= HandleSanctuaryChanged;
         this.tracker.OnLocationChanged -= HandleLocationChanged;
+        this.weatherTracker.OnWeatherChanged -= HandleWeatherChanged;
 
+        this.weatherTracker.Dispose();
         this.tracker.Dispose();
     }
 
@@ -55,9 +61,37 @@ internal sealed class AnnouncementCoordinator : IDisposable
         this.sink.Push(
             names.Area ?? names.Place ?? "Middle La Noscea",
             names.SubArea ?? names.Area ?? "Summerford Farms");
+
+        if (!this.config.WeatherNotificationEnabled)
+            return;
+
+        // Falls back to the first row so the command still shows something when the
+        // tracker has not taken a reading yet.
+        var current = WeatherNameResolver.Resolve(this.weatherTracker.Current)
+                      ?? WeatherNameResolver.Resolve(1);
+
+        if (current is not { } weather)
+            return;
+
+        this.sink.PushWeather(weather.Name, weather.IconId);
     }
 
-    private void OnLogout(int type, int code) => this.gate.Reset();
+    private void HandleWeatherChanged(byte weatherId)
+    {
+        if (!this.gate.ShouldAnnounceWeather())
+            return;
+
+        if (WeatherNameResolver.Resolve(weatherId) is not { } weather)
+            return;
+
+        this.sink.PushWeather(weather.Name, weather.IconId);
+    }
+
+    private void OnLogout(int type, int code)
+    {
+        this.gate.Reset();
+        this.weatherTracker.Reset();
+    }
 
     private void OnZoneInit(ZoneInitEventArgs args)
     {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Configuration;
@@ -22,6 +22,10 @@ public class Configuration : IPluginConfiguration, IGateSettings
     public bool SubAreaNotificationEnabled { get; set; } = true;
 
     public bool IncludeParentTierAsHeader { get; set; } = true;
+
+    public bool WeatherNotificationEnabled { get; set; } = false;
+
+    public bool ShowWeatherIcon { get; set; } = true;
 
     public bool HideNativeAreaText { get; set; } = true;
 
