@@ -3,14 +3,6 @@ using RegionsOfXIV.UI;
 
 namespace RegionsOfXIV.Tests;
 
-// The motion effects, which are otherwise judged by watching them. What is
-// checked here is not how they look — that is a matter of taste and a running
-// game — but the handful of properties that make them safe to hand back to the
-// plain renderer, and that would show up in game as a flicker or a jump rather
-// than as an obvious fault.
-//
-// GlyphAnimator is pure arithmetic over System types, so this needs no font
-// atlas, no ImGui and no Dalamud. Same seam as NotificationGate.
 public class GlyphAnimatorTests
 {
     private const float FontSize = 91f;
@@ -32,10 +24,6 @@ public class GlyphAnimatorTests
         return data;
     }
 
-    // The one that matters most. NotificationOverlay stops animating at full
-    // progress and draws the line in a single run instead, so every effect has to
-    // already be exactly at rest by then — otherwise the last frame of the reveal
-    // jumps.
     [Theory]
     [MemberData(nameof(AnimatedEffects))]
     public void EveryEffectIsAtRestWhenTheRevealCompletes(MotionEffect effect)
@@ -75,16 +63,12 @@ public class GlyphAnimatorTests
         }
     }
 
-    // --- the stagger --------------------------------------------------------
-
     [Fact]
     public void LaterGlyphsStartLater()
     {
         Assert.True(GlyphAnimator.LocalProgress(11, 12, 0.3f) < GlyphAnimator.LocalProgress(0, 12, 0.3f));
     }
 
-    // The last glyph must finish exactly as the reveal does, or the line is still
-    // arriving when the overlay switches to the plain run.
     [Fact]
     public void TheLastGlyphCompletesExactlyAtTheEnd()
     {
@@ -113,15 +97,11 @@ public class GlyphAnimatorTests
         }
     }
 
-    // --- individual effects -------------------------------------------------
-
     [Fact]
     public void RiseComesUpFromBelowAndOvershoots()
     {
         Assert.True(GlyphAnimator.For(MotionEffect.Rise, 0, 12, 0f, FontSize).OffsetY > 0f);
 
-        // Somewhere in the middle it must pass its target and come back, which is
-        // what separates this from a plain ease-out.
         var highest = 0f;
         for (var step = 0; step <= 100; step++)
             highest = MathF.Min(highest, GlyphAnimator.For(MotionEffect.Rise, 0, 1, step / 100f, FontSize).OffsetY);
@@ -152,8 +132,6 @@ public class GlyphAnimatorTests
         Assert.Equal(1f, GlyphAnimator.For(MotionEffect.Burn, 3, 12, 0f, FontSize).Heat, 5);
     }
 
-    // Typewriter is the one effect with no in-between: a glyph is typed or it is
-    // not, and half-drawn letters would give away that it is a fade underneath.
     [Fact]
     public void TypewriterNeverDrawsAPartialGlyph()
     {

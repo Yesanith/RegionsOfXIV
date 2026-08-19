@@ -3,8 +3,6 @@ using Dalamud.Interface.Utility.Raii;
 
 namespace RegionsOfXIV.UI;
 
-// Presets, the motion, and the particles. Everything here is judged by watching
-// it, which is why every control on this tab fires a sample.
 internal sealed partial class ConfigWindow
 {
     private void DrawEffectsTab()
@@ -14,9 +12,6 @@ internal sealed partial class ConfigWindow
 
         var changed = false;
 
-        // Changes that alter the animation itself rather than how it looks. A
-        // sample already on screen is past its motion stage, so keeping it alive
-        // would show nothing: these have to start a fresh one to be seen at all.
         var restart = false;
 
         ImGui.TextWrapped("How the letters move as they arrive.");
@@ -35,8 +30,6 @@ internal sealed partial class ConfigWindow
 
         restart |= Choice("Particles", () => this.config.Particles, v => this.config.Particles = v, Label);
 
-        // The rest of the section is dead weight with nothing to configure, so it
-        // only appears once an effect is chosen.
         if (this.config.Particles != ParticleEffect.None)
         {
             changed |= Slider("Density",
@@ -48,8 +41,6 @@ internal sealed partial class ConfigWindow
                 "The default amber suits embers and sparkles. Hearts and petals\n" +
                 "want moving towards pink.");
 
-            // Embers under a burn is the pairing these were built for, but the two
-            // are independent settings and neither implies the other.
             if (this.config.Particles == ParticleEffect.Embers && this.config.Motion != MotionEffect.Burn)
                 ImGui.TextWrapped("Embers go with the Burn motion, but they do not need it.");
         }
@@ -64,10 +55,6 @@ internal sealed partial class ConfigWindow
 
         this.config.Save();
 
-        // Every setting on this tab is something you have to watch to judge, so
-        // each change earns a sample — same reasoning as the General tab. Which
-        // kind of sample is the difference between seeing your choice and
-        // wondering whether it did anything.
         if (restart)
             this.actions.Preview(SampleHeader, SampleText);
         else

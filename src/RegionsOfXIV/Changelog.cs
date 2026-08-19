@@ -6,16 +6,6 @@ namespace RegionsOfXIV;
 
 internal readonly record struct ChangelogEntry(Version Version, string[] Changes);
 
-// What changed, per release, for the window that shows up once after an update.
-//
-// Held in code rather than read from a file: it is a handful of lines that change
-// when the version does, and shipping it as an asset would mean a file that can go
-// missing, arrive stale, or need parsing — three failure modes for something with
-// no moving parts.
-//
-// Newest first, which is both the order it reads in and the order Since depends
-// on. Write for somebody who has been away for one release: what is different now,
-// not what the commits were.
 internal static class Changelog
 {
     public static readonly ChangelogEntry[] All =
@@ -55,17 +45,9 @@ internal static class Changelog
         ]),
     ];
 
-    // What this build is, from the assembly rather than from a constant that would
-    // need remembering twice. The csproj's <Version> is what sets it.
     public static Version Current =>
         Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 0, 0);
 
-    // Everything newer than the version the player last had.
-    //
-    // A null lastSeen means the stored config predates this window existing, so
-    // there is no honest answer to "what have you missed" — it could be one release
-    // or all of them. The newest entry alone is the useful half of the guess: it
-    // describes the update that just happened, which is what they are here for.
     public static ChangelogEntry[] Since(Version? lastSeen)
     {
         if (All.Length == 0)
@@ -77,9 +59,6 @@ internal static class Changelog
         return All.Where(entry => entry.Version > lastSeen).ToArray();
     }
 
-    // Tolerant on purpose. The value comes out of a config file that a person can
-    // edit, and a version that will not parse should show the changelog rather than
-    // throw on the way in.
     public static Version? Parse(string? stored) =>
         Version.TryParse(stored, out var version) ? version : null;
 }

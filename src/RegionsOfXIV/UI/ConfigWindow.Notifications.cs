@@ -3,7 +3,6 @@ using Dalamud.Interface.Utility.Raii;
 
 namespace RegionsOfXIV.UI;
 
-// What gets announced, and what the game is stopped from announcing itself.
 internal sealed partial class ConfigWindow
 {
     private void DrawNotificationsTab()
@@ -30,9 +29,6 @@ internal sealed partial class ConfigWindow
         changed |= Checkbox("Show the parent tier as a header",
             () => this.config.IncludeParentTierAsHeader, v => this.config.IncludeParentTierAsHeader = v);
 
-        // Switching suppression off puts the game's own text back immediately,
-        // rather than at the next reload — the addon is already on screen and only
-        // needs showing again.
         if (Checkbox("Hide the game's own area text",
                 () => this.config.HideNativeAreaText, v => this.config.HideNativeAreaText = v))
         {

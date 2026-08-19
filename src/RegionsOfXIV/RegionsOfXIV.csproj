@@ -9,20 +9,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <!--
-    The services are internal, and making them public purely to be tested would
-    widen the plugin's surface to say something about its build layout.
-  -->
   <ItemGroup>
     <InternalsVisibleTo Include="RegionsOfXIV.Tests" />
   </ItemGroup>
 
-  <!--
-    Bundled assets. The game's own fonts (AXIS / Jupiter / TrumpGothic / Meidinger)
-    do NOT go here - Dalamud loads those straight out of the game's files at
-    runtime. Only fonts we ship ourselves (e.g. the Eorzean alphabet) belong in
-    assets/fonts.
-  -->
   <ItemGroup>
     <Content Include="..\..\assets\fonts\**\*.ttf;..\..\assets\fonts\**\*.otf">
       <Link>Fonts\%(Filename)%(Extension)</Link>
@@ -30,15 +20,6 @@
       <Visible>false</Visible>
     </Content>
 
-    <!--
-      Dalamud looks for the installer icon at "images/icon.png" beside the plugin
-      DLL, so it has to be copied into the build output rather than merely living
-      in assets/. Without this a dev-loaded plugin shows the generic default icon,
-      and there is nothing to tell you why.
-
-      Lower-case "images" deliberately: it matches the path Dalamud expects and the
-      layout D17 wants in a submission.
-    -->
     <Content Include="..\..\assets\images\icon.png">
       <Link>images\icon.png</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

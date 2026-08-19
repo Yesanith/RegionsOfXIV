@@ -10,9 +10,6 @@ using RegionsOfXIV.UI;
 
 namespace RegionsOfXIV;
 
-// Entry point and composition root. Constructs the services, wires the Dalamud
-// lifecycle, and handles the command — nothing here decides what gets announced;
-// that is AnnouncementCoordinator's job.
 public sealed class Plugin : IDalamudPlugin
 {
     private const string CommandName = "/regions";
@@ -48,7 +45,6 @@ public sealed class Plugin : IDalamudPlugin
         this.nativeUiSuppressor = new NativeUiSuppressor(this.config);
         this.uiVisibilityGuard = new UiVisibilityGuard();
 
-        // Before the overlay, which takes the handles.
         this.fonts.Rebuild(this.config.DisplayFontSize, this.config.HeaderFontSize);
 
         this.overlay = new NotificationOverlay(this.config, this.fonts);
@@ -70,20 +66,9 @@ public sealed class Plugin : IDalamudPlugin
         this.windowSystem.AddWindow(this.configWindow);
         this.windowSystem.AddWindow(this.changelogWindow);
 
-        // Nothing on screen announces that a freshly installed plugin has settings,
-        // and this one's defaults change what the game itself draws — it hides the
-        // native area text and the loading-screen title out of the box. Showing the
-        // window once makes that discoverable and reversible.
-        //
-        // Saving immediately is what makes it once: the config file's absence is the
-        // first-run signal, so writing it now is what stops this repeating on every
-        // load. Deleting the config to reset therefore also brings the window back,
-        // which is the behaviour you would want.
         if (isFirstRun)
             this.configWindow.IsOpen = true;
 
-        // Saves in both cases — see below for why that is what makes each of them
-        // happen once rather than every load.
         SettleVersion(isFirstRun);
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
@@ -100,22 +85,10 @@ public sealed class Plugin : IDalamudPlugin
         Log.Information("Regions of XIV loaded.");
     }
 
-    // Decides whether this load has a changelog to show, and records the version
-    // either way.
-    //
-    // Recording is what makes it once. The window is opened here and the version
-    // written in the same breath, rather than when the player closes the window —
-    // otherwise a reload with it still open would show it again, and quitting the
-    // game without closing it would mean it never stopped.
-    //
-    // A first install is stamped but shown nothing. Somebody who has never run this
-    // plugin has not missed anything, and the config window is already opening in
-    // front of them; two unrequested windows at once is one too many.
     private void SettleVersion(bool isFirstRun)
     {
         var current = Changelog.Current.ToString();
 
-        // The ordinary case, every load after the first on a given build.
         if (this.config.LastSeenVersion == current)
             return;
 
@@ -127,16 +100,10 @@ public sealed class Plugin : IDalamudPlugin
                 Log.Information($"Updated from {this.config.LastSeenVersion ?? "an earlier build"} to {current}.");
         }
 
-        // Reached whether or not anything was shown, which is the point: a build
-        // that adds no changelog entry still moves the marker, so the release after
-        // it is not compared against a version two behind. It also writes the file
-        // that makes a first install a first install exactly once.
         this.config.LastSeenVersion = current;
         this.config.Save();
     }
 
-    // Reverse construction order: the coordinator unsubscribes from the suppressor,
-    // so it has to go first.
     public void Dispose()
     {
         PluginInterface.UiBuilder.Draw -= this.windowSystem.Draw;
@@ -158,24 +125,12 @@ public sealed class Plugin : IDalamudPlugin
         this.fonts.Dispose();
     }
 
-    // GetPluginConfig throws if the stored JSON no longer matches this type — a
-    // renamed field, a changed type, a half-written file after a crash. Left
-    // unhandled that bricks the plugin on every subsequent load with no recovery
-    // path short of the user finding the file in AppData themselves, so preserve
-    // the bad config and carry on with defaults.
-    //
-    // Returns whether this looks like a first install: no stored config at all.
-    // Recovering from an unreadable one does not count — the user has had this
-    // plugin for a while and does not need introducing to it.
     private static (Configuration Config, bool IsFirstRun) LoadConfiguration()
     {
         try
         {
             if (PluginInterface.GetPluginConfig() is Configuration stored)
             {
-                // Written back immediately, so the migration is paid once rather
-                // than on every load until some unrelated setting happens to be
-                // changed.
                 if (stored.Migrate())
                     stored.Save();
 
@@ -223,10 +178,6 @@ public sealed class Plugin : IDalamudPlugin
             return;
         }
 
-        // On demand, because the automatic showing is deliberately once and there is
-        // otherwise no way back to it — the version is stamped the moment the window
-        // opens, so by the time anyone thinks "what did that say?" it is unreachable
-        // short of hand-editing the config file.
         if (argument.Equals("changelog", StringComparison.OrdinalIgnoreCase))
         {
             this.changelogWindow.ShowAll();

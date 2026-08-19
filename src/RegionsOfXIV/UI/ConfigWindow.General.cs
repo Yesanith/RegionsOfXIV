@@ -6,9 +6,6 @@ using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
 
-// Where the notification sits and what it looks like: position, face, size,
-// spacing, casing, colours. The decode switch lives here too, because it is a
-// decision about the plugin rather than about a look — see the Effects tab.
 internal sealed partial class ConfigWindow
 {
     private void DrawGeneralTab()
@@ -54,9 +51,6 @@ internal sealed partial class ConfigWindow
         changed |= Checkbox("Uppercase",
             () => this.config.UppercaseText, v => this.config.UppercaseText = v);
 
-        // Its own flag, not `changed`: turning the decode on or off changes what
-        // the reveal does, and a sample already on screen has finished revealing.
-        // Only a fresh notification shows the difference.
         var restart = Checkbox("Decode from Eorzean script",
             () => this.config.DecodeEffectEnabled, v => this.config.DecodeEffectEnabled = v);
         Tooltip(
@@ -108,27 +102,17 @@ internal sealed partial class ConfigWindow
         if (!changed && !restart)
             return;
 
-        // Size and family changes need new atlas handles; doing it here keeps the
-        // rebuild off the draw path.
         this.actions.RebuildFonts();
         this.config.Save();
 
-        // After the rebuild, so the sample is drawn with the size and family just
-        // chosen rather than the previous one. Everything on this tab changes how a
-        // notification looks, so every change earns a preview — that is the whole
-        // point of the tab.
         if (restart)
             this.actions.Preview(SampleHeader, SampleText);
         else
             this.actions.LivePreview(SampleHeader, SampleText);
     }
 
-    // Two warnings about the chosen face, in order of severity.
     private void DrawFontWarnings()
     {
-        // Latin-only faces do not merely look wrong on a Japanese client, they
-        // render nothing at all. That is a different severity from the softening
-        // warning below, so it gets its own colour and goes first.
         if (FontService.IsLatinOnly(this.config.DisplayFont) &&
             Plugin.ClientState.ClientLanguage == ClientLanguage.Japanese)
         {
@@ -141,8 +125,6 @@ internal sealed partial class ConfigWindow
             }
         }
 
-        // Bitmap faces soften past their ceiling. Noto reports an infinite ceiling
-        // rather than being special-cased here, so this simply never fires for it.
         var ceiling = FontService.NativeCeilingPx(this.config.DisplayFont);
         if (this.config.DisplayFontSize <= ceiling)
             return;

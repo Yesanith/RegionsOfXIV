@@ -1,4 +1,3 @@
-# Build & output
 bin/
 obj/
 artifacts/
@@ -6,7 +5,6 @@ TestResults/
 *.binlog
 *.log
 
-# IDE & tooling
 .vs/
 .idea/
 .vscode/
@@ -16,29 +14,11 @@ TestResults/
 *.suo
 *.cache
 
-# Markdown documentation.
-#
-# Ignored by default: notes, roadmaps and generated references are working
-# material, not part of what ships.
-#
-# Both exceptions are anchored with a leading slash. Without it, "README.md"
-# matches at ANY depth, which silently re-includes assets/*/README.md as well —
-# that is what the previous version of this file did.
-#
-# LICENSE.md is excepted deliberately: the AGPL requires the licence text to
-# travel with the source, so it must not fall under the blanket *.md rule.
 *.md
 !/README.md
 !/LICENSE.md
 
-# Local-only development files.
-#
-# Kept on disk, deliberately out of the repository. AddonNodeDump logs an addon's
-# node tree to the plugin log and is wired to nothing — it exists to answer
-# questions about what the game actually puts in _AreaText and the loading-screen
-# title, and should not ship as dead code.
 src/RegionsOfXIV/Services/AddonNodeDump.cs
 
-# System files
 .DS_Store
 Thumbs.db

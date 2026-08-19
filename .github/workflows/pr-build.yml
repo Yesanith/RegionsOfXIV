@@ -28,8 +28,6 @@ jobs:
     - name: Build with dotnet
       run: dotnet build RegionsOfXIV.sln --configuration Release
 
-    # --no-build so this runs the binaries just built rather than quietly
-    # producing a second set under a different platform.
     - name: Test
       run: dotnet test RegionsOfXIV.sln --configuration Release --no-build
 

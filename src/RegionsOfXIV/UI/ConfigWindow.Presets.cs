@@ -7,25 +7,10 @@ using Dalamud.Interface.Utility.Raii;
 
 namespace RegionsOfXIV.UI;
 
-// Presets, both kinds, on a page of their own.
-//
-// They sat under the Effects tab while a preset meant only motion, particles and
-// a palette. A saved preset now carries every setting on every tab, so belonging
-// to one tab misrepresented it.
-//
-// Both kinds write every setting, so the page says so once at the top rather than
-// twice underneath. What still separates them is where the values come from and
-// what can be done to them: a built-in is the defaults plus a look, is fixed, and
-// cannot be removed; a saved preset is whatever the player had at the moment they
-// saved, and can be overwritten or deleted.
 internal sealed partial class ConfigWindow
 {
     private string newPresetName = string.Empty;
 
-    // The outcome of the last copy or paste, shown under the buttons. Held rather
-    // than raised as a toast because it belongs to the thing that was clicked, and
-    // a failed import in particular needs to be read next to the button that
-    // caused it.
     private string shareStatus = string.Empty;
     private bool shareFailed;
     private DateTime shareStatusAt;
@@ -78,16 +63,8 @@ internal sealed partial class ConfigWindow
         if (!applied)
             return;
 
-        // A saved preset can carry a different font and size, so the atlas has to
-        // be rebuilt before anything is drawn with it — same ordering as the
-        // General tab, and for the same reason.
         this.actions.RebuildFonts();
 
-        // A saved preset also carries the native-suppression flags, and the
-        // suppressor only ever hides — switching one off has to put the game's own
-        // text back by hand, which is what the Notifications tab does when the
-        // checkbox moves. Without this, applying a preset with suppression off
-        // would leave the game's text hidden until a reload.
         if (!this.config.HideNativeAreaText)
             this.actions.RestoreNativeAreaText();
 
@@ -98,9 +75,6 @@ internal sealed partial class ConfigWindow
         this.actions.Preview(SampleHeader, SampleText);
     }
 
-    // Laid out as a wrapping row of buttons rather than a combo, because a preset
-    // is an action and not a stored state — nothing here is "current", and a combo
-    // would imply otherwise.
     private bool DrawBuiltInPresets()
     {
         var applied = false;
@@ -130,8 +104,6 @@ internal sealed partial class ConfigWindow
         var applied = false;
         var row = new WrappingRow();
 
-        // Collected rather than acted on inside the loop: mutating a List while
-        // enumerating it throws, and one of each per frame is plenty.
         UserPreset? remove = null;
         UserPreset? overwrite = null;
         UserPreset? share = null;
@@ -140,8 +112,6 @@ internal sealed partial class ConfigWindow
         {
             row.Place(preset.Name);
 
-            // The id is kept off the label so two presets named alike cannot
-            // collide, which nothing prevents.
             if (ImGui.Button($"{preset.Name}##saved-{preset.Name}"))
             {
                 preset.ApplyTo(this.config);
@@ -167,16 +137,12 @@ internal sealed partial class ConfigWindow
 
         if (share is not null)
         {
-            // The preset's own stored snapshot, not the live config — this shares
-            // what the button would apply, which is not necessarily what is on
-            // screen right now.
             ImGui.SetClipboardText(PresetCode.Encode(share.Name, share.Settings));
             Report($"Copied a code for \"{share.Name}\".", failed: false);
         }
 
         if (overwrite is not null)
         {
-            // Replaced in place so the button keeps its position in the row.
             var at = this.config.UserPresets.IndexOf(overwrite);
             this.config.UserPresets[at] = UserPreset.Capture(overwrite.Name, this.config);
             this.config.Save();
@@ -195,15 +161,9 @@ internal sealed partial class ConfigWindow
     {
         var name = this.newPresetName.Trim();
 
-        // Matching an existing name replaces it rather than producing a second
-        // entry with the same label, which would be indistinguishable on screen.
         var existing = this.config.UserPresets.FirstOrDefault(
             p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
 
-        // One box, three uses: it names a preset being saved, a code being copied,
-        // and a code being imported. All three are "what do you want to call this",
-        // asked at the moment you would answer it, so a second field would only
-        // raise the question of which one applied.
         ImGui.SetNextItemWidth(180f * ImGuiHelpers.GlobalScale);
         ImGui.InputTextWithHint("##new-preset-name", "Name it — to save, copy or import", ref this.newPresetName, 48);
 
@@ -225,9 +185,6 @@ internal sealed partial class ConfigWindow
         Tooltip("Saves every setting on General, Effects, Notifications and Durations.");
     }
 
-    // Codes travel through the clipboard rather than a text box. A code runs to a
-    // few hundred characters, an ImGui input field would show about a fifth of one,
-    // and nobody types these — they are copied out of a chat window.
     private bool DrawShareCodeRow()
     {
         ImGui.TextWrapped("Share codes");
@@ -235,14 +192,6 @@ internal sealed partial class ConfigWindow
 
         var named = this.newPresetName.Trim().Length > 0;
 
-        // Disabled without a name rather than falling back to one.
-        //
-        // The fallback used to be "Shared preset", which is how everybody who
-        // copied without typing anything ended up handing out codes by that name —
-        // and how anyone importing several ended up with "Shared preset",
-        // "Shared preset (2)", "Shared preset (3)" and no way to tell them apart.
-        // The name is the only thing a recipient has to go on, so it is fixed here,
-        // at the one point where somebody knows what the preset is.
         using (ImRaii.Disabled(!named))
         {
             if (ImGui.Button("Copy current settings"))
@@ -303,8 +252,6 @@ internal sealed partial class ConfigWindow
         }
         catch (Exception ex)
         {
-            // The clipboard is a shared OS resource and another process can hold it
-            // open, which surfaces here rather than anywhere we control.
             Plugin.Log.Debug(ex, "Could not read the clipboard.");
             Report("Could not read the clipboard. Try again in a moment.", failed: true);
             return false;
@@ -316,10 +263,6 @@ internal sealed partial class ConfigWindow
             return false;
         }
 
-        // A name typed here wins over the one in the code. Codes made by this build
-        // always carry a deliberate name, but ones made before that was enforced do
-        // not, and neither does a code whose author called it something you already
-        // use — so the person importing gets the final say over their own list.
         var typed = this.newPresetName.Trim();
         if (typed.Length > 0)
         {
@@ -327,21 +270,15 @@ internal sealed partial class ConfigWindow
             this.newPresetName = string.Empty;
         }
 
-        // Saved before it is applied, so a code someone liked enough to paste is
-        // still there after they go on to change things.
         preset.Name = UniqueName(preset.Name);
         this.config.UserPresets.Add(preset);
         preset.ApplyTo(this.config);
 
         Report($"Imported \"{preset.Name}\" and applied it.", failed: false);
 
-        // The caller saves and rebuilds, same as applying any other preset.
         return true;
     }
 
-    // Two presets with the same name are indistinguishable in a row of buttons, and
-    // an import is the one path that can produce a collision without the user
-    // having typed anything. Terminates: the list is finite.
     private string UniqueName(string wanted)
     {
         if (!NameTaken(wanted))
@@ -358,9 +295,6 @@ internal sealed partial class ConfigWindow
     private bool NameTaken(string name) => this.config.UserPresets.Any(
         p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
 
-    // Buttons of differing widths wrapped to the window, which ImGui has no layout
-    // for. Measuring before placing is the only way to know whether the next one
-    // fits on the current line.
     private struct WrappingRow()
     {
         private float spent = 0f;

@@ -1,0 +1,95 @@
+name: Discord Release Notification
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag of the release to announce, e.g. v0.2.2.0
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send release info to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.RELEASEWEBHOOK }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          set -euo pipefail
+
+          MAX_BODY_CHARS=3500
+
+          RELEASE=$(gh release view "$TAG" --repo "$REPO" \
+            --json name,body,url,isPrerelease,author,publishedAt)
+
+          RELEASE_NAME=$(jq -r '.name // ""' <<< "$RELEASE")
+          RELEASE_URL=$(jq -r '.url' <<< "$RELEASE")
+          AUTHOR_NAME=$(jq -r '.author.login // "unknown"' <<< "$RELEASE")
+          IS_PRERELEASE=$(jq -r '.isPrerelease' <<< "$RELEASE")
+          TIMESTAMP=$(jq -r '.publishedAt' <<< "$RELEASE")
+          BODY_RAW=$(jq -r '.body // ""' <<< "$RELEASE")
+
+          if [ -z "$RELEASE_NAME" ]; then
+            RELEASE_NAME="$TAG"
+          fi
+
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            EMBED_COLOR=15844367
+            KIND_TEXT="Pre-release"
+          else
+            EMBED_COLOR=3066993
+            KIND_TEXT="Release"
+          fi
+
+          if [ "$(printf %s "$BODY_RAW" | wc -c)" -gt "$MAX_BODY_CHARS" ]; then
+            BODY_TEXT="$(printf %s "$BODY_RAW" | head -c "$MAX_BODY_CHARS")"
+            BODY_TEXT="${BODY_TEXT}"$'\n\n'"*Read the full notes on GitHub →*"
+          else
+            BODY_TEXT="$BODY_RAW"
+          fi
+
+          if [ -z "$BODY_TEXT" ]; then
+            BODY_TEXT="_No release notes provided._"
+          fi
+
+          PAYLOAD=$(jq -n \
+            --arg title "${KIND_TEXT}: ${RELEASE_NAME}" \
+            --arg desc "$BODY_TEXT" \
+            --arg url "$RELEASE_URL" \
+            --arg tag "$TAG" \
+            --arg author "$AUTHOR_NAME" \
+            --arg footer "${REPO##*/} · GitHub Actions" \
+            --arg timestamp "$TIMESTAMP" \
+            --argjson color "$EMBED_COLOR" \
+            '{
+              embeds: [{
+                title: $title,
+                description: $desc,
+                url: $url,
+                color: $color,
+                fields: [
+                  { name: "Tag", value: $tag, inline: true },
+                  { name: "Published by", value: $author, inline: true }
+                ],
+                thumbnail: {
+                  url: "https://raw.githubusercontent.com/Yesanith/RegionsOfXIV/master/assets/images/icon.png"
+                },
+                footer: {
+                  text: $footer,
+                  icon_url: "https://github.githubassets.com/favicons/favicon.png"
+                },
+                timestamp: $timestamp
+              }]
+            }')
+
+          curl -sfS -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "$DISCORD_WEBHOOK"

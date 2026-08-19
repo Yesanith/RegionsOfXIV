@@ -5,36 +5,15 @@ using Dalamud.Bindings.ImGui;
 
 namespace RegionsOfXIV.UI;
 
-// The ambient particles drifting around one notification, and the whole of their
-// simulation: spawn, move, age out, draw.
-//
-// One field per notification, so particles fade away with the text that owned
-// them rather than outliving it — and so two notifications overlapping during a
-// handover keep their own.
-//
-// Everything is drawn from ImDrawList primitives. That is not a shortcut: a "♥"
-// glyph would render as a blank box under the Latin-only game faces, and a sprite
-// would be the first art asset the plugin has ever had to ship, install and load.
-// Circles and quads cost nothing and look the same under every font.
 internal sealed class ParticleField
 {
-    // A ceiling rather than a budget: at the default density the effects settle
-    // around a dozen live particles, and this only comes into play if someone
-    // pushes density to maximum and then stands in a doorway triggering
-    // announcements. Cheap insurance against an unbounded list.
     private const int MaxParticles = 256;
 
-    // Long frames — a zone load, a stutter — must not teleport a particle across
-    // the screen. Anything past this is treated as this much, so a hitch slows
-    // the effect rather than breaking it.
     private const float MaxFrameSeconds = 0.1f;
 
     private readonly List<Particle> particles = [];
     private readonly Random random = new();
 
-    // Fractional particles owed from previous frames. Kept between frames so a
-    // spawn rate below one per frame still spawns at the right *average* rate
-    // rather than rounding to zero every time.
     private float pending;
 
     private struct Particle
@@ -45,15 +24,11 @@ internal sealed class ParticleField
         public float Life;
         public float Size;
 
-        // Per-particle randomness, so a shared sine does not move every particle
-        // in lockstep.
         public float Phase;
     }
 
     public bool IsEmpty => this.particles.Count == 0;
 
-    // center/extent describe the text the particles are playing around: the
-    // middle of the line, and half its width and height.
     public void Update(
         ParticleEffect effect, float density, float deltaSeconds, Vector2 center, Vector2 extent, bool spawning)
     {
@@ -66,10 +41,6 @@ internal sealed class ParticleField
             particle.Age += dt;
             if (particle.Age >= particle.Life)
             {
-                // Swapped with the last entry rather than removed in place, which
-                // would shift everything after it. Order carries no meaning here —
-                // they are a cloud, not a list — and the walk is backwards, so the
-                // entry moved into this slot has already been dealt with.
                 this.particles[i] = this.particles[^1];
                 this.particles.RemoveAt(this.particles.Count - 1);
                 continue;
@@ -77,9 +48,6 @@ internal sealed class ParticleField
 
             particle.Position += particle.Velocity * dt;
 
-            // Sideways drift, applied as a displacement rather than folded into
-            // the velocity so it stays a sway and does not accumulate into a
-            // sideways drift across the particle's whole life.
             if (effect is ParticleEffect.Hearts or ParticleEffect.Petals)
                 particle.Position.X += MathF.Sin((particle.Age * 2.2f) + particle.Phase) * 14f * dt;
 
@@ -97,9 +65,6 @@ internal sealed class ParticleField
             this.particles.Add(Spawn(effect, center, extent));
         }
 
-        // At the ceiling the loop above stops consuming, so drop what is owed
-        // rather than banking a backlog that would burst the moment a particle
-        // ages out.
         if (this.particles.Count >= MaxParticles)
             this.pending = 0f;
     }
@@ -117,8 +82,6 @@ internal sealed class ParticleField
             if (alpha <= 0f)
                 continue;
 
-            // Embers cool as they rise: bright yellow-white at the bottom,
-            // settling into the configured colour as they climb and go out.
             var tint = effect == ParticleEffect.Embers
                 ? Vector4.Lerp(new Vector4(1f, 0.95f, 0.7f, 1f), color, MathF.Min(life * 2f, 1f))
                 : color;
@@ -146,10 +109,6 @@ internal sealed class ParticleField
         }
     }
 
-    // Per-second spawn rates at density 1. Sparkles are the densest because they
-    // are the smallest and the shortest-lived; hearts the sparsest because they
-    // are the most conspicuous and a crowd of them reads as spam rather than as
-    // charm.
     private static float RatePerSecond(ParticleEffect effect) => effect switch
     {
         ParticleEffect.Hearts => 6f,
@@ -159,9 +118,6 @@ internal sealed class ParticleField
         _ => 0f,
     };
 
-    // How a particle's alpha behaves over its life. Everything fades out at the
-    // end; sparkles additionally twinkle, and embers fade fast so the tail of the
-    // stream thins out rather than ending in a line of dots.
     private static float Fade(ParticleEffect effect, float life, float age, float phase) => effect switch
     {
         ParticleEffect.Sparkles => (1f - life) * (0.45f + (0.55f * MathF.Sin((age * 9f) + phase))),
@@ -175,7 +131,6 @@ internal sealed class ParticleField
 
         return effect switch
         {
-            // From along the baseline, rising and spreading.
             ParticleEffect.Hearts => new Particle
             {
                 Position = new Vector2(center.X + Range(-extent.X, extent.X), center.Y + Range(0f, extent.Y)),
@@ -185,7 +140,6 @@ internal sealed class ParticleField
                 Phase = phase,
             },
 
-            // From the text itself, fast and short-lived.
             ParticleEffect.Embers => new Particle
             {
                 Position = new Vector2(center.X + Range(-extent.X, extent.X), center.Y + Range(-extent.Y, extent.Y)),
@@ -195,7 +149,6 @@ internal sealed class ParticleField
                 Phase = phase,
             },
 
-            // Hanging in the air around the line rather than traveling through it.
             ParticleEffect.Sparkles => new Particle
             {
                 Position = new Vector2(
@@ -207,7 +160,6 @@ internal sealed class ParticleField
                 Phase = phase,
             },
 
-            // From above, falling past the text.
             _ => new Particle
             {
                 Position = new Vector2(
@@ -223,9 +175,6 @@ internal sealed class ParticleField
 
     private float Range(float min, float max) => min + ((float)this.random.NextDouble() * (max - min));
 
-    // Two lobes and a point. Drawn from three primitives rather than a polygon
-    // path because that is the whole shape, and a heart described by five numbers
-    // is easier to nudge than one described by a vertex list.
     private static void DrawHeart(ImDrawListPtr drawList, Vector2 at, float size, uint color)
     {
         var r = size * 0.5f;
@@ -240,8 +189,6 @@ internal sealed class ParticleField
             color);
     }
 
-    // A four-point star, as two crossed diamonds. Both are wound the same way
-    // round, which convex fill requires.
     private static void DrawSparkle(ImDrawListPtr drawList, Vector2 at, float size, uint color)
     {
         var r = size * 0.5f;
@@ -262,8 +209,6 @@ internal sealed class ParticleField
             color);
     }
 
-    // A leaf-ish quad, turning as it falls. The rotation is the particle's age,
-    // so it tumbles at a constant rate from wherever its phase started it.
     private static void DrawPetal(ImDrawListPtr drawList, Vector2 at, float size, float angle, uint color)
     {
         var r = size * 0.5f;
