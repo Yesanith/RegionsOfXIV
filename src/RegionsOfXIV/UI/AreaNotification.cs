@@ -71,6 +71,9 @@ internal sealed class AreaNotification
 
     public string Text { get; }
 
+    /// <summary>Game icon shown beside the text, or zero for none.</summary>
+    public uint IconId { get; init; }
+
     private NotificationPhase Phase { get; set; } = NotificationPhase.FadeIn;
 
     public float Opacity { get; private set; }

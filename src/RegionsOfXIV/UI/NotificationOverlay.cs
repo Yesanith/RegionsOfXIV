@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Windowing;
@@ -68,34 +68,34 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         if (this.previewHeld)
             return;
 
-        Spawn(this.locations, header, text);
+        Spawn(this.locations, new Line(header, text));
     }
 
-    public void PushWeather(string text)
+    public void PushWeather(string text, uint iconId)
     {
         if (this.previewHeld)
             return;
 
-        Spawn(this.weather, null, text);
+        Spawn(this.weather, new Line(null, text, iconId));
     }
 
     public void TouchPreview(PreviewSample sample)
     {
-        Touch(this.locations, sample.Header, sample.Text);
-        Touch(this.weather, null, WeatherPreview(sample));
+        Touch(this.locations, LocationLine(sample));
+        Touch(this.weather, WeatherLine(sample));
     }
 
     public void PreviewOnce(PreviewSample sample)
     {
         if (!this.previewHeld)
         {
-            Restart(this.locations, sample.Header, sample.Text);
-            Restart(this.weather, null, WeatherPreview(sample));
+            Restart(this.locations, LocationLine(sample));
+            Restart(this.weather, WeatherLine(sample));
             return;
         }
 
-        Replay(this.locations, this.held.Header, this.held.Text);
-        Replay(this.weather, null, WeatherPreview(this.held));
+        Replay(this.locations, LocationLine(this.held));
+        Replay(this.weather, WeatherLine(this.held));
     }
 
     public void HoldPreview(bool held, PreviewSample sample)
@@ -142,13 +142,18 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         Advance(this.weather);
     }
 
-    private string? WeatherPreview(in PreviewSample sample) =>
-        this.config.WeatherNotificationEnabled ? sample.Weather : null;
+    private static Line LocationLine(in PreviewSample sample) =>
+        new(sample.Header, sample.Text);
+
+    private Line? WeatherLine(in PreviewSample sample) =>
+        this.config.WeatherNotificationEnabled
+            ? new Line(null, sample.Weather, sample.WeatherIcon)
+            : null;
 
     private void HoldEach()
     {
-        Hold(this.locations, this.held.Header, this.held.Text);
-        Hold(this.weather, null, WeatherPreview(this.held));
+        Hold(this.locations, LocationLine(this.held));
+        Hold(this.weather, WeatherLine(this.held));
     }
 
     private static void Advance(Lane lane)
@@ -168,9 +173,9 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         }
     }
 
-    private AreaNotification? Spawn(Lane lane, string? header, string text)
+    private AreaNotification? Spawn(Lane lane, Line line)
     {
-        if (string.IsNullOrWhiteSpace(text) && string.IsNullOrWhiteSpace(header))
+        if (string.IsNullOrWhiteSpace(line.Text) && string.IsNullOrWhiteSpace(line.Header))
             return null;
 
         foreach (var existing in lane.Items)
@@ -180,15 +185,18 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         }
 
         var notification = new AreaNotification(
-            header,
-            text,
+            line.Header,
+            line.Text,
             this.config.FadeInDuration,
             lane.Animated && this.config.Motion != MotionEffect.None
                 ? this.config.MotionDuration
                 : TimeSpan.Zero,
             lane.Animated && this.renderer.IsDecoding ? this.config.RevealDuration : TimeSpan.Zero,
             this.config.ShowDuration,
-            this.config.FadeOutDuration);
+            this.config.FadeOutDuration)
+        {
+            IconId = line.Icon,
+        };
 
         lane.Items.Add(notification);
         lane.Preview = null;
@@ -196,9 +204,9 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         return notification;
     }
 
-    private void SpawnPreview(Lane lane, string? header, string text)
+    private void SpawnPreview(Lane lane, Line line)
     {
-        if (Spawn(lane, header, text) is not { } notification)
+        if (Spawn(lane, line) is not { } notification)
             return;
 
         notification.IsPinned = true;
@@ -207,20 +215,20 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         lane.PreviewTouchedAt = DateTime.UtcNow;
     }
 
-    private void Restart(Lane lane, string? header, string? text)
+    private void Restart(Lane lane, Line? line)
     {
-        if (text is null)
+        if (line is not { } content)
         {
             Release(lane);
             return;
         }
 
-        Spawn(lane, header, text);
+        Spawn(lane, content);
     }
 
-    private void Replay(Lane lane, string? header, string? text)
+    private void Replay(Lane lane, Line? line)
     {
-        if (text is null)
+        if (line is not { } content)
         {
             Release(lane);
             return;
@@ -229,12 +237,12 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         if (lane.Preview is { } current)
             lane.Items.Remove(current);
 
-        SpawnPreview(lane, header, text);
+        SpawnPreview(lane, content);
     }
 
-    private void Touch(Lane lane, string? header, string? text)
+    private void Touch(Lane lane, Line? line)
     {
-        if (text is null)
+        if (line is not { } content)
         {
             Release(lane);
             return;
@@ -248,19 +256,19 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             return;
         }
 
-        SpawnPreview(lane, header, text);
+        SpawnPreview(lane, content);
     }
 
-    private void Hold(Lane lane, string? header, string? text)
+    private void Hold(Lane lane, Line? line)
     {
-        if (text is null)
+        if (line is not { } content)
         {
             Release(lane);
             return;
         }
 
         if (lane.Preview is not { IsDone: false })
-            SpawnPreview(lane, header, text);
+            SpawnPreview(lane, content);
     }
 
     private static void Release(Lane lane)
@@ -290,6 +298,9 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     }
 
     private static TimeSpan Longer(TimeSpan a, TimeSpan b) => a > b ? a : b;
+
+    /// <summary>What one notification says. A null Line means the lane has nothing to show.</summary>
+    private readonly record struct Line(string? Header, string Text, uint Icon = 0);
 
     private sealed class Lane(Action<AreaNotification> draw, bool animated)
     {

@@ -1,7 +1,9 @@
-using System;
+﻿using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.ManagedFontAtlas;
+using Dalamud.Interface.Textures;
+using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
 using RegionsOfXIV.Services;
 
@@ -10,6 +12,11 @@ namespace RegionsOfXIV.UI;
 internal sealed class NotificationRenderer(Configuration config, FontService fonts)
 {
     private static readonly Vector4 EmberColor = new(1f, 0.55f, 0.15f, 1f);
+
+    /// <summary>Icon height as a multiple of the header line, and the gap it keeps from the text.</summary>
+    private const float IconScale = 1.3f;
+
+    private const float IconGap = 0.25f;
 
     public bool IsDecoding => config.DecodeEffectEnabled && fonts.EorzeanDisplay != null;
 
@@ -59,10 +66,49 @@ internal sealed class NotificationRenderer(Configuration config, FontService fon
             // from the name below it. Outgoing lines drift up, away from the block.
             var top = anchor - HeaderGap() - (notification.StackOffset * ImGuiHelpers.GlobalScale);
 
+            var lineHeight = ImGui.GetTextLineHeight();
+
+            // Room is kept for the icon whether or not the texture has finished
+            // loading, so the text does not jump sideways when it arrives.
+            var hasIcon = config.ShowWeatherIcon && notification.IconId != 0;
+            var iconWidth = hasIcon ? lineHeight * (IconScale + IconGap) : 0f;
+
+            // The icon and the text are centred as one group, so the text shifts right
+            // by half the room the icon takes up.
+            var textCenterX = centerX + (iconWidth / 2f);
+
             var tracking = Tracking();
-            DrawRun(drawList, Layout(notification.DisplayLayout, text, tracking, centerX),
-                text, centerX, top, tracking, fill, stroke, strokeDistance);
+            var layout = Layout(notification.DisplayLayout, text, tracking, textCenterX);
+
+            if (hasIcon && WeatherIcon(notification.IconId) is { } icon)
+            {
+                var size = lineHeight * IconScale;
+                var left = textCenterX - (layout.Width / 2f) - iconWidth;
+                var iconTop = top + ((lineHeight - size) / 2f);
+
+                drawList.AddImage(
+                    icon.Handle,
+                    new Vector2(left, iconTop),
+                    new Vector2(left + size, iconTop + size),
+                    Vector2.Zero,
+                    Vector2.One,
+                    GlyphPainter.Packed(Vector4.One, notification.Opacity));
+            }
+
+            DrawRun(drawList, layout, text, textCenterX, top, tracking, fill, stroke, strokeDistance);
         }
+    }
+
+    /// <summary>The game's own icon for a weather, or null while it is still loading.</summary>
+    private static IDalamudTextureWrap? WeatherIcon(uint iconId)
+    {
+        if (iconId == 0)
+            return null;
+
+        return Plugin.TextureProvider.GetFromGameIcon(new GameIconLookup(iconId))
+            .TryGetWrap(out var wrap, out _)
+            ? wrap
+            : null;
     }
 
     private float DrawHeader(

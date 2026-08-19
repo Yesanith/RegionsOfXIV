@@ -1,4 +1,4 @@
-using Dalamud.Bindings.ImGui;
+﻿using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility.Raii;
 
 namespace RegionsOfXIV.UI;
@@ -34,6 +34,14 @@ internal sealed partial class ConfigWindow
             + "place name, so it never interrupts a location notice.\n\n"
             + "Weather runs on a fixed cycle of about 23 minutes, and arriving somewhere "
             + "never announces it — only an actual change does.");
+
+        using (ImRaii.Disabled(!this.config.WeatherNotificationEnabled))
+        {
+            changed |= Checkbox("Show the weather icon",
+                () => this.config.ShowWeatherIcon, v => this.config.ShowWeatherIcon = v);
+        }
+
+        Tooltip("Draws the game's own icon for the weather to the left of its name.");
 
         ImGui.Separator();
 

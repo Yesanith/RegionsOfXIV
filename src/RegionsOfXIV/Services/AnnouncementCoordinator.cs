@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Dalamud.Game.ClientState;
 using RegionsOfXIV.Models;
 
@@ -65,8 +65,15 @@ internal sealed class AnnouncementCoordinator : IDisposable
         if (!this.config.WeatherNotificationEnabled)
             return;
 
-        this.sink.PushWeather(
-            WeatherNameResolver.Resolve(this.weatherTracker.Current) ?? "Clear Skies");
+        // Falls back to the first row so the command still shows something when the
+        // tracker has not taken a reading yet.
+        var current = WeatherNameResolver.Resolve(this.weatherTracker.Current)
+                      ?? WeatherNameResolver.Resolve(1);
+
+        if (current is not { } weather)
+            return;
+
+        this.sink.PushWeather(weather.Name, weather.IconId);
     }
 
     private void HandleWeatherChanged(byte weatherId)
@@ -74,10 +81,10 @@ internal sealed class AnnouncementCoordinator : IDisposable
         if (!this.gate.ShouldAnnounceWeather())
             return;
 
-        if (WeatherNameResolver.Resolve(weatherId) is not { } name)
+        if (WeatherNameResolver.Resolve(weatherId) is not { } weather)
             return;
 
-        this.sink.PushWeather(name);
+        this.sink.PushWeather(weather.Name, weather.IconId);
     }
 
     private void OnLogout(int type, int code)
