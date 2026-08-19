@@ -49,7 +49,7 @@ jobs:
           DESCRIPTION=$(echo "$COMMITS_JSON" | jq -r --argjson max "$MAX_SHOWN" '
             (length) as $total
             | (if $total > $max then .[0:$max] else . end) as $shown
-            | ($shown | map("[`" + (.id[0:7]) + "`](" + .url + ") " + (.message | split("\n")[0]) + " - " + .author.name)) as $lines
+            | ($shown | map("[`" + (.id[0:7]) + "`](" + .url + ") " + (.message | split("\n")[0]) + " - " + (.author.username // "unknown"))) as $lines
             | ($lines + (if $total > $max then
                 ["*… and " + (($total - $max) | tostring) + " more commit" + (if ($total - $max) > 1 then "s" else "" end) + "*"]
               else [] end))
