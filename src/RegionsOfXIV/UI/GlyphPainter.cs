@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 
@@ -41,23 +42,6 @@ internal static class GlyphPainter
             : width;
     }
 
-    public static void DrawCentered(
-        ImDrawListPtr drawList,
-        float centerX,
-        float top,
-        string text,
-        uint fillColor,
-        uint strokeColor,
-        float strokeDistance)
-    {
-        if (string.IsNullOrEmpty(text))
-            return;
-
-        var left = centerX - (ImGui.CalcTextSize(text).X / 2f);
-
-        DrawStroked(drawList, new Vector2(left, top), text, fillColor, strokeColor, strokeDistance);
-    }
-
     public static void DrawRun(
         ImDrawListPtr drawList,
         float[] positions,
@@ -98,13 +82,15 @@ internal static class GlyphPainter
             fillColor);
     }
 
-    public static float[] GlyphPositions(string text, float centerX, float tracking)
+    public static float[] GlyphPositions(string text, float centerX, float tracking, out float width)
     {
         var xs = new float[text.Length];
         for (var i = 0; i < text.Length; i++)
             xs[i] = ImGui.CalcTextSize(text[..i]).X + (tracking * i);
 
-        var left = centerX - (RunWidth(text, tracking) / 2f);
+        width = RunWidth(text, tracking);
+
+        var left = centerX - (width / 2f);
         for (var i = 0; i < xs.Length; i++)
             xs[i] += left;
 
@@ -136,6 +122,16 @@ internal static class GlyphPainter
         return glyphs;
     }
 
-    private static string Single(char glyph) =>
-        glyph < AsciiGlyphs.Length ? AsciiGlyphs[glyph] : glyph.ToString();
+    private static readonly Dictionary<char, string> WideGlyphs = [];
+
+    private static string Single(char glyph)
+    {
+        if (glyph < AsciiGlyphs.Length)
+            return AsciiGlyphs[glyph];
+
+        if (!WideGlyphs.TryGetValue(glyph, out var cached))
+            WideGlyphs[glyph] = cached = glyph.ToString();
+
+        return cached;
+    }
 }

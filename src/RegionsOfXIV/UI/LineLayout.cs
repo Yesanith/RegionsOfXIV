@@ -17,14 +17,15 @@ internal sealed class LineLayout
 
     public float[] Positions => this.positions;
 
-    public float[] Store(string line, float tracking, float centerX, int generation, float[] positions)
+    public float Width { get; private set; }
+
+    public void Store(string line, float tracking, float centerX, int generation, float[] positions, float width)
     {
         this.text = line;
         this.tracking = tracking;
         this.centerX = centerX;
         this.generation = generation;
         this.positions = positions;
-
-        return positions;
+        Width = width;
     }
 }
