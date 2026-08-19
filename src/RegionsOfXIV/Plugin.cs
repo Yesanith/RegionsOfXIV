@@ -56,8 +56,9 @@ public sealed class Plugin : IDalamudPlugin
         this.configWindow = new ConfigWindow(
             this.config,
             new ConfigActions(
-                this.overlay.Push,
+                this.overlay.PreviewOnce,
                 this.overlay.TouchPreview,
+                this.overlay.HoldPreview,
                 RebuildFonts,
                 this.nativeUiSuppressor.RestoreAreaText,
                 this.nativeUiSuppressor.RestoreLoadingTitle));
