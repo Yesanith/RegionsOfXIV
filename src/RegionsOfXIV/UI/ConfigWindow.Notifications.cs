@@ -26,6 +26,17 @@ internal sealed partial class ConfigWindow
 
         ImGui.Separator();
 
+        changed |= Checkbox("Weather changes",
+            () => this.config.WeatherNotificationEnabled, v => this.config.WeatherNotificationEnabled = v);
+
+        Tooltip(
+            "Announces the weather turning over, on its own line just above the "
+            + "place name, so it never interrupts a location notice.\n\n"
+            + "Weather runs on a fixed cycle of about 23 minutes, and arriving somewhere "
+            + "never announces it — only an actual change does.");
+
+        ImGui.Separator();
+
         changed |= Checkbox("Show the parent tier as a header",
             () => this.config.IncludeParentTierAsHeader, v => this.config.IncludeParentTierAsHeader = v);
 
@@ -54,7 +65,10 @@ internal sealed partial class ConfigWindow
             "drawn over the loading screen, and shows the same names in this\n" +
             "plugin's style instead.");
 
-        if (changed)
-            this.config.Save();
+        if (!changed)
+            return;
+
+        this.config.Save();
+        this.actions.LivePreview(Sample);
     }
 }

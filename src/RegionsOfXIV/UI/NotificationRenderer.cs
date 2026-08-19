@@ -35,6 +35,36 @@ internal sealed class NotificationRenderer(Configuration config, FontService fon
         DrawTextLine(notification, drawList, centerX, top, strokeDistance);
     }
 
+    public void DrawWeather(AreaNotification notification)
+    {
+        var drawList = ImGui.GetWindowDrawList();
+        var viewport = ImGui.GetMainViewport();
+
+        var centerX = viewport.Pos.X + (viewport.Size.X * (config.HorizontalPosition / 100f));
+        var anchor = viewport.Pos.Y + (viewport.Size.Y * (config.VerticalPosition / 100f));
+
+        notification.ApplyCasing(config.UppercaseText);
+
+        var text = notification.CasedText;
+        if (string.IsNullOrWhiteSpace(text))
+            return;
+
+        var fill = GlyphPainter.Packed(config.HeaderColor, notification.Opacity);
+        var stroke = GlyphPainter.Packed(config.StrokeColor, notification.Opacity);
+        var strokeDistance = ImGuiHelpers.GlobalScale * config.StrokeThickness;
+
+        using (fonts.Header.Push())
+        {
+            // One header line above the block, matching the gap the header keeps
+            // from the name below it. Outgoing lines drift up, away from the block.
+            var top = anchor - HeaderGap() - (notification.StackOffset * ImGuiHelpers.GlobalScale);
+
+            var tracking = Tracking();
+            DrawRun(drawList, Layout(notification.DisplayLayout, text, tracking, centerX),
+                text, centerX, top, tracking, fill, stroke, strokeDistance);
+        }
+    }
+
     private float DrawHeader(
         AreaNotification notification, ImDrawListPtr drawList, float centerX, float top,
         uint stroke, float strokeDistance)
@@ -61,9 +91,12 @@ internal sealed class NotificationRenderer(Configuration config, FontService fon
 
             DrawRun(drawList, layout, header, centerX, top, tracking, fill, stroke, strokeDistance);
 
-            return top + (ImGui.GetTextLineHeight() * (config.OverlapHeader ? 1.1f : 1.6f));
+            return top + HeaderGap();
         }
     }
+
+    /// <summary>Vertical step between the header line and the name below it, in the header font.</summary>
+    private float HeaderGap() => ImGui.GetTextLineHeight() * (config.OverlapHeader ? 1.1f : 1.6f);
 
     private void DrawParticles(AreaNotification notification, ImDrawListPtr drawList, float centerX, float top)
     {

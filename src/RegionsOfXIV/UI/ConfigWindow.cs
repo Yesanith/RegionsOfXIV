@@ -8,10 +8,12 @@ using Dalamud.Utility;
 
 namespace RegionsOfXIV.UI;
 
+internal readonly record struct PreviewSample(string? Header, string Text, string Weather);
+
 internal readonly record struct ConfigActions(
-    Action<string?, string> Preview,
-    Action<string?, string> LivePreview,
-    Action<bool, string?, string> HoldPreview,
+    Action<PreviewSample> Preview,
+    Action<PreviewSample> LivePreview,
+    Action<bool, PreviewSample> HoldPreview,
     Action RebuildFonts,
     Action RestoreNativeAreaText,
     Action RestoreNativeLoadingTitle);
@@ -78,11 +80,11 @@ internal sealed partial class ConfigWindow : Window, IDisposable
     private void SetEditing(bool on)
     {
         this.editing = on;
-        this.actions.HoldPreview(on, SampleHeader, SampleText);
+        this.actions.HoldPreview(on, Sample);
     }
 
-    private const string SampleHeader = "Middle La Noscea";
-    private const string SampleText = "Summerford Farms";
+    private static readonly PreviewSample Sample =
+        new("Middle La Noscea", "Summerford Farms", "Clear Skies");
 
     private const string DiscordInvite = "https://discord.com/invite/ax2gsRqvpa";
 

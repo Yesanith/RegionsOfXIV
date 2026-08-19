@@ -63,7 +63,7 @@ internal sealed partial class ConfigWindow
             this.actions.RestoreNativeLoadingTitle();
 
         this.config.Save();
-        this.actions.Preview(SampleHeader, SampleText);
+        this.actions.Preview(Sample);
     }
 
     private bool DrawBuiltInPresets()

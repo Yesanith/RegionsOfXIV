@@ -15,4 +15,6 @@ internal interface IGateSettings
     bool HideInDuty { get; }
 
     bool HideWhileTravellingFast { get; }
+
+    bool WeatherNotificationEnabled { get; }
 }
