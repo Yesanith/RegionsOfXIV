@@ -25,6 +25,8 @@ jobs:
         run: |
           set -euo pipefail
 
+          : "${DISCORD_WEBHOOK:?the RELEASEWEBHOOK secret is not set on this repository}"
+
           MAX_BODY_CHARS=3500
 
           RELEASE=$(gh release view "$TAG" --repo "$REPO" \

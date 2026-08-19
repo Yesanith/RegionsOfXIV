@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 
@@ -16,12 +16,12 @@ internal static class GlyphPainter
     public static void DrawStroked(
         ImDrawListPtr drawList,
         Vector2 position,
-        string text,
+        ReadOnlySpan<char> text,
         uint fillColor,
         uint strokeColor,
         float strokeDistance)
     {
-        if (string.IsNullOrEmpty(text))
+        if (text.IsEmpty)
             return;
 
         if (strokeDistance > 0f)
@@ -108,30 +108,9 @@ internal static class GlyphPainter
         if (glyph == ' ')
             return;
 
-        DrawStroked(drawList, new Vector2(x, y), Single(glyph), fill, stroke, strokeDistance);
-    }
+        Span<char> one = stackalloc char[1];
+        one[0] = glyph;
 
-    private static readonly string[] AsciiGlyphs = BuildAsciiGlyphs();
-
-    private static string[] BuildAsciiGlyphs()
-    {
-        var glyphs = new string[128];
-        for (var i = 0; i < glyphs.Length; i++)
-            glyphs[i] = ((char)i).ToString();
-
-        return glyphs;
-    }
-
-    private static readonly Dictionary<char, string> WideGlyphs = [];
-
-    private static string Single(char glyph)
-    {
-        if (glyph < AsciiGlyphs.Length)
-            return AsciiGlyphs[glyph];
-
-        if (!WideGlyphs.TryGetValue(glyph, out var cached))
-            WideGlyphs[glyph] = cached = glyph.ToString();
-
-        return cached;
+        DrawStroked(drawList, new Vector2(x, y), one, fill, stroke, strokeDistance);
     }
 }
