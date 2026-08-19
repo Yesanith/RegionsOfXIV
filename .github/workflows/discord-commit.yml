@@ -12,21 +12,60 @@ jobs:
       - name: Send commit info to Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.COMMITWEBHOOK }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COMMITS_JSON: ${{ toJson(github.event.commits) }}
         run: |
           REPO_NAME="${{ github.event.repository.name }}"
           BRANCH_NAME="${{ github.ref_name }}"
+          FORCED="${{ github.event.forced }}"
           COMMIT_COUNT=$(echo "$COMMITS_JSON" | jq 'length')
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          MAX_SHOWN=8
 
-          # Build a GitHub-style commit list:
+          # Color: orange for force-pushes, purple otherwise
+          if [ "$FORCED" = "true" ]; then
+            EMBED_COLOR=15105570
+          else
+            EMBED_COLOR=10181046
+          fi
+
+          # Fetch aggregate diff stats for this push via the compare API
+          COMPARE_JSON=$(curl -sfS \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/compare/${{ github.event.before }}...${{ github.event.after }}" || echo '{}')
+
+          STATS_LINE=$(echo "$COMPARE_JSON" | jq -r '
+            if (.files // null) == null then
+              "stats unavailable"
+            else
+              (.files | map(.additions) | add // 0) as $add
+              | (.files | map(.deletions) | add // 0) as $del
+              | (.files | length) as $count
+              | "+" + ($add|tostring) + " -" + ($del|tostring) + " across " + ($count|tostring) + " file" + (if $count == 1 then "" else "s" end)
+            end
+          ')
+
+          # Build a GitHub-style commit list, capped at MAX_SHOWN entries:
           # [`hash`](url) message - author
-          DESCRIPTION=$(echo "$COMMITS_JSON" | jq -r '
-            [.[] | "[`" + (.id[0:7]) + "`](" + .url + ") " + (.message | split("\n")[0]) + " - " + .author.name]
+          # ...with a "and N more" line if truncated
+          DESCRIPTION=$(echo "$COMMITS_JSON" | jq -r --argjson max "$MAX_SHOWN" '
+            (length) as $total
+            | (if $total > $max then .[0:$max] else . end) as $shown
+            | ($shown | map("[`" + (.id[0:7]) + "`](" + .url + ") " + (.message | split("\n")[0]) + " - " + .author.name)) as $lines
+            | ($lines + (if $total > $max then
+                ["*… and " + (($total - $max) | tostring) + " more commit" + (if ($total - $max) > 1 then "s" else "" end) + "*"]
+              else [] end))
             | join("\n")
           ')
 
-          if [ "$COMMIT_COUNT" -eq 1 ]; then
+          if [ "$FORCED" = "true" ]; then
+            if [ "$COMMIT_COUNT" -eq 1 ]; then
+              TITLE_TEXT="1 commit force-pushed to ${BRANCH_NAME}"
+            else
+              TITLE_TEXT="${COMMIT_COUNT} commits force-pushed to ${BRANCH_NAME}"
+            fi
+          elif [ "$COMMIT_COUNT" -eq 1 ]; then
             TITLE_TEXT="1 new commit pushed to ${BRANCH_NAME}"
           else
             TITLE_TEXT="${COMMIT_COUNT} new commits pushed to ${BRANCH_NAME}"
@@ -39,12 +78,17 @@ jobs:
             --arg url "${{ github.event.compare }}" \
             --arg footer "${REPO_NAME} · GitHub Actions" \
             --arg timestamp "$TIMESTAMP" \
+            --arg stats "$STATS_LINE" \
+            --argjson color "$EMBED_COLOR" \
             '{
               embeds: [{
                 title: $title,
                 description: $desc,
                 url: $url,
-                color: 10181046,
+                color: $color,
+                fields: [
+                  { name: "Changes", value: $stats, inline: false }
+                ],
                 thumbnail: {
                   url: "https://raw.githubusercontent.com/Yesanith/RegionsOfXIV/master/assets/images/icon.png"
                 },
