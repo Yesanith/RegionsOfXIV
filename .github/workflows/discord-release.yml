@@ -2,41 +2,89 @@ name: Discord Release Notification
 
 on:
   release:
-    types:
-      - published
+    types: [published]
 
 jobs:
   notify:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Send Discord notification
+      - name: Send release info to Discord
         env:
-          WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
-          RELEASE_NAME: ${{ github.event.release.name }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-          RELEASE_URL: ${{ github.event.release.html_url }}
-          RELEASE_BODY: ${{ github.event.release.body }}
+          DISCORD_WEBHOOK: ${{ secrets.RELEASEWEBHOOK }}
         run: |
-          curl \
-            -H "Content-Type: application/json" \
-            -d "$(jq -n \
-              --arg name "$RELEASE_NAME" \
-              --arg tag "$RELEASE_TAG" \
-              --arg url "$RELEASE_URL" \
-              --arg body "$RELEASE_BODY" \
-              '{
-                embeds: [{
-                  title: ("🚀 " + $name),
-                  description: $body,
-                  url: $url,
-                  fields: [
-                    {
-                      name: "Version",
-                      value: $tag,
-                      inline: true
-                    }
-                  ]
-                }]
-              }')" \
-            "$WEBHOOK"
+          REPO_NAME="${{ github.event.repository.name }}"
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          RELEASE_NAME="${{ github.event.release.name }}"
+          RELEASE_URL="${{ github.event.release.html_url }}"
+          AUTHOR_NAME="${{ github.event.release.author.login }}"
+          IS_PRERELEASE="${{ github.event.release.prerelease }}"
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          MAX_BODY_CHARS=3500
+
+          # Fall back to the tag name if no release title was set
+          if [ -z "$RELEASE_NAME" ] || [ "$RELEASE_NAME" = "null" ]; then
+            RELEASE_NAME="$TAG_NAME"
+          fi
+
+          # Color: gold for pre-releases, green for full releases
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            EMBED_COLOR=15844367
+            KIND_TEXT="Pre-release"
+          else
+            EMBED_COLOR=3066993
+            KIND_TEXT="Release"
+          fi
+
+          TITLE_TEXT="${KIND_TEXT}: ${RELEASE_NAME}"
+
+          # Release body (notes) as raw markdown, truncated if too long for an embed description
+          BODY_RAW=$(jq -r '.release.body // ""' <<< "${{ toJson(github.event) }}")
+          BODY_LEN=$(echo -n "$BODY_RAW" | wc -c)
+
+          if [ "$BODY_LEN" -gt "$MAX_BODY_CHARS" ]; then
+            BODY_TEXT=$(echo -n "$BODY_RAW" | head -c "$MAX_BODY_CHARS")
+            BODY_TEXT="${BODY_TEXT}...
+
+*Read the full notes on GitHub →*"
+          else
+            BODY_TEXT="$BODY_RAW"
+          fi
+
+          if [ -z "$BODY_TEXT" ] || [ "$BODY_TEXT" = "null" ]; then
+            BODY_TEXT="_No release notes provided._"
+          fi
+
+          # Build the final JSON payload safely with jq (handles escaping for us)
+          PAYLOAD=$(jq -n \
+            --arg title "$TITLE_TEXT" \
+            --arg desc "$BODY_TEXT" \
+            --arg url "$RELEASE_URL" \
+            --arg tag "$TAG_NAME" \
+            --arg author "$AUTHOR_NAME" \
+            --arg footer "${REPO_NAME} · GitHub Actions" \
+            --arg timestamp "$TIMESTAMP" \
+            --argjson color "$EMBED_COLOR" \
+            '{
+              embeds: [{
+                title: $title,
+                description: $desc,
+                url: $url,
+                color: $color,
+                fields: [
+                  { name: "Tag", value: $tag, inline: true },
+                  { name: "Published by", value: $author, inline: true }
+                ],
+                thumbnail: {
+                  url: "https://raw.githubusercontent.com/Yesanith/RegionsOfXIV/master/assets/images/icon.png"
+                },
+                footer: {
+                  text: $footer,
+                  icon_url: "https://github.githubassets.com/favicons/favicon.png"
+                },
+                timestamp: $timestamp
+              }]
+            }')
+
+          curl -sfS -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "$DISCORD_WEBHOOK"
