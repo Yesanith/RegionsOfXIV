@@ -1,8 +1,20 @@
 name: Discord Release Notification
 
+# workflow_dispatch is here so an announcement can be re-sent without touching the
+# release itself. Un-publishing and re-publishing would fire this again, but it
+# also drops "Latest" for a few seconds, and the plugin manifest points every
+# user's updater at /releases/latest/download.
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag of the release to announce, e.g. v0.2.2.0
+        required: true
+
+permissions:
+  contents: read
 
 jobs:
   notify:
@@ -11,19 +23,38 @@ jobs:
       - name: Send release info to Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.RELEASEWEBHOOK }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          # The only two interpolations in this file, both of them tag names.
+          #
+          # Nothing else from the event is expanded into the script — the release
+          # title and body are fetched through gh below instead. Interpolating
+          # those is what broke this workflow before: `toJson(github.event)` pasted
+          # a multi-line JSON blob into the middle of a `run: |` block, which left
+          # the file unparseable, so it never registered its release trigger and
+          # silently announced nothing. It is also how release notes could inject
+          # shell, being text anyone opening a PR can influence.
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
         run: |
-          REPO_NAME="${{ github.event.repository.name }}"
-          TAG_NAME="${{ github.event.release.tag_name }}"
-          RELEASE_NAME="${{ github.event.release.name }}"
-          RELEASE_URL="${{ github.event.release.html_url }}"
-          AUTHOR_NAME="${{ github.event.release.author.login }}"
-          IS_PRERELEASE="${{ github.event.release.prerelease }}"
-          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          set -euo pipefail
+
           MAX_BODY_CHARS=3500
 
+          # One API call for everything the embed needs, landing as JSON in a
+          # variable rather than as text in the script.
+          RELEASE=$(gh release view "$TAG" --repo "$REPO" \
+            --json name,body,url,isPrerelease,author,publishedAt)
+
+          RELEASE_NAME=$(jq -r '.name // ""' <<< "$RELEASE")
+          RELEASE_URL=$(jq -r '.url' <<< "$RELEASE")
+          AUTHOR_NAME=$(jq -r '.author.login // "unknown"' <<< "$RELEASE")
+          IS_PRERELEASE=$(jq -r '.isPrerelease' <<< "$RELEASE")
+          TIMESTAMP=$(jq -r '.publishedAt' <<< "$RELEASE")
+          BODY_RAW=$(jq -r '.body // ""' <<< "$RELEASE")
+
           # Fall back to the tag name if no release title was set
-          if [ -z "$RELEASE_NAME" ] || [ "$RELEASE_NAME" = "null" ]; then
-            RELEASE_NAME="$TAG_NAME"
+          if [ -z "$RELEASE_NAME" ]; then
+            RELEASE_NAME="$TAG"
           fi
 
           # Color: gold for pre-releases, green for full releases
@@ -35,33 +66,32 @@ jobs:
             KIND_TEXT="Release"
           fi
 
-          TITLE_TEXT="${KIND_TEXT}: ${RELEASE_NAME}"
-
-          # Release body (notes) as raw markdown, truncated if too long for an embed description
-          BODY_RAW=$(jq -r '.release.body // ""' <<< "${{ toJson(github.event) }}")
-          BODY_LEN=$(echo -n "$BODY_RAW" | wc -c)
-
-          if [ "$BODY_LEN" -gt "$MAX_BODY_CHARS" ]; then
-            BODY_TEXT=$(echo -n "$BODY_RAW" | head -c "$MAX_BODY_CHARS")
-            BODY_TEXT="${BODY_TEXT}...
-
-*Read the full notes on GitHub →*"
+          # Discord caps an embed description at 4096; 3500 leaves room for the
+          # "read more" line without having to count it.
+          # Every line here stays a single line. A literal newline inside a shell
+          # string sits at whatever column it was typed at, and this is a YAML block
+          # scalar where column is structure — which is the class of mistake that
+          # made this file unparseable in the first place.
+          if [ "$(printf %s "$BODY_RAW" | wc -c)" -gt "$MAX_BODY_CHARS" ]; then
+            BODY_TEXT="$(printf %s "$BODY_RAW" | head -c "$MAX_BODY_CHARS")"
+            BODY_TEXT="${BODY_TEXT}"$'\n\n'"*Read the full notes on GitHub →*"
           else
             BODY_TEXT="$BODY_RAW"
           fi
 
-          if [ -z "$BODY_TEXT" ] || [ "$BODY_TEXT" = "null" ]; then
+          if [ -z "$BODY_TEXT" ]; then
             BODY_TEXT="_No release notes provided._"
           fi
 
-          # Build the final JSON payload safely with jq (handles escaping for us)
+          # Built with jq so it handles the escaping, the notes being arbitrary
+          # markdown with quotes and newlines in it.
           PAYLOAD=$(jq -n \
-            --arg title "$TITLE_TEXT" \
+            --arg title "${KIND_TEXT}: ${RELEASE_NAME}" \
             --arg desc "$BODY_TEXT" \
             --arg url "$RELEASE_URL" \
-            --arg tag "$TAG_NAME" \
+            --arg tag "$TAG" \
             --arg author "$AUTHOR_NAME" \
-            --arg footer "${REPO_NAME} · GitHub Actions" \
+            --arg footer "${REPO##*/} · GitHub Actions" \
             --arg timestamp "$TIMESTAMP" \
             --argjson color "$EMBED_COLOR" \
             '{
