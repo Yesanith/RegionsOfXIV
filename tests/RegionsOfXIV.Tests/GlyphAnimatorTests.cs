@@ -142,4 +142,78 @@ public class GlyphAnimatorTests
             Assert.True(alpha is 0f or 1f, $"alpha was {alpha} at {step}%");
         }
     }
+
+    private static bool IsSettled(MotionEffect effect, float progress, int count = 16)
+    {
+        for (var i = 0; i < count; i++)
+        {
+            var now = GlyphAnimator.For(effect, i, count, progress, FontSize);
+            var end = GlyphAnimator.For(effect, i, count, 1f, FontSize);
+
+            if (MathF.Abs(now.Alpha - end.Alpha) > 0.001f
+                || MathF.Abs(now.OffsetY - end.OffsetY) > 0.01f
+                || MathF.Abs(now.Heat - end.Heat) > 0.001f)
+                return false;
+        }
+
+        return true;
+    }
+
+    [Theory]
+    [MemberData(nameof(AnimatedEffects))]
+    public void EveryEffectKeepsMovingUntilTheEndOfItsStage(MotionEffect effect)
+    {
+        Assert.False(
+            IsSettled(effect, 0.85f),
+            $"{effect} had already finished at 85% and stalls for the rest of its stage");
+    }
+
+    private static (float Lowest, float Highest) TravelWhileLegible(MotionEffect effect)
+    {
+        float lowest = 0f, highest = 0f;
+        var seen = false;
+
+        for (var step = 0; step <= 1000; step++)
+        {
+            var state = GlyphAnimator.For(effect, 0, 1, step / 1000f, FontSize);
+            if (state.Alpha < 0.25f)
+                continue;
+
+            if (!seen)
+            {
+                lowest = highest = state.OffsetY;
+                seen = true;
+            }
+
+            lowest = MathF.Max(lowest, state.OffsetY);
+            highest = MathF.Min(highest, state.OffsetY);
+        }
+
+        return (lowest, highest);
+    }
+
+    [Fact]
+    public void RiseIsStillBelowTheLineWhenItBecomesLegible()
+    {
+        var start = GlyphAnimator.For(MotionEffect.Rise, 0, 1, 0f, FontSize).OffsetY;
+        var (lowest, _) = TravelWhileLegible(MotionEffect.Rise);
+
+        Assert.True(
+            lowest > start * 0.5f,
+            $"Rise was only {lowest:0.0}px below its target once legible, out of {start:0.0}px of travel");
+    }
+
+    [Fact]
+    public void RiseAndWaveDoNotLookLikeEachOther()
+    {
+        var (riseLowest, riseHighest) = TravelWhileLegible(MotionEffect.Rise);
+        var (waveLowest, waveHighest) = TravelWhileLegible(MotionEffect.Wave);
+
+        Assert.True(riseLowest > 0f, "Rise never appears below the line while legible");
+        Assert.True(waveLowest <= 0.001f, "Wave should never appear below the line");
+
+        Assert.True(
+            MathF.Abs(riseLowest - riseHighest) > MathF.Abs(waveLowest - waveHighest) * 2f,
+            "Rise should travel visibly further than Wave");
+    }
 }
