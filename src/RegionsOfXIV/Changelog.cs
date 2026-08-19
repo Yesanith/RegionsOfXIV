@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 
@@ -10,6 +10,14 @@ internal static class Changelog
 {
     public static readonly ChangelogEntry[] All =
     [
+        new(new Version("0.2.3.0"),
+        [
+            "Weather announcements. When the weather turns over it is announced on its own line above the place name, with the game's own icon beside it. Off by default; switch it on under Notifications.",
+            "The weather line is styled like everything else, sharing the underline, the motion and decode effects, and your colours and timings.",
+            "Arriving somewhere never announces its weather, only an actual change does, so walking around does not set it off.",
+            "The preview shows everything that is switched on, weather included, so what you are adjusting is what you can see.",
+        ]),
+
         new(new Version("0.2.2.0"),
         [
             "Save your own presets. A preset now covers every setting on General, Effects, Notifications and Durations, not just the look.",

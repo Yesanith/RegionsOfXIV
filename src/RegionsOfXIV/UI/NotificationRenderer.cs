@@ -16,7 +16,7 @@ internal sealed class NotificationRenderer(Configuration config, FontService fon
     /// <summary>Icon height as a multiple of the header line, and the gap it keeps from the text.</summary>
     private const float IconScale = 1.3f;
 
-    private const float IconGap = 0.25f;
+    private const float IconGap = 0.5f;
 
     /// <summary>Least room between the weather line and the block when an underline divides them.</summary>
     private const float UnderlinedWeatherGap = 1.7f;
