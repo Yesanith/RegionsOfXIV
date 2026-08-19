@@ -3,14 +3,6 @@ using RegionsOfXIV.UI;
 
 namespace RegionsOfXIV.Tests;
 
-// The motion effects, which are otherwise judged by watching them. What is
-// checked here is not how they look — that is a matter of taste and a running
-// game — but the handful of properties that make them safe to hand back to the
-// plain renderer, and that would show up in game as a flicker or a jump rather
-// than as an obvious fault.
-//
-// GlyphAnimator is pure arithmetic over System types, so this needs no font
-// atlas, no ImGui and no Dalamud. Same seam as NotificationGate.
 public class GlyphAnimatorTests
 {
     private const float FontSize = 91f;
@@ -32,10 +24,6 @@ public class GlyphAnimatorTests
         return data;
     }
 
-    // The one that matters most. NotificationOverlay stops animating at full
-    // progress and draws the line in a single run instead, so every effect has to
-    // already be exactly at rest by then — otherwise the last frame of the reveal
-    // jumps.
     [Theory]
     [MemberData(nameof(AnimatedEffects))]
     public void EveryEffectIsAtRestWhenTheRevealCompletes(MotionEffect effect)
@@ -75,16 +63,12 @@ public class GlyphAnimatorTests
         }
     }
 
-    // --- the stagger --------------------------------------------------------
-
     [Fact]
     public void LaterGlyphsStartLater()
     {
         Assert.True(GlyphAnimator.LocalProgress(11, 12, 0.3f) < GlyphAnimator.LocalProgress(0, 12, 0.3f));
     }
 
-    // The last glyph must finish exactly as the reveal does, or the line is still
-    // arriving when the overlay switches to the plain run.
     [Fact]
     public void TheLastGlyphCompletesExactlyAtTheEnd()
     {
@@ -113,15 +97,11 @@ public class GlyphAnimatorTests
         }
     }
 
-    // --- individual effects -------------------------------------------------
-
     [Fact]
     public void RiseComesUpFromBelowAndOvershoots()
     {
         Assert.True(GlyphAnimator.For(MotionEffect.Rise, 0, 12, 0f, FontSize).OffsetY > 0f);
 
-        // Somewhere in the middle it must pass its target and come back, which is
-        // what separates this from a plain ease-out.
         var highest = 0f;
         for (var step = 0; step <= 100; step++)
             highest = MathF.Min(highest, GlyphAnimator.For(MotionEffect.Rise, 0, 1, step / 100f, FontSize).OffsetY);
@@ -152,8 +132,6 @@ public class GlyphAnimatorTests
         Assert.Equal(1f, GlyphAnimator.For(MotionEffect.Burn, 3, 12, 0f, FontSize).Heat, 5);
     }
 
-    // Typewriter is the one effect with no in-between: a glyph is typed or it is
-    // not, and half-drawn letters would give away that it is a fade underneath.
     [Fact]
     public void TypewriterNeverDrawsAPartialGlyph()
     {
@@ -163,5 +141,79 @@ public class GlyphAnimatorTests
 
             Assert.True(alpha is 0f or 1f, $"alpha was {alpha} at {step}%");
         }
+    }
+
+    private static bool IsSettled(MotionEffect effect, float progress, int count = 16)
+    {
+        for (var i = 0; i < count; i++)
+        {
+            var now = GlyphAnimator.For(effect, i, count, progress, FontSize);
+            var end = GlyphAnimator.For(effect, i, count, 1f, FontSize);
+
+            if (MathF.Abs(now.Alpha - end.Alpha) > 0.001f
+                || MathF.Abs(now.OffsetY - end.OffsetY) > 0.01f
+                || MathF.Abs(now.Heat - end.Heat) > 0.001f)
+                return false;
+        }
+
+        return true;
+    }
+
+    [Theory]
+    [MemberData(nameof(AnimatedEffects))]
+    public void EveryEffectKeepsMovingUntilTheEndOfItsStage(MotionEffect effect)
+    {
+        Assert.False(
+            IsSettled(effect, 0.85f),
+            $"{effect} had already finished at 85% and stalls for the rest of its stage");
+    }
+
+    private static (float Lowest, float Highest) TravelWhileLegible(MotionEffect effect)
+    {
+        float lowest = 0f, highest = 0f;
+        var seen = false;
+
+        for (var step = 0; step <= 1000; step++)
+        {
+            var state = GlyphAnimator.For(effect, 0, 1, step / 1000f, FontSize);
+            if (state.Alpha < 0.25f)
+                continue;
+
+            if (!seen)
+            {
+                lowest = highest = state.OffsetY;
+                seen = true;
+            }
+
+            lowest = MathF.Max(lowest, state.OffsetY);
+            highest = MathF.Min(highest, state.OffsetY);
+        }
+
+        return (lowest, highest);
+    }
+
+    [Fact]
+    public void RiseIsStillBelowTheLineWhenItBecomesLegible()
+    {
+        var start = GlyphAnimator.For(MotionEffect.Rise, 0, 1, 0f, FontSize).OffsetY;
+        var (lowest, _) = TravelWhileLegible(MotionEffect.Rise);
+
+        Assert.True(
+            lowest > start * 0.5f,
+            $"Rise was only {lowest:0.0}px below its target once legible, out of {start:0.0}px of travel");
+    }
+
+    [Fact]
+    public void RiseAndWaveDoNotLookLikeEachOther()
+    {
+        var (riseLowest, riseHighest) = TravelWhileLegible(MotionEffect.Rise);
+        var (waveLowest, waveHighest) = TravelWhileLegible(MotionEffect.Wave);
+
+        Assert.True(riseLowest > 0f, "Rise never appears below the line while legible");
+        Assert.True(waveLowest <= 0.001f, "Wave should never appear below the line");
+
+        Assert.True(
+            MathF.Abs(riseLowest - riseHighest) > MathF.Abs(waveLowest - waveHighest) * 2f,
+            "Rise should travel visibly further than Wave");
     }
 }

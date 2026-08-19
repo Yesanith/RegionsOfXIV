@@ -1,9 +1,5 @@
 name: Discord Release Notification
 
-# workflow_dispatch is here so an announcement can be re-sent without touching the
-# release itself. Un-publishing and re-publishing would fire this again, but it
-# also drops "Latest" for a few seconds, and the plugin manifest points every
-# user's updater at /releases/latest/download.
 on:
   release:
     types: [published]
@@ -25,23 +21,14 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.RELEASEWEBHOOK }}
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          # The only two interpolations in this file, both of them tag names.
-          #
-          # Nothing else from the event is expanded into the script — the release
-          # title and body are fetched through gh below instead. Interpolating
-          # those is what broke this workflow before: `toJson(github.event)` pasted
-          # a multi-line JSON blob into the middle of a `run: |` block, which left
-          # the file unparseable, so it never registered its release trigger and
-          # silently announced nothing. It is also how release notes could inject
-          # shell, being text anyone opening a PR can influence.
           TAG: ${{ github.event.release.tag_name || inputs.tag }}
         run: |
           set -euo pipefail
 
+          : "${DISCORD_WEBHOOK:?the RELEASEWEBHOOK secret is not set on this repository}"
+
           MAX_BODY_CHARS=3500
 
-          # One API call for everything the embed needs, landing as JSON in a
-          # variable rather than as text in the script.
           RELEASE=$(gh release view "$TAG" --repo "$REPO" \
             --json name,body,url,isPrerelease,author,publishedAt)
 
@@ -52,12 +39,10 @@ jobs:
           TIMESTAMP=$(jq -r '.publishedAt' <<< "$RELEASE")
           BODY_RAW=$(jq -r '.body // ""' <<< "$RELEASE")
 
-          # Fall back to the tag name if no release title was set
           if [ -z "$RELEASE_NAME" ]; then
             RELEASE_NAME="$TAG"
           fi
 
-          # Color: gold for pre-releases, green for full releases
           if [ "$IS_PRERELEASE" = "true" ]; then
             EMBED_COLOR=15844367
             KIND_TEXT="Pre-release"
@@ -66,12 +51,6 @@ jobs:
             KIND_TEXT="Release"
           fi
 
-          # Discord caps an embed description at 4096; 3500 leaves room for the
-          # "read more" line without having to count it.
-          # Every line here stays a single line. A literal newline inside a shell
-          # string sits at whatever column it was typed at, and this is a YAML block
-          # scalar where column is structure — which is the class of mistake that
-          # made this file unparseable in the first place.
           if [ "$(printf %s "$BODY_RAW" | wc -c)" -gt "$MAX_BODY_CHARS" ]; then
             BODY_TEXT="$(printf %s "$BODY_RAW" | head -c "$MAX_BODY_CHARS")"
             BODY_TEXT="${BODY_TEXT}"$'\n\n'"*Read the full notes on GitHub →*"
@@ -83,8 +62,6 @@ jobs:
             BODY_TEXT="_No release notes provided._"
           fi
 
-          # Built with jq so it handles the escaping, the notes being arbitrary
-          # markdown with quotes and newlines in it.
           PAYLOAD=$(jq -n \
             --arg title "${KIND_TEXT}: ${RELEASE_NAME}" \
             --arg desc "$BODY_TEXT" \

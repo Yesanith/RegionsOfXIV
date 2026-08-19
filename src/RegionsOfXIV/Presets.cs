@@ -3,19 +3,6 @@ using System.Numerics;
 
 namespace RegionsOfXIV;
 
-// A named look, as a complete configuration.
-//
-// Look holds only the settings that make this preset what it is; ApplyTo puts
-// everything else back to its default first, so a built-in is a whole
-// configuration and not a diff against whatever happened to be there. Two players
-// who click "Inferno" see the same notification, whatever either had changed
-// beforehand — which is what a named preset has to mean to be worth naming.
-//
-// Applied and then forgotten. Nothing records which preset a config came from,
-// and the settings a preset writes are the same ones the tabs edit, so there is
-// no such thing as "leaving" one — you pick a look and then adjust it. The
-// alternative, tracking an active preset and flipping it to "Custom" the moment
-// anything is touched, buys a label at the cost of bookkeeping in every setter.
 internal readonly record struct Preset(string Name, string Description, Action<Configuration> Look)
 {
     public void ApplyTo(Configuration config)
@@ -27,22 +14,8 @@ internal readonly record struct Preset(string Name, string Description, Action<C
 
 internal static class Presets
 {
-    // Each Look below writes only what distinguishes it. Size, position, font,
-    // durations, which tiers announce, the decode, when to stay quiet — all of it
-    // arrives from the defaults by way of ResetToDefaults, so nothing here has to
-    // list a setting merely to be complete, and a setting added to Configuration
-    // later is covered the moment it has a default.
-    //
-    // Note this reaches the decode switch too. A preset used to leave
-    // DecodeEffectEnabled alone on the grounds that it was a decision about the
-    // whole plugin; now that applying one is understood as a full reset, carving
-    // out a single setting would be the surprising behaviour rather than the safe
-    // one.
     public static readonly Preset[] All =
     [
-        // Nothing to write: this *is* the defaults, so the reset has already done
-        // the whole job. Kept as a preset because "put it all back" is exactly what
-        // someone reaches for after experimenting.
         new(
             "Classic",
             "The plugin as it ships: a decode, no movement, no particles.",
@@ -131,9 +104,6 @@ internal static class Presets
                 config.UppercaseText = true;
             }),
 
-        // The plugin's own ancestor. Wide tracking and uppercase is most of what
-        // makes the Guild Wars 2 original recognisable, and it wants no motion —
-        // the decode alone carries it.
         new(
             "Tyria",
             "Wide uppercase in gold, still and unhurried — a nod to the original.",

@@ -11,25 +11,7 @@ with a styled, animated on-screen notification.**
 [![build](https://img.shields.io/github/actions/workflow/status/Yesanith/RegionsOfXIV/pr-build.yml?branch=master)](https://github.com/Yesanith/RegionsOfXIV/actions/workflows/pr-build.yml)
 [![license](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue)](LICENSE.md)
 
-<!--
-  Live install count from Dalamud's own backend. Uncomment once the plugin is
-  listed — until then the badge honestly reports "no result", because the name
-  is not in that endpoint yet.
-
-[![downloads](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fkamori.goats.dev%2FPlugin%2FDownloadCounts&query=%24.RegionsOfXIV&label=downloads&color=blue)](https://github.com/Yesanith/RegionsOfXIV)
--->
-
 </div>
-
-<!--
-  A screenshot or a short gif of a notification belongs here — it is the one
-  thing this page cannot say in words. Drop the file in assets/images/ and
-  uncomment:
-
-<div align="center">
-  <img src="assets/images/preview.png" width="720" alt="A notification in game">
-</div>
--->
 
 Final Fantasy XIV announces zone changes on screen, but changes your **sub-area**
 silently — the only feedback is the small text above the minimap. Regions of XIV

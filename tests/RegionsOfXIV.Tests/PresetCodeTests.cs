@@ -3,9 +3,6 @@ using RegionsOfXIV;
 
 namespace RegionsOfXIV.Tests;
 
-// The codec is the one piece here whose failures are silent: a truncated code
-// still looks like a code, and a value that fails to round-trip comes back as a
-// plausible default rather than as an error. So it gets exercised end to end.
 public class PresetCodeTests
 {
     private static Configuration Sample() => new()
@@ -48,8 +45,6 @@ public class PresetCodeTests
         Assert.Equal(TimeSpan.FromSeconds(7.25), preset!.Settings.ShowDuration);
     }
 
-    // The saved-preset list is excluded from a copy, so it must be absent from a
-    // code too — otherwise sharing one preset would drag every other one along.
     [Fact]
     public void DoesNotCarryTheSavedPresetList()
     {
@@ -60,8 +55,6 @@ public class PresetCodeTests
         Assert.Empty(preset!.Settings.UserPresets);
     }
 
-    // A code omits anything at its default, so an unmentioned setting has to arrive
-    // at that default rather than at zero.
     [Fact]
     public void LeavesUnmentionedSettingsAtTheirDefaults()
     {
@@ -72,10 +65,6 @@ public class PresetCodeTests
             Assert.Equal(property.GetValue(defaults), property.GetValue(preset!.Settings));
     }
 
-    // The forward-compatibility case, and the reason this plugin can keep adding
-    // motions and particles: a code from a newer build names an effect this one
-    // does not have. It has to land on the default rather than be stored as a
-    // number that no switch arm matches.
     [Theory]
     [InlineData(99)]
     [InlineData(5)]
@@ -95,8 +84,6 @@ public class PresetCodeTests
         Assert.Equal(defaults.DisplayFont, preset.Settings.DisplayFont);
     }
 
-    // ...while everything the older build *does* understand still arrives. A single
-    // unknown effect must not cost the rest of the preset.
     [Fact]
     public void KeepsTheRestOfACodeThatNamesAnUnknownEffect()
     {
@@ -111,8 +98,6 @@ public class PresetCodeTests
         Assert.Equal(new Vector4(0.1f, 0.2f, 0.3f, 0.4f), preset.Settings.TextColor);
     }
 
-    // Appending a member must not disturb the ones already out in the wild: a code
-    // is numbers, so an existing effect has to keep the number it was written with.
     [Fact]
     public void PinsTheEffectOrdinalsThatCodesAlreadyCarry()
     {
@@ -134,8 +119,6 @@ public class PresetCodeTests
         Assert.Equal(3, (int)DisplayFontChoice.NotoSansCjk);
     }
 
-    // One unbroken token: no base64 characters that a chat client would break a
-    // line on or that a reader would mistake for punctuation.
     [Fact]
     public void ProducesOnePasteableToken()
     {
@@ -148,8 +131,6 @@ public class PresetCodeTests
         Assert.DoesNotContain(' ', code);
     }
 
-    // Only the differences go in, so a preset that changes a handful of settings
-    // has to stay short enough to paste into a chat message.
     [Fact]
     public void StaysShortEnoughForAChatMessage()
     {
@@ -179,8 +160,6 @@ public class PresetCodeTests
         Assert.NotEmpty(error);
     }
 
-    // Truncation is the realistic corruption: someone selects most of a long code
-    // out of a chat window and misses the tail.
     [Fact]
     public void RefusesATruncatedCode()
     {

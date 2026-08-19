@@ -3,7 +3,6 @@ using Dalamud.Interface.Utility.Raii;
 
 namespace RegionsOfXIV.UI;
 
-// How long each stage of a notification lasts.
 internal sealed partial class ConfigWindow
 {
     private void DrawDurationsTab()

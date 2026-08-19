@@ -2,10 +2,6 @@ using RegionsOfXIV.Models;
 
 namespace RegionsOfXIV.Tests;
 
-// DiffTier is what decides which name a location change is announced under, so
-// "coarsest wins" is load-bearing rather than a detail: a zone change moves every
-// id below it too, and reporting the finest difference would announce a sub-area
-// on arrival at a new zone.
 public class LocationSnapshotTests
 {
     private static LocationSnapshot Snapshot(
@@ -44,7 +40,6 @@ public class LocationSnapshotTests
     [Fact]
     public void TheCoarsestDifferenceWins()
     {
-        // What a zone change actually looks like: everything below it moved too.
         var arrived = Snapshot(zone: 999, place: 999, area: 999, subArea: 999);
 
         Assert.Equal(LocationTier.Zone, arrived.DiffTier(Snapshot()));
@@ -53,8 +48,6 @@ public class LocationSnapshotTests
     [Fact]
     public void OnlyTheTerritoryIdDecidesEmptiness()
     {
-        // A zone the game names at no other tier is still a place the player is
-        // standing in, so it must not read as "we have not sampled yet".
         Assert.True(LocationSnapshot.Empty.IsEmpty);
         Assert.False(new LocationSnapshot(100, 0, 0, 0, 0, 0).IsEmpty);
     }

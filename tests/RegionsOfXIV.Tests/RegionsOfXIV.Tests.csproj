@@ -1,25 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!--
-    Matches the plugin's target framework and platform, because it references the
-    plugin project and a net10.0 test assembly cannot load a net10.0-windows one.
-
-    Most of what is tested here is deliberately clear of Dalamud — NotificationGate
-    and LocationSnapshot reach the game only through IGameState and IGateSettings,
-    which is what lets them be tested with fakes. That seam still stands and is
-    still the point.
-
-    Dalamud is on the runtime path anyway, for one reason: Configuration implements
-    IPluginConfiguration, so merely constructing one loads the assembly. PresetCode
-    encodes and decodes a Configuration, so its tests cannot avoid that. The
-    reference below is the whole of the concession, and it exists so the codec can
-    be tested at all — a share code that silently truncates or drops a field would
-    otherwise only be found by a player pasting one.
-
-    Note what this costs: an assembly load error used to be a reliable signal that
-    the seam had leaked. It is not any more. Judge a leak by whether a test needs a
-    Dalamud *type*, not by whether it can find the DLL.
-  -->
   <PropertyGroup>
     <TargetFramework>net10.0-windows7.0</TargetFramework>
     <Platforms>x64</Platforms>
@@ -29,12 +9,6 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <!--
-    The same location the Dalamud SDK resolves against, and the same one the CI
-    workflow unzips into, so this needs no path of its own on either. Private,
-    unlike the plugin's own reference to it: a test host has no Dalamud already
-    loaded to bind to, so the file has to be next to the test assembly.
-  -->
   <PropertyGroup>
     <DalamudLibPath Condition="'$(DalamudLibPath)' == ''">$(AppData)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
   </PropertyGroup>

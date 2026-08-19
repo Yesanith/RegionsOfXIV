@@ -1,5 +1,4 @@
 root = true
-# top-most EditorConfig file
 
 [*]
 charset = utf-8
@@ -7,13 +6,9 @@ charset = utf-8
 end_of_line = lf
 insert_final_newline = true
 
-# 4 space indentation
 indent_style = space
 indent_size = 4
 
-# disable redundant style warnings
-
-# Microsoft .NET properties
 csharp_indent_braces = false
 csharp_new_line_before_catch = true
 csharp_new_line_before_else = true
@@ -80,7 +75,6 @@ csharp_space_between_method_declaration_parameter_list_parentheses = false
 csharp_space_between_parentheses = none
 csharp_space_between_square_brackets = false
 
-# ReSharper properties
 resharper_align_linq_query = true
 resharper_align_multiline_argument = true
 resharper_align_multiline_calls_chain = true
@@ -110,7 +104,6 @@ resharper_place_field_attribute_on_same_line = false
 resharper_show_autodetect_configure_formatting_tip = false
 resharper_use_indent_from_vs = false
 
-# ReSharper inspection severities
 resharper_arrange_missing_parentheses_highlighting = hint
 resharper_arrange_redundant_parentheses_highlighting = hint
 resharper_arrange_this_qualifier_highlighting = hint
