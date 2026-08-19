@@ -11,6 +11,7 @@ jobs:
 
     steps:
       - name: Send Discord notification
+        if: ${{ secrets.DISCORD_COMMIT_WEBHOOK != '' }}
         env:
           WEBHOOK: ${{ secrets.DISCORD_COMMIT_WEBHOOK }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
