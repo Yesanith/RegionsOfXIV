@@ -2,6 +2,7 @@
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
+using Dalamud.Interface.ImGuiFileDialog;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using Dalamud.Utility;
@@ -17,6 +18,7 @@ internal readonly record struct ConfigActions(
     Action<PreviewSample> LivePreview,
     Action<bool, PreviewSample> HoldPreview,
     Action RebuildFonts,
+    Func<FontRole, string?> FontProblem,
     Action ShowChangelog,
     Action RestoreNativeAreaText,
     Action RestoreNativeLoadingTitle);
@@ -25,6 +27,7 @@ internal sealed partial class ConfigWindow : Window, IDisposable
 {
     private readonly Configuration config;
     private readonly ConfigActions actions;
+    private readonly FileDialogManager fileDialogs = new();
 
     private bool editing;
 
@@ -49,11 +52,12 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         });
     }
 
-    public void Dispose() { }
+    public void Dispose() => this.fileDialogs.Reset();
 
     public override void OnClose()
     {
         SetEditing(false);
+        this.fileDialogs.Reset();
 
         if (this.unsaved)
         {
@@ -66,12 +70,15 @@ internal sealed partial class ConfigWindow : Window, IDisposable
     {
         SaveIfSettled();
 
+        this.fileDialogs.Draw();
+
         DrawEditingToggle();
 
         using var tabs = ImRaii.TabBar("##RegionsOfXIVTabs");
         if (!tabs) return;
 
         DrawGeneralTab();
+        DrawFontsTab();
         DrawEffectsTab();
         DrawPresetsTab();
         DrawNotificationsTab();
@@ -139,12 +146,13 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         Tooltip($"{tooltip}\n\nOpens {DiscordInvite} in your browser.");
     }
 
-    private static string Label(DisplayFontChoice choice) => choice switch
+    private static string Label(FontChoice choice) => choice switch
     {
-        DisplayFontChoice.NotoSansCjk => "Noto Sans CJK (recommended)",
-        DisplayFontChoice.TrumpGothic => "Trump Gothic",
-        DisplayFontChoice.Jupiter => "Jupiter",
-        DisplayFontChoice.Axis => "Axis",
+        FontChoice.NotoSansCjk => "Noto Sans CJK (recommended)",
+        FontChoice.TrumpGothic => "Trump Gothic",
+        FontChoice.Jupiter => "Jupiter",
+        FontChoice.Axis => "Axis",
+        FontChoice.Custom => "Custom file",
         _ => choice.ToString(),
     };
 
@@ -225,6 +233,19 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         }
 
         return value;
+    }
+
+    private static readonly Vector4 GoodColor = new(0.45f, 0.85f, 0.45f, 1f);
+
+    private static readonly Vector4 CautionColor = new(1f, 0.78f, 0.35f, 1f);
+
+    private static readonly Vector4 FaultColor = new(1f, 0.35f, 0.35f, 1f);
+
+    private static void Warn(Vector4 color, string text)
+    {
+        using var pushed = ImRaii.PushColor(ImGuiCol.Text, color);
+
+        ImGui.TextWrapped(text);
     }
 
     private const float TooltipWidthInEm = 35f;

@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using RegionsOfXIV;
 
 namespace RegionsOfXIV.Tests;
@@ -9,7 +9,7 @@ public class PresetCodeTests
     {
         Motion = MotionEffect.Burn,
         Particles = ParticleEffect.Embers,
-        DisplayFont = DisplayFontChoice.Jupiter,
+        DisplayFont = FontChoice.Jupiter,
         DisplayFontSize = 61f,
         LetterSpacing = 12.5f,
         UppercaseText = true,
@@ -74,7 +74,7 @@ public class PresetCodeTests
         var future = Sample();
         future.Motion = (MotionEffect)unknown;
         future.Particles = (ParticleEffect)unknown;
-        future.DisplayFont = (DisplayFontChoice)unknown;
+        future.DisplayFont = (FontChoice)unknown;
 
         Assert.True(PresetCode.TryDecode(PresetCode.Encode("Future", future), out var preset, out var error), error);
 
@@ -113,10 +113,15 @@ public class PresetCodeTests
         Assert.Equal(3, (int)ParticleEffect.Sparkles);
         Assert.Equal(4, (int)ParticleEffect.Petals);
 
-        Assert.Equal(0, (int)DisplayFontChoice.TrumpGothic);
-        Assert.Equal(1, (int)DisplayFontChoice.Jupiter);
-        Assert.Equal(2, (int)DisplayFontChoice.Axis);
-        Assert.Equal(3, (int)DisplayFontChoice.NotoSansCjk);
+        Assert.Equal(0, (int)FontChoice.TrumpGothic);
+        Assert.Equal(1, (int)FontChoice.Jupiter);
+        Assert.Equal(2, (int)FontChoice.Axis);
+        Assert.Equal(3, (int)FontChoice.NotoSansCjk);
+        Assert.Equal(4, (int)FontChoice.Custom);
+
+        Assert.Equal(0, (int)FontRole.Text);
+        Assert.Equal(1, (int)FontRole.Header);
+        Assert.Equal(2, (int)FontRole.Weather);
     }
 
     [Fact]

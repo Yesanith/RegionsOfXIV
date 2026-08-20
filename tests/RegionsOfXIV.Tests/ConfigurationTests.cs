@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using RegionsOfXIV;
 
 namespace RegionsOfXIV.Tests;
@@ -70,6 +70,34 @@ public class ConfigurationTests
 
         Assert.Equal(new Configuration().HeaderColor.W, target.HeaderColor.W);
         Assert.Equal(0.5f, target.HeaderColor.X);
+    }
+
+    [Fact]
+    public void AConfigWrittenBeforeWeatherHadItsOwnSizeKeepsTheSizeItWasShowing()
+    {
+        var config = new Configuration
+        {
+            Version = 1,
+            HeaderFontSize = 40f,
+        };
+
+        Assert.True(config.Migrate());
+
+        Assert.Equal(40f, config.WeatherFontSize);
+        Assert.Equal(Configuration.CurrentVersion, config.Version);
+    }
+
+    [Fact]
+    public void AConfigAlreadyOnThisVersionIsLeftAlone()
+    {
+        var config = new Configuration
+        {
+            HeaderFontSize = 40f,
+            WeatherFontSize = 12f,
+        };
+
+        Assert.False(config.Migrate());
+        Assert.Equal(12f, config.WeatherFontSize);
     }
 
     [Fact]

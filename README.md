@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
 <img src="assets/images/icon.png" width="140" alt="Regions of XIV icon">
 
@@ -44,10 +44,15 @@ for Guild Wars 2.
 - **Correct in every language.** Names come from game data rather than from the
   screen, and the default font carries glyphs for every language the client can
   display.
-- **Styled to taste.** Place it anywhere on screen, in one of the game's own
-  faces or Dalamud's Noto, with your own colours, letter spacing, casing and
-  outline weight. Name, header and weather can each take their own colour and
-  outline, or share one.
+- **Your own fonts.** Name, header and weather each pick their own face and
+  size: one of the game's own, Dalamud's Noto, or any `.ttf`, `.otf` or `.ttc`
+  sitting on your PC. A font you supply loads exactly as it is and stays yours to
+  look after — and a preset carries where the file sits rather than the font
+  itself, so a shared one falls back to Noto on someone else's machine.
+- **Styled to taste.** Place it anywhere on screen, with your own colours, letter
+  spacing, casing, outline weight and a drop shadow you can throw in any
+  direction. Name, header and weather can each take their own colour and outline,
+  or share one.
 - **Live preview.** Drag the position, size and colour sliders and a sample
   notification follows them as you go.
 - **Knows when to stay quiet.** Silent through cutscenes, PvP and gpose; through
@@ -141,6 +146,11 @@ launching the game.
 The plugin draws its own text glyph by glyph rather than handing ImGui a string,
 because the effects animate each letter separately. `UI/NotificationRenderer.cs`
 decides where a line goes; `UI/NotificationRenderer.Runs.cs` paints it.
+
+`Services/FontService.cs` keeps one face per `FontRole` — text, header, weather
+— and rebuilds only the roles whose face, size or file actually changed. A role
+set to a custom file also holds a Noto fallback, so a font that will not load
+degrades to something readable rather than to nothing.
 
 ## Feedback
 

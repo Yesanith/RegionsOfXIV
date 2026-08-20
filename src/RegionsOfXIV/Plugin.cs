@@ -53,7 +53,7 @@ public sealed class Plugin : IDalamudPlugin
         this.nativeUiSuppressor = new NativeUiSuppressor(this.config);
         this.uiVisibilityGuard = new UiVisibilityGuard();
 
-        this.fonts.Rebuild(this.config.DisplayFontSize, this.config.HeaderFontSize);
+        this.fonts.Rebuild();
 
         this.overlay = new NotificationOverlay(this.config, this.fonts);
 
@@ -88,6 +88,7 @@ public sealed class Plugin : IDalamudPlugin
                 this.overlay.TouchPreview,
                 this.overlay.HoldPreview,
                 RebuildFonts,
+                this.fonts.ProblemWith,
                 this.changelogWindow.ShowAll,
                 this.nativeUiSuppressor.RestoreAreaText,
                 this.nativeUiSuppressor.RestoreLoadingTitle));
@@ -257,5 +258,5 @@ public sealed class Plugin : IDalamudPlugin
     private void ToggleConfigUi() => this.configWindow.Toggle();
 
     private void RebuildFonts() =>
-        this.fonts.Rebuild(this.config.DisplayFontSize, this.config.HeaderFontSize);
+        this.fonts.Rebuild();
 }

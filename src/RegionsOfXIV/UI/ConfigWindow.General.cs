@@ -1,8 +1,5 @@
-﻿using System.Numerics;
 using Dalamud.Bindings.ImGui;
-using Dalamud.Game;
 using Dalamud.Interface.Utility.Raii;
-using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
 
@@ -14,7 +11,42 @@ internal sealed partial class ConfigWindow
         if (!tab) return;
 
         var changed = false;
+        var restart = false;
 
+        DrawPlacement(ref changed);
+        DrawLettering(ref changed, ref restart);
+
+        ImGui.Separator();
+
+        DrawColors(ref changed);
+        DrawShadow(ref changed);
+
+        ImGui.Separator();
+
+        DrawHeaderShape(ref changed);
+
+        ImGui.Separator();
+
+        DrawQuietRules(ref changed);
+
+        ImGui.Separator();
+
+        if (ImGui.Button("Preview"))
+            this.actions.Preview(Sample);
+
+        if (!changed && !restart)
+            return;
+
+        MarkUnsaved();
+
+        if (restart)
+            this.actions.Preview(Sample);
+        else
+            this.actions.LivePreview(Sample);
+    }
+
+    private void DrawPlacement(ref bool changed)
+    {
         this.config.VerticalPosition = Slider(
             "Vertical position", this.config.VerticalPosition, 0f, 100f, "%.0f%%", ref changed);
 
@@ -23,21 +55,10 @@ internal sealed partial class ConfigWindow
         Tooltip(
             "The text is centred on this point, so 50% is the middle of the screen.\n" +
             "A long place name set near either end will reach past it.");
+    }
 
-        this.config.DisplayFontSize = Slider(
-            "Font size", this.config.DisplayFontSize, 24f, 140f, "%.0f px", ref changed);
-
-        this.config.DisplayFont = Choice(
-            "Font", this.config.DisplayFont, Label, ref changed);
-        Tooltip(
-            "Noto Sans CJK is vector — sharp at any size, and it covers every language.\n\n"
-            + "The game's own faces suit FFXIV better, but each is a bitmap with a ceiling:\n"
-            + "Trump Gothic — Latin only, to 91 px.\n"
-            + "Jupiter — Latin only, to 61 px.\n"
-            + "Axis — to 48 px, the only one with Japanese glyphs.");
-
-        DrawFontWarnings();
-
+    private void DrawLettering(ref bool changed, ref bool restart)
+    {
         this.config.LetterSpacing = Slider(
             "Letter spacing", this.config.LetterSpacing, 0f, 30f, "%.0f%%", ref changed);
         Tooltip(
@@ -48,7 +69,6 @@ internal sealed partial class ConfigWindow
         this.config.UppercaseText = Checkbox(
             "Uppercase", this.config.UppercaseText, ref changed);
 
-        var restart = false;
         this.config.DecodeEffectEnabled = Checkbox(
             "Decode from Eorzean script", this.config.DecodeEffectEnabled, ref restart);
         Tooltip(
@@ -57,7 +77,10 @@ internal sealed partial class ConfigWindow
             "the line arrives in Eorzean, lands, then resolves. Turned off, it\n" +
             "arrives already readable. Presets leave this alone, so switching it\n" +
             "off here switches it off for all of them.");
+    }
 
+    private void DrawColors(ref bool changed)
+    {
         this.config.TextColor = ColorPicker(
             "Text colour", this.config.TextColor, ref changed);
 
@@ -69,7 +92,6 @@ internal sealed partial class ConfigWindow
 
         this.config.SeparateLineColors = Checkbox(
             "Colour each line separately", this.config.SeparateLineColors, ref changed);
-
         Tooltip(
             "Off, the weather line follows the header, and one outline colour\n" +
             "covers all three lines.\n\n" +
@@ -80,22 +102,54 @@ internal sealed partial class ConfigWindow
         using (ImRaii.Disabled(!this.config.SeparateLineColors))
         {
             this.config.WeatherColor = ColorPicker(
-            "Weather colour", this.config.WeatherColor, ref changed);
+                "Weather colour", this.config.WeatherColor, ref changed);
 
             this.config.HeaderStrokeColor = ColorPicker(
-            "Header outline colour", this.config.HeaderStrokeColor, ref changed);
+                "Header outline colour", this.config.HeaderStrokeColor, ref changed);
 
             this.config.WeatherStrokeColor = ColorPicker(
-            "Weather outline colour", this.config.WeatherStrokeColor, ref changed);
+                "Weather outline colour", this.config.WeatherStrokeColor, ref changed);
         }
 
         this.config.StrokeThickness = Slider(
             "Outline thickness", this.config.StrokeThickness, 0f, 4f, "%.1f px", ref changed);
         Tooltip("Zero turns the outline off.");
+    }
 
+    private void DrawShadow(ref bool changed)
+    {
+        this.config.ShadowEnabled = Checkbox(
+            "Drop shadow", this.config.ShadowEnabled, ref changed);
+        Tooltip(
+            "A second copy of every line, offset behind it. Sits under the outline, so\n" +
+            "the two can be used together — a tight outline for legibility and a soft\n" +
+            "shadow for depth.\n\n" +
+            "One shadow covers all three lines; it does not follow the separate colours.");
+
+        using var disabled = ImRaii.Disabled(!this.config.ShadowEnabled);
+
+        this.config.ShadowColor = ColorPicker(
+            "Shadow colour", this.config.ShadowColor, ref changed);
+
+        this.config.ShadowOffsetX = Slider(
+            "Shadow across", this.config.ShadowOffsetX, -20f, 20f, "%.0f px", ref changed);
+        Tooltip("Negative moves the shadow to the left.");
+
+        this.config.ShadowOffsetY = Slider(
+            "Shadow down", this.config.ShadowOffsetY, -20f, 20f, "%.0f px", ref changed);
+        Tooltip("Negative lifts the shadow above the text.");
+
+        this.config.ShadowSoftness = Slider(
+            "Shadow spread", this.config.ShadowSoftness, 0f, 6f, "%.1f px", ref changed);
+        Tooltip(
+            "Fattens the shadow outwards. Zero keeps it the same shape as the\n" +
+            "letters; higher values thicken it into a halo behind them.");
+    }
+
+    private void DrawHeaderShape(ref bool changed)
+    {
         this.config.IncludeParentTierAsHeader = Checkbox(
             "Show header", this.config.IncludeParentTierAsHeader, ref changed);
-
         Tooltip(
             "The smaller line above the name, giving where the place sits: the region\n" +
             "above a zone, the area above a sub-area.\n\n" +
@@ -108,9 +162,10 @@ internal sealed partial class ConfigWindow
 
         this.config.OverlapHeader = Checkbox(
             "Overlap header", this.config.OverlapHeader, ref changed);
+    }
 
-        ImGui.Separator();
-
+    private void DrawQuietRules(ref bool changed)
+    {
         this.config.HideInCombat = Checkbox(
             "Hide during combat", this.config.HideInCombat, ref changed);
 
@@ -123,48 +178,5 @@ internal sealed partial class ConfigWindow
             "Only affects sub-areas, and only above a speed no ground travel reaches,\n" +
             "so it comes into play when flying. Zone and area changes are always\n" +
             "announced however fast you are moving.");
-
-        ImGui.Separator();
-
-        if (ImGui.Button("Preview"))
-            this.actions.Preview(Sample);
-
-        if (!changed && !restart)
-            return;
-
-        this.actions.RebuildFonts();
-        MarkUnsaved();
-
-        if (restart)
-            this.actions.Preview(Sample);
-        else
-            this.actions.LivePreview(Sample);
-    }
-
-    private void DrawFontWarnings()
-    {
-        if (FontService.IsLatinOnly(this.config.DisplayFont) &&
-            Plugin.ClientState.ClientLanguage == ClientLanguage.Japanese)
-        {
-            using (ImRaii.PushColor(ImGuiCol.Text, new Vector4(1f, 0.35f, 0.35f, 1f)))
-            {
-                ImGui.TextWrapped(
-                    $"{Label(this.config.DisplayFont)} has no Japanese glyphs. On this client that " +
-                    "means place names will render as blank boxes, not just look soft. " +
-                    "Choose Axis or Noto Sans CJK instead.");
-            }
-        }
-
-        var ceiling = FontService.NativeCeilingPx(this.config.DisplayFont);
-        if (this.config.DisplayFontSize <= ceiling)
-            return;
-
-        using (ImRaii.PushColor(ImGuiCol.Text, new Vector4(1f, 0.78f, 0.35f, 1f)))
-        {
-            ImGui.TextWrapped(
-                $"This font has no bitmap above {ceiling:F0} px, so at " +
-                $"{this.config.DisplayFontSize:F0} px it is being upscaled and will look soft. " +
-                "Lower the size, or switch to Noto Sans CJK, which stays sharp at any size.");
-        }
     }
 }
