@@ -101,12 +101,11 @@ internal sealed partial class ConfigWindow : Window, IDisposable
 
     private const uint FairWeather = 2;
 
-    private const string DiscordInvite = "https://discord.com/invite/ax2gsRqvpa";
+    private const string DiscordInvite = DiscordLink.Invite;
 
     private static void DrawDiscordLink(string label, string tooltip)
     {
-        if (ImGui.Button(label))
-            Util.OpenLink(DiscordInvite);
+        DiscordLink.DrawButton(label);
 
         Tooltip($"{tooltip}\n\nOpens {DiscordInvite} in your browser.");
     }
