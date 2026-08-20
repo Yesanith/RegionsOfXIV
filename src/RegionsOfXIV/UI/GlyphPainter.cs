@@ -25,8 +25,6 @@ internal static class GlyphPainter
         if (text.IsEmpty)
             return;
 
-        // Fonts are built at one size, so a line too wide for the screen is drawn with
-        // the same face asked to render smaller rather than rebuilt at another size.
         if (scale < 1f)
         {
             var font = ImGui.GetFont();
@@ -106,7 +104,7 @@ internal static class GlyphPainter
     {
         var xs = new float[text.Length];
         for (var i = 0; i < text.Length; i++)
-            xs[i] = (ImGui.CalcTextSize(text[..i]).X + (tracking * i)) * scale;
+            xs[i] = (Offset(text, i) + (tracking * i)) * scale;
 
         width = RunWidth(text, tracking) * scale;
 
@@ -115,6 +113,16 @@ internal static class GlyphPainter
             xs[i] += left;
 
         return xs;
+    }
+
+    private static float Offset(string text, int index)
+    {
+        if (index == 0)
+            return 0f;
+
+        var through = ImGui.CalcTextSize(text[..(index + 1)]).X;
+
+        return through - ImGui.CalcTextSize(text.AsSpan(index, 1)).X;
     }
 
     public static float Lerp(float from, float to, float t) => from + ((to - from) * t);

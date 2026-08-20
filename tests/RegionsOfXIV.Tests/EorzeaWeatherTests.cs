@@ -67,7 +67,6 @@ public class EorzeaWeatherTests
     [Fact]
     public void TheRollIsStableAcrossRuns()
     {
-        // Pins the arithmetic itself: if the shifts or the day maths drift, these move.
         var a = EorzeaWeather.Chance(At(1_700_000_000));
         var b = EorzeaWeather.Chance(At(1_700_000_000));
 

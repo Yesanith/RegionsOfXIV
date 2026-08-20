@@ -1,4 +1,4 @@
-using Dalamud.Bindings.ImGui;
+﻿using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility.Raii;
 
 namespace RegionsOfXIV.UI;
@@ -12,8 +12,6 @@ internal sealed partial class ConfigWindow
 
         var changed = false;
 
-        // Timing can only be judged by watching it, so the sample is replayed when a
-        // slider is let go rather than restarted on every frame of the drag.
         var settled = false;
 
         ImGui.TextWrapped(
@@ -54,7 +52,7 @@ internal sealed partial class ConfigWindow
         Tooltip("How long the line takes to disappear once its time is up.");
 
         if (changed)
-            this.config.Save();
+            MarkUnsaved();
 
         if (settled)
             this.actions.Preview(Sample);

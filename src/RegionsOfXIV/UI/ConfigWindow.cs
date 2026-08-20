@@ -51,10 +51,21 @@ internal sealed partial class ConfigWindow : Window, IDisposable
 
     public void Dispose() { }
 
-    public override void OnClose() => SetEditing(false);
+    public override void OnClose()
+    {
+        SetEditing(false);
+
+        if (this.unsaved)
+        {
+            this.unsaved = false;
+            this.config.Save();
+        }
+    }
 
     public override void Draw()
     {
+        SaveIfSettled();
+
         DrawEditingToggle();
 
         using var tabs = ImRaii.TabBar("##RegionsOfXIVTabs");
@@ -81,6 +92,19 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         ImGui.Separator();
     }
 
+    private bool unsaved;
+
+    private void MarkUnsaved() => this.unsaved = true;
+
+    private void SaveIfSettled()
+    {
+        if (!this.unsaved || ImGui.IsAnyItemActive())
+            return;
+
+        this.unsaved = false;
+        this.config.Save();
+    }
+
     private void SetEditing(bool on)
     {
         this.editing = on;
@@ -89,7 +113,6 @@ internal sealed partial class ConfigWindow : Window, IDisposable
 
     private static readonly PreviewSample Sample = BuildSample();
 
-    /// <summary>The sample shown while configuring, using the client's own words for the weather.</summary>
     private static PreviewSample BuildSample()
     {
         var weather = WeatherNameResolver.Resolve(FairWeather);
@@ -172,14 +195,33 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         return true;
     }
 
+    private const int FaintAlpha = 12;
+
     private static bool ColorPicker(string label, Func<Vector4> get, Action<Vector4> set)
     {
         var value = get();
-        if (!ImGui.ColorEdit4(label, ref value, ImGuiColorEditFlags.NoInputs))
-            return false;
+        var changed = ImGui.ColorEdit4(label, ref value, ImGuiColorEditFlags.NoInputs);
 
-        set(value);
-        return true;
+        if (changed)
+            set(value);
+
+        var alpha = (int)MathF.Round(value.W * 255f);
+
+        if (alpha < FaintAlpha)
+        {
+            ImGui.SameLine();
+            ImGui.TextDisabled($"(alpha {alpha} — invisible)");
+
+            Tooltip(
+                "Alpha is how solid a colour is, from 0 to 255, and this one is far\n" +
+                "too low to see. It is still being drawn — just not visibly.\n\n" +
+                "Choosing another colour will not bring it back on its own, because\n" +
+                "picking a hue leaves the alpha alone. Drag the alpha bar — the\n" +
+                "narrow chequered strip right of the rainbow — up to the top, or\n" +
+                "click the \"Original\" swatch beside it.");
+        }
+
+        return changed;
     }
 
     private static bool Choice<T>(string label, Func<T> get, Action<T> set, Func<T, string> name)
@@ -206,7 +248,6 @@ internal sealed partial class ConfigWindow : Window, IDisposable
 
     private const float TooltipWidthInEm = 35f;
 
-    /// <summary>Muted text that wraps, which TextDisabled on its own does not.</summary>
     private static void DisabledWrapped(string text)
     {
         using var color = ImRaii.PushColor(ImGuiCol.Text, ImGui.GetColorU32(ImGuiCol.TextDisabled));

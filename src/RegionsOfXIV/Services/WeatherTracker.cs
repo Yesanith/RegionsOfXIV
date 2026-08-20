@@ -38,11 +38,6 @@ internal sealed class WeatherTracker : IDisposable
 
     public void Reset() => this.current = 0;
 
-    /// <summary>
-    /// Sets the baseline without announcing. The coordinator calls this when it has
-    /// already announced a zone's weather from the forecast, so the reading that lands
-    /// a moment later is not treated as a change.
-    /// </summary>
     public void Prime(uint weatherId)
     {
         if (weatherId <= byte.MaxValue)
@@ -51,20 +46,17 @@ internal sealed class WeatherTracker : IDisposable
 
     public void Sample()
     {
-        // Logged out you were not there to see anything, so the next reading starts fresh.
         if (!this.game.IsLoggedIn)
         {
             Reset();
             return;
         }
 
-        // Mid-load the reading still belongs to where you came from.
         if (this.game.IsBetweenAreas)
             return;
 
         var active = this.readActive();
 
-        // Zero means the game has not settled on a weather yet.
         if (active == 0 || active == this.current)
             return;
 

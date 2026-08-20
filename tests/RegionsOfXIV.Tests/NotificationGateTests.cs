@@ -304,7 +304,6 @@ public class NotificationGateTests
     {
         var gate = Gate();
 
-        // A default setup takes 2.4s to finish decoding: fade in, the beat, then the reveal.
         gate.MarkAnnounced(NextSubArea, LocationTier.SubArea, Timing(readable: 2.4));
 
         this.clock.Advance(2);
@@ -333,7 +332,6 @@ public class NotificationGateTests
     {
         var gate = Gate();
 
-        // Five sub-areas in a loop, the sort of circuit a city block is.
         for (var i = 0; i < 5; i++)
         {
             gate.MarkAnnounced(SubArea(i), LocationTier.SubArea, Timing());

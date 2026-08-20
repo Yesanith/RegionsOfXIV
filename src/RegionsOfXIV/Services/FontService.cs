@@ -119,7 +119,6 @@ internal sealed class FontService : IDisposable
 
         try
         {
-            // Two sizes: the place name decodes at display size, the weather line at header size.
             this.eorzeanDisplayFont = BuildEorzean(path, displaySizePx);
             this.eorzeanHeaderFont = BuildEorzean(path, headerSizePx);
 

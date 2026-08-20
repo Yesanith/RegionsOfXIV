@@ -40,7 +40,6 @@ internal sealed partial class ConfigWindow
         ImGui.Separator();
         ImGui.Spacing();
 
-        // Four buttons do not fit side by side at the window's smallest width.
         var row = new WrappingRow();
 
         row.Place(WhatsNew);
@@ -100,7 +99,6 @@ internal sealed partial class ConfigWindow
         ImGui.TextColored(HeadingColor, command);
         ImGui.SameLine();
 
-        // Wraps at the window edge rather than running off it on a narrow window.
         ImGui.PushTextWrapPos(0f);
         DisabledWrapped(what);
         ImGui.PopTextWrapPos();

@@ -34,6 +34,9 @@ public sealed class Plugin : IDalamudPlugin
     private readonly NotificationOverlay overlay;
     private readonly ConfigWindow configWindow;
     private readonly ChangelogWindow changelogWindow;
+#if DEBUG
+    private readonly IconBrowserWindow iconBrowserWindow;
+#endif
     private readonly AnnouncementCoordinator coordinator;
     private readonly UiVisibilityGuard uiVisibilityGuard;
 
@@ -67,6 +70,12 @@ public sealed class Plugin : IDalamudPlugin
         this.windowSystem.AddWindow(this.overlay);
         this.windowSystem.AddWindow(this.configWindow);
         this.windowSystem.AddWindow(this.changelogWindow);
+
+#if DEBUG
+
+        this.iconBrowserWindow = new IconBrowserWindow();
+        this.windowSystem.AddWindow(this.iconBrowserWindow);
+#endif
 
         if (isFirstRun)
             this.configWindow.IsOpen = true;
@@ -118,6 +127,9 @@ public sealed class Plugin : IDalamudPlugin
         this.coordinator.Dispose();
 
         this.windowSystem.RemoveAllWindows();
+#if DEBUG
+        this.iconBrowserWindow.Dispose();
+#endif
         this.changelogWindow.Dispose();
         this.configWindow.Dispose();
         this.overlay.Dispose();
@@ -179,6 +191,26 @@ public sealed class Plugin : IDalamudPlugin
             this.coordinator.PushPreview();
             return;
         }
+
+#if DEBUG
+        if (argument.Equals("icons", StringComparison.OrdinalIgnoreCase))
+        {
+            this.iconBrowserWindow.Toggle();
+            return;
+        }
+
+        if (argument.Equals("banners", StringComparison.OrdinalIgnoreCase))
+        {
+            SheetSearch.Banners();
+            return;
+        }
+
+        if (argument.StartsWith("find ", StringComparison.OrdinalIgnoreCase))
+        {
+            SheetSearch.Run(argument[5..].Trim());
+            return;
+        }
+#endif
 
         if (argument.Equals("changelog", StringComparison.OrdinalIgnoreCase))
         {

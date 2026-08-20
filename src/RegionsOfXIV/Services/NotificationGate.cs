@@ -5,16 +5,10 @@ namespace RegionsOfXIV.Services;
 
 internal sealed class NotificationGate
 {
-    /// <summary>The least time between announcements, whatever the timings are set to.</summary>
     private static readonly TimeSpan GlobalCooldown = TimeSpan.FromMilliseconds(2000);
 
     private static readonly TimeSpan PingPongWindow = TimeSpan.FromSeconds(30);
 
-    /// <summary>
-    /// How many recently announced places are remembered. A city block is a handful of
-    /// sub-areas in a loop, so remembering only the last one or two lets the whole
-    /// circuit announce itself again on the way back round.
-    /// </summary>
     private const int RecentPlaces = 6;
 
     private const float TravellingSpeed = 20f;
@@ -24,11 +18,6 @@ internal sealed class NotificationGate
 
     private readonly Func<DateTime> now;
 
-    /// <summary>
-    /// The earliest the next announcement may start. Held far enough out that whatever
-    /// is on screen has finished decoding, so a line is never replaced before it can
-    /// be read.
-    /// </summary>
     private DateTime nextAllowed = DateTime.MinValue;
 
     private DateTime suppressFinerUntil = DateTime.MinValue;
@@ -155,10 +144,6 @@ internal sealed class NotificationGate
             this.suppressFinerUntil = now + timing.OnScreen;
     }
 
-    /// <summary>
-    /// Keeps the next announcement back until this one has been readable, so walking
-    /// through a city cannot stack half-decoded names on top of each other.
-    /// </summary>
     private void HoldOff(DateTime now, NotificationTiming timing) =>
         this.nextAllowed = now + (timing.UntilReadable > GlobalCooldown
             ? timing.UntilReadable

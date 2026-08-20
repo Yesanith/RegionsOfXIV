@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game;
 using Dalamud.Interface.Utility.Raii;
@@ -66,9 +66,43 @@ internal sealed partial class ConfigWindow
         changed |= ColorPicker("Outline colour",
             () => this.config.StrokeColor, v => this.config.StrokeColor = v);
 
+        changed |= Checkbox("Colour each line separately",
+            () => this.config.SeparateLineColors,
+            v => this.config.SeparateLineColors = v);
+
+        Tooltip(
+            "Off, the weather line follows the header, and one outline colour\n" +
+            "covers all three lines.\n\n" +
+            "On, the weather line and the outlines take the colours below. Making\n" +
+            "a line transparent in both its colour and its outline is how you fade\n" +
+            "that one line back without touching the others.");
+
+        using (ImRaii.Disabled(!this.config.SeparateLineColors))
+        {
+            changed |= ColorPicker("Weather colour",
+                () => this.config.WeatherColor, v => this.config.WeatherColor = v);
+
+            changed |= ColorPicker("Header outline colour",
+                () => this.config.HeaderStrokeColor, v => this.config.HeaderStrokeColor = v);
+
+            changed |= ColorPicker("Weather outline colour",
+                () => this.config.WeatherStrokeColor, v => this.config.WeatherStrokeColor = v);
+        }
+
         changed |= Slider("Outline thickness",
             () => this.config.StrokeThickness, v => this.config.StrokeThickness = v, 0f, 4f, "%.1f px");
         Tooltip("Zero turns the outline off.");
+
+        changed |= Checkbox("Show header",
+            () => this.config.IncludeParentTierAsHeader,
+            v => this.config.IncludeParentTierAsHeader = v);
+
+        Tooltip(
+            "The smaller line above the name, giving where the place sits: the region\n" +
+            "above a zone, the area above a sub-area.\n\n" +
+            "Turned off, only the name itself is shown. The weather line, if you have\n" +
+            "it on, is unaffected — as are the two settings below, which still apply\n" +
+            "to it.");
 
         changed |= Checkbox("Underline header",
             () => this.config.UnderlineHeader, v => this.config.UnderlineHeader = v);
@@ -100,7 +134,7 @@ internal sealed partial class ConfigWindow
             return;
 
         this.actions.RebuildFonts();
-        this.config.Save();
+        MarkUnsaved();
 
         if (restart)
             this.actions.Preview(Sample);
