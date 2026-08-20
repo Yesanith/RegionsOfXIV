@@ -169,10 +169,10 @@ internal sealed partial class NotificationRenderer
         return cache;
     }
 
-    private float ScaleFor(in FontPair faces, string text, float room)
+    private float ScaleFor(in FontPair faces, LineLayout cache, string text, float room)
     {
         using (faces.Plain.Push())
-            return FitScale(text, Tracking(), room);
+            return FitScale(cache, text, Tracking(), room);
     }
 
     private static float RoomFor(ImGuiViewportPtr viewport, float centerX)
@@ -183,14 +183,24 @@ internal sealed partial class NotificationRenderer
         return MathF.Max(MathF.Min(toLeft, toRight), 1f) * 2f * WidthBudget;
     }
 
-    private static float FitScale(string text, float tracking, float room)
+    private float FitScale(LineLayout cache, string text, float tracking, float room)
     {
         if (string.IsNullOrEmpty(text))
             return 1f;
 
-        var natural = GlyphPainter.RunWidth(text, tracking);
+        var natural = NaturalWidth(cache, text, tracking);
 
         return natural <= room ? 1f : room / natural;
+    }
+
+    private float NaturalWidth(LineLayout cache, string text, float tracking)
+    {
+        var generation = fonts.Generation;
+
+        if (!cache.HasNaturalWidth(text, tracking, generation))
+            cache.StoreNaturalWidth(text, tracking, generation, GlyphPainter.RunWidth(text, tracking));
+
+        return cache.NaturalWidth;
     }
 
     private float Tracking() => ImGui.GetTextLineHeight() * (config.LetterSpacing / 100f);

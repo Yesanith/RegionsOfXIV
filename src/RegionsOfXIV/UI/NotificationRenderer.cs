@@ -36,7 +36,7 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
         top = DrawHeader(notification, drawList, centerX, top, room);
 
         var faces = new FontPair(fonts.Display, fonts.EorzeanDisplay);
-        var scale = ScaleFor(faces, notification.CasedText, room);
+        var scale = ScaleFor(faces, notification.DisplayLayout, notification.CasedText, room);
 
         DrawParticles(notification, drawList, centerX, top, scale);
 
@@ -79,7 +79,8 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
             textCenterX = centerX + (iconWidth / 2f);
 
             var tracking = Tracking();
-            scale = FitScale(text, tracking, RoomFor(viewport, centerX) - iconWidth);
+            scale = FitScale(
+                notification.DisplayLayout, text, tracking, RoomFor(viewport, centerX) - iconWidth);
 
             var width = Layout(notification.DisplayLayout, text, tracking, textCenterX, scale).Width;
 
@@ -118,7 +119,7 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
         using (fonts.Header.Push())
         {
             var tracking = Tracking();
-            var scale = FitScale(header, tracking, room);
+            var scale = FitScale(notification.HeaderLayout, header, tracking, room);
             var layout = Layout(notification.HeaderLayout, header, tracking, centerX, scale);
 
             if (config.UnderlineHeader)

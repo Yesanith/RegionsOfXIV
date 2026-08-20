@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using RegionsOfXIV;
 using RegionsOfXIV.Services;
 
@@ -24,6 +24,10 @@ public class FontTests
     public void APathIsNeverNullHoweverTheSettingWasBuilt()
     {
         Assert.Equal(string.Empty, new FontSetting(FontChoice.Custom, null!, 24f).Path);
+
+        var cleared = new FontSetting(FontChoice.Custom, "mine.ttf", 24f) with { Path = null! };
+
+        Assert.Equal(string.Empty, cleared.Path);
     }
 
     [Theory]

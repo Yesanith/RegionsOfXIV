@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using RegionsOfXIV;
 using RegionsOfXIV.UI;
 
@@ -44,6 +44,34 @@ public class ShadowTests
     public void AShadowOffsetBackwardsStillDraws()
     {
         Assert.True(new Shadow(Opaque, new Vector2(-3f, -3f), 0f).IsVisible);
+    }
+
+    [Fact]
+    public void AnOutlineWithNoWidthIsNotDrawn()
+    {
+        Assert.False(new Ink(Opaque, Opaque, 0f, Shadow.None).HasStroke);
+    }
+
+    [Fact]
+    public void AnOutlineWithNoOpacityIsNotDrawn()
+    {
+        Assert.False(new Ink(Opaque, Invisible, 2f, Shadow.None).HasStroke);
+    }
+
+    [Fact]
+    public void AnOutlineWithBothIsDrawn()
+    {
+        Assert.True(new Ink(Opaque, Opaque, 2f, Shadow.None).HasStroke);
+    }
+
+    [Fact]
+    public void AFullyFadedLineIsNotDrawnAtAll()
+    {
+        var faded = new Ink(Invisible, Invisible, 2f, Shadow.None);
+
+        Assert.False(faded.HasFill);
+        Assert.False(faded.HasStroke);
+        Assert.False(faded.Shadow.IsVisible);
     }
 
     [Fact]

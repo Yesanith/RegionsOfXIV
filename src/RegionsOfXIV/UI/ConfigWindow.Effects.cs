@@ -33,10 +33,10 @@ internal sealed partial class ConfigWindow
         if (this.config.Particles != ParticleEffect.None)
         {
             this.config.ParticleDensity = Slider(
-            "Density", this.config.ParticleDensity, 0.2f, 3f, "%.1fx", ref changed);
+                "Density", this.config.ParticleDensity, 0.2f, 3f, "%.1fx", ref changed);
 
             this.config.ParticleColor = ColorPicker(
-            "Particle colour", this.config.ParticleColor, ref changed);
+                "Particle colour", this.config.ParticleColor, ref changed);
             Tooltip(
                 "The default amber suits embers and sparkles. Hearts and petals\n" +
                 "want moving towards pink.");

@@ -186,11 +186,14 @@ internal sealed partial class ConfigWindow : Window, IDisposable
     }
 
     private static TimeSpan DrawSeconds(
-        string label, TimeSpan value, float min, float max, ref bool changed)
+        string label, TimeSpan value, float min, float max, ref bool changed, ref bool settled)
     {
         var seconds = (float)value.TotalSeconds;
+        var edited = ImGui.SliderFloat(label, ref seconds, min, max, "%.2f s");
 
-        if (!ImGui.SliderFloat(label, ref seconds, min, max, "%.2f s"))
+        settled |= ImGui.IsItemDeactivatedAfterEdit();
+
+        if (!edited)
             return value;
 
         changed = true;

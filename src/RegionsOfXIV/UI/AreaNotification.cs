@@ -29,6 +29,8 @@ internal sealed class AreaNotification
 
     private float fadeOutFrom = 1f;
 
+    private bool? casedAsUpper;
+
     public AreaNotification(
         string? header,
         string text,
@@ -99,30 +101,24 @@ internal sealed class AreaNotification
 
     public LineLayout HeaderLayout { get; } = new();
 
-    private bool casedAsUpper;
-    private bool everCased;
-    private string casedText = string.Empty;
-    private string casedHeader = string.Empty;
+    public string CasedText { get; private set; } = string.Empty;
+
+    public string CasedHeader { get; private set; } = string.Empty;
 
     public void ApplyCasing(bool uppercase)
     {
-        if (this.everCased && this.casedAsUpper == uppercase)
+        if (this.casedAsUpper == uppercase)
             return;
 
-        this.everCased = true;
         this.casedAsUpper = uppercase;
 
-        this.casedText = uppercase ? Text.ToUpperInvariant() : Text;
-        this.casedHeader = Header == null
+        CasedText = uppercase ? Text.ToUpperInvariant() : Text;
+        CasedHeader = Header == null
             ? string.Empty
             : uppercase ? Header.ToUpperInvariant() : Header;
 
         Cipher = null;
     }
-
-    public string CasedText => this.casedText;
-
-    public string CasedHeader => this.casedHeader;
 
     public void Update()
     {

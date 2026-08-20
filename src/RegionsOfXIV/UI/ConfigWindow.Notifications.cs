@@ -40,7 +40,7 @@ internal sealed partial class ConfigWindow
         using (ImRaii.Disabled(!this.config.WeatherNotificationEnabled))
         {
             this.config.ShowWeatherIcon = Checkbox(
-            "Show the weather icon", this.config.ShowWeatherIcon, ref changed);
+                "Show the weather icon", this.config.ShowWeatherIcon, ref changed);
         }
 
         Tooltip("Draws the game's own icon for the weather to the left of its name.");

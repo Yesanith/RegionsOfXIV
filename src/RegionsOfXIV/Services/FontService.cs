@@ -10,11 +10,11 @@ namespace RegionsOfXIV.Services;
 
 internal sealed class FontService : IDisposable
 {
-    public const long MaxCustomFontBytes = 64L * 1024 * 1024;
+    private const long MaxCustomFontBytes = 64L * 1024 * 1024;
 
-    public static readonly string[] CustomFontExtensions = [".ttf", ".otf", ".ttc"];
+    private static readonly string[] CustomFontExtensions = [".ttf", ".otf", ".ttc"];
 
-    public const FontChoice FallbackChoice = FontChoice.NotoSansCjk;
+    private const FontChoice FallbackChoice = FontChoice.NotoSansCjk;
 
     private const string CouldNotLoad =
         "That file could not be read as a font, so the plugin is drawing with Noto Sans CJK instead.";

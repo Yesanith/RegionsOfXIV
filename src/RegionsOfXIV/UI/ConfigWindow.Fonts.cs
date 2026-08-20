@@ -11,7 +11,27 @@ namespace RegionsOfXIV.UI;
 
 internal sealed partial class ConfigWindow
 {
-    private readonly string?[] fontPathEdits = new string?[3];
+    private sealed class FontPathEditor
+    {
+        public string? Buffer;
+
+        public string? Checked;
+
+        public string? Problem;
+
+        public string? ProblemWith(string path)
+        {
+            if (this.Checked == path)
+                return this.Problem;
+
+            this.Checked = path;
+            this.Problem = FontService.CustomFontProblem(path);
+
+            return this.Problem;
+        }
+    }
+
+    private readonly FontPathEditor[] pathEditors = [new(), new(), new()];
 
     private void DrawFontsTab()
     {
@@ -101,8 +121,9 @@ internal sealed partial class ConfigWindow
 
     private bool DrawCustomFont(FontRole role, string label, FontSetting font)
     {
+        var editor = this.pathEditors[(int)role];
         var stored = font.Path;
-        var buffer = this.fontPathEdits[(int)role] ??= stored;
+        var buffer = editor.Buffer ??= stored;
         var changed = false;
 
         ImGui.SetNextItemWidth(
@@ -111,18 +132,18 @@ internal sealed partial class ConfigWindow
         ImGui.InputTextWithHint(
             $"##font-path-{label}", "Path to a .ttf, .otf or .ttc file", ref buffer, 512);
 
-        this.fontPathEdits[(int)role] = buffer;
+        editor.Buffer = buffer;
 
         if (ImGui.IsItemDeactivatedAfterEdit())
         {
             stored = buffer.Trim().Trim('"');
             this.config.SetFontFor(role, font with { Path = stored });
-            this.fontPathEdits[(int)role] = stored;
+            editor.Buffer = stored;
             changed = true;
         }
         else if (!ImGui.IsItemActive() && buffer != stored)
         {
-            this.fontPathEdits[(int)role] = stored;
+            editor.Buffer = stored;
         }
 
         ImGui.SameLine();
@@ -139,20 +160,20 @@ internal sealed partial class ConfigWindow
             if (ImGui.Button($"Clear##font-clear-{label}"))
             {
                 this.config.SetFontFor(role, font with { Path = string.Empty });
-                this.fontPathEdits[(int)role] = string.Empty;
+                editor.Buffer = string.Empty;
                 changed = true;
             }
         }
 
-        DrawCustomFontStatus(role, stored);
+        DrawCustomFontStatus(role, editor, stored);
         DrawCustomFontNotice();
 
         return changed;
     }
 
-    private void DrawCustomFontStatus(FontRole role, string path)
+    private void DrawCustomFontStatus(FontRole role, FontPathEditor editor, string path)
     {
-        var problem = FontService.CustomFontProblem(path) ?? this.actions.FontProblem(role);
+        var problem = editor.ProblemWith(path) ?? this.actions.FontProblem(role);
 
         if (problem == null)
         {
@@ -220,7 +241,7 @@ internal sealed partial class ConfigWindow
             role,
             this.config.FontFor(role) with { Choice = FontChoice.Custom, Path = chosen[0] });
 
-        this.fontPathEdits[(int)role] = chosen[0];
+        this.pathEditors[(int)role].Buffer = chosen[0];
 
         this.actions.RebuildFonts();
         this.config.Save();

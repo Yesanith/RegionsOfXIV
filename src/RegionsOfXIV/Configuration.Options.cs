@@ -18,7 +18,13 @@ public enum FontRole
 
 public readonly record struct FontSetting(FontChoice Choice, string Path, float SizePx)
 {
-    public string Path { get; init; } = Path ?? string.Empty;
+    private readonly string path = Path ?? string.Empty;
+
+    public string Path
+    {
+        get => this.path;
+        init => this.path = value ?? string.Empty;
+    }
 
     public bool IsCustom => this.Choice == FontChoice.Custom;
 }

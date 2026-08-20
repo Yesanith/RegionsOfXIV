@@ -62,10 +62,7 @@ internal sealed class NotificationGate
 
     public bool ShouldAnnounceNativeAreaText()
     {
-        if (!this.config.AreaNotificationEnabled && !this.config.SubAreaNotificationEnabled)
-            return false;
-
-        if (IsBlockedByGameState())
+        if (!CanAnnounceAnyArea())
             return false;
 
         var now = this.now();
@@ -76,16 +73,15 @@ internal sealed class NotificationGate
         return now >= this.suppressFinerUntil;
     }
 
-    public bool ShouldAnnounceSanctuary()
-    {
-        if (!this.config.AreaNotificationEnabled && !this.config.SubAreaNotificationEnabled)
-            return false;
+    public bool ShouldAnnounceSanctuary() =>
+        CanAnnounceAnyArea() && this.now() >= this.nextAllowed;
 
-        if (IsBlockedByGameState())
-            return false;
+    public bool ShouldAnnounceWeather() =>
+        this.config.WeatherNotificationEnabled && !IsBlockedByGameState();
 
-        return this.now() >= this.nextAllowed;
-    }
+    private bool CanAnnounceAnyArea() =>
+        (this.config.AreaNotificationEnabled || this.config.SubAreaNotificationEnabled)
+        && !IsBlockedByGameState();
 
     public void MarkZoneAnnounced(NotificationTiming timing)
     {
@@ -171,14 +167,6 @@ internal sealed class NotificationGate
         LocationTier.SubArea => this.config.SubAreaNotificationEnabled,
         _ => false,
     };
-
-    public bool ShouldAnnounceWeather()
-    {
-        if (!this.config.WeatherNotificationEnabled)
-            return false;
-
-        return !IsBlockedByGameState();
-    }
 
     private bool IsBlockedByGameState()
     {

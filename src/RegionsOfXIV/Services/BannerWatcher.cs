@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
@@ -31,6 +31,14 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
 
     private unsafe void OnImage(AddonEvent type, AddonArgs args)
     {
+        if (!this.config.BannerNotificationEnabled)
+        {
+            if (this.showing.Count > 0)
+                this.showing.Clear();
+
+            return;
+        }
+
         var addon = (AddonImage*)args.Addon.Address;
         if (addon == null)
             return;
@@ -39,7 +47,7 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
         var icon = addon->IsVisible ? IconOf(addon->ImageNode) : 0;
 
         var name = icon == 0 ? null : BannerNameResolver.Resolve(icon);
-        var taking = name is not null && this.config.BannerNotificationEnabled;
+        var taking = name is not null;
 
         if (taking && this.config.HideNativeBanner)
             Hide(addon);

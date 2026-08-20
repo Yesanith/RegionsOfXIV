@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 
@@ -12,7 +12,12 @@ internal readonly record struct Shadow(uint Color, Vector2 Offset, float Spread)
         (this.Color >> 24) != 0u && (this.Offset != Vector2.Zero || this.Spread > 0f);
 }
 
-internal readonly record struct Ink(uint Fill, uint Stroke, float StrokeDistance, Shadow Shadow);
+internal readonly record struct Ink(uint Fill, uint Stroke, float StrokeDistance, Shadow Shadow)
+{
+    public bool HasStroke => this.StrokeDistance > 0f && (this.Stroke >> 24) != 0u;
+
+    public bool HasFill => (this.Fill >> 24) != 0u;
+}
 
 internal static class GlyphPainter
 {
@@ -30,7 +35,7 @@ internal static class GlyphPainter
         in Ink ink,
         float scale = 1f)
     {
-        if (text.IsEmpty)
+        if (text.IsEmpty || (!ink.HasFill && !ink.HasStroke && !ink.Shadow.IsVisible))
             return;
 
         var font = ImGui.GetFont();
@@ -39,13 +44,14 @@ internal static class GlyphPainter
         if (ink.Shadow.IsVisible)
             DrawShadow(drawList, font, size, position, text, ink.Shadow);
 
-        if (ink.StrokeDistance > 0f)
+        if (ink.HasStroke)
         {
             foreach (var offset in StrokeOffsets)
                 drawList.AddText(font, size, position + (offset * ink.StrokeDistance), ink.Stroke, text);
         }
 
-        drawList.AddText(font, size, position, ink.Fill, text);
+        if (ink.HasFill)
+            drawList.AddText(font, size, position, ink.Fill, text);
     }
 
     private static void DrawShadow(
