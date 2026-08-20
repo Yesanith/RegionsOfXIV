@@ -32,8 +32,9 @@ internal sealed partial class ConfigWindow
         Tooltip(
             "Announces the weather turning over, on its own line just above the "
             + "place name, so it never interrupts a location notice.\n\n"
-            + "Weather runs on a fixed cycle of about 23 minutes, and arriving somewhere "
-            + "never announces it — only an actual change does.");
+            + "Weather runs on a fixed cycle of about 23 minutes, and arriving anywhere "
+            + "new announces what it is doing there, so it shows up with the place name "
+            + "as you walk in.");
 
         using (ImRaii.Disabled(!this.config.WeatherNotificationEnabled))
         {
