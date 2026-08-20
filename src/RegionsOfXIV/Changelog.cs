@@ -14,7 +14,7 @@ internal static class Changelog
         [
             "Weather announcements. When the weather turns over it is announced on its own line above the place name, with the game's own icon beside it. Off by default; switch it on under Notifications.",
             "The weather line is styled like everything else, sharing the underline, the motion and decode effects, and your colours and timings.",
-            "Arriving somewhere never announces its weather, only an actual change does, so walking around does not set it off.",
+            "Arriving somewhere new announces its weather alongside the place name, and the weather turning over while you stand there announces on its own.",
             "The preview shows everything that is switched on, weather included, so what you are adjusting is what you can see.",
         ]),
 

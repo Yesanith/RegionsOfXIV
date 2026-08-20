@@ -76,6 +76,25 @@ internal sealed class AnnouncementCoordinator : IDisposable
         this.sink.PushWeather(weather.Name, weather.IconId);
     }
 
+    /// <summary>
+    /// Says what the weather is doing where you have just landed. The forecast is worked
+    /// out from the clock rather than read from the game, so it is known while the
+    /// loading screen is still up and lands with the place name rather than behind it.
+    /// </summary>
+    private void AnnounceArrivalWeather(uint territoryTypeId)
+    {
+        if (!this.config.WeatherNotificationEnabled)
+            return;
+
+        if (WeatherNameResolver.Forecast(territoryTypeId, DateTimeOffset.UtcNow) is not { } weather)
+            return;
+
+        // Baselined so the reading that settles a moment later is not read as a change.
+        this.weatherTracker.Prime(weather.Id);
+
+        this.sink.PushWeather(weather.Name, weather.IconId);
+    }
+
     private void HandleWeatherChanged(byte weatherId)
     {
         if (!this.gate.ShouldAnnounceWeather())
@@ -111,9 +130,12 @@ internal sealed class AnnouncementCoordinator : IDisposable
         var header = HeaderOrNull(PlaceNameResolver.Resolve(territory.PlaceNameRegion.RowId), text);
 
         Plugin.Log.Debug($"ZoneInit [{territory.RowId}]: {header} / {text} (duty={isDuty})");
+        this.weatherTracker.Probe("ZoneInit");
 
         this.sink.Push(header, text);
         this.gate.MarkZoneAnnounced(this.sink.EstimatedDuration);
+
+        AnnounceArrivalWeather(territory.RowId);
     }
 
     private void HandleAreaTextShown(string? nativeText)
