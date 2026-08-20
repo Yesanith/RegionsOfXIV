@@ -59,7 +59,9 @@ internal sealed class ChangelogWindow : Window, IDisposable
 
         ImGui.Spacing();
 
-        using (var body = ImRaii.Child("##changelog-body", new Vector2(0, -ImGui.GetFrameHeightWithSpacing()), false))
+        var footer = ImGui.GetFrameHeightWithSpacing() + ImGui.GetTextLineHeightWithSpacing();
+
+        using (var body = ImRaii.Child("##changelog-body", new Vector2(0, -footer), false))
         {
             if (body)
             {
@@ -72,6 +74,11 @@ internal sealed class ChangelogWindow : Window, IDisposable
             IsOpen = false;
 
         ImGui.SameLine();
+        DiscordLink.DrawButton("Join the Discord");
+
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip($"Ideas, bug reports and preset codes.\n{DiscordLink.Invite}");
+
         ImGui.TextDisabled(this.afterUpdate
             ? "You will not see this again until the next update."
             : "Shown because you asked — \"/regions changelog\".");

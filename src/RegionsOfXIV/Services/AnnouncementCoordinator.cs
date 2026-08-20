@@ -130,7 +130,6 @@ internal sealed class AnnouncementCoordinator : IDisposable
         var header = HeaderOrNull(PlaceNameResolver.Resolve(territory.PlaceNameRegion.RowId), text);
 
         Plugin.Log.Debug($"ZoneInit [{territory.RowId}]: {header} / {text} (duty={isDuty})");
-        this.weatherTracker.Probe("ZoneInit");
 
         this.sink.Push(header, text);
         this.gate.MarkZoneAnnounced(this.sink.EstimatedDuration);
