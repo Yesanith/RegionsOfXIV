@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using RegionsOfXIV.Models;
 
 namespace RegionsOfXIV.Services;
@@ -9,6 +9,8 @@ internal sealed class NotificationGate
 
     private static readonly TimeSpan PingPongWindow = TimeSpan.FromSeconds(30);
 
+    private const int RecentPlaces = 6;
+
     private const float TravellingSpeed = 20f;
 
     private readonly IGateSettings config;
@@ -16,14 +18,16 @@ internal sealed class NotificationGate
 
     private readonly Func<DateTime> now;
 
-    private DateTime lastNotification = DateTime.MinValue;
+    private DateTime nextAllowed = DateTime.MinValue;
 
     private DateTime suppressFinerUntil = DateTime.MinValue;
 
     private DateTime suppressCoarseUntil = DateTime.MinValue;
 
-    private LocationSnapshot lastAnnounced = LocationSnapshot.Empty;
-    private LocationSnapshot secondLastAnnounced = LocationSnapshot.Empty;
+    private readonly (LocationSnapshot Place, DateTime At)[] recent =
+        new (LocationSnapshot, DateTime)[RecentPlaces];
+
+    private int nextSlot;
 
     public NotificationGate(IGateSettings config, IGameState game, Func<DateTime>? clock = null)
     {
@@ -34,11 +38,12 @@ internal sealed class NotificationGate
 
     public void Reset()
     {
-        this.lastNotification = DateTime.MinValue;
+        this.nextAllowed = DateTime.MinValue;
         this.suppressFinerUntil = DateTime.MinValue;
         this.suppressCoarseUntil = DateTime.MinValue;
-        this.lastAnnounced = LocationSnapshot.Empty;
-        this.secondLastAnnounced = LocationSnapshot.Empty;
+
+        Array.Clear(this.recent);
+        this.nextSlot = 0;
     }
 
     public bool ShouldAnnounceZoneEntry(bool destinationIsPvp, bool destinationIsDuty)
@@ -65,7 +70,7 @@ internal sealed class NotificationGate
 
         var now = this.now();
 
-        if (now - this.lastNotification < GlobalCooldown)
+        if (now < this.nextAllowed)
             return false;
 
         return now >= this.suppressFinerUntil;
@@ -79,16 +84,17 @@ internal sealed class NotificationGate
         if (IsBlockedByGameState())
             return false;
 
-        return this.now() - this.lastNotification >= GlobalCooldown;
+        return this.now() >= this.nextAllowed;
     }
 
-    public void MarkZoneAnnounced(TimeSpan onScreenDuration)
+    public void MarkZoneAnnounced(NotificationTiming timing)
     {
         var now = this.now();
 
-        this.lastNotification = now;
-        this.suppressFinerUntil = now + onScreenDuration;
-        this.suppressCoarseUntil = now + onScreenDuration;
+        HoldOff(now, timing);
+
+        this.suppressFinerUntil = now + timing.OnScreen;
+        this.suppressCoarseUntil = now + timing.OnScreen;
     }
 
     public bool ShouldAnnounce(
@@ -105,7 +111,7 @@ internal sealed class NotificationGate
 
         var now = this.now();
 
-        if (now - this.lastNotification < GlobalCooldown)
+        if (now < this.nextAllowed)
             return false;
 
         if (tier > LocationTier.Place && now < this.suppressFinerUntil)
@@ -114,8 +120,7 @@ internal sealed class NotificationGate
         if (tier <= LocationTier.Place && now < this.suppressCoarseUntil)
             return false;
 
-        if (now - this.lastNotification < PingPongWindow &&
-            (current == this.lastAnnounced || current == this.secondLastAnnounced))
+        if (AnnouncedRecently(current, now))
             return false;
 
         if (tier == LocationTier.SubArea &&
@@ -126,14 +131,36 @@ internal sealed class NotificationGate
         return true;
     }
 
-    public void MarkAnnounced(in LocationSnapshot announced, LocationTier tier, TimeSpan onScreenDuration)
+    public void MarkAnnounced(in LocationSnapshot announced, LocationTier tier, NotificationTiming timing)
     {
-        this.lastNotification = this.now();
-        this.secondLastAnnounced = this.lastAnnounced;
-        this.lastAnnounced = announced;
+        var now = this.now();
+
+        HoldOff(now, timing);
+
+        this.recent[this.nextSlot] = (announced, now);
+        this.nextSlot = (this.nextSlot + 1) % RecentPlaces;
 
         if (tier <= LocationTier.Place)
-            this.suppressFinerUntil = this.now() + onScreenDuration;
+            this.suppressFinerUntil = now + timing.OnScreen;
+    }
+
+    private void HoldOff(DateTime now, NotificationTiming timing) =>
+        this.nextAllowed = now + (timing.UntilReadable > GlobalCooldown
+            ? timing.UntilReadable
+            : GlobalCooldown);
+
+    private bool AnnouncedRecently(in LocationSnapshot current, DateTime now)
+    {
+        foreach (var (place, at) in this.recent)
+        {
+            if (at == default || now - at >= PingPongWindow)
+                continue;
+
+            if (place == current)
+                return true;
+        }
+
+        return false;
     }
 
     private bool IsTierEnabled(LocationTier tier) => tier switch

@@ -30,6 +30,9 @@ for Guild Wars 2.
 - **Weather, if you want it.** The sky above the place name, with the game's own
   icon beside it, as you arrive and again whenever it turns over. Worked out from
   the clock rather than read off the screen, so it is there the moment you land.
+- **The game's banners, in your lettering.** Quest Accepted, Duty Commenced,
+  Level Up! and the rest, redrawn with the same effects as a place name. Only the
+  ones the plugin can name are taken over — the rest keep the game's own.
 - **Decodes from the Eorzean alphabet** as it reveals, glyph by glyph — and the
   letters can rise, wave, type or catch alight while they resolve.
 - **Hearts, embers, sparkles or petals** drifting around the text, if that is
@@ -43,7 +46,8 @@ for Guild Wars 2.
   display.
 - **Styled to taste.** Place it anywhere on screen, in one of the game's own
   faces or Dalamud's Noto, with your own colours, letter spacing, casing and
-  outline weight.
+  outline weight. Name, header and weather can each take their own colour and
+  outline, or share one.
 - **Live preview.** Drag the position, size and colour sliders and a sample
   notification follows them as you go.
 - **Knows when to stay quiet.** Silent through cutscenes, PvP and gpose; through
@@ -89,6 +93,7 @@ This does not auto-update. Building from source works the same way — see
 | --- | --- |
 | `/regions` | open the settings |
 | `/regions test` | fire a sample notification, bypassing the suppression rules |
+| `/regions changelog` | show what has changed, all versions |
 
 The settings open by themselves the first time, because the defaults change what
 the game itself draws.

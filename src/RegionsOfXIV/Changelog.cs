@@ -10,6 +10,18 @@ internal static class Changelog
 {
     public static readonly ChangelogEntry[] All =
     [
+        new(new Version("0.3.0.0"),
+        [
+            "The game's own banners are yours now. Quest Accepted, Duty Commenced, Level Up! and the rest are redrawn in this plugin's lettering, with the same effects as a place name. Off by default; switch it on under Notifications.",
+            "Only banners the plugin has words for are taken over. The wording is painted into the game's artwork rather than stored as text, so anything it cannot name keeps the game's own banner instead of losing it.",
+            "Letters sit properly after a Q. The game's fonts carry per-pair spacing and the plugin was dropping one pair per letter, which left every line slightly loose and slightly off centre. Plain in Jupiter, subtle everywhere else.",
+            "Colour each line separately. The weather line, the header's outline and the weather's outline can each take their own colour, so one line can be faded back without touching the others.",
+            "The header switch has moved to General, next to the rest of the header settings, where it can actually be found.",
+            "Settings are written when you let go of a slider rather than on every frame you drag it, so the colour pickers no longer feel like they have stuck.",
+            "A colour turned transparent now says so, instead of looking like a setting that has stopped working.",
+            "Preset codes survive being pasted around. Line wrapping, chat formatting and the invisible characters a web page leaves behind are stripped before the code is read.",
+        ]),
+
         new(new Version("0.2.3.0"),
         [
             "Weather announcements. When the weather turns over it is announced on its own line above the place name, with the game's own icon beside it. Off by default; switch it on under Notifications.",

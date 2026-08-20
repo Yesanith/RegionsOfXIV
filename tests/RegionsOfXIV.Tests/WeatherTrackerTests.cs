@@ -102,7 +102,6 @@ public class WeatherTrackerTests
     {
         var (tracker, _, seen, set) = Build();
 
-        // What the coordinator does on arrival: announce the forecast, then baseline it.
         tracker.Prime(9);
 
         set(9);

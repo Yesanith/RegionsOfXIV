@@ -44,7 +44,7 @@ internal static class PresetCode
     {
         preset = null;
 
-        var trimmed = (code ?? string.Empty).Trim();
+        var trimmed = Clean(code);
 
         if (trimmed.Length == 0)
         {
@@ -104,10 +104,46 @@ internal static class PresetCode
         }
         catch (Exception)
         {
-            error = "That code is damaged — it may have been cut short when it was copied.";
+            error = "That code is damaged — some of it went missing on the way here. "
+                    + "Ask for it again and copy the whole line in one go.";
             return false;
         }
     }
+
+    private static string Clean(string? code)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+            return string.Empty;
+
+        var start = code.IndexOf(Prefix, StringComparison.OrdinalIgnoreCase);
+        if (start > 0)
+            code = code[start..];
+
+        var kept = new StringBuilder(code.Length);
+
+        foreach (var c in code)
+        {
+            if (char.IsWhiteSpace(c) || Decorative(c))
+                continue;
+
+            kept.Append(c);
+        }
+
+        return kept.ToString();
+    }
+
+    private static readonly char[] Decorations =
+    [
+        '`', '"', '<', '>',
+        (char)0x0027,
+        (char)0x00a0,
+        (char)0x200b,
+        (char)0x200c,
+        (char)0x200d,
+        (char)0xfeff,
+    ];
+
+    private static bool Decorative(char c) => Array.IndexOf(Decorations, c) >= 0;
 
     private static Dictionary<string, object?> Overrides(Configuration settings)
     {

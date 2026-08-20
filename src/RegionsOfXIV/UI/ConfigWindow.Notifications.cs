@@ -46,8 +46,28 @@ internal sealed partial class ConfigWindow
 
         ImGui.Separator();
 
-        changed |= Checkbox("Show the parent tier as a header",
-            () => this.config.IncludeParentTierAsHeader, v => this.config.IncludeParentTierAsHeader = v);
+        changed |= Checkbox("Banners",
+            () => this.config.BannerNotificationEnabled, v => this.config.BannerNotificationEnabled = v);
+
+        Tooltip(
+            "Redraws the game's full-screen banners — \"Quest Accepted\", "
+            + "\"Duty Commenced\", \"Level Up!\" — in this plugin's lettering.\n\n"
+            + "The wording is painted into the game's artwork rather than stored as "
+            + "text, so only banners this plugin has words for are taken over. Any "
+            + "it does not recognise keep the game's own.");
+
+        using (ImRaii.Disabled(!this.config.BannerNotificationEnabled))
+        {
+            changed |= Checkbox("Hide the game's own banner",
+                () => this.config.HideNativeBanner, v => this.config.HideNativeBanner = v);
+        }
+
+        Tooltip(
+            "Fades out the game's artwork so only this plugin's version shows.\n\n"
+            + "Turn this off to see both, which is a quick way to check the "
+            + "wording matches.");
+
+        ImGui.Separator();
 
         if (Checkbox("Hide the game's own area text",
                 () => this.config.HideNativeAreaText, v => this.config.HideNativeAreaText = v))
@@ -77,7 +97,7 @@ internal sealed partial class ConfigWindow
         if (!changed)
             return;
 
-        this.config.Save();
+        MarkUnsaved();
         this.actions.LivePreview(Sample);
     }
 }

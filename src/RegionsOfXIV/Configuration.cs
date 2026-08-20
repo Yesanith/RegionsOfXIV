@@ -27,9 +27,13 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
     public bool ShowWeatherIcon { get; set; } = true;
 
+    public bool BannerNotificationEnabled { get; set; } = false;
+
     public bool HideNativeAreaText { get; set; } = true;
 
     public bool HideNativeLoadingTitle { get; set; } = true;
+
+    public bool HideNativeBanner { get; set; } = true;
 
     public float VerticalPosition { get; set; } = 25f;
 
@@ -64,6 +68,14 @@ public class Configuration : IPluginConfiguration, IGateSettings
     public Vector4 HeaderColor { get; set; } = new(0.698f, 0.627f, 0.569f, 1f);
 
     public Vector4 StrokeColor { get; set; } = new(0f, 0f, 0f, 0.8f);
+
+    public bool SeparateLineColors { get; set; } = false;
+
+    public Vector4 WeatherColor { get; set; } = new(0.698f, 0.627f, 0.569f, 1f);
+
+    public Vector4 HeaderStrokeColor { get; set; } = new(0f, 0f, 0f, 0.8f);
+
+    public Vector4 WeatherStrokeColor { get; set; } = new(0f, 0f, 0f, 0.8f);
 
     public float StrokeThickness { get; set; } = 1f;
 

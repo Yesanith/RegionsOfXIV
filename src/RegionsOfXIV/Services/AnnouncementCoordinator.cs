@@ -12,6 +12,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
     private readonly NotificationGate gate;
     private readonly LocationTracker tracker;
     private readonly WeatherTracker weatherTracker;
+    private readonly BannerWatcher banners;
 
     private string? pendingNativeAreaText;
 
@@ -31,6 +32,9 @@ internal sealed class AnnouncementCoordinator : IDisposable
         this.weatherTracker = new WeatherTracker(game);
         this.weatherTracker.Start();
 
+        this.banners = new BannerWatcher(config);
+
+        this.banners.OnBannerShown += HandleBannerShown;
         this.weatherTracker.OnWeatherChanged += HandleWeatherChanged;
         this.tracker.OnLocationChanged += HandleLocationChanged;
         this.tracker.OnSanctuaryChanged += HandleSanctuaryChanged;
@@ -49,7 +53,9 @@ internal sealed class AnnouncementCoordinator : IDisposable
         this.tracker.OnSanctuaryChanged -= HandleSanctuaryChanged;
         this.tracker.OnLocationChanged -= HandleLocationChanged;
         this.weatherTracker.OnWeatherChanged -= HandleWeatherChanged;
+        this.banners.OnBannerShown -= HandleBannerShown;
 
+        this.banners.Dispose();
         this.weatherTracker.Dispose();
         this.tracker.Dispose();
     }
@@ -65,8 +71,6 @@ internal sealed class AnnouncementCoordinator : IDisposable
         if (!this.config.WeatherNotificationEnabled)
             return;
 
-        // Falls back to the first row so the command still shows something when the
-        // tracker has not taken a reading yet.
         var current = WeatherNameResolver.Resolve(this.weatherTracker.Current)
                       ?? WeatherNameResolver.Resolve(1);
 
@@ -76,11 +80,6 @@ internal sealed class AnnouncementCoordinator : IDisposable
         this.sink.PushWeather(weather.Name, weather.IconId);
     }
 
-    /// <summary>
-    /// Says what the weather is doing where you have just landed. The forecast is worked
-    /// out from the clock rather than read from the game, so it is known while the
-    /// loading screen is still up and lands with the place name rather than behind it.
-    /// </summary>
     private void AnnounceArrivalWeather(uint territoryTypeId)
     {
         if (!this.config.WeatherNotificationEnabled)
@@ -89,10 +88,16 @@ internal sealed class AnnouncementCoordinator : IDisposable
         if (WeatherNameResolver.Forecast(territoryTypeId, DateTimeOffset.UtcNow) is not { } weather)
             return;
 
-        // Baselined so the reading that settles a moment later is not read as a change.
         this.weatherTracker.Prime(weather.Id);
 
         this.sink.PushWeather(weather.Name, weather.IconId);
+    }
+
+    private void HandleBannerShown(uint iconId, string text)
+    {
+        Plugin.Log.Debug($"Banner [{iconId}]: {text}");
+
+        this.sink.Push(null, text.ToUpperInvariant());
     }
 
     private void HandleWeatherChanged(byte weatherId)
@@ -132,7 +137,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
         Plugin.Log.Debug($"ZoneInit [{territory.RowId}]: {header} / {text} (duty={isDuty})");
 
         this.sink.Push(header, text);
-        this.gate.MarkZoneAnnounced(this.sink.EstimatedDuration);
+        this.gate.MarkZoneAnnounced(this.sink.Timing);
 
         AnnounceArrivalWeather(territory.RowId);
     }
@@ -156,7 +161,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
                 Plugin.Log.Debug($"Native area text only (TerritoryInfo unchanged): {nativeText}");
                 this.sink.Push(null, nativeText);
                 this.gate.MarkAnnounced(
-                    this.tracker.Current, LocationTier.SubArea, this.sink.EstimatedDuration);
+                    this.tracker.Current, LocationTier.SubArea, this.sink.Timing);
             }
         }
         finally
@@ -185,7 +190,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
         Plugin.Log.Debug($"Sanctuary {(inSanctuary ? "entered" : "left")}: {header} / {text}");
 
         this.sink.Push(header, text);
-        this.gate.MarkAnnounced(this.tracker.Current, LocationTier.SubArea, this.sink.EstimatedDuration);
+        this.gate.MarkAnnounced(this.tracker.Current, LocationTier.SubArea, this.sink.Timing);
     }
 
     private void HandleLocationChanged(LocationSnapshot previous, LocationSnapshot current)
@@ -209,7 +214,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
             return;
 
         this.sink.Push(header, text);
-        this.gate.MarkAnnounced(current, tier, this.sink.EstimatedDuration);
+        this.gate.MarkAnnounced(current, tier, this.sink.Timing);
     }
 
     private (string? Header, string Text) BuildNotificationText(

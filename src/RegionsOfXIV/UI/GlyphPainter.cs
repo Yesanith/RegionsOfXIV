@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 
@@ -19,10 +19,26 @@ internal static class GlyphPainter
         ReadOnlySpan<char> text,
         uint fillColor,
         uint strokeColor,
-        float strokeDistance)
+        float strokeDistance,
+        float scale = 1f)
     {
         if (text.IsEmpty)
             return;
+
+        if (scale < 1f)
+        {
+            var font = ImGui.GetFont();
+            var size = ImGui.GetFontSize() * scale;
+
+            if (strokeDistance > 0f)
+            {
+                foreach (var offset in StrokeOffsets)
+                    drawList.AddText(font, size, position + (offset * strokeDistance), strokeColor, text);
+            }
+
+            drawList.AddText(font, size, position, fillColor, text);
+            return;
+        }
 
         if (strokeDistance > 0f)
         {
@@ -49,10 +65,11 @@ internal static class GlyphPainter
         float top,
         uint fillColor,
         uint strokeColor,
-        float strokeDistance)
+        float strokeDistance,
+        float scale = 1f)
     {
         for (var i = 0; i < text.Length; i++)
-            DrawGlyph(drawList, positions[i], top, text[i], fillColor, strokeColor, strokeDistance);
+            DrawGlyph(drawList, positions[i], top, text[i], fillColor, strokeColor, strokeDistance, scale);
     }
 
     public static void DrawUnderline(
@@ -82,13 +99,14 @@ internal static class GlyphPainter
             fillColor);
     }
 
-    public static float[] GlyphPositions(string text, float centerX, float tracking, out float width)
+    public static float[] GlyphPositions(
+        string text, float centerX, float tracking, float scale, out float width)
     {
         var xs = new float[text.Length];
         for (var i = 0; i < text.Length; i++)
-            xs[i] = ImGui.CalcTextSize(text[..i]).X + (tracking * i);
+            xs[i] = (Offset(text, i) + (tracking * i)) * scale;
 
-        width = RunWidth(text, tracking);
+        width = RunWidth(text, tracking) * scale;
 
         var left = centerX - (width / 2f);
         for (var i = 0; i < xs.Length; i++)
@@ -97,13 +115,24 @@ internal static class GlyphPainter
         return xs;
     }
 
+    private static float Offset(string text, int index)
+    {
+        if (index == 0)
+            return 0f;
+
+        var through = ImGui.CalcTextSize(text[..(index + 1)]).X;
+
+        return through - ImGui.CalcTextSize(text.AsSpan(index, 1)).X;
+    }
+
     public static float Lerp(float from, float to, float t) => from + ((to - from) * t);
 
     public static uint Packed(Vector4 color, float alpha) =>
         ImGui.ColorConvertFloat4ToU32(color with { W = color.W * alpha });
 
     public static void DrawGlyph(
-        ImDrawListPtr drawList, float x, float y, char glyph, uint fill, uint stroke, float strokeDistance)
+        ImDrawListPtr drawList, float x, float y, char glyph,
+        uint fill, uint stroke, float strokeDistance, float scale = 1f)
     {
         if (glyph == ' ')
             return;
@@ -111,6 +140,6 @@ internal static class GlyphPainter
         Span<char> one = stackalloc char[1];
         one[0] = glyph;
 
-        DrawStroked(drawList, new Vector2(x, y), one, fill, stroke, strokeDistance);
+        DrawStroked(drawList, new Vector2(x, y), one, fill, stroke, strokeDistance, scale);
     }
 }

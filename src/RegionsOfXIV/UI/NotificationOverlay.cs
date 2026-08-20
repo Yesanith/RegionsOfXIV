@@ -54,14 +54,23 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         this.previewHeld = false;
     }
 
-    public TimeSpan EstimatedDuration =>
-        (this.config.Motion == MotionEffect.None
-            ? this.config.FadeInDuration
-            : Longer(this.config.FadeInDuration, this.config.MotionDuration))
-        + TimeSpan.FromMilliseconds(200)
-        + (this.renderer.IsDecoding ? this.config.RevealDuration : TimeSpan.Zero)
-        + this.config.ShowDuration
-        + this.config.FadeOutDuration;
+    public NotificationTiming Timing
+    {
+        get
+        {
+            var arriving = this.config.Motion == MotionEffect.None
+                ? this.config.FadeInDuration
+                : Longer(this.config.FadeInDuration, this.config.MotionDuration);
+
+            var readable = arriving
+                           + AreaNotification.HoldDuration
+                           + (this.renderer.IsDecoding ? this.config.RevealDuration : TimeSpan.Zero);
+
+            return new NotificationTiming(
+                readable,
+                readable + this.config.ShowDuration + this.config.FadeOutDuration);
+        }
+    }
 
     public void Push(string? header, string text)
     {
@@ -128,8 +137,6 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     {
         if (this.previewHeld)
         {
-            // Weather can be switched on and off while a held preview is up, so the
-            // lanes are reconciled every frame rather than only when a preview starts.
             HoldEach();
         }
         else
@@ -297,7 +304,6 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
 
     private static TimeSpan Longer(TimeSpan a, TimeSpan b) => a > b ? a : b;
 
-    /// <summary>What one notification says. A null Line means the lane has nothing to show.</summary>
     private readonly record struct Line(string? Header, string Text, uint Icon = 0);
 
     private sealed class Lane(Action<AreaNotification> draw)

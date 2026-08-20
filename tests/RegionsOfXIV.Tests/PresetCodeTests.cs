@@ -168,4 +168,33 @@ public class PresetCodeTests
         Assert.Null(preset);
         Assert.NotEmpty(error);
     }
+
+    [Fact]
+    public void CarriesEverySettingThePluginHas()
+    {
+        var original = new Configuration();
+
+        foreach (var property in ConfigurationCopy.Settings)
+            property.SetValue(original, Changed(property.PropertyType, property.GetValue(original)));
+
+        Assert.True(
+            PresetCode.TryDecode(PresetCode.Encode("Every", original), out var preset, out var error), error);
+
+        foreach (var property in ConfigurationCopy.Settings)
+            Assert.Equal(property.GetValue(original), property.GetValue(preset!.Settings));
+    }
+
+    private static object Changed(Type type, object? value) => value switch
+    {
+        bool flag => !flag,
+        float number => number + 1f,
+        int number => number + 1,
+        TimeSpan span => span + TimeSpan.FromSeconds(1),
+        Vector4 colour => new Vector4(colour.X + 0.125f, 0.25f, 0.375f, 0.5f),
+        Enum current => Enum.GetValues(type).Cast<Enum>().First(other => !other.Equals(current)),
+        string text => text + "x",
+        null when type == typeof(string) => "changed",
+        _ => throw new InvalidOperationException(
+            $"{type.Name} has no rule here, so this test cannot prove {type.Name} settings travel."),
+    };
 }

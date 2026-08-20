@@ -1,4 +1,4 @@
-using RegionsOfXIV.Models;
+﻿using RegionsOfXIV.Models;
 using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.Tests;
@@ -18,6 +18,9 @@ public class NotificationGateTests
 
     private bool Announce(LocationSnapshot to, LocationTier tier, float speed = 0f) =>
         Gate().ShouldAnnounce(Here, to, tier, speed);
+
+    private static NotificationTiming Timing(double onScreen = 5, double readable = 1) =>
+        new(TimeSpan.FromSeconds(readable), TimeSpan.FromSeconds(onScreen));
 
     [Fact]
     public void NoChangeIsNotAnnounced()
@@ -117,7 +120,7 @@ public class NotificationGateTests
         var gate = Gate();
 
         Assert.True(gate.ShouldAnnounce(Here, NextSubArea, LocationTier.SubArea, 0f));
-        gate.MarkAnnounced(NextSubArea, LocationTier.SubArea, TimeSpan.FromSeconds(5));
+        gate.MarkAnnounced(NextSubArea, LocationTier.SubArea, Timing());
 
         this.clock.Advance(1);
         Assert.False(gate.ShouldAnnounce(NextSubArea, NextArea, LocationTier.Area, 0f));
@@ -130,7 +133,7 @@ public class NotificationGateTests
     public void AFinerChangeWaitsOutTheZoneAnnouncementOnScreen()
     {
         var gate = Gate();
-        gate.MarkZoneAnnounced(TimeSpan.FromSeconds(8));
+        gate.MarkZoneAnnounced(Timing(onScreen: 8));
 
         this.clock.Advance(3);
         Assert.False(gate.ShouldAnnounce(Here, NextSubArea, LocationTier.SubArea, 0f));
@@ -143,7 +146,7 @@ public class NotificationGateTests
     public void TheTrackerDoesNotRepeatWhatZoneInitAlreadyAnnounced()
     {
         var gate = Gate();
-        gate.MarkZoneAnnounced(TimeSpan.FromSeconds(8));
+        gate.MarkZoneAnnounced(Timing(onScreen: 8));
 
         this.clock.Advance(3);
         Assert.False(gate.ShouldAnnounce(Here, NextZone, LocationTier.Zone, 0f));
@@ -157,10 +160,10 @@ public class NotificationGateTests
     {
         var gate = Gate();
 
-        gate.MarkAnnounced(Here, LocationTier.SubArea, TimeSpan.FromSeconds(5));
+        gate.MarkAnnounced(Here, LocationTier.SubArea, Timing());
         this.clock.Advance(3);
 
-        gate.MarkAnnounced(NextSubArea, LocationTier.SubArea, TimeSpan.FromSeconds(5));
+        gate.MarkAnnounced(NextSubArea, LocationTier.SubArea, Timing());
         this.clock.Advance(3);
 
         Assert.False(gate.ShouldAnnounce(NextSubArea, Here, LocationTier.SubArea, 0f));
@@ -171,7 +174,7 @@ public class NotificationGateTests
     {
         var gate = Gate();
 
-        gate.MarkAnnounced(Here, LocationTier.SubArea, TimeSpan.FromSeconds(5));
+        gate.MarkAnnounced(Here, LocationTier.SubArea, Timing());
         this.clock.Advance(31);
 
         Assert.True(gate.ShouldAnnounce(NextSubArea, Here, LocationTier.SubArea, 0f));
@@ -182,7 +185,7 @@ public class NotificationGateTests
     {
         var gate = Gate();
 
-        gate.MarkAnnounced(Here, LocationTier.SubArea, TimeSpan.FromSeconds(5));
+        gate.MarkAnnounced(Here, LocationTier.SubArea, Timing());
         gate.Reset();
 
         Assert.True(gate.ShouldAnnounce(NextSubArea, Here, LocationTier.SubArea, 0f));
@@ -252,7 +255,7 @@ public class NotificationGateTests
     public void SanctuaryEntryIgnoresTheZoneAnnouncementStillOnScreen()
     {
         var gate = Gate();
-        gate.MarkZoneAnnounced(TimeSpan.FromSeconds(8));
+        gate.MarkZoneAnnounced(Timing(onScreen: 8));
 
         this.clock.Advance(3);
 
@@ -263,7 +266,7 @@ public class NotificationGateTests
     public void SanctuaryEntryStillWaitsOutTheGlobalCooldown()
     {
         var gate = Gate();
-        gate.MarkZoneAnnounced(TimeSpan.FromSeconds(8));
+        gate.MarkZoneAnnounced(Timing(onScreen: 8));
 
         this.clock.Advance(1);
 
@@ -287,7 +290,7 @@ public class NotificationGateTests
     public void NativeAreaTextWaitsForACoarseAnnouncementToClear()
     {
         var gate = Gate();
-        gate.MarkZoneAnnounced(TimeSpan.FromSeconds(8));
+        gate.MarkZoneAnnounced(Timing(onScreen: 8));
 
         this.clock.Advance(3);
         Assert.False(gate.ShouldAnnounceNativeAreaText());
@@ -295,4 +298,62 @@ public class NotificationGateTests
         this.clock.Advance(6);
         Assert.True(gate.ShouldAnnounceNativeAreaText());
     }
+
+    [Fact]
+    public void ALineIsNotReplacedBeforeItHasBeenReadable()
+    {
+        var gate = Gate();
+
+        gate.MarkAnnounced(NextSubArea, LocationTier.SubArea, Timing(readable: 2.4));
+
+        this.clock.Advance(2);
+        Assert.False(gate.ShouldAnnounce(NextSubArea, NextArea, LocationTier.Area, 0f));
+
+        this.clock.Advance(0.5);
+        Assert.True(gate.ShouldAnnounce(NextSubArea, NextArea, LocationTier.Area, 0f));
+    }
+
+    [Fact]
+    public void AQuickLineStillWaitsOutTheGlobalCooldown()
+    {
+        var gate = Gate();
+
+        gate.MarkAnnounced(NextSubArea, LocationTier.SubArea, Timing(readable: 0.4));
+
+        this.clock.Advance(1);
+        Assert.False(gate.ShouldAnnounce(NextSubArea, NextArea, LocationTier.Area, 0f));
+
+        this.clock.Advance(1.1);
+        Assert.True(gate.ShouldAnnounce(NextSubArea, NextArea, LocationTier.Area, 0f));
+    }
+
+    [Fact]
+    public void AWholeCityBlockIsRememberedNotJustTheLastOne()
+    {
+        var gate = Gate();
+
+        for (var i = 0; i < 5; i++)
+        {
+            gate.MarkAnnounced(SubArea(i), LocationTier.SubArea, Timing());
+            this.clock.Advance(3);
+        }
+
+        Assert.False(gate.ShouldAnnounce(SubArea(4), SubArea(0), LocationTier.SubArea, 0f));
+    }
+
+    [Fact]
+    public void TheOldestPlaceEventuallyFallsOutOfMemory()
+    {
+        var gate = Gate();
+
+        for (var i = 0; i < 7; i++)
+        {
+            gate.MarkAnnounced(SubArea(i), LocationTier.SubArea, Timing());
+            this.clock.Advance(3);
+        }
+
+        Assert.True(gate.ShouldAnnounce(SubArea(6), SubArea(0), LocationTier.SubArea, 0f));
+    }
+
+    private static LocationSnapshot SubArea(int index) => new(100, 1, 2, 3, 4, (uint)(20 + index));
 }

@@ -3,17 +3,10 @@ using Lumina.Excel.Sheets;
 
 namespace RegionsOfXIV.Services;
 
-/// <summary>A weather as it is shown: the name the client uses, and its game icon.</summary>
 internal readonly record struct ResolvedWeather(uint Id, string Name, uint IconId);
 
 internal static class WeatherNameResolver
 {
-    /// <summary>
-    /// What the weather will be in a territory at a given moment, worked out from the
-    /// clock and the zone's own table rather than read from the running game. This is
-    /// known before the loading screen ends, which is what lets the weather line land
-    /// alongside the place name instead of seconds behind it.
-    /// </summary>
     public static ResolvedWeather? Forecast(uint territoryTypeId, DateTimeOffset at)
     {
         if (Rates(territoryTypeId) is not { } rate)

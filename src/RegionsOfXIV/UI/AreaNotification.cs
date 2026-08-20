@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Dalamud.Interface.Animation;
 using Dalamud.Interface.Animation.EasingFunctions;
 
@@ -16,7 +16,7 @@ internal enum NotificationPhase
 
 internal sealed class AreaNotification
 {
-    private static readonly TimeSpan HoldDuration = TimeSpan.FromMilliseconds(200);
+    public static readonly TimeSpan HoldDuration = TimeSpan.FromMilliseconds(200);
 
     private readonly Easing fadeIn;
     private readonly Easing? motion;
@@ -71,7 +71,6 @@ internal sealed class AreaNotification
 
     public string Text { get; }
 
-    /// <summary>Game icon shown beside the text, or zero for none.</summary>
     public uint IconId { get; init; }
 
     private NotificationPhase Phase { get; set; } = NotificationPhase.FadeIn;

@@ -1,4 +1,4 @@
-using Dalamud.Bindings.ImGui;
+﻿using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility.Raii;
 
 namespace RegionsOfXIV.UI;
@@ -53,12 +53,11 @@ internal sealed partial class ConfigWindow
         if (!changed && !restart)
             return;
 
-        this.config.Save();
+        MarkUnsaved();
 
         if (restart)
             this.actions.Preview(Sample);
         else
             this.actions.LivePreview(Sample);
     }
-
 }

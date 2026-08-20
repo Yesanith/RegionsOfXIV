@@ -124,5 +124,4 @@ internal sealed partial class ConfigWindow
 
     private bool NameTaken(string name) => this.config.UserPresets.Any(
         p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
-
 }
