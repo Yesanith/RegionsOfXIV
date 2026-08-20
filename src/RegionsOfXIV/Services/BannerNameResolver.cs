@@ -47,7 +47,7 @@ internal static class BannerNameResolver
                 found.TryAdd(icon, name);
         }
 
-        Plugin.Log.Debug(
+        Log.Debug(
             $"Banner names: {found.Count} known, {fromStamps} of them from stamps.");
 
         return found;

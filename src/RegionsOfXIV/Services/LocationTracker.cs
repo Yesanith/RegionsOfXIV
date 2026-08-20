@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Numerics;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using RegionsOfXIV.Models;
@@ -6,7 +6,7 @@ using Lumina.Excel.Sheets;
 
 namespace RegionsOfXIV.Services;
 
-internal sealed unsafe class LocationTracker : IDisposable
+internal sealed unsafe class LocationTracker : ILocationSource, IDisposable
 {
     private static readonly TimeSpan PollInterval = TimeSpan.FromMilliseconds(200);
 

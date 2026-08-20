@@ -82,7 +82,7 @@ internal sealed partial class ConfigWindow
         }
         catch (Exception ex)
         {
-            Plugin.Log.Debug(ex, "Could not read the clipboard.");
+            Log.Debug(ex, "Could not read the clipboard.");
             Report("Could not read the clipboard. Try again in a moment.", failed: true);
             return false;
         }

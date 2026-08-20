@@ -16,7 +16,7 @@ internal sealed partial class ConfigWindow
 
         ImGui.TextWrapped("How the letters move as they arrive.");
 
-        restart |= Choice("Motion", () => this.config.Motion, v => this.config.Motion = v, Label);
+        this.config.Motion = Choice("Motion", this.config.Motion, Label, ref restart);
         Tooltip(
             "None — the letters simply appear where they belong.\n" +
             "Typewriter — one letter at a time, no fade.\n" +
@@ -28,15 +28,15 @@ internal sealed partial class ConfigWindow
         ImGui.Separator();
         ImGui.TextWrapped("What plays around it, for as long as it is on screen.");
 
-        restart |= Choice("Particles", () => this.config.Particles, v => this.config.Particles = v, Label);
+        this.config.Particles = Choice("Particles", this.config.Particles, Label, ref restart);
 
         if (this.config.Particles != ParticleEffect.None)
         {
-            changed |= Slider("Density",
-                () => this.config.ParticleDensity, v => this.config.ParticleDensity = v, 0.2f, 3f, "%.1fx");
+            this.config.ParticleDensity = Slider(
+            "Density", this.config.ParticleDensity, 0.2f, 3f, "%.1fx", ref changed);
 
-            changed |= ColorPicker("Particle colour",
-                () => this.config.ParticleColor, v => this.config.ParticleColor = v);
+            this.config.ParticleColor = ColorPicker(
+            "Particle colour", this.config.ParticleColor, ref changed);
             Tooltip(
                 "The default amber suits embers and sparkles. Hearts and petals\n" +
                 "want moving towards pink.");

@@ -113,7 +113,7 @@ internal sealed class FontService : IDisposable
         var path = FindBundledFont();
         if (path == null)
         {
-            Plugin.Log.Debug("No Eorzean font bundled; decode effect will fall back to a plain fade.");
+            Log.Debug("No Eorzean font bundled; decode effect will fall back to a plain fade.");
             return;
         }
 
@@ -122,11 +122,11 @@ internal sealed class FontService : IDisposable
             this.eorzeanDisplayFont = BuildEorzean(path, displaySizePx);
             this.eorzeanHeaderFont = BuildEorzean(path, headerSizePx);
 
-            Plugin.Log.Information($"Loaded Eorzean font from {path}");
+            Log.Information($"Loaded Eorzean font from {path}");
         }
         catch (Exception ex)
         {
-            Plugin.Log.Error(ex, $"Failed to load bundled Eorzean font from {path}");
+            Log.Error(ex, $"Failed to load bundled Eorzean font from {path}");
 
             this.eorzeanDisplayFont = null;
             this.eorzeanHeaderFont = null;

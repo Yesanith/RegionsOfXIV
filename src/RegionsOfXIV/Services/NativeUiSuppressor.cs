@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace RegionsOfXIV.Services;
 
-internal sealed class NativeUiSuppressor : IDisposable
+internal sealed class NativeUiSuppressor : IAreaTextSource, IDisposable
 {
     private static readonly string[] AreaTextAddons = ["_AreaText"];
 

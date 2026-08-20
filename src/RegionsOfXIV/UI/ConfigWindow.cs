@@ -81,7 +81,11 @@ internal sealed partial class ConfigWindow : Window, IDisposable
 
     private void DrawEditingToggle()
     {
-        Checkbox("Editing mode", () => this.editing, SetEditing);
+        var toggled = false;
+        var wanted = Checkbox("Editing mode", this.editing, ref toggled);
+
+        if (toggled)
+            SetEditing(wanted);
 
         Tooltip(
             "Keeps one sample notification on screen while you work, instead of\n" +
@@ -164,86 +168,63 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         _ => effect.ToString(),
     };
 
-    private static bool Slider(
-        string label, Func<float> get, Action<float> set, float min, float max, string format)
+    private static float Slider(
+        string label, float value, float min, float max, string format, ref bool changed)
     {
-        var value = get();
-        if (!ImGui.SliderFloat(label, ref value, min, max, format))
-            return false;
+        if (ImGui.SliderFloat(label, ref value, min, max, format))
+            changed = true;
 
-        set(value);
-        return true;
+        return value;
     }
 
-    private static bool DrawSeconds(string label, Func<TimeSpan> get, Action<TimeSpan> set, float min, float max)
+    private static TimeSpan DrawSeconds(
+        string label, TimeSpan value, float min, float max, ref bool changed)
     {
-        var seconds = (float)get().TotalSeconds;
+        var seconds = (float)value.TotalSeconds;
+
         if (!ImGui.SliderFloat(label, ref seconds, min, max, "%.2f s"))
-            return false;
+            return value;
 
-        set(TimeSpan.FromSeconds(seconds));
-        return true;
+        changed = true;
+        return TimeSpan.FromSeconds(seconds);
     }
 
-    private static bool Checkbox(string label, Func<bool> get, Action<bool> set)
+    private static bool Checkbox(string label, bool value, ref bool changed)
     {
-        var value = get();
-        if (!ImGui.Checkbox(label, ref value))
-            return false;
+        if (ImGui.Checkbox(label, ref value))
+            changed = true;
 
-        set(value);
-        return true;
+        return value;
     }
 
-    private const int FaintAlpha = 12;
-
-    private static bool ColorPicker(string label, Func<Vector4> get, Action<Vector4> set)
+    private static Vector4 ColorPicker(string label, Vector4 value, ref bool changed)
     {
-        var value = get();
-        var changed = ImGui.ColorEdit4(label, ref value, ImGuiColorEditFlags.NoInputs);
+        var rgb = new Vector3(value.X, value.Y, value.Z);
 
-        if (changed)
-            set(value);
+        if (!ImGui.ColorEdit3(label, ref rgb, ImGuiColorEditFlags.NoInputs))
+            return value;
 
-        var alpha = (int)MathF.Round(value.W * 255f);
-
-        if (alpha < FaintAlpha)
-        {
-            ImGui.SameLine();
-            ImGui.TextDisabled($"(alpha {alpha} — invisible)");
-
-            Tooltip(
-                "Alpha is how solid a colour is, from 0 to 255, and this one is far\n" +
-                "too low to see. It is still being drawn — just not visibly.\n\n" +
-                "Choosing another colour will not bring it back on its own, because\n" +
-                "picking a hue leaves the alpha alone. Drag the alpha bar — the\n" +
-                "narrow chequered strip right of the rainbow — up to the top, or\n" +
-                "click the \"Original\" swatch beside it.");
-        }
-
-        return changed;
+        changed = true;
+        return new Vector4(rgb, value.W);
     }
 
-    private static bool Choice<T>(string label, Func<T> get, Action<T> set, Func<T, string> name)
+    private static T Choice<T>(string label, T value, Func<T, string> name, ref bool changed)
         where T : struct, Enum
     {
-        var current = get();
-        var changed = false;
-
-        using var combo = ImRaii.Combo(label, name(current));
+        using var combo = ImRaii.Combo(label, name(value));
         if (!combo)
-            return false;
+            return value;
 
         foreach (var option in Enum.GetValues<T>())
         {
-            if (!ImGui.Selectable(name(option), option.Equals(current)))
+            if (!ImGui.Selectable(name(option), option.Equals(value)))
                 continue;
 
-            set(option);
+            value = option;
             changed = true;
         }
 
-        return changed;
+        return value;
     }
 
     private const float TooltipWidthInEm = 35f;

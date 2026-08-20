@@ -39,6 +39,10 @@ public sealed class Plugin : IDalamudPlugin
 #endif
     private readonly AnnouncementCoordinator coordinator;
     private readonly UiVisibilityGuard uiVisibilityGuard;
+    private readonly LocationTracker locations;
+    private readonly WeatherTracker weather;
+    private readonly BannerWatcher banners;
+    private readonly GameZoneArrivals zones;
 
     public Plugin()
     {
@@ -52,7 +56,28 @@ public sealed class Plugin : IDalamudPlugin
         this.fonts.Rebuild(this.config.DisplayFontSize, this.config.HeaderFontSize);
 
         this.overlay = new NotificationOverlay(this.config, this.fonts);
-        this.coordinator = new AnnouncementCoordinator(this.config, this.nativeUiSuppressor, this.overlay);
+
+        var game = new DalamudGameState();
+
+        this.locations = new LocationTracker(game);
+        this.weather = new WeatherTracker(game);
+        this.banners = new BannerWatcher(this.config);
+        this.zones = new GameZoneArrivals();
+
+        this.weather.Start();
+
+        this.coordinator = new AnnouncementCoordinator(
+            this.config,
+            game,
+            this.overlay,
+            new AnnouncementSources(
+                this.locations,
+                this.weather,
+                this.nativeUiSuppressor,
+                this.banners,
+                this.zones,
+                new GamePlaceNames(),
+                new GameWeatherNames()));
 
         this.changelogWindow = new ChangelogWindow();
 
@@ -126,6 +151,11 @@ public sealed class Plugin : IDalamudPlugin
 
         this.coordinator.Dispose();
 
+        this.zones.Dispose();
+        this.banners.Dispose();
+        this.weather.Dispose();
+        this.locations.Dispose();
+
         this.windowSystem.RemoveAllWindows();
 #if DEBUG
         this.iconBrowserWindow.Dispose();
@@ -145,7 +175,10 @@ public sealed class Plugin : IDalamudPlugin
         {
             if (PluginInterface.GetPluginConfig() is Configuration stored)
             {
-                if (stored.Migrate())
+                var changed = stored.Migrate();
+                changed |= stored.RepairFaintColors();
+
+                if (changed)
                     stored.Save();
 
                 return (stored, false);

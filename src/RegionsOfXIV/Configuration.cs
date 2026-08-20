@@ -97,6 +97,34 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
     public bool HideWhileTravellingFast { get; set; } = true;
 
+    public const float FaintAlpha = 12f / 255f;
+
+    public bool RepairFaintColors()
+    {
+        var defaults = new Configuration();
+        var repaired = false;
+
+        foreach (var property in ConfigurationCopy.Settings)
+        {
+            if (property.PropertyType != typeof(Vector4))
+                continue;
+
+            var colour = (Vector4)property.GetValue(this)!;
+            if (colour.W >= FaintAlpha)
+                continue;
+
+            var restored = ((Vector4)property.GetValue(defaults)!).W;
+
+            property.SetValue(this, colour with { W = restored });
+            repaired = true;
+
+            Log.Information(
+                $"{property.Name} was stored too faint to see, so its opacity was restored.");
+        }
+
+        return repaired;
+    }
+
     public bool Migrate()
     {
         if (Version == CurrentVersion)
@@ -104,7 +132,7 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
         if (Version > CurrentVersion)
         {
-            Plugin.Log.Warning(
+            Log.Warning(
                 $"The stored configuration is version {Version}, newer than this build understands " +
                 $"({CurrentVersion}). Reading what applies and leaving the file as it is.");
             return false;
@@ -113,7 +141,7 @@ public class Configuration : IPluginConfiguration, IGateSettings
         var from = Version;
 
         Version = CurrentVersion;
-        Plugin.Log.Information($"Migrated the configuration from version {from} to {CurrentVersion}.");
+        Log.Information($"Migrated the configuration from version {from} to {CurrentVersion}.");
         return true;
     }
 

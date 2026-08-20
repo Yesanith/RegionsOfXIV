@@ -1,5 +1,4 @@
 ﻿using System;
-using Dalamud.Game.ClientState;
 using RegionsOfXIV.Models;
 
 namespace RegionsOfXIV.Services;
@@ -7,62 +6,46 @@ namespace RegionsOfXIV.Services;
 internal sealed class AnnouncementCoordinator : IDisposable
 {
     private readonly Configuration config;
-    private readonly NativeUiSuppressor suppressor;
     private readonly INotificationSink sink;
+    private readonly AnnouncementSources sources;
     private readonly NotificationGate gate;
-    private readonly LocationTracker tracker;
-    private readonly WeatherTracker weatherTracker;
-    private readonly BannerWatcher banners;
 
     private string? pendingNativeAreaText;
 
     private string? lastNativeAreaText;
 
     public AnnouncementCoordinator(
-        Configuration config, NativeUiSuppressor suppressor, INotificationSink sink)
+        Configuration config, IGameState game, INotificationSink sink, AnnouncementSources sources)
     {
         this.config = config;
-        this.suppressor = suppressor;
         this.sink = sink;
-
-        var game = new DalamudGameState();
+        this.sources = sources;
 
         this.gate = new NotificationGate(config, game);
-        this.tracker = new LocationTracker(game);
-        this.weatherTracker = new WeatherTracker(game);
-        this.weatherTracker.Start();
 
-        this.banners = new BannerWatcher(config);
-
-        this.banners.OnBannerShown += HandleBannerShown;
-        this.weatherTracker.OnWeatherChanged += HandleWeatherChanged;
-        this.tracker.OnLocationChanged += HandleLocationChanged;
-        this.tracker.OnSanctuaryChanged += HandleSanctuaryChanged;
-        this.suppressor.OnAreaTextShown += HandleAreaTextShown;
-
-        Plugin.ClientState.Logout += OnLogout;
-        Plugin.ClientState.ZoneInit += OnZoneInit;
+        sources.Banners.OnBannerShown += HandleBannerShown;
+        sources.Weather.OnWeatherChanged += HandleWeatherChanged;
+        sources.Locations.OnLocationChanged += HandleLocationChanged;
+        sources.Locations.OnSanctuaryChanged += HandleSanctuaryChanged;
+        sources.AreaText.OnAreaTextShown += HandleAreaTextShown;
+        sources.Zones.Arrived += OnArrived;
+        sources.Zones.LoggedOut += OnLoggedOut;
     }
 
     public void Dispose()
     {
-        Plugin.ClientState.Logout -= OnLogout;
-        Plugin.ClientState.ZoneInit -= OnZoneInit;
-
-        this.suppressor.OnAreaTextShown -= HandleAreaTextShown;
-        this.tracker.OnSanctuaryChanged -= HandleSanctuaryChanged;
-        this.tracker.OnLocationChanged -= HandleLocationChanged;
-        this.weatherTracker.OnWeatherChanged -= HandleWeatherChanged;
-        this.banners.OnBannerShown -= HandleBannerShown;
-
-        this.banners.Dispose();
-        this.weatherTracker.Dispose();
-        this.tracker.Dispose();
+        this.sources.Zones.LoggedOut -= OnLoggedOut;
+        this.sources.Zones.Arrived -= OnArrived;
+        this.sources.AreaText.OnAreaTextShown -= HandleAreaTextShown;
+        this.sources.Locations.OnSanctuaryChanged -= HandleSanctuaryChanged;
+        this.sources.Locations.OnLocationChanged -= HandleLocationChanged;
+        this.sources.Weather.OnWeatherChanged -= HandleWeatherChanged;
+        this.sources.Banners.OnBannerShown -= HandleBannerShown;
     }
 
     public void PushPreview()
     {
-        var names = PlaceNameResolver.Resolve(this.tracker.Current);
+        var names = this.sources.PlaceNames.Resolve(this.sources.Locations.Current);
 
         this.sink.Push(
             names.Area ?? names.Place ?? "Middle La Noscea",
@@ -71,8 +54,8 @@ internal sealed class AnnouncementCoordinator : IDisposable
         if (!this.config.WeatherNotificationEnabled)
             return;
 
-        var current = WeatherNameResolver.Resolve(this.weatherTracker.Current)
-                      ?? WeatherNameResolver.Resolve(1);
+        var current = this.sources.WeatherNames.Resolve(this.sources.Weather.Current)
+                      ?? this.sources.WeatherNames.Resolve(1);
 
         if (current is not { } weather)
             return;
@@ -85,17 +68,17 @@ internal sealed class AnnouncementCoordinator : IDisposable
         if (!this.config.WeatherNotificationEnabled)
             return;
 
-        if (WeatherNameResolver.Forecast(territoryTypeId, DateTimeOffset.UtcNow) is not { } weather)
+        if (this.sources.WeatherNames.Forecast(territoryTypeId, DateTimeOffset.UtcNow) is not { } weather)
             return;
 
-        this.weatherTracker.Prime(weather.Id);
+        this.sources.Weather.Prime(weather.Id);
 
         this.sink.PushWeather(weather.Name, weather.IconId);
     }
 
     private void HandleBannerShown(uint iconId, string text)
     {
-        Plugin.Log.Debug($"Banner [{iconId}]: {text}");
+        Log.Debug($"Banner [{iconId}]: {text}");
 
         this.sink.Push(null, text.ToUpperInvariant());
     }
@@ -105,48 +88,44 @@ internal sealed class AnnouncementCoordinator : IDisposable
         if (!this.gate.ShouldAnnounceWeather())
             return;
 
-        if (WeatherNameResolver.Resolve(weatherId) is not { } weather)
+        if (this.sources.WeatherNames.Resolve(weatherId) is not { } weather)
             return;
 
         this.sink.PushWeather(weather.Name, weather.IconId);
     }
 
-    private void OnLogout(int type, int code)
+    private void OnLoggedOut()
     {
         this.gate.Reset();
-        this.weatherTracker.Reset();
+        this.sources.Weather.Reset();
     }
 
-    private void OnZoneInit(ZoneInitEventArgs args)
+    private void OnArrived(ZoneArrival arrival)
     {
-        if (args.TerritoryType.ValueNullable is not { } territory)
+        if (!this.gate.ShouldAnnounceZoneEntry(arrival.IsPvp, arrival.IsDuty))
             return;
 
-        var isDuty = args.ContentFinderCondition.RowId != 0;
-        if (!this.gate.ShouldAnnounceZoneEntry(territory.IsPvpZone, isDuty))
-            return;
-
-        var text = PlaceNameResolver.Resolve(territory.PlaceName.RowId)
-                   ?? PlaceNameResolver.Resolve(territory.PlaceNameZone.RowId);
+        var text = this.sources.PlaceNames.Resolve(arrival.PlaceNameId)
+                   ?? this.sources.PlaceNames.Resolve(arrival.ZonePlaceNameId);
 
         if (string.IsNullOrWhiteSpace(text))
             return;
 
-        var header = HeaderOrNull(PlaceNameResolver.Resolve(territory.PlaceNameRegion.RowId), text);
+        var header = HeaderOrNull(this.sources.PlaceNames.Resolve(arrival.RegionPlaceNameId), text);
 
-        Plugin.Log.Debug($"ZoneInit [{territory.RowId}]: {header} / {text} (duty={isDuty})");
+        Log.Debug($"Arrived [{arrival.TerritoryTypeId}]: {header} / {text} (duty={arrival.IsDuty})");
 
         this.sink.Push(header, text);
         this.gate.MarkZoneAnnounced(this.sink.Timing);
 
-        AnnounceArrivalWeather(territory.RowId);
+        AnnounceArrivalWeather(arrival.TerritoryTypeId);
     }
 
     private void HandleAreaTextShown(string? nativeText)
     {
         if (string.IsNullOrWhiteSpace(nativeText))
         {
-            this.tracker.Poll();
+            this.sources.Locations.Poll();
             return;
         }
 
@@ -154,14 +133,14 @@ internal sealed class AnnouncementCoordinator : IDisposable
         this.lastNativeAreaText = nativeText;
         try
         {
-            this.tracker.Poll();
+            this.sources.Locations.Poll();
 
             if (this.pendingNativeAreaText is not null && this.gate.ShouldAnnounceNativeAreaText())
             {
-                Plugin.Log.Debug($"Native area text only (TerritoryInfo unchanged): {nativeText}");
+                Log.Debug($"Native area text only (TerritoryInfo unchanged): {nativeText}");
                 this.sink.Push(null, nativeText);
                 this.gate.MarkAnnounced(
-                    this.tracker.Current, LocationTier.SubArea, this.sink.Timing);
+                    this.sources.Locations.Current, LocationTier.SubArea, this.sink.Timing);
             }
         }
         finally
@@ -175,7 +154,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
         if (!this.gate.ShouldAnnounceSanctuary())
             return;
 
-        var names = PlaceNameResolver.Resolve(this.tracker.Current);
+        var names = this.sources.PlaceNames.Resolve(this.sources.Locations.Current);
 
         var text = inSanctuary
             ? names.SubArea ?? names.Area ?? this.lastNativeAreaText
@@ -187,24 +166,24 @@ internal sealed class AnnouncementCoordinator : IDisposable
         var parent = inSanctuary ? names.Area ?? names.Place : names.Place;
         var header = HeaderOrNull(parent, text);
 
-        Plugin.Log.Debug($"Sanctuary {(inSanctuary ? "entered" : "left")}: {header} / {text}");
+        Log.Debug($"Sanctuary {(inSanctuary ? "entered" : "left")}: {header} / {text}");
 
         this.sink.Push(header, text);
-        this.gate.MarkAnnounced(this.tracker.Current, LocationTier.SubArea, this.sink.Timing);
+        this.gate.MarkAnnounced(this.sources.Locations.Current, LocationTier.SubArea, this.sink.Timing);
     }
 
     private void HandleLocationChanged(LocationSnapshot previous, LocationSnapshot current)
     {
         var tier = current.DiffTier(previous);
-        var names = PlaceNameResolver.Resolve(current);
+        var names = this.sources.PlaceNames.Resolve(current);
 
-        Plugin.Log.Debug(
+        Log.Debug(
             $"Location changed [{tier}]: {names.Region} / {names.Zone} / {names.Place} " +
             $"/ {names.Area} / {names.SubArea} " +
             $"[ids {current.TerritoryTypeId}/{current.RegionPlaceNameId}/{current.ZonePlaceNameId}" +
             $"/{current.PlacePlaceNameId}/{current.AreaPlaceNameId}/{current.SubAreaPlaceNameId}]");
 
-        if (!this.gate.ShouldAnnounce(previous, current, tier, this.tracker.Speed))
+        if (!this.gate.ShouldAnnounce(previous, current, tier, this.sources.Locations.Speed))
             return;
 
         var (header, text) = BuildNotificationText(tier, names);
@@ -245,7 +224,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
         if (string.Equals(text, native, StringComparison.OrdinalIgnoreCase))
             return (header, text);
 
-        Plugin.Log.Debug($"TerritoryInfo says \"{text}\", the game says \"{native}\" — taking the game's.");
+        Log.Debug($"TerritoryInfo says \"{text}\", the game says \"{native}\" — taking the game's.");
 
         var parent = names.Area is not null
                      && !string.Equals(names.Area, native, StringComparison.OrdinalIgnoreCase)

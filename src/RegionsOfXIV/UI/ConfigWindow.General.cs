@@ -15,20 +15,20 @@ internal sealed partial class ConfigWindow
 
         var changed = false;
 
-        changed |= Slider("Vertical position",
-            () => this.config.VerticalPosition, v => this.config.VerticalPosition = v, 0f, 100f, "%.0f%%");
+        this.config.VerticalPosition = Slider(
+            "Vertical position", this.config.VerticalPosition, 0f, 100f, "%.0f%%", ref changed);
 
-        changed |= Slider("Horizontal position",
-            () => this.config.HorizontalPosition, v => this.config.HorizontalPosition = v, 0f, 100f, "%.0f%%");
+        this.config.HorizontalPosition = Slider(
+            "Horizontal position", this.config.HorizontalPosition, 0f, 100f, "%.0f%%", ref changed);
         Tooltip(
             "The text is centred on this point, so 50% is the middle of the screen.\n" +
             "A long place name set near either end will reach past it.");
 
-        changed |= Slider("Font size",
-            () => this.config.DisplayFontSize, v => this.config.DisplayFontSize = v, 24f, 140f, "%.0f px");
+        this.config.DisplayFontSize = Slider(
+            "Font size", this.config.DisplayFontSize, 24f, 140f, "%.0f px", ref changed);
 
-        changed |= Choice("Font",
-            () => this.config.DisplayFont, v => this.config.DisplayFont = v, Label);
+        this.config.DisplayFont = Choice(
+            "Font", this.config.DisplayFont, Label, ref changed);
         Tooltip(
             "Noto Sans CJK is vector — sharp at any size, and it covers every language.\n\n"
             + "The game's own faces suit FFXIV better, but each is a bitmap with a ceiling:\n"
@@ -38,18 +38,19 @@ internal sealed partial class ConfigWindow
 
         DrawFontWarnings();
 
-        changed |= Slider("Letter spacing",
-            () => this.config.LetterSpacing, v => this.config.LetterSpacing = v, 0f, 30f, "%.0f%%");
+        this.config.LetterSpacing = Slider(
+            "Letter spacing", this.config.LetterSpacing, 0f, 30f, "%.0f%%", ref changed);
         Tooltip(
             "Extra space between letters, as a percentage of the font size, so it keeps\n" +
             "its proportions when the size changes and the header gets its own share.\n" +
             "Wide spacing is much of what gives the Guild Wars 2 original its look.");
 
-        changed |= Checkbox("Uppercase",
-            () => this.config.UppercaseText, v => this.config.UppercaseText = v);
+        this.config.UppercaseText = Checkbox(
+            "Uppercase", this.config.UppercaseText, ref changed);
 
-        var restart = Checkbox("Decode from Eorzean script",
-            () => this.config.DecodeEffectEnabled, v => this.config.DecodeEffectEnabled = v);
+        var restart = false;
+        this.config.DecodeEffectEnabled = Checkbox(
+            "Decode from Eorzean script", this.config.DecodeEffectEnabled, ref restart);
         Tooltip(
             "Requires a bundled Eorzean font. Latin text only.\n\n" +
             "Runs after the motion on the Effects tab rather than alongside it:\n" +
@@ -57,18 +58,17 @@ internal sealed partial class ConfigWindow
             "arrives already readable. Presets leave this alone, so switching it\n" +
             "off here switches it off for all of them.");
 
-        changed |= ColorPicker("Text colour",
-            () => this.config.TextColor, v => this.config.TextColor = v);
+        this.config.TextColor = ColorPicker(
+            "Text colour", this.config.TextColor, ref changed);
 
-        changed |= ColorPicker("Header colour",
-            () => this.config.HeaderColor, v => this.config.HeaderColor = v);
+        this.config.HeaderColor = ColorPicker(
+            "Header colour", this.config.HeaderColor, ref changed);
 
-        changed |= ColorPicker("Outline colour",
-            () => this.config.StrokeColor, v => this.config.StrokeColor = v);
+        this.config.StrokeColor = ColorPicker(
+            "Outline colour", this.config.StrokeColor, ref changed);
 
-        changed |= Checkbox("Colour each line separately",
-            () => this.config.SeparateLineColors,
-            v => this.config.SeparateLineColors = v);
+        this.config.SeparateLineColors = Checkbox(
+            "Colour each line separately", this.config.SeparateLineColors, ref changed);
 
         Tooltip(
             "Off, the weather line follows the header, and one outline colour\n" +
@@ -79,23 +79,22 @@ internal sealed partial class ConfigWindow
 
         using (ImRaii.Disabled(!this.config.SeparateLineColors))
         {
-            changed |= ColorPicker("Weather colour",
-                () => this.config.WeatherColor, v => this.config.WeatherColor = v);
+            this.config.WeatherColor = ColorPicker(
+            "Weather colour", this.config.WeatherColor, ref changed);
 
-            changed |= ColorPicker("Header outline colour",
-                () => this.config.HeaderStrokeColor, v => this.config.HeaderStrokeColor = v);
+            this.config.HeaderStrokeColor = ColorPicker(
+            "Header outline colour", this.config.HeaderStrokeColor, ref changed);
 
-            changed |= ColorPicker("Weather outline colour",
-                () => this.config.WeatherStrokeColor, v => this.config.WeatherStrokeColor = v);
+            this.config.WeatherStrokeColor = ColorPicker(
+            "Weather outline colour", this.config.WeatherStrokeColor, ref changed);
         }
 
-        changed |= Slider("Outline thickness",
-            () => this.config.StrokeThickness, v => this.config.StrokeThickness = v, 0f, 4f, "%.1f px");
+        this.config.StrokeThickness = Slider(
+            "Outline thickness", this.config.StrokeThickness, 0f, 4f, "%.1f px", ref changed);
         Tooltip("Zero turns the outline off.");
 
-        changed |= Checkbox("Show header",
-            () => this.config.IncludeParentTierAsHeader,
-            v => this.config.IncludeParentTierAsHeader = v);
+        this.config.IncludeParentTierAsHeader = Checkbox(
+            "Show header", this.config.IncludeParentTierAsHeader, ref changed);
 
         Tooltip(
             "The smaller line above the name, giving where the place sits: the region\n" +
@@ -104,22 +103,22 @@ internal sealed partial class ConfigWindow
             "it on, is unaffected — as are the two settings below, which still apply\n" +
             "to it.");
 
-        changed |= Checkbox("Underline header",
-            () => this.config.UnderlineHeader, v => this.config.UnderlineHeader = v);
+        this.config.UnderlineHeader = Checkbox(
+            "Underline header", this.config.UnderlineHeader, ref changed);
 
-        changed |= Checkbox("Overlap header",
-            () => this.config.OverlapHeader, v => this.config.OverlapHeader = v);
+        this.config.OverlapHeader = Checkbox(
+            "Overlap header", this.config.OverlapHeader, ref changed);
 
         ImGui.Separator();
 
-        changed |= Checkbox("Hide during combat",
-            () => this.config.HideInCombat, v => this.config.HideInCombat = v);
+        this.config.HideInCombat = Checkbox(
+            "Hide during combat", this.config.HideInCombat, ref changed);
 
-        changed |= Checkbox("Hide inside duties",
-            () => this.config.HideInDuty, v => this.config.HideInDuty = v);
+        this.config.HideInDuty = Checkbox(
+            "Hide inside duties", this.config.HideInDuty, ref changed);
 
-        changed |= Checkbox("Skip sub-areas while travelling quickly",
-            () => this.config.HideWhileTravellingFast, v => this.config.HideWhileTravellingFast = v);
+        this.config.HideWhileTravellingFast = Checkbox(
+            "Skip sub-areas while travelling quickly", this.config.HideWhileTravellingFast, ref changed);
         Tooltip(
             "Only affects sub-areas, and only above a speed no ground travel reaches,\n" +
             "so it comes into play when flying. Zone and area changes are always\n" +

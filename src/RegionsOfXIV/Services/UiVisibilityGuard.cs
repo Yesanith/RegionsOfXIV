@@ -40,7 +40,7 @@ internal sealed class UiVisibilityGuard : IDisposable
 
         if (loading)
         {
-            Plugin.Log.Debug(
+            Log.Debug(
                 "Loading screen up, suspending automatic UI hide " +
                 $"(gameUiHidden={Plugin.GameGui.GameUiHidden}, " +
                 $"cutscene={Plugin.PluginInterface.UiBuilder.CutsceneActive}, " +

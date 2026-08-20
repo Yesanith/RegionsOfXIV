@@ -120,8 +120,27 @@ The tests need neither the game nor Dalamud, so they run anywhere the SDK does:
 dotnet test RegionsOfXIV.sln -c Release
 ```
 
-How the four detection sources fit together, and where each piece lives, is
-documented in the source itself — start at `Services/AnnouncementCoordinator.cs`.
+### How it fits together
+
+`Services/AnnouncementCoordinator.cs` is the brain: everything that decides *what*
+gets announced and *when* lives there, and it is where to start reading.
+
+It never touches the game directly. Everything it listens to arrives through a
+small interface — arrivals, movement, weather, banners, the game's own area text,
+and the two name lookups — bundled as `AnnouncementSources`. `Plugin.cs` is the
+only place that knows which real implementation goes with which, and the tests
+hand it fakes instead. That is why the announcement rules can be exercised without
+launching the game.
+
+| Layer | What lives there |
+| --- | --- |
+| `Services/` | detection, decisions, game data. Never draws, never references `UI` |
+| `UI/` | windows, the overlay, and the glyph painting |
+| `Models/` | the few plain records both sides pass around |
+
+The plugin draws its own text glyph by glyph rather than handing ImGui a string,
+because the effects animate each letter separately. `UI/NotificationRenderer.cs`
+decides where a line goes; `UI/NotificationRenderer.Runs.cs` paints it.
 
 ## Feedback
 

@@ -7,13 +7,13 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace RegionsOfXIV.Services;
 
-internal sealed class BannerWatcher : IDisposable
+internal sealed class BannerWatcher : IBannerSource, IDisposable
 {
     private static readonly string[] ImageAddons = ["_Image", "_Image2", "_Image3", "_Image4"];
 
     private readonly Configuration config;
 
-    private readonly Dictionary<string, uint> showing = [];
+    private readonly Dictionary<nint, uint> showing = [];
 
     private static readonly HashSet<uint> Unnamed = [];
 
@@ -35,6 +35,7 @@ internal sealed class BannerWatcher : IDisposable
         if (addon == null)
             return;
 
+        var which = (nint)addon;
         var icon = addon->IsVisible ? IconOf(addon->ImageNode) : 0;
 
         var name = icon == 0 ? null : BannerNameResolver.Resolve(icon);
@@ -43,10 +44,10 @@ internal sealed class BannerWatcher : IDisposable
         if (taking && this.config.HideNativeBanner)
             Hide(addon);
 
-        if (this.showing.TryGetValue(args.AddonName, out var last) && last == icon)
+        if (this.showing.TryGetValue(which, out var last) && last == icon)
             return;
 
-        this.showing[args.AddonName] = icon;
+        this.showing[which] = icon;
 
         if (taking)
         {
@@ -55,7 +56,7 @@ internal sealed class BannerWatcher : IDisposable
         }
 
         if (icon != 0 && name == null && Unnamed.Add(icon))
-            Plugin.Log.Information(
+            Log.Information(
                 $"Banner icon {icon} appeared on {args.AddonName} with no name for it yet. "
                 + "Report this id and it can be added.");
     }
