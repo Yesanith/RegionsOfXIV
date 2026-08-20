@@ -51,6 +51,8 @@ public sealed class Plugin : IDalamudPlugin
         this.overlay = new NotificationOverlay(this.config, this.fonts);
         this.coordinator = new AnnouncementCoordinator(this.config, this.nativeUiSuppressor, this.overlay);
 
+        this.changelogWindow = new ChangelogWindow();
+
         this.configWindow = new ConfigWindow(
             this.config,
             new ConfigActions(
@@ -58,10 +60,9 @@ public sealed class Plugin : IDalamudPlugin
                 this.overlay.TouchPreview,
                 this.overlay.HoldPreview,
                 RebuildFonts,
+                this.changelogWindow.ShowAll,
                 this.nativeUiSuppressor.RestoreAreaText,
                 this.nativeUiSuppressor.RestoreLoadingTitle));
-
-        this.changelogWindow = new ChangelogWindow();
 
         this.windowSystem.AddWindow(this.overlay);
         this.windowSystem.AddWindow(this.configWindow);

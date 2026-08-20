@@ -17,6 +17,7 @@ internal readonly record struct ConfigActions(
     Action<PreviewSample> LivePreview,
     Action<bool, PreviewSample> HoldPreview,
     Action RebuildFonts,
+    Action ShowChangelog,
     Action RestoreNativeAreaText,
     Action RestoreNativeLoadingTitle);
 
@@ -28,7 +29,7 @@ internal sealed partial class ConfigWindow : Window, IDisposable
     private bool editing;
 
     public ConfigWindow(Configuration config, ConfigActions actions)
-        : base("Regions of XIV###RegionsOfXIVConfig")
+        : base($"Regions of XIV v{Changelog.Current}###RegionsOfXIVConfig")
     {
         this.config = config;
         this.actions = actions;
@@ -64,6 +65,7 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         DrawPresetsTab();
         DrawNotificationsTab();
         DrawDurationsTab();
+        DrawAboutTab();
     }
 
     private void DrawEditingToggle()
@@ -203,6 +205,14 @@ internal sealed partial class ConfigWindow : Window, IDisposable
     }
 
     private const float TooltipWidthInEm = 35f;
+
+    /// <summary>Muted text that wraps, which TextDisabled on its own does not.</summary>
+    private static void DisabledWrapped(string text)
+    {
+        using var color = ImRaii.PushColor(ImGuiCol.Text, ImGui.GetColorU32(ImGuiCol.TextDisabled));
+
+        ImGui.TextWrapped(text);
+    }
 
     private static void Tooltip(string text)
     {

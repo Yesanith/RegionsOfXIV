@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Dalamud.Interface.Animation;
 using Dalamud.Interface.Animation.EasingFunctions;
 
@@ -16,7 +16,8 @@ internal enum NotificationPhase
 
 internal sealed class AreaNotification
 {
-    private static readonly TimeSpan HoldDuration = TimeSpan.FromMilliseconds(200);
+    /// <summary>The beat between the letters landing and the decode starting.</summary>
+    public static readonly TimeSpan HoldDuration = TimeSpan.FromMilliseconds(200);
 
     private readonly Easing fadeIn;
     private readonly Easing? motion;

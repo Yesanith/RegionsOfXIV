@@ -132,7 +132,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
         Plugin.Log.Debug($"ZoneInit [{territory.RowId}]: {header} / {text} (duty={isDuty})");
 
         this.sink.Push(header, text);
-        this.gate.MarkZoneAnnounced(this.sink.EstimatedDuration);
+        this.gate.MarkZoneAnnounced(this.sink.Timing);
 
         AnnounceArrivalWeather(territory.RowId);
     }
@@ -156,7 +156,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
                 Plugin.Log.Debug($"Native area text only (TerritoryInfo unchanged): {nativeText}");
                 this.sink.Push(null, nativeText);
                 this.gate.MarkAnnounced(
-                    this.tracker.Current, LocationTier.SubArea, this.sink.EstimatedDuration);
+                    this.tracker.Current, LocationTier.SubArea, this.sink.Timing);
             }
         }
         finally
@@ -185,7 +185,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
         Plugin.Log.Debug($"Sanctuary {(inSanctuary ? "entered" : "left")}: {header} / {text}");
 
         this.sink.Push(header, text);
-        this.gate.MarkAnnounced(this.tracker.Current, LocationTier.SubArea, this.sink.EstimatedDuration);
+        this.gate.MarkAnnounced(this.tracker.Current, LocationTier.SubArea, this.sink.Timing);
     }
 
     private void HandleLocationChanged(LocationSnapshot previous, LocationSnapshot current)
@@ -209,7 +209,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
             return;
 
         this.sink.Push(header, text);
-        this.gate.MarkAnnounced(current, tier, this.sink.EstimatedDuration);
+        this.gate.MarkAnnounced(current, tier, this.sink.Timing);
     }
 
     private (string? Header, string Text) BuildNotificationText(

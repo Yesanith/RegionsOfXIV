@@ -54,14 +54,24 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         this.previewHeld = false;
     }
 
-    public TimeSpan EstimatedDuration =>
-        (this.config.Motion == MotionEffect.None
-            ? this.config.FadeInDuration
-            : Longer(this.config.FadeInDuration, this.config.MotionDuration))
-        + TimeSpan.FromMilliseconds(200)
-        + (this.renderer.IsDecoding ? this.config.RevealDuration : TimeSpan.Zero)
-        + this.config.ShowDuration
-        + this.config.FadeOutDuration;
+    public NotificationTiming Timing
+    {
+        get
+        {
+            // The motion runs alongside the fade in, so arriving takes the longer of the two.
+            var arriving = this.config.Motion == MotionEffect.None
+                ? this.config.FadeInDuration
+                : Longer(this.config.FadeInDuration, this.config.MotionDuration);
+
+            var readable = arriving
+                           + AreaNotification.HoldDuration
+                           + (this.renderer.IsDecoding ? this.config.RevealDuration : TimeSpan.Zero);
+
+            return new NotificationTiming(
+                readable,
+                readable + this.config.ShowDuration + this.config.FadeOutDuration);
+        }
+    }
 
     public void Push(string? header, string text)
     {

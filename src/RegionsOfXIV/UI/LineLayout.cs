@@ -1,29 +1,34 @@
-namespace RegionsOfXIV.UI;
+﻿namespace RegionsOfXIV.UI;
 
 internal sealed class LineLayout
 {
     private string? text;
     private float tracking;
     private float centerX;
+    private float scale = 1f;
     private int generation = -1;
 
     private float[] positions = [];
 
-    public bool IsCurrent(string line, float tracking, float centerX, int generation) =>
+    public bool IsCurrent(string line, float tracking, float centerX, float scale, int generation) =>
         ReferenceEquals(this.text, line)
         && this.tracking == tracking
         && this.centerX == centerX
+        && this.scale == scale
         && this.generation == generation;
 
     public float[] Positions => this.positions;
 
     public float Width { get; private set; }
 
-    public void Store(string line, float tracking, float centerX, int generation, float[] positions, float width)
+    public void Store(
+        string line, float tracking, float centerX, float scale, int generation,
+        float[] positions, float width)
     {
         this.text = line;
         this.tracking = tracking;
         this.centerX = centerX;
+        this.scale = scale;
         this.generation = generation;
         this.positions = positions;
         Width = width;
