@@ -15,19 +15,20 @@ internal sealed partial class ConfigWindow
             "it. If you turn the suppression below off, the game's version comes back.");
         ImGui.Separator();
 
-        var changed = Checkbox("Zone changes",
-            () => this.config.ZoneNotificationEnabled, v => this.config.ZoneNotificationEnabled = v);
+        var changed = false;
+        this.config.ZoneNotificationEnabled = Checkbox(
+            "Zone changes", this.config.ZoneNotificationEnabled, ref changed);
 
-        changed |= Checkbox("Area changes",
-            () => this.config.AreaNotificationEnabled, v => this.config.AreaNotificationEnabled = v);
+        this.config.AreaNotificationEnabled = Checkbox(
+            "Area changes", this.config.AreaNotificationEnabled, ref changed);
 
-        changed |= Checkbox("Sub-area changes",
-            () => this.config.SubAreaNotificationEnabled, v => this.config.SubAreaNotificationEnabled = v);
+        this.config.SubAreaNotificationEnabled = Checkbox(
+            "Sub-area changes", this.config.SubAreaNotificationEnabled, ref changed);
 
         ImGui.Separator();
 
-        changed |= Checkbox("Weather changes",
-            () => this.config.WeatherNotificationEnabled, v => this.config.WeatherNotificationEnabled = v);
+        this.config.WeatherNotificationEnabled = Checkbox(
+            "Weather changes", this.config.WeatherNotificationEnabled, ref changed);
 
         Tooltip(
             "Announces the weather turning over, on its own line just above the "
@@ -38,16 +39,16 @@ internal sealed partial class ConfigWindow
 
         using (ImRaii.Disabled(!this.config.WeatherNotificationEnabled))
         {
-            changed |= Checkbox("Show the weather icon",
-                () => this.config.ShowWeatherIcon, v => this.config.ShowWeatherIcon = v);
+            this.config.ShowWeatherIcon = Checkbox(
+                "Show the weather icon", this.config.ShowWeatherIcon, ref changed);
         }
 
         Tooltip("Draws the game's own icon for the weather to the left of its name.");
 
         ImGui.Separator();
 
-        changed |= Checkbox("Banners",
-            () => this.config.BannerNotificationEnabled, v => this.config.BannerNotificationEnabled = v);
+        this.config.BannerNotificationEnabled = Checkbox(
+            "Banners", this.config.BannerNotificationEnabled, ref changed);
 
         Tooltip(
             "Redraws the game's full-screen banners — \"Quest Accepted\", "
@@ -58,8 +59,8 @@ internal sealed partial class ConfigWindow
 
         using (ImRaii.Disabled(!this.config.BannerNotificationEnabled))
         {
-            changed |= Checkbox("Hide the game's own banner",
-                () => this.config.HideNativeBanner, v => this.config.HideNativeBanner = v);
+            this.config.HideNativeBanner = Checkbox(
+            "Hide the game's own banner", this.config.HideNativeBanner, ref changed);
         }
 
         Tooltip(
@@ -69,8 +70,10 @@ internal sealed partial class ConfigWindow
 
         ImGui.Separator();
 
-        if (Checkbox("Hide the game's own area text",
-                () => this.config.HideNativeAreaText, v => this.config.HideNativeAreaText = v))
+        var toggled = false;
+        this.config.HideNativeAreaText = Checkbox("Hide the game's own area text", this.config.HideNativeAreaText, ref toggled);
+
+        if (toggled)
         {
             changed = true;
 
@@ -80,8 +83,11 @@ internal sealed partial class ConfigWindow
 
         Tooltip("Suppresses the native \"_AreaText\" flash, which draws underneath this plugin.");
 
-        if (Checkbox("Hide the loading-screen zone title",
-                () => this.config.HideNativeLoadingTitle, v => this.config.HideNativeLoadingTitle = v))
+        var titleToggled = false;
+        this.config.HideNativeLoadingTitle = Checkbox(
+            "Hide the loading-screen zone title", this.config.HideNativeLoadingTitle, ref titleToggled);
+
+        if (titleToggled)
         {
             changed = true;
 

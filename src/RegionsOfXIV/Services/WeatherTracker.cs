@@ -3,7 +3,7 @@ using FFXIVClientStructs.FFXIV.Client.Graphics.Environment;
 
 namespace RegionsOfXIV.Services;
 
-internal sealed class WeatherTracker : IDisposable
+internal sealed class WeatherTracker : IWeatherSource, IDisposable
 {
     private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(1);
 

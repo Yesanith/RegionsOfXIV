@@ -4,6 +4,21 @@ using Dalamud.Bindings.ImGui;
 
 namespace RegionsOfXIV.UI;
 
+internal readonly record struct Shadow(uint Color, Vector2 Offset, float Spread)
+{
+    public static readonly Shadow None = default;
+
+    public bool IsVisible =>
+        (this.Color >> 24) != 0u && (this.Offset != Vector2.Zero || this.Spread > 0f);
+}
+
+internal readonly record struct Ink(uint Fill, uint Stroke, float StrokeDistance, Shadow Shadow)
+{
+    public bool HasStroke => this.StrokeDistance > 0f && (this.Stroke >> 24) != 0u;
+
+    public bool HasFill => (this.Fill >> 24) != 0u;
+}
+
 internal static class GlyphPainter
 {
     private static readonly Vector2[] StrokeOffsets =
@@ -17,36 +32,45 @@ internal static class GlyphPainter
         ImDrawListPtr drawList,
         Vector2 position,
         ReadOnlySpan<char> text,
-        uint fillColor,
-        uint strokeColor,
-        float strokeDistance,
+        in Ink ink,
         float scale = 1f)
     {
-        if (text.IsEmpty)
+        if (text.IsEmpty || (!ink.HasFill && !ink.HasStroke && !ink.Shadow.IsVisible))
             return;
 
-        if (scale < 1f)
-        {
-            var font = ImGui.GetFont();
-            var size = ImGui.GetFontSize() * scale;
+        var font = ImGui.GetFont();
+        var size = ImGui.GetFontSize() * scale;
 
-            if (strokeDistance > 0f)
-            {
-                foreach (var offset in StrokeOffsets)
-                    drawList.AddText(font, size, position + (offset * strokeDistance), strokeColor, text);
-            }
+        if (ink.Shadow.IsVisible)
+            DrawShadow(drawList, font, size, position, text, ink.Shadow);
 
-            drawList.AddText(font, size, position, fillColor, text);
-            return;
-        }
-
-        if (strokeDistance > 0f)
+        if (ink.HasStroke)
         {
             foreach (var offset in StrokeOffsets)
-                drawList.AddText(position + (offset * strokeDistance), strokeColor, text);
+                drawList.AddText(font, size, position + (offset * ink.StrokeDistance), ink.Stroke, text);
         }
 
-        drawList.AddText(position, fillColor, text);
+        if (ink.HasFill)
+            drawList.AddText(font, size, position, ink.Fill, text);
+    }
+
+    private static void DrawShadow(
+        ImDrawListPtr drawList,
+        ImFontPtr font,
+        float size,
+        Vector2 position,
+        ReadOnlySpan<char> text,
+        in Shadow shadow)
+    {
+        var at = position + shadow.Offset;
+
+        if (shadow.Spread > 0f)
+        {
+            foreach (var offset in StrokeOffsets)
+                drawList.AddText(font, size, at + (offset * shadow.Spread), shadow.Color, text);
+        }
+
+        drawList.AddText(font, size, at, shadow.Color, text);
     }
 
     public static float RunWidth(string text, float tracking)
@@ -63,13 +87,11 @@ internal static class GlyphPainter
         float[] positions,
         string text,
         float top,
-        uint fillColor,
-        uint strokeColor,
-        float strokeDistance,
+        in Ink ink,
         float scale = 1f)
     {
         for (var i = 0; i < text.Length; i++)
-            DrawGlyph(drawList, positions[i], top, text[i], fillColor, strokeColor, strokeDistance, scale);
+            DrawGlyph(drawList, positions[i], top, text[i], ink, scale);
     }
 
     public static void DrawUnderline(
@@ -78,8 +100,7 @@ internal static class GlyphPainter
         float y,
         float fullWidth,
         float progress,
-        uint fillColor,
-        uint borderColor,
+        in Ink ink,
         float thickness = 2f)
     {
         var width = fullWidth * float.Clamp(progress, 0f, 1f);
@@ -88,15 +109,22 @@ internal static class GlyphPainter
 
         var half = width / 2f;
 
-        drawList.AddRectFilled(
-            new Vector2(centerX - half - 1, y - 1),
-            new Vector2(centerX + half + 1, y + thickness + 1),
-            borderColor);
+        var topLeft = new Vector2(centerX - half, y);
+        var bottomRight = new Vector2(centerX + half, y + thickness);
+
+        if (ink.Shadow.IsVisible)
+        {
+            var drop = ink.Shadow.Offset + new Vector2(ink.Shadow.Spread);
+
+            drawList.AddRectFilled(topLeft + drop, bottomRight + drop, ink.Shadow.Color);
+        }
 
         drawList.AddRectFilled(
-            new Vector2(centerX - half, y),
-            new Vector2(centerX + half, y + thickness),
-            fillColor);
+            topLeft - Vector2.One,
+            bottomRight + Vector2.One,
+            ink.Stroke);
+
+        drawList.AddRectFilled(topLeft, bottomRight, ink.Fill);
     }
 
     public static float[] GlyphPositions(
@@ -131,8 +159,7 @@ internal static class GlyphPainter
         ImGui.ColorConvertFloat4ToU32(color with { W = color.W * alpha });
 
     public static void DrawGlyph(
-        ImDrawListPtr drawList, float x, float y, char glyph,
-        uint fill, uint stroke, float strokeDistance, float scale = 1f)
+        ImDrawListPtr drawList, float x, float y, char glyph, in Ink ink, float scale = 1f)
     {
         if (glyph == ' ')
             return;
@@ -140,6 +167,6 @@ internal static class GlyphPainter
         Span<char> one = stackalloc char[1];
         one[0] = glyph;
 
-        DrawStroked(drawList, new Vector2(x, y), one, fill, stroke, strokeDistance, scale);
+        DrawStroked(drawList, new Vector2(x, y), one, ink, scale);
     }
 }

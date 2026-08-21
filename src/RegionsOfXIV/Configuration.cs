@@ -9,7 +9,7 @@ namespace RegionsOfXIV;
 [Serializable]
 public class Configuration : IPluginConfiguration, IGateSettings
 {
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 2;
 
     public int Version { get; set; } = CurrentVersion;
 
@@ -41,9 +41,21 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
     public float DisplayFontSize { get; set; } = 91f;
 
+    public FontChoice DisplayFont { get; set; } = FontChoice.NotoSansCjk;
+
+    public string DisplayFontPath { get; set; } = string.Empty;
+
     public float HeaderFontSize { get; set; } = 24f;
 
-    public DisplayFontChoice DisplayFont { get; set; } = DisplayFontChoice.NotoSansCjk;
+    public FontChoice HeaderFont { get; set; } = FontChoice.Axis;
+
+    public string HeaderFontPath { get; set; } = string.Empty;
+
+    public float WeatherFontSize { get; set; } = 24f;
+
+    public FontChoice WeatherFont { get; set; } = FontChoice.Axis;
+
+    public string WeatherFontPath { get; set; } = string.Empty;
 
     public float LetterSpacing { get; set; } = 0f;
 
@@ -79,6 +91,16 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
     public float StrokeThickness { get; set; } = 1f;
 
+    public bool ShadowEnabled { get; set; } = false;
+
+    public Vector4 ShadowColor { get; set; } = new(0f, 0f, 0f, 0.65f);
+
+    public float ShadowOffsetX { get; set; } = 2f;
+
+    public float ShadowOffsetY { get; set; } = 2f;
+
+    public float ShadowSoftness { get; set; } = 0f;
+
     public List<UserPreset> UserPresets { get; set; } = [];
 
     public TimeSpan FadeInDuration { get; set; } = TimeSpan.FromSeconds(0.9);
@@ -97,6 +119,64 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
     public bool HideWhileTravellingFast { get; set; } = true;
 
+    public FontSetting FontFor(FontRole role) => role switch
+    {
+        FontRole.Header => new FontSetting(HeaderFont, HeaderFontPath, HeaderFontSize),
+        FontRole.Weather => new FontSetting(WeatherFont, WeatherFontPath, WeatherFontSize),
+        _ => new FontSetting(DisplayFont, DisplayFontPath, DisplayFontSize),
+    };
+
+    public void SetFontFor(FontRole role, in FontSetting setting)
+    {
+        switch (role)
+        {
+            case FontRole.Header:
+                (HeaderFont, HeaderFontPath, HeaderFontSize) = setting;
+                break;
+
+            case FontRole.Weather:
+                (WeatherFont, WeatherFontPath, WeatherFontSize) = setting;
+                break;
+
+            default:
+                (DisplayFont, DisplayFontPath, DisplayFontSize) = setting;
+                break;
+        }
+    }
+
+    public bool UsesCustomFont =>
+        DisplayFont == FontChoice.Custom
+        || HeaderFont == FontChoice.Custom
+        || WeatherFont == FontChoice.Custom;
+
+    public const float FaintAlpha = 12f / 255f;
+
+    public bool RepairFaintColors()
+    {
+        var defaults = new Configuration();
+        var repaired = false;
+
+        foreach (var property in ConfigurationCopy.Settings)
+        {
+            if (property.PropertyType != typeof(Vector4))
+                continue;
+
+            var colour = (Vector4)property.GetValue(this)!;
+            if (colour.W >= FaintAlpha)
+                continue;
+
+            var restored = ((Vector4)property.GetValue(defaults)!).W;
+
+            property.SetValue(this, colour with { W = restored });
+            repaired = true;
+
+            Log.Information(
+                $"{property.Name} was stored too faint to see, so its opacity was restored.");
+        }
+
+        return repaired;
+    }
+
     public bool Migrate()
     {
         if (Version == CurrentVersion)
@@ -104,7 +184,7 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
         if (Version > CurrentVersion)
         {
-            Plugin.Log.Warning(
+            Log.Warning(
                 $"The stored configuration is version {Version}, newer than this build understands " +
                 $"({CurrentVersion}). Reading what applies and leaving the file as it is.");
             return false;
@@ -112,8 +192,11 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
         var from = Version;
 
+        if (Version < 2)
+            WeatherFontSize = HeaderFontSize;
+
         Version = CurrentVersion;
-        Plugin.Log.Information($"Migrated the configuration from version {from} to {CurrentVersion}.");
+        Log.Information($"Migrated the configuration from version {from} to {CurrentVersion}.");
         return true;
     }
 

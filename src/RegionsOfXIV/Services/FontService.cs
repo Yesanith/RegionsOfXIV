@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Dalamud;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.GameFonts;
@@ -9,82 +10,187 @@ namespace RegionsOfXIV.Services;
 
 internal sealed class FontService : IDisposable
 {
+    private const long MaxCustomFontBytes = 64L * 1024 * 1024;
+
+    private static readonly string[] CustomFontExtensions = [".ttf", ".otf", ".ttc"];
+
+    private const FontChoice FallbackChoice = FontChoice.NotoSansCjk;
+
+    private const string CouldNotLoad =
+        "That file could not be read as a font, so the plugin is drawing with Noto Sans CJK instead.";
+
+    private static readonly FontRole[] Roles = Enum.GetValues<FontRole>();
+
     private readonly IFontAtlas atlas;
     private readonly Configuration config;
-
-    private IFontHandle? displayFont;
-    private IFontHandle? headerFont;
-    private IFontHandle? eorzeanDisplayFont;
-    private IFontHandle? eorzeanHeaderFont;
-
-    private float builtDisplaySize;
-    private float builtHeaderSize;
-    private DisplayFontChoice builtDisplayChoice;
+    private readonly Face[] faces;
 
     public FontService(Configuration config)
     {
         this.config = config;
         this.atlas = Plugin.PluginInterface.UiBuilder.FontAtlas;
+        this.faces = Roles.Select(_ => new Face()).ToArray();
     }
 
     public int Generation { get; private set; }
 
-    public IFontHandle Display => this.displayFont ?? Plugin.PluginInterface.UiBuilder.DefaultFontHandle;
+    public IFontHandle Display => Plain(FontRole.Text);
 
-    public IFontHandle Header => this.headerFont ?? Plugin.PluginInterface.UiBuilder.DefaultFontHandle;
+    public IFontHandle Header => Plain(FontRole.Header);
 
-    public IFontHandle? EorzeanDisplay => this.eorzeanDisplayFont;
+    public IFontHandle Weather => Plain(FontRole.Weather);
 
-    public IFontHandle? EorzeanHeader => this.eorzeanHeaderFont;
+    public IFontHandle? EorzeanDisplay => this.faces[(int)FontRole.Text].Eorzean;
 
-    public static float NativeCeilingPx(DisplayFontChoice choice) => choice switch
+    public IFontHandle? EorzeanHeader => this.faces[(int)FontRole.Header].Eorzean;
+
+    public IFontHandle? EorzeanWeather => this.faces[(int)FontRole.Weather].Eorzean;
+
+    public string? ProblemWith(FontRole role)
     {
-        DisplayFontChoice.NotoSansCjk => float.PositiveInfinity,
-        DisplayFontChoice.Jupiter => 46f * 4f / 3f,
-        DisplayFontChoice.Axis => 36f * 4f / 3f,
+        var face = this.faces[(int)role];
+
+        if (face.Problem != null)
+            return face.Problem;
+
+        return face.Plain?.LoadException == null ? null : CouldNotLoad;
+    }
+
+    public static float NativeCeilingPx(FontChoice choice) => choice switch
+    {
+        FontChoice.NotoSansCjk => float.PositiveInfinity,
+        FontChoice.Custom => float.PositiveInfinity,
+        FontChoice.Jupiter => 46f * 4f / 3f,
+        FontChoice.Axis => 36f * 4f / 3f,
         _ => 68f * 4f / 3f,
     };
 
-    public static bool IsLatinOnly(DisplayFontChoice choice) =>
-        choice is DisplayFontChoice.TrumpGothic or DisplayFontChoice.Jupiter;
+    public static bool IsLatinOnly(FontChoice choice) =>
+        choice is FontChoice.TrumpGothic or FontChoice.Jupiter;
 
-    public void Rebuild(float displaySizePx, float headerSizePx)
+    public static string? CustomFontProblem(string? path)
     {
-        var choice = this.config.DisplayFont;
+        if (string.IsNullOrWhiteSpace(path))
+            return "No font file has been chosen yet.";
 
-        if (Math.Abs(displaySizePx - this.builtDisplaySize) < 0.5f &&
-            Math.Abs(headerSizePx - this.builtHeaderSize) < 0.5f &&
-            choice == this.builtDisplayChoice)
-            return;
+        var extension = Path.GetExtension(path);
 
-        this.builtDisplaySize = displaySizePx;
-        this.builtHeaderSize = headerSizePx;
-        this.builtDisplayChoice = choice;
+        if (!CustomFontExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
+            return "Only .ttf, .otf and .ttc files can be used as fonts.";
 
-        Generation++;
+        FileInfo file;
 
-        DisposeHandles();
+        try
+        {
+            file = new FileInfo(path);
+        }
+        catch (Exception)
+        {
+            return "That path cannot be read.";
+        }
 
-        this.displayFont = BuildDisplayFont(choice, displaySizePx);
+        if (!file.Exists)
+            return "There is no file at that path any more.";
 
-        this.headerFont = this.atlas.NewGameFontHandle(
-            new GameFontStyle(GameFontFamily.Axis, headerSizePx));
+        if (file.Length == 0)
+            return "That file is empty.";
 
-        TryBuildEorzean(displaySizePx, headerSizePx);
+        if (file.Length > MaxCustomFontBytes)
+            return "That file is far larger than any font, so it is being left alone.";
+
+        return null;
     }
 
-    private IFontHandle BuildDisplayFont(DisplayFontChoice choice, float sizePx) =>
-        choice == DisplayFontChoice.NotoSansCjk
+    public void Rebuild()
+    {
+        var rebuilt = false;
+
+        foreach (var role in Roles)
+        {
+            var wanted = this.config.FontFor(role);
+            var face = this.faces[(int)role];
+
+            if (face.Matches(wanted))
+                continue;
+
+            Build(face, wanted);
+            rebuilt = true;
+        }
+
+        if (rebuilt)
+            Generation++;
+    }
+
+    private IFontHandle Plain(FontRole role)
+    {
+        var face = this.faces[(int)role];
+
+        if (face.Plain is { LoadException: null } handle)
+            return handle;
+
+        return face.Fallback ?? Plugin.PluginInterface.UiBuilder.DefaultFontHandle;
+    }
+
+    private void Build(Face face, FontSetting wanted)
+    {
+        face.Release();
+        face.Built = wanted;
+
+        if (wanted.IsCustom)
+        {
+            face.Problem = CustomFontProblem(wanted.Path);
+            face.Fallback = BuildStock(FallbackChoice, wanted.SizePx);
+
+            if (face.Problem == null)
+                face.Plain = BuildCustom(face, wanted.Path, wanted.SizePx);
+        }
+        else
+        {
+            face.Plain = BuildStock(wanted.Choice, wanted.SizePx);
+        }
+
+        face.Eorzean = BuildFromFile(BundledEorzeanPath(), wanted.SizePx);
+    }
+
+    private IFontHandle BuildStock(FontChoice choice, float sizePx) =>
+        choice == FontChoice.NotoSansCjk
             ? this.atlas.NewDelegateFontHandle(e => e.OnPreBuild(tk =>
                 tk.AddDalamudAssetFont(
                     DalamudAsset.NotoSansCjkMedium,
                     new SafeFontConfig { SizePx = sizePx, GlyphRanges = JapaneseGlyphRanges() })))
             : this.atlas.NewGameFontHandle(new GameFontStyle(ResolveGameFamily(choice), sizePx));
 
-    private static GameFontFamily ResolveGameFamily(DisplayFontChoice choice) => choice switch
+    private IFontHandle? BuildCustom(Face face, string path, float sizePx)
     {
-        DisplayFontChoice.Jupiter => GameFontFamily.Jupiter,
-        DisplayFontChoice.Axis => GameFontFamily.Axis,
+        var handle = BuildFromFile(path, sizePx);
+
+        if (handle == null)
+            face.Problem = CouldNotLoad;
+
+        return handle;
+    }
+
+    private IFontHandle? BuildFromFile(string? path, float sizePx)
+    {
+        if (path == null)
+            return null;
+
+        try
+        {
+            return this.atlas.NewDelegateFontHandle(
+                e => e.OnPreBuild(tk => tk.AddFontFromFile(path, new SafeFontConfig { SizePx = sizePx })));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"Could not load the font at {path}");
+            return null;
+        }
+    }
+
+    private static GameFontFamily ResolveGameFamily(FontChoice choice) => choice switch
+    {
+        FontChoice.Jupiter => GameFontFamily.Jupiter,
+        FontChoice.Axis => GameFontFamily.Axis,
         _ => GameFontFamily.TrumpGothic,
     };
 
@@ -108,34 +214,24 @@ internal sealed class FontService : IDisposable
         return CachedJapaneseGlyphRanges = ranges;
     }
 
-    private void TryBuildEorzean(float displaySizePx, float headerSizePx)
+    private static string? CachedEorzeanPath;
+    private static bool SearchedForEorzean;
+
+    private static string? BundledEorzeanPath()
     {
-        var path = FindBundledFont();
-        if (path == null)
-        {
-            Plugin.Log.Debug("No Eorzean font bundled; decode effect will fall back to a plain fade.");
-            return;
-        }
+        if (SearchedForEorzean)
+            return CachedEorzeanPath;
 
-        try
-        {
-            this.eorzeanDisplayFont = BuildEorzean(path, displaySizePx);
-            this.eorzeanHeaderFont = BuildEorzean(path, headerSizePx);
+        SearchedForEorzean = true;
+        CachedEorzeanPath = FindBundledFont();
 
-            Plugin.Log.Information($"Loaded Eorzean font from {path}");
-        }
-        catch (Exception ex)
-        {
-            Plugin.Log.Error(ex, $"Failed to load bundled Eorzean font from {path}");
+        if (CachedEorzeanPath == null)
+            Log.Debug("No Eorzean font bundled; the decode effect will fall back to a plain fade.");
+        else
+            Log.Information($"Loaded Eorzean font from {CachedEorzeanPath}");
 
-            this.eorzeanDisplayFont = null;
-            this.eorzeanHeaderFont = null;
-        }
+        return CachedEorzeanPath;
     }
-
-    private IFontHandle BuildEorzean(string path, float sizePx) =>
-        this.atlas.NewDelegateFontHandle(
-            e => e.OnPreBuild(tk => tk.AddFontFromFile(path, new SafeFontConfig { SizePx = sizePx })));
 
     private static string? FindBundledFont()
     {
@@ -157,18 +253,41 @@ internal sealed class FontService : IDisposable
         return null;
     }
 
-    private void DisposeHandles()
+    public void Dispose()
     {
-        this.displayFont?.Dispose();
-        this.headerFont?.Dispose();
-        this.eorzeanDisplayFont?.Dispose();
-        this.eorzeanHeaderFont?.Dispose();
-
-        this.displayFont = null;
-        this.headerFont = null;
-        this.eorzeanDisplayFont = null;
-        this.eorzeanHeaderFont = null;
+        foreach (var face in this.faces)
+            face.Release();
     }
 
-    public void Dispose() => DisposeHandles();
+    private sealed class Face
+    {
+        public IFontHandle? Plain;
+
+        public IFontHandle? Fallback;
+
+        public IFontHandle? Eorzean;
+
+        public string? Problem;
+
+        public FontSetting? Built;
+
+        public bool Matches(in FontSetting wanted) =>
+            this.Built is { } built
+            && built.Choice == wanted.Choice
+            && built.Path == wanted.Path
+            && Math.Abs(built.SizePx - wanted.SizePx) < 0.5f;
+
+        public void Release()
+        {
+            this.Plain?.Dispose();
+            this.Fallback?.Dispose();
+            this.Eorzean?.Dispose();
+
+            this.Plain = null;
+            this.Fallback = null;
+            this.Eorzean = null;
+            this.Problem = null;
+            this.Built = null;
+        }
+    }
 }

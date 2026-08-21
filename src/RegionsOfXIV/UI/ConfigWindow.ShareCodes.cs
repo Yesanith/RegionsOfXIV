@@ -1,6 +1,5 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility.Raii;
 
@@ -12,8 +11,6 @@ internal sealed partial class ConfigWindow
     private bool shareFailed;
     private DateTime shareStatusAt;
     private static readonly TimeSpan ShareStatusLinger = TimeSpan.FromSeconds(8);
-    private static readonly Vector4 ShareGood = new(0.45f, 0.85f, 0.45f, 1f);
-    private static readonly Vector4 ShareBad = new(1f, 0.42f, 0.42f, 1f);
 
     private bool DrawShareCodeRow()
     {
@@ -33,7 +30,7 @@ internal sealed partial class ConfigWindow
 
         Tooltip(named
             ? "Puts a code for everything as it stands right now on the clipboard,\n" +
-              $"under the name \"{this.newPresetName.Trim()}\"."
+              $"under the name \"{this.newPresetName.Trim()}\"." + CustomFontCodeNote()
             : "Type a name in the box above first — it travels with the code, and it\n" +
               "is all the person you send it to will have to go on.\n\n" +
               "To share a preset you have already saved, right-click it instead.");
@@ -61,8 +58,7 @@ internal sealed partial class ConfigWindow
         if (this.shareStatus.Length == 0 || DateTime.UtcNow - this.shareStatusAt > ShareStatusLinger)
             return;
 
-        using var color = ImRaii.PushColor(ImGuiCol.Text, this.shareFailed ? ShareBad : ShareGood);
-        ImGui.TextWrapped(this.shareStatus);
+        Warn(this.shareFailed ? FaultColor : GoodColor, this.shareStatus);
     }
 
     private void Report(string message, bool failed)
@@ -82,7 +78,7 @@ internal sealed partial class ConfigWindow
         }
         catch (Exception ex)
         {
-            Plugin.Log.Debug(ex, "Could not read the clipboard.");
+            Log.Debug(ex, "Could not read the clipboard.");
             Report("Could not read the clipboard. Try again in a moment.", failed: true);
             return false;
         }
@@ -104,7 +100,10 @@ internal sealed partial class ConfigWindow
         this.config.UserPresets.Add(preset);
         preset.ApplyTo(this.config);
 
-        Report($"Imported \"{preset.Name}\" and applied it.", failed: false);
+        if (MissingCustomFontNote() is { } note)
+            Report($"Imported \"{preset.Name}\" and applied it. {note}", failed: true);
+        else
+            Report($"Imported \"{preset.Name}\" and applied it.", failed: false);
 
         return true;
     }
@@ -121,6 +120,11 @@ internal sealed partial class ConfigWindow
                 return candidate;
         }
     }
+
+    private string CustomFontCodeNote() => this.config.UsesCustomFont
+        ? "\n\nThe code carries a font file from this PC. Whoever you send it to will\n" +
+          "not have that file, so those lines fall back to Noto Sans CJK for them."
+        : string.Empty;
 
     private bool NameTaken(string name) => this.config.UserPresets.Any(
         p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));

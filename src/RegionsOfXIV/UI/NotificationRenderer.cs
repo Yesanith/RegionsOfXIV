@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility;
@@ -36,7 +36,7 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
         top = DrawHeader(notification, drawList, centerX, top, room);
 
         var faces = new FontPair(fonts.Display, fonts.EorzeanDisplay);
-        var scale = ScaleFor(faces, notification.CasedText, room);
+        var scale = ScaleFor(faces, notification.DisplayLayout, notification.CasedText, room);
 
         DrawParticles(notification, drawList, centerX, top, scale);
 
@@ -61,14 +61,13 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
         if (string.IsNullOrWhiteSpace(text))
             return;
 
-        var fill = GlyphPainter.Packed(WeatherFill, notification.Opacity);
-        var stroke = GlyphPainter.Packed(WeatherStroke, notification.Opacity);
+        var ink = InkFor(WeatherFill, WeatherStroke, notification.Opacity);
 
         float top;
         float textCenterX;
         float scale;
 
-        using (fonts.Header.Push())
+        using (fonts.Weather.Push())
         {
             top = anchor.Y - WeatherGap() - (notification.StackOffset * ImGuiHelpers.GlobalScale);
 
@@ -80,22 +79,24 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
             textCenterX = centerX + (iconWidth / 2f);
 
             var tracking = Tracking();
-            scale = FitScale(text, tracking, RoomFor(viewport, centerX) - iconWidth);
+            scale = FitScale(
+                notification.DisplayLayout, text, tracking, RoomFor(viewport, centerX) - iconWidth);
 
             var width = Layout(notification.DisplayLayout, text, tracking, textCenterX, scale).Width;
 
             if (hasIcon)
-                DrawWeatherIcon(notification, drawList, textCenterX - (width / 2f) - iconWidth, top, lineHeight);
+                DrawWeatherIcon(
+                    notification, drawList, textCenterX - (width / 2f) - iconWidth, top, lineHeight, ink.Shadow);
 
             if (config.UnderlineHeader)
-                DrawUnderline(drawList, centerX, top, iconWidth + width, notification.RevealProgress, fill, stroke);
+                DrawUnderline(drawList, centerX, top, iconWidth + width, notification.RevealProgress, ink);
         }
 
         DrawAnimatedText(
             notification,
             drawList,
             new TextRun(
-                new FontPair(fonts.Header, fonts.EorzeanHeader),
+                new FontPair(fonts.Weather, fonts.EorzeanWeather),
                 text, WeatherFill, WeatherStroke, textCenterX, top),
             scale);
     }
@@ -113,26 +114,26 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
         if (string.IsNullOrWhiteSpace(header))
             return top;
 
-        var fill = GlyphPainter.Packed(config.HeaderColor, notification.Opacity);
-        var stroke = GlyphPainter.Packed(HeaderStroke, notification.Opacity);
+        var ink = InkFor(config.HeaderColor, HeaderStroke, notification.Opacity);
 
         using (fonts.Header.Push())
         {
             var tracking = Tracking();
-            var scale = FitScale(header, tracking, room);
+            var scale = FitScale(notification.HeaderLayout, header, tracking, room);
             var layout = Layout(notification.HeaderLayout, header, tracking, centerX, scale);
 
             if (config.UnderlineHeader)
-                DrawUnderline(drawList, centerX, top, layout.Width, notification.RevealProgress, fill, stroke);
+                DrawUnderline(drawList, centerX, top, layout.Width, notification.RevealProgress, ink);
 
-            DrawRun(drawList, layout, header, centerX, top, tracking, fill, stroke, StrokeDistance, scale);
+            DrawRun(drawList, layout, header, centerX, top, tracking, ink, scale);
 
             return top + HeaderGap();
         }
     }
 
     private static void DrawWeatherIcon(
-        AreaNotification notification, ImDrawListPtr drawList, float left, float top, float lineHeight)
+        AreaNotification notification, ImDrawListPtr drawList,
+        float left, float top, float lineHeight, in Shadow shadow)
     {
         if (GameIcon.Get(notification.IconId) is not { } icon)
             return;
@@ -140,23 +141,34 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
         var size = lineHeight * IconScale;
         var iconTop = top + ((lineHeight - size) / 2f);
 
+        var topLeft = new Vector2(left, iconTop);
+        var bottomRight = new Vector2(left + size, iconTop + size);
+
+        if (shadow.IsVisible)
+            drawList.AddImage(
+                icon.Handle,
+                topLeft + shadow.Offset,
+                bottomRight + shadow.Offset,
+                Vector2.Zero,
+                Vector2.One,
+                shadow.Color);
+
         drawList.AddImage(
             icon.Handle,
-            new Vector2(left, iconTop),
-            new Vector2(left + size, iconTop + size),
+            topLeft,
+            bottomRight,
             Vector2.Zero,
             Vector2.One,
             GlyphPainter.Packed(Vector4.One, notification.Opacity));
     }
 
     private static void DrawUnderline(
-        ImDrawListPtr drawList, float centerX, float top, float width,
-        float progress, uint fill, uint stroke)
+        ImDrawListPtr drawList, float centerX, float top, float width, float progress, in Ink ink)
     {
         var y = top + ImGui.GetTextLineHeight() + (UnderlineDrop * ImGuiHelpers.GlobalScale);
 
         GlyphPainter.DrawUnderline(
-            drawList, centerX, y, width, progress, fill, stroke,
+            drawList, centerX, y, width, progress, ink,
             UnderlineThickness * ImGuiHelpers.GlobalScale);
     }
 
@@ -169,6 +181,25 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
         return config.UnderlineHeader
             ? MathF.Max(gap, ImGui.GetTextLineHeight() * UnderlinedWeatherGap)
             : gap;
+    }
+
+    private Ink InkFor(Vector4 fill, Vector4 stroke, float opacity) => new(
+        GlyphPainter.Packed(fill, opacity),
+        GlyphPainter.Packed(stroke, opacity),
+        StrokeDistance,
+        ShadowFor(opacity));
+
+    private Shadow ShadowFor(float opacity)
+    {
+        if (!config.ShadowEnabled)
+            return Shadow.None;
+
+        var scale = ImGuiHelpers.GlobalScale;
+
+        return new Shadow(
+            GlyphPainter.Packed(config.ShadowColor, opacity),
+            new Vector2(config.ShadowOffsetX, config.ShadowOffsetY) * scale,
+            config.ShadowSoftness * scale);
     }
 
     private Vector4 HeaderStroke =>

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.ManagedFontAtlas;
@@ -44,12 +44,11 @@ internal sealed partial class NotificationRenderer
             return;
         }
 
-        var fill = GlyphPainter.Packed(run.Fill, opacity);
-        var stroke = GlyphPainter.Packed(run.Stroke, opacity);
+        var ink = InkFor(run.Fill, run.Stroke, opacity);
 
         if (decoding && notification.RevealProgress < 1f)
         {
-            DrawDecodingRun(notification, drawList, run, notification.RevealProgress, fill, stroke, scale);
+            DrawDecodingRun(notification, drawList, run, notification.RevealProgress, ink, scale);
             return;
         }
 
@@ -60,7 +59,7 @@ internal sealed partial class NotificationRenderer
             DrawRun(
                 drawList,
                 Layout(notification.DisplayLayout, run.Text, tracking, run.CenterX, scale),
-                run.Text, run.CenterX, run.Top, tracking, fill, stroke, StrokeDistance, scale);
+                run.Text, run.CenterX, run.Top, tracking, ink, scale);
         }
     }
 
@@ -98,9 +97,7 @@ internal sealed partial class NotificationRenderer
                     xs[i],
                     run.Top + state.OffsetY,
                     glyphs[i],
-                    GlyphPainter.Packed(glyphColor, opacity * state.Alpha),
-                    GlyphPainter.Packed(run.Stroke, opacity * state.Alpha),
-                    StrokeDistance,
+                    InkFor(glyphColor, run.Stroke, opacity * state.Alpha),
                     scale);
             }
         }
@@ -108,7 +105,7 @@ internal sealed partial class NotificationRenderer
 
     private void DrawDecodingRun(
         AreaNotification notification, ImDrawListPtr drawList, in TextRun run,
-        float progress, uint fill, uint stroke, float scale)
+        float progress, in Ink ink, float scale)
     {
         var text = run.Text;
         var eorzean = run.Fonts.Eorzean!;
@@ -133,7 +130,7 @@ internal sealed partial class NotificationRenderer
             for (var i = decoded; i < text.Length; i++)
                 GlyphPainter.DrawGlyph(
                     drawList, GlyphPainter.Lerp(runes[i], plain[i], progress), run.Top, cipher[i],
-                    fill, stroke, StrokeDistance, scale);
+                    ink, scale);
         }
 
         using (run.Fonts.Plain.Push())
@@ -141,23 +138,22 @@ internal sealed partial class NotificationRenderer
             for (var i = 0; i < decoded && i < text.Length; i++)
                 GlyphPainter.DrawGlyph(
                     drawList, GlyphPainter.Lerp(runes[i], plain[i], progress), run.Top, text[i],
-                    fill, stroke, StrokeDistance, scale);
+                    ink, scale);
         }
     }
 
     private static void DrawRun(
         ImDrawListPtr drawList, LineLayout layout, string text, float centerX, float top,
-        float tracking, uint fill, uint stroke, float strokeDistance, float scale = 1f)
+        float tracking, in Ink ink, float scale = 1f)
     {
         if (tracking > 0f)
         {
-            GlyphPainter.DrawRun(drawList, layout.Positions, text, top, fill, stroke, strokeDistance, scale);
+            GlyphPainter.DrawRun(drawList, layout.Positions, text, top, ink, scale);
             return;
         }
 
         GlyphPainter.DrawStroked(
-            drawList, new Vector2(centerX - (layout.Width / 2f), top), text,
-            fill, stroke, strokeDistance, scale);
+            drawList, new Vector2(centerX - (layout.Width / 2f), top), text, ink, scale);
     }
 
     private LineLayout Layout(LineLayout cache, string text, float tracking, float centerX, float scale = 1f)
@@ -173,10 +169,10 @@ internal sealed partial class NotificationRenderer
         return cache;
     }
 
-    private float ScaleFor(in FontPair faces, string text, float room)
+    private float ScaleFor(in FontPair faces, LineLayout cache, string text, float room)
     {
         using (faces.Plain.Push())
-            return FitScale(text, Tracking(), room);
+            return FitScale(cache, text, Tracking(), room);
     }
 
     private static float RoomFor(ImGuiViewportPtr viewport, float centerX)
@@ -187,14 +183,24 @@ internal sealed partial class NotificationRenderer
         return MathF.Max(MathF.Min(toLeft, toRight), 1f) * 2f * WidthBudget;
     }
 
-    private static float FitScale(string text, float tracking, float room)
+    private float FitScale(LineLayout cache, string text, float tracking, float room)
     {
         if (string.IsNullOrEmpty(text))
             return 1f;
 
-        var natural = GlyphPainter.RunWidth(text, tracking);
+        var natural = NaturalWidth(cache, text, tracking);
 
         return natural <= room ? 1f : room / natural;
+    }
+
+    private float NaturalWidth(LineLayout cache, string text, float tracking)
+    {
+        var generation = fonts.Generation;
+
+        if (!cache.HasNaturalWidth(text, tracking, generation))
+            cache.StoreNaturalWidth(text, tracking, generation, GlyphPainter.RunWidth(text, tracking));
+
+        return cache.NaturalWidth;
     }
 
     private float Tracking() => ImGui.GetTextLineHeight() * (config.LetterSpacing / 100f);

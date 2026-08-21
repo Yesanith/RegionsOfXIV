@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
 <img src="assets/images/icon.png" width="140" alt="Regions of XIV icon">
 
@@ -44,10 +44,15 @@ for Guild Wars 2.
 - **Correct in every language.** Names come from game data rather than from the
   screen, and the default font carries glyphs for every language the client can
   display.
-- **Styled to taste.** Place it anywhere on screen, in one of the game's own
-  faces or Dalamud's Noto, with your own colours, letter spacing, casing and
-  outline weight. Name, header and weather can each take their own colour and
-  outline, or share one.
+- **Your own fonts.** Name, header and weather each pick their own face and
+  size: one of the game's own, Dalamud's Noto, or any `.ttf`, `.otf` or `.ttc`
+  sitting on your PC. A font you supply loads exactly as it is and stays yours to
+  look after — and a preset carries where the file sits rather than the font
+  itself, so a shared one falls back to Noto on someone else's machine.
+- **Styled to taste.** Place it anywhere on screen, with your own colours, letter
+  spacing, casing, outline weight and a drop shadow you can throw in any
+  direction. Name, header and weather can each take their own colour and outline,
+  or share one.
 - **Live preview.** Drag the position, size and colour sliders and a sample
   notification follows them as you go.
 - **Knows when to stay quiet.** Silent through cutscenes, PvP and gpose; through
@@ -120,8 +125,32 @@ The tests need neither the game nor Dalamud, so they run anywhere the SDK does:
 dotnet test RegionsOfXIV.sln -c Release
 ```
 
-How the four detection sources fit together, and where each piece lives, is
-documented in the source itself — start at `Services/AnnouncementCoordinator.cs`.
+### How it fits together
+
+`Services/AnnouncementCoordinator.cs` is the brain: everything that decides *what*
+gets announced and *when* lives there, and it is where to start reading.
+
+It never touches the game directly. Everything it listens to arrives through a
+small interface — arrivals, movement, weather, banners, the game's own area text,
+and the two name lookups — bundled as `AnnouncementSources`. `Plugin.cs` is the
+only place that knows which real implementation goes with which, and the tests
+hand it fakes instead. That is why the announcement rules can be exercised without
+launching the game.
+
+| Layer | What lives there |
+| --- | --- |
+| `Services/` | detection, decisions, game data. Never draws, never references `UI` |
+| `UI/` | windows, the overlay, and the glyph painting |
+| `Models/` | the few plain records both sides pass around |
+
+The plugin draws its own text glyph by glyph rather than handing ImGui a string,
+because the effects animate each letter separately. `UI/NotificationRenderer.cs`
+decides where a line goes; `UI/NotificationRenderer.Runs.cs` paints it.
+
+`Services/FontService.cs` keeps one face per `FontRole` — text, header, weather
+— and rebuilds only the roles whose face, size or file actually changed. A role
+set to a custom file also holds a Noto fallback, so a font that will not load
+degrades to something readable rather than to nothing.
 
 ## Feedback
 

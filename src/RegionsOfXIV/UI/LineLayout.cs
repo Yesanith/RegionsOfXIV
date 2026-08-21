@@ -33,4 +33,23 @@ internal sealed class LineLayout
         this.positions = positions;
         Width = width;
     }
+
+    private string? measuredText;
+    private float measuredTracking;
+    private int measuredGeneration = -1;
+
+    public float NaturalWidth { get; private set; }
+
+    public bool HasNaturalWidth(string line, float tracking, int generation) =>
+        ReferenceEquals(this.measuredText, line)
+        && this.measuredTracking == tracking
+        && this.measuredGeneration == generation;
+
+    public void StoreNaturalWidth(string line, float tracking, int generation, float width)
+    {
+        this.measuredText = line;
+        this.measuredTracking = tracking;
+        this.measuredGeneration = generation;
+        NaturalWidth = width;
+    }
 }

@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 
 namespace RegionsOfXIV;
@@ -20,6 +20,8 @@ internal static class ConfigurationCopy
     {
         foreach (var property in Settings)
             property.SetValue(to, property.GetValue(from));
+
+        to.RepairFaintColors();
     }
 
     public static void ResetToDefaults(Configuration config) => Apply(new Configuration(), config);

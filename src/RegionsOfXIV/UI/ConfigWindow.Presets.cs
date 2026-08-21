@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Linq;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
+using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
 
@@ -18,9 +19,9 @@ internal sealed partial class ConfigWindow
         var applied = false;
 
         ImGui.TextWrapped(
-            "A preset covers every setting on General, Effects, Notifications and Durations — "
-            + "font and size, position, colours, motion and particles, which tiers announce, "
-            + "the timings, and when to stay quiet.");
+            "A preset covers every setting on General, Fonts, Effects, Notifications and Durations "
+            + "— the face and size of each line, position, colours, motion and particles, which "
+            + "tiers announce, the timings, and when to stay quiet.");
         ImGui.TextDisabled("Applying one replaces all of them, so anything you have changed is overwritten.");
 
         ImGui.Spacing();
@@ -41,6 +42,7 @@ internal sealed partial class ConfigWindow
         applied |= DrawSavedPresets();
 
         ImGui.Separator();
+        DrawCustomFontPresetWarning();
         DrawSavePresetRow();
 
         ImGui.Separator();
@@ -173,7 +175,36 @@ internal sealed partial class ConfigWindow
             }
         }
 
-        Tooltip("Saves every setting on General, Effects, Notifications and Durations.");
+        Tooltip("Saves every setting on General, Fonts, Effects, Notifications and Durations.");
+    }
+
+    private void DrawCustomFontPresetWarning()
+    {
+        if (!this.config.UsesCustomFont)
+            return;
+
+        Warn(
+            CautionColor,
+            "These settings use a font from this PC. A preset stores where that file sits, not the "
+            + "font itself, so on anyone else's machine the path will not exist and those lines fall "
+            + "back to Noto Sans CJK — everything else in the preset still applies. Put the line "
+            + "back on a built-in face if you want a preset to look the same for whoever you hand it to.");
+
+        ImGui.Spacing();
+    }
+
+    private string? MissingCustomFontNote()
+    {
+        foreach (var role in Enum.GetValues<FontRole>())
+        {
+            var font = this.config.FontFor(role);
+
+            if (font.IsCustom && FontService.CustomFontProblem(font.Path) != null)
+                return "It carries a font file from the sender's PC that is not on yours, so those "
+                       + "lines are drawn with Noto Sans CJK. Choose your own on the Fonts tab.";
+        }
+
+        return null;
     }
 
     private struct WrappingRow()

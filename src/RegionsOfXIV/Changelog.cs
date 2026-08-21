@@ -10,6 +10,18 @@ internal static class Changelog
 {
     public static readonly ChangelogEntry[] All =
     [
+        new(new Version("0.4.0.0"),
+        [
+            "Use your own fonts. The name, the header and the weather line each pick their own face and size now, and any of them can point at a .ttf, .otf or .ttc sitting on your PC.",
+            "A font you supply stays yours to look after. The plugin loads it exactly as it is, says plainly when it cannot, and falls back to Noto Sans CJK rather than to nothing.",
+            "Presets carry where a custom font file sits rather than the font itself. Sharing one warns you first, and importing one that names a font you do not have tells you which lines fell back.",
+            "A drop shadow, thrown in any direction and spread as far as you like. It sits under the outline so the two can be used together, and the underline and weather icon cast it too.",
+            "The weather line has its own font and size instead of borrowing the header's. Settings you already had keep the size they were showing.",
+            "The header's size can be adjusted at last. It had a setting but never a slider.",
+            "Font and size have moved off General onto their own Fonts tab, a page for each of the three lines.",
+            "Less work every frame: banners are no longer watched for while the feature is off, a line is measured once instead of on every frame it is up, and an outline you cannot see is no longer drawn eight times over.",
+        ]),
+
         new(new Version("0.3.0.0"),
         [
             "The game's own banners are yours now. Quest Accepted, Duty Commenced, Level Up! and the rest are redrawn in this plugin's lettering, with the same effects as a place name. Off by default; switch it on under Notifications.",
