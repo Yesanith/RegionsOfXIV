@@ -5,6 +5,9 @@ namespace RegionsOfXIV.UI;
 
 internal sealed partial class ConfigWindow
 {
+    // "settled" rather than "changed" drives the preview here: replaying the notification on
+    // every frame of a drag would restart the animation continuously and show nothing useful, so
+    // it fires once when a slider is let go.
     private void DrawDurationsTab()
     {
         using var tab = ImRaii.TabItem("Durations");

@@ -6,10 +6,23 @@ namespace RegionsOfXIV;
 
 internal readonly record struct ChangelogEntry(Version Version, string[] Changes);
 
+// Kept newest first, and the top entry's version must match the assembly version in the csproj
+// -- Since compares against it to decide what a returning player has not seen yet, so an entry
+// added without bumping the build shows up to people who are not running it.
 internal static class Changelog
 {
     public static readonly ChangelogEntry[] All =
     [
+        new(new Version("0.4.1.0"),
+        [
+            "Arriving somewhere new while the last notice is still up no longer leaves the two written over each other. The one on its way out now leaves quickly and moves clear of the one arriving, instead of fading at reading pace underneath it.",
+            "The new place still appears the moment you reach it. Nothing waits its turn.",
+            "Colours have their alpha back, in the picker where it used to be. It stops at 15% rather than running down to nothing, so a line can be faded behind the others without being faded until it looks like the plugin has stopped working.",
+            "A colour already stored fainter than that is brought back up to it when the plugin loads, which covers anything left invisible by the version that had no alpha at all.",
+            "The gap between the header and the place name is a slider, where it was a switch with two positions.",
+            "The sample in the settings window follows the header switch again. Turning \"Show header\" off left it showing one.",
+        ]),
+
         new(new Version("0.4.0.0"),
         [
             "Use your own fonts. The name, the header and the weather line each pick their own face and size now, and any of them can point at a .ttf, .otf or .ttc sitting on your PC.",

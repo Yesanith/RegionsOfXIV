@@ -4,6 +4,9 @@ using RegionsOfXIV.Models;
 
 namespace RegionsOfXIV.Services;
 
+// The real implementations behind AnnouncementSources: thin adapters from Dalamud events and
+// sheet lookups onto the plugin's own types. Deliberately free of decisions -- anything worth
+// testing belongs in the coordinator, not here.
 internal sealed class GameZoneArrivals : IZoneArrivals, IDisposable
 {
     public event Action<ZoneArrival>? Arrived;

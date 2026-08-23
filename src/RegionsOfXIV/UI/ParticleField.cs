@@ -5,6 +5,9 @@ using Dalamud.Bindings.ImGui;
 
 namespace RegionsOfXIV.UI;
 
+// Ambient particles around a notification, drawn from ImGui primitives rather than textures so
+// they cost nothing to ship and work whatever font is in use. One field per notification, so
+// particles fade out with the line that spawned them.
 internal sealed class ParticleField
 {
     private const int MaxParticles = 256;
@@ -29,6 +32,9 @@ internal sealed class ParticleField
 
     public bool IsEmpty => this.particles.Count == 0;
 
+    // Spawning is budgeted in fractional particles carried between frames, so the rate stays the
+    // same whatever the frame rate. The delta is capped as well: after a stutter or a loading
+    // screen an uncapped step would teleport every particle off screen at once.
     public void Update(
         ParticleEffect effect, float density, float deltaSeconds, Vector2 center, Vector2 extent, bool spawning)
     {
@@ -38,6 +44,8 @@ internal sealed class ParticleField
         {
             var particle = this.particles[i];
 
+            // Swap-with-last removal: order does not matter here and it avoids shuffling the
+            // tail of the list for every particle that expires.
             particle.Age += dt;
             if (particle.Age >= particle.Life)
             {

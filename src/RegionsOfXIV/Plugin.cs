@@ -10,6 +10,11 @@ using RegionsOfXIV.UI;
 
 namespace RegionsOfXIV;
 
+// Composition root. Dalamud fills the service properties by reflection before the constructor
+// runs, which is why they are static -- it saves threading a dozen handles through every class.
+//
+// Construction order matters: the config is loaded and migrated first, fonts are built before
+// anything can draw, and the coordinator is wired last because it needs every source to exist.
 public sealed class Plugin : IDalamudPlugin
 {
     private const string CommandName = "/regions";
@@ -195,6 +200,8 @@ public sealed class Plugin : IDalamudPlugin
         }
     }
 
+    // A config that cannot be parsed is moved aside rather than deleted or overwritten, so the
+    // plugin starts on defaults and whatever the user had is still recoverable by hand.
     private static void QuarantineBrokenConfig()
     {
         try

@@ -3,6 +3,11 @@ using FFXIVClientStructs.FFXIV.Client.Graphics.Environment;
 
 namespace RegionsOfXIV.Services;
 
+// Watches the weather the client has actually settled on, which is what catches the sky changing
+// while you stand still. Arrivals do not come through here -- the coordinator forecasts those
+// from the clock and calls Prime, because on arrival this reading is not trustworthy yet.
+//
+// readActive is injectable purely so the tests can drive it without the game.
 internal sealed class WeatherTracker : IWeatherSource, IDisposable
 {
     private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(1);

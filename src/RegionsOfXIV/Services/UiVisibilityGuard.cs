@@ -5,6 +5,9 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace RegionsOfXIV.Services;
 
+// Dalamud hides plugin windows during cutscenes and whenever the game UI is hidden. The overlay
+// opts out of that so a notification survives a cutscene, which then means it also has to be
+// suppressed manually while a loading screen is up -- otherwise it draws over the black.
 internal sealed class UiVisibilityGuard : IDisposable
 {
     private bool suspended;

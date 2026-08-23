@@ -11,6 +11,8 @@ internal sealed partial class ConfigWindow
 {
     private string newPresetName = string.Empty;
 
+    // Applying a preset rewrites the whole config, so afterwards the fonts have to be rebuilt and
+    // the native UI suppression re-checked -- the preset may have turned either of those off.
     private void DrawPresetsTab()
     {
         using var tab = ImRaii.TabItem("Presets");
@@ -193,6 +195,8 @@ internal sealed partial class ConfigWindow
         ImGui.Spacing();
     }
 
+    // A preset carries the path to a custom font, not the font, so a code that travels between
+    // machines usually points at a file the recipient does not have.
     private string? MissingCustomFontNote()
     {
         foreach (var role in Enum.GetValues<FontRole>())

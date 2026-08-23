@@ -3,6 +3,11 @@ using RegionsOfXIV.Models;
 
 namespace RegionsOfXIV.Services;
 
+// Everything the coordinator is allowed to know about the outside world. Each of these has one
+// real implementation backed by the game and one fake in the tests, which is what keeps the
+// announcement rules testable without launching FFXIV.
+//
+// ZoneArrival exists so Dalamud's own event argument type does not leak past this boundary.
 internal readonly record struct AnnouncementSources(
     ILocationSource Locations,
     IWeatherSource Weather,

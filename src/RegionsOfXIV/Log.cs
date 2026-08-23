@@ -2,6 +2,8 @@ using System;
 
 namespace RegionsOfXIV;
 
+// Null-guarded so tests and early startup can log without Dalamud having injected the real
+// logger yet.
 internal static class Log
 {
     public static void Debug(string message) => Plugin.Log?.Debug(message);

@@ -3,6 +3,8 @@ using System;
 namespace RegionsOfXIV;
 
 [Serializable]
+// A saved preset is a whole Configuration, copied by value both going in and coming out, so
+// editing your live settings never reaches back into a preset you saved earlier.
 public class UserPreset
 {
     public string Name { get; set; } = string.Empty;

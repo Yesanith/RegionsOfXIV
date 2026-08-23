@@ -7,9 +7,15 @@ using RegionsOfXIV.Services;
 namespace RegionsOfXIV;
 
 [Serializable]
+// Every setting, stored flat rather than grouped into nested objects. Grouping would read
+// better but would change the shape of the saved JSON and silently reset everyone, so the
+// grouping lives in the config window instead.
+//
+// Adding a setting here is enough for it to be saved, to travel in presets and share codes, and
+// to be covered by the round-trip tests -- see ConfigurationCopy.
 public class Configuration : IPluginConfiguration, IGateSettings
 {
-    public const int CurrentVersion = 2;
+    public const int CurrentVersion = 3;
 
     public int Version { get; set; } = CurrentVersion;
 
@@ -63,7 +69,15 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
     public bool UnderlineHeader { get; set; } = true;
 
+    // Superseded by HeaderGap. Kept only so a config written before version 3 can be migrated,
+    // and excluded from ConfigurationCopy so it no longer travels in presets.
     public bool OverlapHeader { get; set; } = true;
+
+    public const float OverlappedHeaderGap = 1.1f;
+
+    public const float SpacedHeaderGap = 1.6f;
+
+    public float HeaderGap { get; set; } = OverlappedHeaderGap;
 
     public bool DecodeEffectEnabled { get; set; } = true;
 
@@ -144,16 +158,33 @@ public class Configuration : IPluginConfiguration, IGateSettings
         }
     }
 
+    // The one place that decides whether a line gets a header. Both the live announcement path
+    // and the config-window preview go through here; when the preview had its own copy of this
+    // rule, "Show header" quietly stopped working in the preview only.
+    public string? HeaderFor(string? parent, string? text)
+    {
+        if (!IncludeParentTierAsHeader || parent is null)
+            return null;
+
+        return string.Equals(parent, text, StringComparison.OrdinalIgnoreCase) ? null : parent;
+    }
+
     public bool UsesCustomFont =>
         DisplayFont == FontChoice.Custom
         || HeaderFont == FontChoice.Custom
         || WeatherFont == FontChoice.Custom;
 
-    public const float FaintAlpha = 12f / 255f;
+    // The floor under every colour's alpha. Transparency is worth having -- a line can be pushed
+    // back behind the others -- but a colour faded the whole way to nothing reads as a plugin that
+    // has broken rather than a line that is hidden, and that is what the old unbounded alpha bar
+    // kept producing by accident.
+    public const float MinAlpha = 0.15f;
 
+    // Enforced on load and on import as well as in the picker, because a config or a share code
+    // written before the floor existed can still carry a zero. Raised to the floor rather than to
+    // the colour's default, since a faint colour may well have been chosen deliberately.
     public bool RepairFaintColors()
     {
-        var defaults = new Configuration();
         var repaired = false;
 
         foreach (var property in ConfigurationCopy.Settings)
@@ -162,21 +193,22 @@ public class Configuration : IPluginConfiguration, IGateSettings
                 continue;
 
             var colour = (Vector4)property.GetValue(this)!;
-            if (colour.W >= FaintAlpha)
+            if (colour.W >= MinAlpha)
                 continue;
 
-            var restored = ((Vector4)property.GetValue(defaults)!).W;
-
-            property.SetValue(this, colour with { W = restored });
+            property.SetValue(this, colour with { W = MinAlpha });
             repaired = true;
 
             Log.Information(
-                $"{property.Name} was stored too faint to see, so its opacity was restored.");
+                $"{property.Name} was stored too faint to see, so it was raised to the minimum.");
         }
 
         return repaired;
     }
 
+    // Runs once on load, before anything reads the config. Each step is guarded on the version
+    // the setting was introduced in, so a config can jump several versions in one go. Steps must
+    // stay in ascending order and must never assume an earlier step ran this session.
     public bool Migrate()
     {
         if (Version == CurrentVersion)
@@ -194,6 +226,9 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
         if (Version < 2)
             WeatherFontSize = HeaderFontSize;
+
+        if (Version < 3)
+            HeaderGap = OverlapHeader ? OverlappedHeaderGap : SpacedHeaderGap;
 
         Version = CurrentVersion;
         Log.Information($"Migrated the configuration from version {from} to {CurrentVersion}.");

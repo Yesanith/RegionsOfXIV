@@ -8,6 +8,9 @@ using Dalamud.Interface.ManagedFontAtlas;
 
 namespace RegionsOfXIV.Services;
 
+// Owns one built font per FontRole -- text, header, weather -- and rebuilds only the roles whose
+// face, size or file actually changed, because a rebuild throws away the whole Dalamud font atlas
+// and is far too expensive to do on every frame a slider is being dragged.
 internal sealed class FontService : IDisposable
 {
     private const long MaxCustomFontBytes = 64L * 1024 * 1024;
@@ -32,6 +35,8 @@ internal sealed class FontService : IDisposable
         this.faces = Roles.Select(_ => new Face()).ToArray();
     }
 
+    // Bumped whenever any face is rebuilt. LineLayout keys its caches on this, so a font change
+    // invalidates every measurement taken against the old glyphs.
     public int Generation { get; private set; }
 
     public IFontHandle Display => Plain(FontRole.Text);
@@ -68,6 +73,9 @@ internal sealed class FontService : IDisposable
     public static bool IsLatinOnly(FontChoice choice) =>
         choice is FontChoice.TrumpGothic or FontChoice.Jupiter;
 
+    // Checked before the file is handed to the atlas, because a bad path fails asynchronously
+    // inside the build and surfaces as a blank line rather than an error anyone can act on.
+    // Callers should cache the result -- it touches the disk.
     public static string? CustomFontProblem(string? path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -121,6 +129,9 @@ internal sealed class FontService : IDisposable
             Generation++;
     }
 
+    // A custom font that fails to load leaves Plain unusable. Falling through to the stock face
+    // built alongside it keeps the notification readable; pushing the failed handle would silently
+    // give us the small default UI font instead, which looks broken rather than degraded.
     private IFontHandle Plain(FontRole role)
     {
         var face = this.faces[(int)role];
@@ -136,6 +147,7 @@ internal sealed class FontService : IDisposable
         face.Release();
         face.Built = wanted;
 
+        // Only custom roles get a fallback built, since a stock face cannot fail to load.
         if (wanted.IsCustom)
         {
             face.Problem = CustomFontProblem(wanted.Path);
@@ -271,6 +283,8 @@ internal sealed class FontService : IDisposable
 
         public FontSetting? Built;
 
+        // Half a pixel of slack: a size slider passes through many intermediate values on the
+        // way to where it is going, and none of them are worth an atlas rebuild.
         public bool Matches(in FontSetting wanted) =>
             this.Built is { } built
             && built.Choice == wanted.Choice

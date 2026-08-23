@@ -6,7 +6,7 @@ namespace RegionsOfXIV.Tests;
 public class ConfigurationTests
 {
     [Fact]
-    public void AColourStoredTooFaintToSeeGetsItsOpacityBack()
+    public void AColourStoredTooFaintToSeeIsRaisedToTheFloor()
     {
         var config = new Configuration
         {
@@ -15,14 +15,14 @@ public class ConfigurationTests
 
         Assert.True(config.RepairFaintColors());
 
-        Assert.Equal(new Configuration().StrokeColor.W, config.StrokeColor.W);
+        Assert.Equal(Configuration.MinAlpha, config.StrokeColor.W);
         Assert.Equal(0.37f, config.StrokeColor.X);
         Assert.Equal(0.24f, config.StrokeColor.Y);
         Assert.Equal(0.13f, config.StrokeColor.Z);
     }
 
     [Fact]
-    public void AFullyTransparentColourIsRepairedToo()
+    public void AFullyTransparentColourIsRaisedTooRatherThanLeftInvisible()
     {
         var config = new Configuration
         {
@@ -30,7 +30,21 @@ public class ConfigurationTests
         };
 
         Assert.True(config.RepairFaintColors());
-        Assert.Equal(1f, config.TextColor.W);
+        Assert.Equal(Configuration.MinAlpha, config.TextColor.W);
+    }
+
+    // The point of the floor: a deliberately faded line keeps the alpha it was given, so only the
+    // ones that would be invisible are touched.
+    [Fact]
+    public void AFadedButVisibleColourKeepsTheAlphaItWasGiven()
+    {
+        var config = new Configuration
+        {
+            HeaderColor = new Vector4(1f, 1f, 1f, 0.3f),
+        };
+
+        Assert.False(config.RepairFaintColors());
+        Assert.Equal(0.3f, config.HeaderColor.W);
     }
 
     [Fact]
@@ -53,7 +67,7 @@ public class ConfigurationTests
                 continue;
 
             var colour = (Vector4)property.GetValue(config)!;
-            Assert.True(colour.W >= Configuration.FaintAlpha, property.Name);
+            Assert.True(colour.W >= Configuration.MinAlpha, property.Name);
         }
     }
 
@@ -68,7 +82,7 @@ public class ConfigurationTests
         var target = new Configuration();
         ConfigurationCopy.Apply(source, target);
 
-        Assert.Equal(new Configuration().HeaderColor.W, target.HeaderColor.W);
+        Assert.Equal(Configuration.MinAlpha, target.HeaderColor.W);
         Assert.Equal(0.5f, target.HeaderColor.X);
     }
 

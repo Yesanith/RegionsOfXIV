@@ -29,6 +29,8 @@ internal sealed class ChangelogWindow : Window, IDisposable
 
     public void Dispose() { }
 
+    // Shown once after an update, listing only what is new to this player. Opens itself only if
+    // there is something to say, so a reinstall at the same version stays quiet.
     public void ShowSince(Version? lastSeen)
     {
         this.entries = Changelog.Since(lastSeen);

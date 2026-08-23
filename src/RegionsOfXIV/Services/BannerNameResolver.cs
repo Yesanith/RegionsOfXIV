@@ -4,6 +4,11 @@ using Lumina.Excel.Sheets;
 
 namespace RegionsOfXIV.Services;
 
+// A banner's wording exists only as pixels inside its artwork, so there is no string to read.
+// Two sources are crossed to recover it: GroupPoseStamp names a dozen or so of the same icons for
+// the gpose stamp picker and is localised by the game, and ScreenImage says which of those icons
+// are actually used as banners. Anything left over falls back to a hand-read English table, which
+// is why that half only applies on an English client.
 internal static class BannerNameResolver
 {
     private static Dictionary<uint, string>? banners;

@@ -5,6 +5,12 @@ using Dalamud.Interface.ManagedFontAtlas;
 
 namespace RegionsOfXIV.UI;
 
+// The painting half of the renderer: given a line and where it goes, put the glyphs on screen.
+//
+// Three routes through here, in priority order. Motion still running: every glyph is placed by
+// GlyphAnimator. Motion done but decode still running: glyphs cross-fade from their Eorzean
+// stand-ins to the real letters. Neither running: the line is drawn in one piece where letter
+// spacing allows it, which is far cheaper than a call per glyph.
 internal sealed partial class NotificationRenderer
 {
     private static readonly Vector4 EmberColor = new(1f, 0.55f, 0.15f, 1f);
@@ -142,6 +148,9 @@ internal sealed partial class NotificationRenderer
         }
     }
 
+    // Letter spacing forces the per-glyph path, since ImGui cannot space a string for us. Without
+    // it the whole line goes out as a single call, which is around ten draw calls instead of ten
+    // per letter.
     private static void DrawRun(
         ImDrawListPtr drawList, LineLayout layout, string text, float centerX, float top,
         float tracking, in Ink ink, float scale = 1f)

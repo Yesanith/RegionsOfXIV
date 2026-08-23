@@ -8,6 +8,11 @@ using System.Text.Json.Serialization;
 
 namespace RegionsOfXIV;
 
+// A whole preset squeezed into one line of text that survives being pasted into game chat.
+//
+// Only settings that differ from the defaults are stored, which keeps a typical code short
+// enough to paste and means a code made by an older build still applies cleanly -- anything it
+// does not mention simply stays at whatever this build defaults to.
 internal static class PresetCode
 {
     private const string Prefix = "ROX1-";
@@ -110,6 +115,9 @@ internal static class PresetCode
         }
     }
 
+    // Codes arrive having been through chat, Discord and web pages, which add line wrapping,
+    // smart quotes and invisible formatting characters. Everything before the prefix is dropped
+    // and the known decorations are stripped before decoding is attempted.
     private static string Clean(string? code)
     {
         if (string.IsNullOrWhiteSpace(code))
@@ -185,6 +193,9 @@ internal static class PresetCode
         }
     }
 
+    // A code from a newer build can name an effect this one has never heard of. Skipping the
+    // value rather than storing it keeps the rest of the preset usable instead of leaving an
+    // enum holding a number nothing can render.
     private static bool IsUndefinedEnum(Type type, object? value)
     {
         if (value == null)
@@ -194,6 +205,8 @@ internal static class PresetCode
         return underlying.IsEnum && !Enum.IsDefined(underlying, value);
     }
 
+    // Capped on the way out, not the way in: a short code can inflate to an enormous amount of
+    // data, and this is parsing something a stranger pasted.
     private static string? Inflate(byte[] raw)
     {
         using var input = new MemoryStream(raw);

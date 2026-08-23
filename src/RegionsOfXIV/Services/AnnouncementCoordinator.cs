@@ -3,6 +3,12 @@ using RegionsOfXIV.Models;
 
 namespace RegionsOfXIV.Services;
 
+// Everything that decides what gets announced and when. Start reading here.
+//
+// It never touches the game directly: arrivals, movement, weather, banners, the game's own area
+// text and the two name lookups all arrive through the interfaces in AnnouncementSources.
+// Plugin.cs is the only place that knows which real implementation goes with which, which is why
+// these rules can be exercised in tests without launching the game.
 internal sealed class AnnouncementCoordinator : IDisposable
 {
     private readonly Configuration config;
@@ -63,6 +69,9 @@ internal sealed class AnnouncementCoordinator : IDisposable
         this.sink.PushWeather(weather.Name, weather.IconId);
     }
 
+    // Forecast rather than observed: on arrival the client has not necessarily settled on the
+    // real weather yet, and EorzeaWeather can work it out from the clock immediately. Priming the
+    // tracker with the answer stops it announcing the same weather again a moment later.
     private void AnnounceArrivalWeather(uint territoryTypeId)
     {
         if (!this.config.WeatherNotificationEnabled)
@@ -121,6 +130,11 @@ internal sealed class AnnouncementCoordinator : IDisposable
         AnnounceArrivalWeather(arrival.TerritoryTypeId);
     }
 
+    // The game showing its own area text is the only warning we get for some sub-area changes, so
+    // it is used as a trigger to re-read our own position. If polling explains the change, the
+    // location handlers announce it and clear pendingNativeAreaText on the way through; if it is
+    // still set afterwards, the game knows about somewhere we cannot see and its wording is used
+    // verbatim rather than dropping the notice entirely.
     private void HandleAreaTextShown(string? nativeText)
     {
         if (string.IsNullOrWhiteSpace(nativeText))
@@ -213,6 +227,9 @@ internal sealed class AnnouncementCoordinator : IDisposable
         return (HeaderOrNull(parent, text), text ?? string.Empty);
     }
 
+    // Where the game's wording and ours disagree, the game wins for the name itself -- it knows
+    // about places TerritoryInfo does not expose -- while the header still comes from our own
+    // sheet lookups so it stays consistent with every other announcement.
     private (string? Header, string Text) ReconcileWithNative(
         string? header, string text, in ResolvedLocation names)
     {
@@ -234,11 +251,6 @@ internal sealed class AnnouncementCoordinator : IDisposable
         return (HeaderOrNull(parent, native), native);
     }
 
-    private string? HeaderOrNull(string? parent, string? text)
-    {
-        if (!this.config.IncludeParentTierAsHeader || parent is null)
-            return null;
-
-        return string.Equals(parent, text, StringComparison.OrdinalIgnoreCase) ? null : parent;
-    }
+    private string? HeaderOrNull(string? parent, string? text) =>
+        this.config.HeaderFor(parent, text);
 }

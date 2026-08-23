@@ -2,6 +2,12 @@ using System.Collections.Generic;
 
 namespace RegionsOfXIV.Services;
 
+// Read off the artwork by hand, because the wording is painted into the textures and exists
+// nowhere in the game's data as text. English only, and only used to fill gaps that
+// BannerNameResolver could not cross-reference from the sheets.
+//
+// A banner missing from here keeps the game's own version rather than being replaced, so an
+// incomplete list degrades quietly. New ids get logged when they appear.
 internal static class BannerNames
 {
     public static readonly IReadOnlyDictionary<uint, string> English = new Dictionary<uint, string>

@@ -93,4 +93,124 @@ public class AreaNotificationTests
 
         Assert.Null(notification.Cipher);
     }
+
+    private static AreaNotification Fading(TimeSpan fadeOutDuration) => new(
+        null,
+        "Summerford Farms",
+        TimeSpan.FromMilliseconds(1),
+        TimeSpan.Zero,
+        TimeSpan.Zero,
+        TimeSpan.FromMilliseconds(1),
+        fadeOutDuration);
+
+    private static bool RunUntil(AreaNotification notification, Func<AreaNotification, bool> until)
+    {
+        var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(3);
+
+        while (DateTime.UtcNow < deadline)
+        {
+            notification.Update();
+
+            if (until(notification))
+                return true;
+
+            Thread.Sleep(10);
+        }
+
+        return false;
+    }
+
+    [Fact]
+    public void AnInterruptedFadeOutIsHalfTheNaturalOne()
+    {
+        Assert.Equal(
+            TimeSpan.FromSeconds(1),
+            AreaNotification.InterruptedFadeOutFor(TimeSpan.FromSeconds(2)));
+    }
+
+    [Fact]
+    public void AnInterruptedFadeOutIsNeverShortEnoughToSnap()
+    {
+        Assert.Equal(
+            TimeSpan.FromMilliseconds(120),
+            AreaNotification.InterruptedFadeOutFor(TimeSpan.FromMilliseconds(150)));
+    }
+
+    // FadeOutDuration goes down to 0.05s, below the floor, and cutting a line short must never
+    // leave it on screen longer than letting it end on its own would have.
+    [Fact]
+    public void AnInterruptedFadeOutNeverOutlastsTheFadeItStandsInFor()
+    {
+        Assert.Equal(
+            TimeSpan.FromMilliseconds(50),
+            AreaNotification.InterruptedFadeOutFor(TimeSpan.FromMilliseconds(50)));
+    }
+
+    [Fact]
+    public void BeingInterruptedStartsTheFadeImmediately()
+    {
+        var notification = Fading(TimeSpan.FromSeconds(1));
+
+        notification.Dismiss();
+
+        Assert.True(notification.IsFadingOut);
+    }
+
+    [Fact]
+    public void AnInterruptedNotificationIsGoneWellInsideItsConfiguredFadeOut()
+    {
+        var notification = Fading(TimeSpan.FromSeconds(1));
+
+        notification.Dismiss();
+        Thread.Sleep(800);
+        notification.Update();
+
+        Assert.True(notification.IsDone);
+    }
+
+    // The other half of the same rule: shortening the interrupted fade must not have shortened
+    // the ordinary one, which is a reading time the user configured.
+    [Fact]
+    public void ANaturalFadeOutStillTakesTheFullConfiguredTime()
+    {
+        var notification = Fading(TimeSpan.FromSeconds(2));
+
+        Assert.True(RunUntil(notification, n => n.IsFadingOut));
+
+        Thread.Sleep(1300);
+        notification.Update();
+
+        Assert.False(notification.IsDone);
+    }
+
+    [Fact]
+    public void BeingPushedDownDoesNotTeleportTheLine()
+    {
+        var notification = Fading(TimeSpan.FromSeconds(1));
+
+        notification.PushDown(91f);
+
+        Assert.Equal(0f, notification.StackOffset);
+    }
+
+    [Fact]
+    public void BeingPushedDownArrivesAtTheFullDistance()
+    {
+        var notification = Fading(TimeSpan.FromSeconds(1));
+
+        notification.PushDown(91f);
+        Assert.True(RunUntil(notification, n => n.StackOffset >= 90.5f));
+    }
+
+    [Fact]
+    public void SeveralArrivalsInARowKeepPushingTheSameLineFurtherDown()
+    {
+        var notification = Fading(TimeSpan.FromSeconds(1));
+
+        notification.PushDown(91f);
+        Assert.True(RunUntil(notification, n => n.StackOffset >= 90.5f));
+
+        notification.PushDown(91f);
+        Assert.True(RunUntil(notification, n => n.StackOffset >= 181.5f));
+    }
 }
