@@ -87,7 +87,7 @@ public class ShadowTests
     {
         var config = new Configuration();
 
-        Assert.True(config.ShadowColor.W >= Configuration.FaintAlpha);
+        Assert.True(config.ShadowColor.W >= Configuration.MinAlpha);
         Assert.True(config.ShadowOffsetX != 0f || config.ShadowOffsetY != 0f);
     }
 

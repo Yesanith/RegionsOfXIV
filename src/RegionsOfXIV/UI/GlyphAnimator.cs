@@ -4,6 +4,9 @@ namespace RegionsOfXIV.UI;
 
 internal readonly record struct GlyphState(float OffsetY, float Alpha, float Heat);
 
+// Where one glyph sits partway through a motion effect, as a pure function of its index and the
+// overall progress. Each letter runs the same curve offset in time, so the effect sweeps along
+// the line rather than moving every letter together.
 internal static class GlyphAnimator
 {
     private const float GlyphWindow = 0.45f;

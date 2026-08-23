@@ -6,6 +6,12 @@ using Lumina.Excel.Sheets;
 
 namespace RegionsOfXIV.Services;
 
+// The game raises no event for walking between areas inside a zone, so position has to be
+// sampled. Polled rather than read every frame -- a fifth of a second is far finer than anyone
+// can cross a boundary, and reading TerritoryInfo is not free.
+//
+// Poll() exists so the coordinator can force a sample the moment the game shows its own area
+// text, instead of waiting up to a full interval to find out whether it agrees with us.
 internal sealed unsafe class LocationTracker : ILocationSource, IDisposable
 {
     private static readonly TimeSpan PollInterval = TimeSpan.FromMilliseconds(200);
@@ -51,6 +57,8 @@ internal sealed unsafe class LocationTracker : ILocationSource, IDisposable
         ForgetPosition();
     }
 
+    // Pushes the next scheduled sample out as well, so an on-demand poll does not cause a second
+    // one a few milliseconds later.
     public void Poll()
     {
         this.nextPoll = DateTime.UtcNow + PollInterval;

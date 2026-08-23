@@ -1,5 +1,8 @@
 namespace RegionsOfXIV.Models;
 
+// Where the player is, at every tier the game tracks, as one comparable value. Being a record
+// struct is what lets NotificationGate keep a short history of recent places and compare them
+// directly to spot walking back and forth over a boundary.
 public readonly record struct LocationSnapshot(
     uint TerritoryTypeId,
     uint RegionPlaceNameId,
@@ -12,6 +15,9 @@ public readonly record struct LocationSnapshot(
 
     public bool IsEmpty => TerritoryTypeId == 0;
 
+    // Returns the coarsest tier that differs, and the order of these checks is the whole point:
+    // walking into a new zone also changes every finer id under it, and that should announce as
+    // a zone change rather than as a sub-area one.
     public LocationTier DiffTier(in LocationSnapshot other)
     {
         if (TerritoryTypeId != other.TerritoryTypeId) return LocationTier.Territory;
@@ -24,6 +30,8 @@ public readonly record struct LocationSnapshot(
     }
 }
 
+// Ordered coarse to fine, and the gate compares these with < and > to decide which announcements
+// suppress which. Do not reorder.
 public enum LocationTier
 {
     None = 0,

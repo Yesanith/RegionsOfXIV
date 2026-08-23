@@ -19,6 +19,8 @@ internal readonly record struct Ink(uint Fill, uint Stroke, float StrokeDistance
     public bool HasFill => (this.Fill >> 24) != 0u;
 }
 
+// Text is drawn a glyph at a time rather than handed to ImGui as a string, because the motion
+// and decode effects move each letter independently. Everything here is built around that.
 internal static class GlyphPainter
 {
     private static readonly Vector2[] StrokeOffsets =
@@ -28,6 +30,9 @@ internal static class GlyphPainter
         new(-1, 1), new(0, 1), new(1, 1),
     ];
 
+    // Shadow first, then the outline ring, then the fill on top. Each layer is skipped when it
+    // would be invisible: a line costs up to nineteen draw calls per glyph with everything on, so
+    // the cheap checks are worth making.
     public static void DrawStroked(
         ImDrawListPtr drawList,
         Vector2 position,
@@ -143,6 +148,11 @@ internal static class GlyphPainter
         return xs;
     }
 
+    // The game's fonts carry kerning pairs, so a glyph's position depends on the one before it.
+    // Measuring the prefix up to and including this glyph, then subtracting the glyph's own width,
+    // recovers a position that keeps the pair spacing; measuring glyphs individually loses one
+    // kern per letter and leaves the line loose and off centre. This is what made the Q in
+    // "Quest Accepted" and "Entrance Square" sit wrong.
     private static float Offset(string text, int index)
     {
         if (index == 0)

@@ -5,6 +5,12 @@ namespace RegionsOfXIV.Services;
 
 internal readonly record struct ResolvedWeather(uint Id, string Name, uint IconId);
 
+// Turns a weather id into something showable, and works out what the weather will be without
+// waiting to observe it.
+//
+// Each zone has its own weighted table in WeatherRate; EorzeaWeather turns the clock into a
+// number from 0 to 99 and that table turns the number into the weather, which is how the client
+// and the server stay in agreement without exchanging anything.
 internal static class WeatherNameResolver
 {
     public static ResolvedWeather? Forecast(uint territoryTypeId, DateTimeOffset at)

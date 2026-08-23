@@ -3,6 +3,8 @@ using RegionsOfXIV.Models;
 
 namespace RegionsOfXIV.Services;
 
+// Names come from the game's own sheets rather than off the screen, so they are already in the
+// player's language and correct even when the on-screen text is suppressed.
 internal static class PlaceNameResolver
 {
     public static string? Resolve(uint placeNameRowId)

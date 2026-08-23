@@ -6,6 +6,10 @@ using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
 
+// Decides where each line goes and hands the glyph painting to the Runs half of the class.
+//
+// The weather line is drawn above the anchor and the header and name below it, so a notification
+// grows outwards from the point the position sliders choose rather than downwards from the top.
 internal sealed partial class NotificationRenderer(Configuration config, FontService fonts)
 {
     private const float IconScale = 1.3f;
@@ -172,8 +176,10 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
             UnderlineThickness * ImGuiHelpers.GlobalScale);
     }
 
-    private float HeaderGap() => ImGui.GetTextLineHeight() * (config.OverlapHeader ? 1.1f : 1.6f);
+    private float HeaderGap() => ImGui.GetTextLineHeight() * config.HeaderGap;
 
+    // An underlined header needs the weather pushed further up, or the underline collides with
+    // the descenders of the line above it.
     private float WeatherGap()
     {
         var gap = HeaderGap();
@@ -189,6 +195,8 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
         StrokeDistance,
         ShadowFor(opacity));
 
+    // Offsets are in real pixels scaled by the UI scale, deliberately not by the auto-shrink
+    // scale, so the shadow keeps the same weight as the outline when a long name is squeezed.
     private Shadow ShadowFor(float opacity)
     {
         if (!config.ShadowEnabled)
@@ -208,6 +216,8 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
     private Vector4 WeatherStroke =>
         config.SeparateLineColors ? config.WeatherStrokeColor : config.StrokeColor;
 
+    // With separate colours off, the weather line follows the header rather than the name, since
+    // the two of them are the small text above the place name and read as a pair.
     private Vector4 WeatherFill =>
         config.SeparateLineColors ? config.WeatherColor : config.HeaderColor;
 

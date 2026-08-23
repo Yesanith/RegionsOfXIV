@@ -23,6 +23,13 @@ internal readonly record struct ConfigActions(
     Action RestoreNativeAreaText,
     Action RestoreNativeLoadingTitle);
 
+// Split across ConfigWindow.*.cs, one file per tab, sharing the small widget helpers at the
+// bottom of this file. Those helpers all take the current value and hand back the new one,
+// setting a shared "changed" flag, so a tab can act once at the end rather than after each
+// control.
+//
+// The window never touches the plugin directly: everything it needs to make happen goes through
+// the delegates in ConfigActions, which Plugin.cs supplies.
 internal sealed partial class ConfigWindow : Window, IDisposable
 {
     private readonly Configuration config;
@@ -107,6 +114,9 @@ internal sealed partial class ConfigWindow : Window, IDisposable
 
     private void MarkUnsaved() => this.unsaved = true;
 
+    // Writing the config on every changed frame meant a full JSON serialise and disk write per
+    // frame while a slider was being dragged, which made the pickers feel like they had stuck.
+    // The write is deferred until nothing is being interacted with.
     private void SaveIfSettled()
     {
         if (!this.unsaved || ImGui.IsAnyItemActive())
@@ -208,15 +218,36 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         return value;
     }
 
+    // The alpha bar is back, but floored at Configuration.MinAlpha rather than running to zero.
+    // Unbounded, it was easy to drag to nothing by accident and impossible to undo, because
+    // picking a new colour leaves the alpha where it was -- so the line simply vanished and read
+    // as a broken plugin. Dragging below the floor now stops there instead.
+    //
+    // NoTooltip replaces ImGui's own colour tooltip with the one below, which is the only place
+    // the floor is explained.
     private static Vector4 ColorPicker(string label, Vector4 value, ref bool changed)
     {
-        var rgb = new Vector3(value.X, value.Y, value.Z);
+        var edited = ImGui.ColorEdit4(
+            label,
+            ref value,
+            ImGuiColorEditFlags.NoInputs
+            | ImGuiColorEditFlags.AlphaBar
+            | ImGuiColorEditFlags.AlphaPreviewHalf
+            | ImGuiColorEditFlags.NoTooltip);
 
-        if (!ImGui.ColorEdit3(label, ref rgb, ImGuiColorEditFlags.NoInputs))
-            return value;
+        if (edited)
+        {
+            changed = true;
+            value = value with { W = Math.Max(value.W, Configuration.MinAlpha) };
+        }
 
-        changed = true;
-        return new Vector4(rgb, value.W);
+        Tooltip(
+            $"Currently {value.W * 100f:F0}% solid.\n\nClick for the full picker. The narrow "
+            + "chequered strip right of the rainbow is alpha — how solid this colour is — and it "
+            + $"stops at {Configuration.MinAlpha * 100f:F0}%, far enough back to sit behind the "
+            + "other lines but not so far that the line disappears and looks like a fault.");
+
+        return value;
     }
 
     private static T Choice<T>(string label, T value, Func<T, string> name, ref bool changed)
@@ -260,6 +291,8 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         ImGui.TextWrapped(text);
     }
 
+    // Note the argument is built whether or not the tooltip shows, so keep interpolated ones off
+    // hot paths.
     private static void Tooltip(string text)
     {
         if (!ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))

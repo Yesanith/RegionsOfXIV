@@ -12,6 +12,8 @@ internal readonly record struct Preset(string Name, string Description, Action<C
     }
 }
 
+// Each preset resets everything to defaults first, then applies only what it is named for, so
+// applying one is not affected by whatever was set before it.
 internal static class Presets
 {
     public static readonly Preset[] All =

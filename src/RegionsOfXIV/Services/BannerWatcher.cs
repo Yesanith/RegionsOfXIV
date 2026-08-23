@@ -7,6 +7,12 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace RegionsOfXIV.Services;
 
+// The game's full-screen banners live in four persistent addons that are created at login and
+// hidden between uses, so there is no setup event to hook -- the only way to notice one is to
+// look at them every frame and watch for a change.
+//
+// That makes this the most frequently run code in the plugin, which is why it gives up
+// immediately when the feature is off.
 internal sealed class BannerWatcher : IBannerSource, IDisposable
 {
     private static readonly string[] ImageAddons = ["_Image", "_Image2", "_Image3", "_Image4"];
@@ -69,6 +75,9 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
                 + "Report this id and it can be added.");
     }
 
+    // Made transparent rather than hidden. Setting IsVisible would make the addon lie about its
+    // own state, and the game turns the banner off again on its own once it is done -- which also
+    // resets the alpha, so this needs no undo.
     private static unsafe void Hide(AddonImage* addon)
     {
         var root = addon->RootNode;
@@ -77,6 +86,9 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
             root->Color.A = 0;
     }
 
+    // IconId is only populated while the texture is loading. Once it has settled the id survives
+    // nowhere but the file name of the loaded resource, so a path like ui/icon/120000/120001_hr1.tex
+    // has to be parsed back into 120001.
     private static unsafe uint IconOf(AtkImageNode* node)
     {
         if (node == null)

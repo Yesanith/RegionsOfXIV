@@ -3,6 +3,14 @@ using RegionsOfXIV.Models;
 
 namespace RegionsOfXIV.Services;
 
+// Every rule about staying quiet, in one place. Three separate suppression windows overlap here:
+//
+//   nextAllowed         nothing at all until the current notice has been readable for a moment
+//   suppressFinerUntil  a zone announcement mutes the smaller areas inside it
+//   suppressCoarseUntil the reverse, so a sub-area does not get stomped by its own parent
+//
+// plus a short memory of recent places, which is what stops a notification flickering when you
+// walk back and forth across a boundary.
 internal sealed class NotificationGate
 {
     private static readonly TimeSpan GlobalCooldown = TimeSpan.FromMilliseconds(2000);
@@ -46,6 +54,9 @@ internal sealed class NotificationGate
         this.nextSlot = 0;
     }
 
+    // Deliberately does not consult IsBlockedByGameState. A zone entry is decided during the
+    // loading screen, when BetweenAreas and friends are all set, so those checks would refuse
+    // every arrival there is.
     public bool ShouldAnnounceZoneEntry(bool destinationIsPvp, bool destinationIsDuty)
     {
         if (!this.config.HideNativeLoadingTitle)
@@ -145,6 +156,8 @@ internal sealed class NotificationGate
             ? timing.UntilReadable
             : GlobalCooldown);
 
+    // A small ring buffer rather than a set: it needs to forget, and the window is short enough
+    // that a linear scan of six entries costs nothing.
     private bool AnnouncedRecently(in LocationSnapshot current, DateTime now)
     {
         foreach (var (place, at) in this.recent)

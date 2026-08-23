@@ -40,6 +40,9 @@ internal sealed class NativeUiSuppressor : IAreaTextSource, IDisposable
 
     public void RestoreLoadingTitle() => SetVisible(LoadingTitleAddons, true);
 
+    // Registered on setup, refresh and draw. The first two carry new wording and are where the
+    // text is read; PreDraw carries nothing new and exists only to keep re-hiding the addon,
+    // because the game makes it visible again on its own whenever it re-renders.
     private unsafe void OnAreaText(AddonEvent type, AddonArgs args)
     {
         var isContentEvent = type != AddonEvent.PreDraw;
@@ -53,6 +56,9 @@ internal sealed class NativeUiSuppressor : IAreaTextSource, IDisposable
             OnAreaTextShown?.Invoke(text);
     }
 
+    // The addon has no stable node id for its caption, so the first non-empty text node is taken.
+    // Fragile by nature -- if a patch reorders the nodes this is what will start returning the
+    // wrong string.
     private static unsafe string? ReadLargestText(AtkUnitBase* addon)
     {
         for (var i = 0; i < addon->UldManager.NodeListCount; i++)

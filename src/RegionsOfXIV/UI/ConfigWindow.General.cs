@@ -10,6 +10,10 @@ internal sealed partial class ConfigWindow
         using var tab = ImRaii.TabItem("General");
         if (!tab) return;
 
+        // Two flags, because they lead to different previews. Most settings only need the
+        // notification redrawn with the new value, which LivePreview does without restarting it.
+        // The decode toggle changes how the line arrives, so it has to be played from the top to
+        // be seen at all.
         var changed = false;
         var restart = false;
 
@@ -95,9 +99,8 @@ internal sealed partial class ConfigWindow
         Tooltip(
             "Off, the weather line follows the header, and one outline colour\n" +
             "covers all three lines.\n\n" +
-            "On, the weather line and the outlines take the colours below. Making\n" +
-            "a line transparent in both its colour and its outline is how you fade\n" +
-            "that one line back without touching the others.");
+            "On, the weather line and the outlines take the colours below, so one\n" +
+            "line can be pushed towards the background without touching the others.");
 
         using (ImRaii.Disabled(!this.config.SeparateLineColors))
         {
@@ -160,8 +163,13 @@ internal sealed partial class ConfigWindow
         this.config.UnderlineHeader = Checkbox(
             "Underline header", this.config.UnderlineHeader, ref changed);
 
-        this.config.OverlapHeader = Checkbox(
-            "Overlap header", this.config.OverlapHeader, ref changed);
+        this.config.HeaderGap = Slider(
+            "Header gap", this.config.HeaderGap, 0.5f, 2.5f, "%.2f lines", ref changed);
+        Tooltip(
+            "How far the name sits below the header, measured in lines of header text.\n\n" +
+            "Low values pull the two together until they almost touch, which is the\n" +
+            "tighter look the plugin has always shipped with. Higher values open the\n" +
+            "gap up and give each line room to breathe.");
     }
 
     private void DrawQuietRules(ref bool changed)

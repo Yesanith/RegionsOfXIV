@@ -11,6 +11,12 @@ namespace RegionsOfXIV.UI;
 
 internal sealed partial class ConfigWindow
 {
+    // Per-role scratch state for the custom font row. The typed path is buffered rather than
+    // written straight to the config, because committing on every keystroke would rebuild the
+    // font atlas per character; it lands when the field loses focus.
+    //
+    // ProblemWith caches its answer for the same reason -- validating a path touches the disk,
+    // and this is drawn every frame the tab is open.
     private sealed class FontPathEditor
     {
         public string? Buffer;
@@ -171,6 +177,9 @@ internal sealed partial class ConfigWindow
         return changed;
     }
 
+    // Two sources of trouble: the path itself, checked here and immediately; and the atlas
+    // failing to parse a file that does exist, which happens asynchronously and only shows up in
+    // the font handle afterwards.
     private void DrawCustomFontStatus(FontRole role, FontPathEditor editor, string path)
     {
         var problem = editor.ProblemWith(path) ?? this.actions.FontProblem(role);

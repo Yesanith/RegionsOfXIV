@@ -2,6 +2,10 @@
 
 namespace RegionsOfXIV.Services;
 
+// Weather in FFXIV is not random and not sent to the client -- it is a pure function of the
+// clock, so it can be worked out for any zone at any time without waiting to observe it. That is
+// what lets an arrival announce the weather in the same breath as the place name instead of a
+// beat later.
 internal static class EorzeaWeather
 {
     private const long BellSeconds = 175;
