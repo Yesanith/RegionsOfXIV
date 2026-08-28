@@ -132,21 +132,22 @@ build by default:
 
 | File | What it does |
 | --- | --- |
-| `Services/AddonNodeDump.cs` | logs an addon's node tree, for working out what the game actually puts in `_AreaText`, the loading-screen title or a banner |
 | `Services/SheetSearch.cs` | searches the game's Excel sheets from chat |
 | `UI/IconBrowserWindow.cs` | a scrollable grid of the game's own icons, for finding an icon ID |
+| `UI/BannerPreviewWindow.cs` | fires any banner on demand, and is where banner names get transcribed |
 
-They are wired to three `/regions` subcommands that exist only in a Debug build:
+They are wired to four `/regions` subcommands that exist only in a Debug build:
 
 | Command | Effect |
 | --- | --- |
+| `/regions preview` | open the banner preview |
 | `/regions icons` | open the icon browser |
 | `/regions banners` | list the banner rows found in the sheets |
 | `/regions find <term>` | search the sheets for a term |
 
-`RegionsOfXIV.csproj` removes all three from compilation in every configuration
-but Debug, so none of it reaches a release build — the types are absent from the
-Release assembly entirely, not merely unreachable.
+`RegionsOfXIV.csproj` removes all three files from compilation in every
+configuration but Debug, so none of it reaches a release build — the types are
+absent from the Release assembly entirely, not merely unreachable.
 
 ### How it fits together
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -12,8 +12,8 @@ using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
 
-// Debug-only tooling. Gitignored, and removed from compilation in every configuration but
-// Debug by the ItemGroup in RegionsOfXIV.csproj, so none of this reaches a release build.
+// Debug-only tooling, removed from compilation in every configuration but Debug by the ItemGroup
+// in RegionsOfXIV.csproj, so none of this reaches a release build.
 internal sealed class IconBrowserWindow : Window, IDisposable
 {
     private const float RowHeight = 56f;

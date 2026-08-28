@@ -119,6 +119,8 @@ public sealed class Plugin : IDalamudPlugin
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
+            // Shown in Dalamud's own command list, so it names only the subcommands a release
+            // build has -- the debug ones are not there to be found.
             HelpMessage = "Open the Regions of XIV settings. \"/regions test\" fires a sample notification, "
                           + "\"/regions changelog\" shows what has changed.",
         });
@@ -250,9 +252,22 @@ public sealed class Plugin : IDalamudPlugin
     {
         var argument = args.Trim();
 
+        // Bare /regions opens the settings, matching the installer's own button for the plugin.
+        if (argument.Length == 0)
+        {
+            ToggleConfigUi();
+            return;
+        }
+
         if (argument.Equals("test", StringComparison.OrdinalIgnoreCase))
         {
             this.coordinator.PushPreview();
+            return;
+        }
+
+        if (argument.Equals("changelog", StringComparison.OrdinalIgnoreCase))
+        {
+            this.changelogWindow.ShowAll();
             return;
         }
 
@@ -281,12 +296,6 @@ public sealed class Plugin : IDalamudPlugin
             return;
         }
 #endif
-
-        if (argument.Equals("changelog", StringComparison.OrdinalIgnoreCase))
-        {
-            this.changelogWindow.ShowAll();
-            return;
-        }
 
         ToggleConfigUi();
     }

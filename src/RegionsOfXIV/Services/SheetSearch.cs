@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
@@ -6,8 +6,8 @@ using Lumina.Excel.Sheets;
 
 namespace RegionsOfXIV.Services;
 
-// Debug-only tooling. Gitignored, and removed from compilation in every configuration but
-// Debug by the ItemGroup in RegionsOfXIV.csproj, so none of this reaches a release build.
+// Debug-only tooling, removed from compilation in every configuration but Debug by the ItemGroup
+// in RegionsOfXIV.csproj, so none of this reaches a release build.
 internal static class SheetSearch
 {
     private const int MaxHits = 40;
