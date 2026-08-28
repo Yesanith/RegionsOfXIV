@@ -103,6 +103,13 @@ internal static class PresetCode
             if (root.TryGetProperty("s", out var overrides) && overrides.ValueKind == JsonValueKind.Object)
                 ApplyOverrides(overrides, built.Settings);
 
+            // A code carries the config version it was written against, and settings have been
+            // replaced since -- 0.3.0.0 wrote OverlapHeader where this build reads HeaderGap.
+            // Running the same migration the config file gets is what stops an old code quietly
+            // landing on the default for everything that has been superseded since.
+            built.Settings.Version = VersionOf(root);
+            built.Settings.Migrate();
+
             preset = built;
             error = string.Empty;
             return true;
@@ -171,11 +178,20 @@ internal static class PresetCode
         return result;
     }
 
+    // Absent means a code from before the field existed; every build has written it, so treating
+    // a missing one as current keeps a hand-made code from being migrated out of shape.
+    private static int VersionOf(JsonElement root) =>
+        root.TryGetProperty("v", out var version)
+        && version.ValueKind == JsonValueKind.Number
+        && version.TryGetInt32(out var value)
+            ? value
+            : Configuration.CurrentVersion;
+
     private static void ApplyOverrides(JsonElement overrides, Configuration to)
     {
         foreach (var member in overrides.EnumerateObject())
         {
-            if (ConfigurationCopy.Find(member.Name) is not { } property)
+            if (ConfigurationCopy.FindForImport(member.Name) is not { } property)
                 continue;
 
             try

@@ -25,7 +25,14 @@ jobs:
         Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/latest.zip -OutFile latest.zip
         Expand-Archive -Force latest.zip "$env:AppData\XIVLauncher\addon\Hooks\dev"
 
-    - name: Build with dotnet
+    # Debug first, and deliberately. The developer tools live behind #if DEBUG and
+    # are removed from compilation in every other configuration, so a Release-only
+    # pipeline cannot see them break. Debug is also what Rider and Visual Studio
+    # build by default, which makes it the configuration a fresh clone hits first.
+    - name: Build (Debug)
+      run: dotnet build RegionsOfXIV.sln --configuration Debug
+
+    - name: Build (Release)
       run: dotnet build RegionsOfXIV.sln --configuration Release
 
     - name: Test

@@ -16,6 +16,13 @@ internal sealed class AnnouncementCoordinator : IDisposable
     private readonly AnnouncementSources sources;
     private readonly NotificationGate gate;
 
+#if DEBUG
+    // Handed to the banner preview window so it can show what the gate currently thinks. Guarded
+    // rather than left public because nothing in a release build has any business reaching in
+    // here — the gate is the coordinator's own, and every real caller is in this file.
+    internal NotificationGate Gate => this.gate;
+#endif
+
     private string? pendingNativeAreaText;
 
     private string? lastNativeAreaText;
@@ -89,7 +96,11 @@ internal sealed class AnnouncementCoordinator : IDisposable
     {
         Log.Debug($"Banner [{iconId}]: {text}");
 
-        this.sink.Push(null, text.ToUpperInvariant());
+        if (!this.gate.ShouldAnnounceBanner())
+            return;
+
+        BannerNotification.PushTo(this.sink, text);
+        this.gate.MarkBannerAnnounced(this.sink.Timing);
     }
 
     private void HandleWeatherChanged(byte weatherId)

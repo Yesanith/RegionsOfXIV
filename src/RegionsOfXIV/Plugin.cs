@@ -41,6 +41,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly ChangelogWindow changelogWindow;
 #if DEBUG
     private readonly IconBrowserWindow iconBrowserWindow;
+    private readonly BannerPreviewWindow bannerPreviewWindow;
 #endif
     private readonly AnnouncementCoordinator coordinator;
     private readonly UiVisibilityGuard uiVisibilityGuard;
@@ -106,6 +107,9 @@ public sealed class Plugin : IDalamudPlugin
 
         this.iconBrowserWindow = new IconBrowserWindow();
         this.windowSystem.AddWindow(this.iconBrowserWindow);
+
+        this.bannerPreviewWindow = new BannerPreviewWindow(this.overlay, this.coordinator.Gate);
+        this.windowSystem.AddWindow(this.bannerPreviewWindow);
 #endif
 
         if (isFirstRun)
@@ -164,6 +168,7 @@ public sealed class Plugin : IDalamudPlugin
 
         this.windowSystem.RemoveAllWindows();
 #if DEBUG
+        this.bannerPreviewWindow.Dispose();
         this.iconBrowserWindow.Dispose();
 #endif
         this.changelogWindow.Dispose();
@@ -182,6 +187,7 @@ public sealed class Plugin : IDalamudPlugin
             if (PluginInterface.GetPluginConfig() is Configuration stored)
             {
                 var changed = stored.Migrate();
+                changed |= MigrateSavedPresets(stored);
                 changed |= stored.RepairFaintColors();
 
                 if (changed)
@@ -198,6 +204,23 @@ public sealed class Plugin : IDalamudPlugin
             QuarantineBrokenConfig();
             return (new Configuration(), false);
         }
+    }
+
+    // A saved preset is a whole configuration of its own, written by whichever build saved it, so
+    // it is exactly as old as the file it sits in and needs the same migration. Without this,
+    // applying a preset saved before a setting was replaced quietly resets that setting to its
+    // default -- the preset still holds the old value, but nothing reads it any more.
+    private static bool MigrateSavedPresets(Configuration config)
+    {
+        var changed = false;
+
+        foreach (var preset in config.UserPresets)
+        {
+            if (preset.Settings is { } settings)
+                changed |= settings.Migrate();
+        }
+
+        return changed;
     }
 
     // A config that cannot be parsed is moved aside rather than deleted or overwritten, so the
@@ -237,6 +260,12 @@ public sealed class Plugin : IDalamudPlugin
         if (argument.Equals("icons", StringComparison.OrdinalIgnoreCase))
         {
             this.iconBrowserWindow.Toggle();
+            return;
+        }
+
+        if (argument.Equals("preview", StringComparison.OrdinalIgnoreCase))
+        {
+            this.bannerPreviewWindow.Toggle();
             return;
         }
 

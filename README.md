@@ -125,6 +125,29 @@ The tests need neither the game nor Dalamud, so they run anywhere the SDK does:
 dotnet test RegionsOfXIV.sln -c Release
 ```
 
+### Developer tools
+
+Three files are compiled only in Debug, which is what Rider and Visual Studio
+build by default:
+
+| File | What it does |
+| --- | --- |
+| `Services/AddonNodeDump.cs` | logs an addon's node tree, for working out what the game actually puts in `_AreaText`, the loading-screen title or a banner |
+| `Services/SheetSearch.cs` | searches the game's Excel sheets from chat |
+| `UI/IconBrowserWindow.cs` | a scrollable grid of the game's own icons, for finding an icon ID |
+
+They are wired to three `/regions` subcommands that exist only in a Debug build:
+
+| Command | Effect |
+| --- | --- |
+| `/regions icons` | open the icon browser |
+| `/regions banners` | list the banner rows found in the sheets |
+| `/regions find <term>` | search the sheets for a term |
+
+`RegionsOfXIV.csproj` removes all three from compilation in every configuration
+but Debug, so none of it reaches a release build — the types are absent from the
+Release assembly entirely, not merely unreachable.
+
 ### How it fits together
 
 `Services/AnnouncementCoordinator.cs` is the brain: everything that decides *what*

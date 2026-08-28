@@ -356,4 +356,107 @@ public class NotificationGateTests
     }
 
     private static LocationSnapshot SubArea(int index) => new(100, 1, 2, 3, 4, (uint)(20 + index));
+
+    // --- banners ------------------------------------------------------------
+
+    [Fact]
+    public void BannersAreAnnouncedByDefault()
+    {
+        Assert.True(Gate().ShouldAnnounceBanner());
+    }
+
+    [Fact]
+    public void BannersRespectTheirOwnToggle()
+    {
+        this.settings.BannerNotificationEnabled = false;
+
+        Assert.False(Gate().ShouldAnnounceBanner());
+    }
+
+    [Theory]
+    [InlineData("cutscene")]
+    [InlineData("pvp")]
+    [InlineData("gpose")]
+    [InlineData("loggedout")]
+    public void BannersAreSuppressedByTheUnconditionalRules(string state)
+    {
+        switch (state)
+        {
+            case "cutscene": this.game.IsInCutscene = true; break;
+            case "pvp": this.game.IsPvP = true; break;
+            case "gpose": this.game.IsGPosing = true; break;
+            default: this.game.IsLoggedIn = false; break;
+        }
+
+        Assert.False(Gate().ShouldAnnounceBanner());
+    }
+
+    // Level Up! and Duty Commenced are about being in combat and in a duty, so the two settings
+    // that would otherwise silence them are deliberately not consulted.
+    [Fact]
+    public void BannersSurviveHideInCombat()
+    {
+        this.settings.HideInCombat = true;
+        this.game.IsInCombat = true;
+
+        Assert.True(Gate().ShouldAnnounceBanner());
+    }
+
+    [Fact]
+    public void BannersSurviveHideInDuty()
+    {
+        this.settings.HideInDuty = true;
+        this.game.IsBoundByDuty = true;
+
+        Assert.True(Gate().ShouldAnnounceBanner());
+    }
+
+    // Duty Commenced fires around a transition, which is exactly when BetweenAreas is set.
+    [Fact]
+    public void BannersSurviveALoadingScreen()
+    {
+        this.game.IsBetweenAreas = true;
+
+        Assert.True(Gate().ShouldAnnounceBanner());
+    }
+
+    [Fact]
+    public void BannersWaitOutTheGlobalCooldown()
+    {
+        var gate = Gate();
+        gate.MarkAnnounced(NextSubArea, LocationTier.SubArea, Timing());
+
+        this.clock.Advance(1);
+        Assert.False(gate.ShouldAnnounceBanner());
+
+        this.clock.Advance(1.5);
+        Assert.True(gate.ShouldAnnounceBanner());
+    }
+
+    [Fact]
+    public void OneBannerHoldsOffTheNext()
+    {
+        var gate = Gate();
+
+        Assert.True(gate.ShouldAnnounceBanner());
+        gate.MarkBannerAnnounced(Timing());
+
+        Assert.False(gate.ShouldAnnounceBanner());
+
+        this.clock.Advance(2.5);
+        Assert.True(gate.ShouldAnnounceBanner());
+    }
+
+    // A banner is not a location, so marking one must not mute the area tiers or enter the
+    // recent-places memory.
+    [Fact]
+    public void ABannerDoesNotMuteLocationTiers()
+    {
+        var gate = Gate();
+        gate.MarkBannerAnnounced(Timing(onScreen: 8));
+
+        this.clock.Advance(2.5);
+
+        Assert.True(gate.ShouldAnnounce(Here, NextSubArea, LocationTier.SubArea, 0f));
+    }
 }

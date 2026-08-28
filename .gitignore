@@ -18,10 +18,6 @@ TestResults/
 !/README.md
 !/LICENSE.md
 
-src/RegionsOfXIV/Services/AddonNodeDump.cs
-src/RegionsOfXIV/Services/SheetSearch.cs
-src/RegionsOfXIV/UI/IconBrowserWindow.cs
-
 /dispose.txt
 /notes/
 /scratch/

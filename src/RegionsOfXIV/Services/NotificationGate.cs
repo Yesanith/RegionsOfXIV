@@ -3,6 +3,19 @@ using RegionsOfXIV.Models;
 
 namespace RegionsOfXIV.Services;
 
+// Why a banner is being held back, for the debug preview window to show. The gate is otherwise
+// only observable by walking around and noticing what fails to appear.
+internal enum BannerBlock
+{
+    None,
+    Disabled,
+    LoggedOut,
+    Cutscene,
+    Pvp,
+    GPose,
+    Cooldown,
+}
+
 // Every rule about staying quiet, in one place. Three separate suppression windows overlap here:
 //
 //   nextAllowed         nothing at all until the current notice has been readable for a moment
@@ -90,6 +103,43 @@ internal sealed class NotificationGate
     public bool ShouldAnnounceWeather() =>
         this.config.WeatherNotificationEnabled && !IsBlockedByGameState();
 
+    // Banners answer to a narrower set of rules than anything else here, and each omission is
+    // deliberate.
+    //
+    // Combat and duty are not consulted. Level Up! and Duty Commenced are *about* those states,
+    // so honouring HideInCombat or HideInDuty would suppress precisely the banners worth having.
+    //
+    // BetweenAreas is not consulted either: Duty Commenced fires around a transition, which is
+    // exactly when that flag is set.
+    //
+    // What does apply is the unconditional set — a banner has no business drawing over a
+    // cutscene, in PvP or in gpose — and the global cooldown, so two in quick succession cannot
+    // stack and one cannot land on top of a zone arrival.
+    public bool ShouldAnnounceBanner() => BannerBlockReason() == BannerBlock.None;
+
+    // The conditions live here rather than in ShouldAnnounceBanner so the debug preview can show
+    // why a banner would be refused without restating the rules. A second copy in the UI would
+    // drift, and a diagnostic that lies about the thing it diagnoses is worse than none.
+    public BannerBlock BannerBlockReason()
+    {
+        if (!this.config.BannerNotificationEnabled)
+            return BannerBlock.Disabled;
+
+        if (!this.game.IsLoggedIn)
+            return BannerBlock.LoggedOut;
+
+        if (this.game.IsInCutscene)
+            return BannerBlock.Cutscene;
+
+        if (this.game.IsPvP)
+            return BannerBlock.Pvp;
+
+        if (this.game.IsGPosing)
+            return BannerBlock.GPose;
+
+        return this.now() < this.nextAllowed ? BannerBlock.Cooldown : BannerBlock.None;
+    }
+
     private bool CanAnnounceAnyArea() =>
         (this.config.AreaNotificationEnabled || this.config.SubAreaNotificationEnabled)
         && !IsBlockedByGameState();
@@ -150,6 +200,11 @@ internal sealed class NotificationGate
         if (tier <= LocationTier.Place)
             this.suppressFinerUntil = now + timing.OnScreen;
     }
+
+    // The global cooldown only. The finer and coarser windows and the recent-places memory are
+    // all about location tiers, and a banner is not a location — muting a sub-area because a
+    // Level Up! went past would be the wrong trade.
+    public void MarkBannerAnnounced(NotificationTiming timing) => HoldOff(this.now(), timing);
 
     private void HoldOff(DateTime now, NotificationTiming timing) =>
         this.nextAllowed = now + (timing.UntilReadable > GlobalCooldown

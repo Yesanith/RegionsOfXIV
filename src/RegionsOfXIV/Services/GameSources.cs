@@ -1,5 +1,6 @@
 using System;
 using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.Conditions;
 using RegionsOfXIV.Models;
 
 namespace RegionsOfXIV.Services;
@@ -55,4 +56,26 @@ internal sealed class GameWeatherNames : IWeatherNames
 
     public ResolvedWeather? Forecast(uint territoryTypeId, DateTimeOffset at) =>
         WeatherNameResolver.Forecast(territoryTypeId, at);
+}
+
+internal sealed class DalamudGameState : IGameState
+{
+    public bool IsLoggedIn => Plugin.ClientState.IsLoggedIn;
+
+    public bool IsBetweenAreas =>
+        Plugin.Condition[ConditionFlag.BetweenAreas] ||
+        Plugin.Condition[ConditionFlag.BetweenAreas51];
+
+    public bool IsInCutscene =>
+        Plugin.Condition[ConditionFlag.OccupiedInCutSceneEvent] ||
+        Plugin.Condition[ConditionFlag.WatchingCutscene] ||
+        Plugin.Condition[ConditionFlag.WatchingCutscene78];
+
+    public bool IsPvP => Plugin.ClientState.IsPvP;
+
+    public bool IsGPosing => Plugin.ClientState.IsGPosing;
+
+    public bool IsInCombat => Plugin.Condition[ConditionFlag.InCombat];
+
+    public bool IsBoundByDuty => Plugin.Condition[ConditionFlag.BoundByDuty];
 }

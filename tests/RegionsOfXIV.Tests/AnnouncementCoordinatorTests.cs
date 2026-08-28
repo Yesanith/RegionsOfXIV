@@ -166,6 +166,8 @@ public class AnnouncementCoordinatorTests
     [Fact]
     public void BannersAreAnnouncedInCapitals()
     {
+        this.config.BannerNotificationEnabled = true;
+
         using var _ = Build();
 
         this.banners.Show(120001, "Quest Accepted");
@@ -175,17 +177,24 @@ public class AnnouncementCoordinatorTests
         Assert.Null(announced.Header);
     }
 
+    // Was BannersAreNotHeldBackByThePacingThatGovernsPlaces, which asserted the opposite: that a
+    // banner ignored the global cooldown entirely. Banners now share it, so an arrival holds the
+    // next banner off and two banners in a row cannot stack.
+    //
+    // The coordinator builds its own gate on the real clock, so this can only show the holding
+    // off. NotificationGateTests covers the release, where the clock can be advanced.
     [Fact]
-    public void BannersAreNotHeldBackByThePacingThatGovernsPlaces()
+    public void BannersWaitOutThePacingFromAPlace()
     {
+        this.config.BannerNotificationEnabled = true;
+
         using var _ = Build();
 
         this.zones.Arrive(Arrival());
         this.banners.Show(120001, "Quest Accepted");
         this.banners.Show(120002, "Quest Complete");
 
-        Assert.Equal(3, this.sink.Pushed.Count);
-        Assert.Equal("QUEST COMPLETE", this.sink.Last!.Text);
+        Assert.Single(this.sink.Pushed);
     }
 
     [Fact]
