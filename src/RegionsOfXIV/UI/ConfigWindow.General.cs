@@ -16,9 +16,10 @@ internal sealed partial class ConfigWindow
         // be seen at all.
         var changed = false;
         var restart = false;
+        var refont = false;
 
         DrawPlacement(ref changed);
-        DrawLettering(ref changed, ref restart);
+        DrawLettering(ref changed, ref restart, ref refont);
 
         ImGui.Separator();
 
@@ -43,6 +44,11 @@ internal sealed partial class ConfigWindow
 
         MarkUnsaved();
 
+        // Before the replay, not after: the Eorzean face only exists while the decode effect is on,
+        // so previewing against the old atlas would show the state before the toggle.
+        if (refont)
+            this.actions.RebuildFonts();
+
         if (restart)
             this.actions.Preview(Sample);
         else
@@ -61,7 +67,7 @@ internal sealed partial class ConfigWindow
             "A long place name set near either end will reach past it.");
     }
 
-    private void DrawLettering(ref bool changed, ref bool restart)
+    private void DrawLettering(ref bool changed, ref bool restart, ref bool refont)
     {
         this.config.LetterSpacing = Slider(
             "Letter spacing", this.config.LetterSpacing, 0f, 30f, "%.0f%%", ref changed);
@@ -73,8 +79,16 @@ internal sealed partial class ConfigWindow
         this.config.UppercaseText = Checkbox(
             "Uppercase", this.config.UppercaseText, ref changed);
 
+        var wasDecoding = this.config.DecodeEffectEnabled;
+
         this.config.DecodeEffectEnabled = Checkbox(
             "Decode from Eorzean script", this.config.DecodeEffectEnabled, ref restart);
+
+        // Asked explicitly rather than reading restart, which happens to mean the same thing today
+        // only because this is the one control on the tab that sets it.
+        if (this.config.DecodeEffectEnabled != wasDecoding)
+            refont = true;
+
         Tooltip(
             "Requires a bundled Eorzean font. Latin text only.\n\n" +
             "Runs after the motion on the Effects tab rather than alongside it:\n" +

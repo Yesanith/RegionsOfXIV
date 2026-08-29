@@ -47,7 +47,10 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
 
     private readonly BannerDecisions decisions = new();
 
-    private static readonly HashSet<uint> Unnamed = [];
+    // Per watcher rather than static. A static set outlives the plugin being reloaded, so an id
+    // logged once would stay silent for the rest of the game session -- including across the
+    // reload someone does precisely to go and look at it.
+    private readonly HashSet<uint> unnamed = [];
 
     public event Action<uint, string, BannerBlock>? OnBannerShown;
 
@@ -107,7 +110,7 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
         {
             this.decisions.Record(which, icon, taken: false);
 
-            if (icon != 0 && Unnamed.Add(icon))
+            if (icon != 0 && this.unnamed.Add(icon))
                 Log.Information(
                     $"Banner icon {icon} appeared on {addonName} with no name for it yet. "
                     + "Report this id and it can be added.");

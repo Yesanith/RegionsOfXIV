@@ -165,6 +165,9 @@ internal sealed class AreaNotification
 
         this.casedAsUpper = uppercase;
 
+        // Invariant, not the user's culture: these are place names out of game data rather than
+        // anything the player typed, and a Turkish locale would upcase "i" to a dotted capital for
+        // those players alone.
         CasedText = uppercase ? Text.ToUpperInvariant() : Text;
         CasedHeader = Header == null
             ? string.Empty

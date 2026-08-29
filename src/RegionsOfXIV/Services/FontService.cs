@@ -28,6 +28,8 @@ internal sealed class FontService : IDisposable
     private readonly Configuration config;
     private readonly Face[] faces;
 
+    private bool builtWithDecoding;
+
     public FontService(Configuration config)
     {
         this.config = config;
@@ -113,12 +115,19 @@ internal sealed class FontService : IDisposable
     {
         var rebuilt = false;
 
+        // The decode effect is not part of a face's identity -- choice, path and size are -- but it
+        // decides whether the Eorzean handle gets built at all. So a change to it has to force every
+        // role through Build even though Matches would happily say nothing moved.
+        var decoding = this.config.DecodeEffectEnabled;
+        var decodingChanged = decoding != this.builtWithDecoding;
+        this.builtWithDecoding = decoding;
+
         foreach (var role in Roles)
         {
             var wanted = this.config.FontFor(role);
             var face = this.faces[(int)role];
 
-            if (face.Matches(wanted))
+            if (!decodingChanged && face.Matches(wanted))
                 continue;
 
             Build(face, wanted);
@@ -161,10 +170,16 @@ internal sealed class FontService : IDisposable
             face.Plain = BuildStock(wanted.Choice, wanted.SizePx);
         }
 
+        // Only while the decode effect is on, since it is the only thing that draws with this
+        // handle. Built unconditionally it cost three faces' worth of atlas for every player with
+        // the effect off.
+        //
         // Default ranges on purpose. The Eorzean font is a Latin-only recreation of the in-game
         // alphabet, so asking it for kana and kanji would reserve thousands of glyphs it does not
         // contain and cost atlas space for nothing.
-        face.Eorzean = BuildFromFile(BundledEorzeanPath(), wanted.SizePx, glyphRanges: null);
+        face.Eorzean = this.config.DecodeEffectEnabled
+            ? BuildFromFile(BundledEorzeanPath(), wanted.SizePx, glyphRanges: null)
+            : null;
     }
 
     private IFontHandle BuildStock(FontChoice choice, float sizePx) =>
