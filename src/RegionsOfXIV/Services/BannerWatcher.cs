@@ -7,6 +7,27 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace RegionsOfXIV.Services;
 
+// What each _Image addon is currently showing, and what was decided about it. Kept apart from the
+// addon pointers so the ordering rule in OnImage can be exercised without the game running.
+internal sealed class BannerDecisions
+{
+    private readonly Dictionary<nint, (uint Icon, bool Taken)> showing = [];
+
+    public int Count => this.showing.Count;
+
+    public void Clear() => this.showing.Clear();
+
+    // True when this addon is showing something it was not showing last frame. That transition is
+    // the only moment the gate may be consulted -- see OnImage.
+    public bool IsNew(nint addon, uint icon) =>
+        !this.showing.TryGetValue(addon, out var state) || state.Icon != icon;
+
+    public void Record(nint addon, uint icon, bool taken) => this.showing[addon] = (icon, taken);
+
+    public bool IsTaken(nint addon) =>
+        this.showing.TryGetValue(addon, out var state) && state.Taken;
+}
+
 // The game's full-screen banners live in four persistent addons that are created at login and
 // hidden between uses, so there is no setup event to hook -- the only way to notice one is to
 // look at them every frame and watch for a change.
@@ -19,15 +40,21 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
 
     private readonly Configuration config;
 
-    private readonly Dictionary<nint, uint> showing = [];
+    // Whether a banner would actually be replaced right now. A predicate rather than the gate
+    // itself, so this stays ignorant of what decides -- and of AnnouncementCoordinator, which
+    // reaches back the other way through OnBannerShown.
+    private readonly Func<bool> willAnnounce;
+
+    private readonly BannerDecisions decisions = new();
 
     private static readonly HashSet<uint> Unnamed = [];
 
     public event Action<uint, string>? OnBannerShown;
 
-    public BannerWatcher(Configuration config)
+    public BannerWatcher(Configuration config, Func<bool> willAnnounce)
     {
         this.config = config;
+        this.willAnnounce = willAnnounce;
 
         Plugin.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, ImageAddons, OnImage);
     }
@@ -39,8 +66,8 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
     {
         if (!this.config.BannerNotificationEnabled)
         {
-            if (this.showing.Count > 0)
-                this.showing.Clear();
+            if (this.decisions.Count > 0)
+                this.decisions.Clear();
 
             return;
         }
@@ -52,18 +79,31 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
         var which = (nint)addon;
         var icon = addon->IsVisible ? IconOf(addon->ImageNode) : 0;
 
-        var name = icon == 0 ? null : BannerNameResolver.Resolve(icon);
-        var taking = name is not null;
+        if (this.decisions.IsNew(which, icon))
+            Decide(which, icon, args.AddonName);
 
-        if (taking && this.config.HideNativeBanner)
+        // Hidden from the decision recorded at the transition, never from a fresh one. This runs
+        // on PreDraw for every frame the banner is up, and asking again would give a different
+        // answer: announcing sets the gate's cooldown, so the very next frame would say no, the
+        // alpha would stop being reset, and the game's banner would fade back in underneath our
+        // own notification halfway through it.
+        if (this.config.HideNativeBanner && this.decisions.IsTaken(which))
             Hide(addon);
+    }
 
-        if (this.showing.TryGetValue(which, out var last) && last == icon)
-            return;
+    // The one place the gate is consulted, and only when the icon has just changed.
+    //
+    // It is asked before the event goes out rather than after, because handling that event is what
+    // sets the cooldown -- the question here is whether this banner gets replaced, not whether a
+    // second one could follow it.
+    private void Decide(nint which, uint icon, string addonName)
+    {
+        var name = icon == 0 ? null : BannerNameResolver.Resolve(icon);
+        var taken = name is not null && this.willAnnounce();
 
-        this.showing[which] = icon;
+        this.decisions.Record(which, icon, taken);
 
-        if (taking)
+        if (taken)
         {
             OnBannerShown?.Invoke(icon, name!);
             return;
@@ -71,7 +111,7 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
 
         if (icon != 0 && name == null && Unnamed.Add(icon))
             Log.Information(
-                $"Banner icon {icon} appeared on {args.AddonName} with no name for it yet. "
+                $"Banner icon {icon} appeared on {addonName} with no name for it yet. "
                 + "Report this id and it can be added.");
     }
 

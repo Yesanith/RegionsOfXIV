@@ -16,25 +16,20 @@ internal sealed class AnnouncementCoordinator : IDisposable
     private readonly AnnouncementSources sources;
     private readonly NotificationGate gate;
 
-#if DEBUG
-    // Handed to the banner preview window so it can show what the gate currently thinks. Guarded
-    // rather than left public because nothing in a release build has any business reaching in
-    // here — the gate is the coordinator's own, and every real caller is in this file.
-    internal NotificationGate Gate => this.gate;
-#endif
-
     private string? pendingNativeAreaText;
 
     private string? lastNativeAreaText;
 
+    // The gate arrives rather than being built here because BannerWatcher needs the same one: it
+    // has to know whether a banner will really be replaced before it hides the game's own, and a
+    // second gate would keep its own cooldown and answer differently.
     public AnnouncementCoordinator(
-        Configuration config, IGameState game, INotificationSink sink, AnnouncementSources sources)
+        Configuration config, NotificationGate gate, INotificationSink sink, AnnouncementSources sources)
     {
         this.config = config;
         this.sink = sink;
         this.sources = sources;
-
-        this.gate = new NotificationGate(config, game);
+        this.gate = gate;
 
         sources.Banners.OnBannerShown += HandleBannerShown;
         sources.Weather.OnWeatherChanged += HandleWeatherChanged;

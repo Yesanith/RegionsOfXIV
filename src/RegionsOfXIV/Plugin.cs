@@ -65,16 +65,21 @@ public sealed class Plugin : IDalamudPlugin
 
         var game = new DalamudGameState();
 
+        // One gate, owned here, because two things need the same answer from it: the coordinator
+        // decides whether to announce, and the watcher has to know that decision before it hides
+        // the game's own banner -- otherwise a refused banner leaves nothing on screen at all.
+        var gate = new NotificationGate(this.config, game);
+
         this.locations = new LocationTracker(game);
         this.weather = new WeatherTracker(game);
-        this.banners = new BannerWatcher(this.config);
+        this.banners = new BannerWatcher(this.config, gate.ShouldAnnounceBanner);
         this.zones = new GameZoneArrivals();
 
         this.weather.Start();
 
         this.coordinator = new AnnouncementCoordinator(
             this.config,
-            game,
+            gate,
             this.overlay,
             new AnnouncementSources(
                 this.locations,
@@ -108,7 +113,7 @@ public sealed class Plugin : IDalamudPlugin
         this.iconBrowserWindow = new IconBrowserWindow();
         this.windowSystem.AddWindow(this.iconBrowserWindow);
 
-        this.bannerPreviewWindow = new BannerPreviewWindow(this.overlay, this.coordinator.Gate);
+        this.bannerPreviewWindow = new BannerPreviewWindow(this.overlay, gate);
         this.windowSystem.AddWindow(this.bannerPreviewWindow);
 #endif
 

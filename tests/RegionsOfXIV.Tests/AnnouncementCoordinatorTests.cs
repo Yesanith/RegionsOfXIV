@@ -33,7 +33,7 @@ public class AnnouncementCoordinatorTests
 
         return new AnnouncementCoordinator(
             this.config,
-            this.game,
+            new NotificationGate(this.config, this.game),
             this.sink,
             new AnnouncementSources(
                 this.locations, this.weather, this.areaText,
