@@ -19,7 +19,7 @@ body:
       description: >-
         Shown next to the plugin in `/xlplugins`, or at the bottom of the
         settings window.
-      placeholder: "0.2.1.0"
+      placeholder: "0.4.2.0"
     validations:
       required: true
 

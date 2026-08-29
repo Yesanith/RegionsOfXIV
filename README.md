@@ -31,8 +31,10 @@ for Guild Wars 2.
   icon beside it, as you arrive and again whenever it turns over. Worked out from
   the clock rather than read off the screen, so it is there the moment you land.
 - **The game's banners, in your lettering.** Quest Accepted, Duty Commenced,
-  Level Up! and the rest, redrawn with the same effects as a place name. Only the
-  ones the plugin can name are taken over — the rest keep the game's own.
+  Level Up! and the rest, redrawn with the same effects as a place name. A
+  banner's wording is painted into its artwork rather than stored as text, so the
+  names are transcribed by hand and only English is substantially covered. A
+  banner the plugin has no name for keeps the game's own.
 - **Decodes from the Eorzean alphabet** as it reveals, glyph by glyph — and the
   letters can rise, wave, type or catch alight while they resolve.
 - **Hearts, embers, sparkles or petals** drifting around the text, if that is
@@ -64,10 +66,8 @@ for Guild Wars 2.
 
 ## Installing
 
-> Not on Dalamud's official plugin installer yet — a
-> [D17](https://github.com/goatcorp/DalamudPluginsD17) submission is open. Until
-> it lands, the custom repository below is the way in, and it updates itself
-> like any other plugin.
+> Regions of XIV is distributed through the custom repository below. Add it once
+> and the plugin installs and updates itself like any other.
 
 In game: `/xlsettings` → **Experimental** → paste into **Custom Plugin
 Repositories**:
@@ -120,7 +120,7 @@ Two things come out of that, and they are easy to mix up:
 | Path | What it is |
 | --- | --- |
 | `src/RegionsOfXIV/bin/x64/Release/` | the plugin itself — DLL, `Fonts/`, `images/`. Point Dalamud's **Dev Plugin Locations** here |
-| `src/RegionsOfXIV/bin/x64/Release/RegionsOfXIV/` | the packaged layout — `latest.zip`, manifest and icon, for a repo listing or a D17 submission. No DLL, so dev-loading from here finds nothing |
+| `src/RegionsOfXIV/bin/x64/Release/RegionsOfXIV/` | the packaged layout — `latest.zip`, manifest and icon, for the repository listing. No DLL, so dev-loading from here finds nothing |
 
 The tests need neither the game nor Dalamud, so they run anywhere the SDK does:
 
@@ -135,7 +135,7 @@ build by default:
 
 | File | What it does |
 | --- | --- |
-| `Services/SheetSearch.cs` | searches the game's Excel sheets from chat |
+| `Services/SheetSearch.cs` | searches the game's Excel sheets, writing what it finds to the Dalamud log |
 | `UI/IconBrowserWindow.cs` | a scrollable grid of the game's own icons, for finding an icon ID |
 | `UI/BannerPreviewWindow.cs` | fires any banner on demand, and is where banner names get transcribed |
 
@@ -145,8 +145,8 @@ They are wired to four `/regions` subcommands that exist only in a Debug build:
 | --- | --- |
 | `/regions preview` | open the banner preview |
 | `/regions icons` | open the icon browser |
-| `/regions banners` | list the banner rows found in the sheets |
-| `/regions find <term>` | search the sheets for a term |
+| `/regions banners` | log the banner rows found in the sheets |
+| `/regions find <term>` | search the sheets for a term and log the hits |
 
 `RegionsOfXIV.csproj` removes all three files from compilation in every
 configuration but Debug, so none of it reaches a release build — the types are
