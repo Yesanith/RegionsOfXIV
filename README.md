@@ -48,7 +48,10 @@ for Guild Wars 2.
   size: one of the game's own, Dalamud's Noto, or any `.ttf`, `.otf` or `.ttc`
   sitting on your PC. A font you supply loads exactly as it is and stays yours to
   look after — and a preset carries where the file sits rather than the font
-  itself, so a shared one falls back to Noto on someone else's machine.
+  itself, so a shared one falls back to Noto on someone else's machine. It has to
+  carry the letters your client needs: the plugin asks for Latin, kana and kanji,
+  but it cannot add a glyph a font does not have, so a Latin-only display face on
+  the Japanese client will draw blanks for Japanese place names.
 - **Styled to taste.** Place it anywhere on screen, with your own colours, letter
   spacing, casing, outline weight and a drop shadow you can throw in any
   direction. Name, header and weather can each take their own colour and outline,

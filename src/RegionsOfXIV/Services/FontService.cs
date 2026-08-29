@@ -161,7 +161,10 @@ internal sealed class FontService : IDisposable
             face.Plain = BuildStock(wanted.Choice, wanted.SizePx);
         }
 
-        face.Eorzean = BuildFromFile(BundledEorzeanPath(), wanted.SizePx);
+        // Default ranges on purpose. The Eorzean font is a Latin-only recreation of the in-game
+        // alphabet, so asking it for kana and kanji would reserve thousands of glyphs it does not
+        // contain and cost atlas space for nothing.
+        face.Eorzean = BuildFromFile(BundledEorzeanPath(), wanted.SizePx, glyphRanges: null);
     }
 
     private IFontHandle BuildStock(FontChoice choice, float sizePx) =>
@@ -169,12 +172,15 @@ internal sealed class FontService : IDisposable
             ? this.atlas.NewDelegateFontHandle(e => e.OnPreBuild(tk =>
                 tk.AddDalamudAssetFont(
                     DalamudAsset.NotoSansCjkMedium,
-                    new SafeFontConfig { SizePx = sizePx, GlyphRanges = JapaneseGlyphRanges() })))
+                    new SafeFontConfig { SizePx = sizePx, GlyphRanges = NotificationGlyphRanges() })))
             : this.atlas.NewGameFontHandle(new GameFontStyle(ResolveGameFamily(choice), sizePx));
 
     private IFontHandle? BuildCustom(Face face, string path, float sizePx)
     {
-        var handle = BuildFromFile(path, sizePx);
+        // The same ranges the stock face gets. Without them ImGui builds its default set, which is
+        // Latin-1 only, and a player on the Japanese client who picks a custom font gets blanks for
+        // every place name with nothing anywhere saying why.
+        var handle = BuildFromFile(path, sizePx, NotificationGlyphRanges());
 
         if (handle == null)
             face.Problem = CouldNotLoad;
@@ -182,7 +188,9 @@ internal sealed class FontService : IDisposable
         return handle;
     }
 
-    private IFontHandle? BuildFromFile(string? path, float sizePx)
+    // Ranges are the caller's to state, and the two callers want opposite things -- so there is no
+    // default: anything new calling this has to decide which it is.
+    private IFontHandle? BuildFromFile(string? path, float sizePx, ushort[]? glyphRanges)
     {
         if (path == null)
             return null;
@@ -190,7 +198,8 @@ internal sealed class FontService : IDisposable
         try
         {
             return this.atlas.NewDelegateFontHandle(
-                e => e.OnPreBuild(tk => tk.AddFontFromFile(path, new SafeFontConfig { SizePx = sizePx })));
+                e => e.OnPreBuild(tk => tk.AddFontFromFile(
+                    path, new SafeFontConfig { SizePx = sizePx, GlyphRanges = glyphRanges })));
         }
         catch (Exception ex)
         {
@@ -206,12 +215,16 @@ internal sealed class FontService : IDisposable
         _ => GameFontFamily.TrumpGothic,
     };
 
-    private static ushort[]? CachedJapaneseGlyphRanges;
+    private static ushort[]? CachedNotificationGlyphRanges;
 
-    private static unsafe ushort[] JapaneseGlyphRanges()
+    // Every glyph a notification face has to be able to draw. ImGui's "Japanese" set is a misnomer
+    // for our purposes: it carries Latin-1 as well as kana and kanji, which between them cover all
+    // four official client languages -- English, German, French and Japanese. Nothing needs adding
+    // to it; the bug was only ever that the custom path never received it.
+    private static unsafe ushort[] NotificationGlyphRanges()
     {
-        if (CachedJapaneseGlyphRanges != null)
-            return CachedJapaneseGlyphRanges;
+        if (CachedNotificationGlyphRanges != null)
+            return CachedNotificationGlyphRanges;
 
         var source = ImGui.GetIO().Fonts.GetGlyphRangesJapanese();
 
@@ -223,7 +236,7 @@ internal sealed class FontService : IDisposable
         for (var i = 0; i < length; i++)
             ranges[i] = source[i];
 
-        return CachedJapaneseGlyphRanges = ranges;
+        return CachedNotificationGlyphRanges = ranges;
     }
 
     private static string? CachedEorzeanPath;
