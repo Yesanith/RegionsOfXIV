@@ -49,9 +49,13 @@ internal interface IAreaTextSource
     event Action<string?>? OnAreaTextShown;
 }
 
+// The banner's icon, its wording, and why the gate would refuse it -- BannerBlock.None when it
+// would not. The reason travels with the event because the watcher has to know it first, to decide
+// whether to hide the game's own banner; asking a second time on the other side would be a second
+// read of the clock, and a cooldown expiring between the two would show both banners at once.
 internal interface IBannerSource
 {
-    event Action<uint, string>? OnBannerShown;
+    event Action<uint, string, BannerBlock>? OnBannerShown;
 }
 
 internal readonly record struct ZoneArrival(

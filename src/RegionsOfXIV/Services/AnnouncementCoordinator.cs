@@ -87,11 +87,16 @@ internal sealed class AnnouncementCoordinator : IDisposable
         this.sink.PushWeather(weather.Name, weather.IconId);
     }
 
-    private void HandleBannerShown(uint iconId, string text)
+    // The gate has already been asked, by the watcher, which needed the answer before this to know
+    // whether to hide the game's own banner. Asking again here would read the clock a second time
+    // and could disagree with it, so the reason it reached is what gets acted on.
+    private void HandleBannerShown(uint iconId, string text, BannerBlock blocked)
     {
-        Log.Debug($"Banner [{iconId}]: {text}");
+        Log.Debug(blocked == BannerBlock.None
+            ? $"Banner [{iconId}]: {text}"
+            : $"Banner [{iconId}]: {text} -- refused: {blocked}");
 
-        if (!this.gate.ShouldAnnounceBanner())
+        if (blocked != BannerBlock.None)
             return;
 
         BannerNotification.PushTo(this.sink, text);

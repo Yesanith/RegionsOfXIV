@@ -72,7 +72,7 @@ public sealed class Plugin : IDalamudPlugin
 
         this.locations = new LocationTracker(game);
         this.weather = new WeatherTracker(game);
-        this.banners = new BannerWatcher(this.config, gate.ShouldAnnounceBanner);
+        this.banners = new BannerWatcher(this.config, gate.BannerBlockReason);
         this.zones = new GameZoneArrivals();
 
         this.weather.Start();

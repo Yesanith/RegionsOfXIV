@@ -177,24 +177,23 @@ public class AnnouncementCoordinatorTests
         Assert.Null(announced.Header);
     }
 
-    // Was BannersAreNotHeldBackByThePacingThatGovernsPlaces, which asserted the opposite: that a
-    // banner ignored the global cooldown entirely. Banners now share it, so an arrival holds the
-    // next banner off and two banners in a row cannot stack.
-    //
-    // The coordinator builds its own gate on the real clock, so this can only show the holding
-    // off. NotificationGateTests covers the release, where the clock can be advanced.
+    // Was BannersWaitOutThePacingFromAPlace, which arrived somewhere and then fired two banners to
+    // watch the cooldown hold the second one off. The coordinator no longer asks the gate -- the
+    // watcher asks once and sends the answer with the banner -- so what is left to check here is
+    // that the answer is honoured. The pacing rule itself is covered in NotificationGateTests,
+    // where the clock can be advanced.
     [Fact]
-    public void BannersWaitOutThePacingFromAPlace()
+    public void ABannerTheGateRefusedIsNotPushed()
     {
         this.config.BannerNotificationEnabled = true;
 
         using var _ = Build();
 
-        this.zones.Arrive(Arrival());
         this.banners.Show(120001, "Quest Accepted");
-        this.banners.Show(120002, "Quest Complete");
+        this.banners.Show(120002, "Quest Complete", BannerBlock.Cooldown);
 
-        Assert.Single(this.sink.Pushed);
+        var announced = Assert.Single(this.sink.Places);
+        Assert.Equal("QUEST ACCEPTED", announced.Text);
     }
 
     [Fact]

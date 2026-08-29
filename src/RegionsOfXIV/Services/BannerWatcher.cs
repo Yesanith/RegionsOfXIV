@@ -40,21 +40,21 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
 
     private readonly Configuration config;
 
-    // Whether a banner would actually be replaced right now. A predicate rather than the gate
-    // itself, so this stays ignorant of what decides -- and of AnnouncementCoordinator, which
-    // reaches back the other way through OnBannerShown.
-    private readonly Func<bool> willAnnounce;
+    // Why a banner would be held back right now, or None. A delegate rather than the gate itself,
+    // so this stays ignorant of what decides -- and of AnnouncementCoordinator, which reaches back
+    // the other way through OnBannerShown.
+    private readonly Func<BannerBlock> blockReason;
 
     private readonly BannerDecisions decisions = new();
 
     private static readonly HashSet<uint> Unnamed = [];
 
-    public event Action<uint, string>? OnBannerShown;
+    public event Action<uint, string, BannerBlock>? OnBannerShown;
 
-    public BannerWatcher(Configuration config, Func<bool> willAnnounce)
+    public BannerWatcher(Configuration config, Func<BannerBlock> blockReason)
     {
         this.config = config;
-        this.willAnnounce = willAnnounce;
+        this.blockReason = blockReason;
 
         Plugin.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, ImageAddons, OnImage);
     }
@@ -91,7 +91,10 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
             Hide(addon);
     }
 
-    // The one place the gate is consulted, and only when the icon has just changed.
+    // The one place the gate is consulted, for the whole plugin, and only when the icon has just
+    // changed. The answer rides out on the event so the coordinator acts on this reading rather
+    // than taking its own: the two would be separate reads of the clock, and a cooldown expiring
+    // between them would leave the game's banner up while the replacement was pushed over it.
     //
     // It is asked before the event goes out rather than after, because handling that event is what
     // sets the cooldown -- the question here is whether this banner gets replaced, not whether a
@@ -99,20 +102,26 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
     private void Decide(nint which, uint icon, string addonName)
     {
         var name = icon == 0 ? null : BannerNameResolver.Resolve(icon);
-        var taken = name is not null && this.willAnnounce();
 
-        this.decisions.Record(which, icon, taken);
-
-        if (taken)
+        if (name is null)
         {
-            OnBannerShown?.Invoke(icon, name!);
+            this.decisions.Record(which, icon, taken: false);
+
+            if (icon != 0 && Unnamed.Add(icon))
+                Log.Information(
+                    $"Banner icon {icon} appeared on {addonName} with no name for it yet. "
+                    + "Report this id and it can be added.");
+
             return;
         }
 
-        if (icon != 0 && name == null && Unnamed.Add(icon))
-            Log.Information(
-                $"Banner icon {icon} appeared on {addonName} with no name for it yet. "
-                + "Report this id and it can be added.");
+        var reason = this.blockReason();
+
+        this.decisions.Record(which, icon, reason == BannerBlock.None);
+
+        // Raised even when the gate refuses. The coordinator logs every banner it hears about, and
+        // that line is the only view there is of what gets turned down and why.
+        OnBannerShown?.Invoke(icon, name, reason);
     }
 
     // Made transparent rather than hidden. Setting IsVisible would make the addon lie about its
