@@ -250,7 +250,7 @@ internal sealed partial class ConfigWindow
         {
             var font = this.config.FontFor(role);
 
-            if (font.IsCustom && FontService.CustomFontProblem(font.Path) != null)
+            if (font.IsCustom && FontLimits.CustomFontProblem(font.Path) != null)
                 return Loc.Get(
                     "presets.customfont.missing",
                     "It carries a font file from the sender's PC that is not on yours, so those "
