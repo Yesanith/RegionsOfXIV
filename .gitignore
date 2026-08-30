@@ -17,6 +17,7 @@ TestResults/
 *.md
 !/README.md
 !/LICENSE.md
+!/TRANSLATING.md
 
 /dispose.txt
 /notes/
