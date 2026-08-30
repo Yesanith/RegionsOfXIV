@@ -13,6 +13,18 @@ internal static class Changelog
 {
     public static readonly ChangelogEntry[] All =
     [
+        new(new Version("0.5.0.0"),
+        [
+            "The settings window reads in your language. German, French, Japanese and Turkish ship with the plugin, and it follows the language Dalamud is set to unless you pick one yourself under General.",
+            "Those four were drafted by a machine. The window says so at the top until someone who speaks the language has been through it, and correcting one needs nothing but a text editor and a GitHub account. TRANSLATING.md explains how.",
+            "Banners can be drawn in a language you choose rather than the one your client runs in. Turkish wording ships. Any banner the plugin has no words for keeps the game's own artwork, whichever language you pick.",
+            "Light Party and Full Party are announced and hidden like every other banner. They arrive on a part of the interface the plugin was not watching, which is why those two were always missed.",
+            "A banner arriving right behind a place name is no longer dropped. Holding one back never bought quiet, it only left the game's own version on screen instead, so a banner now takes its own line below the place name. How far below is a slider.",
+            "The font sliders reach much further up, for anyone running at a high resolution who found the old top of the range still small. On a Japanese client they stop where the game can still build the letters, and your setting is kept as you left it.",
+            "Accented letters no longer vanish while a line decodes. The Eorzean alphabet has no glyph for them, so anything with an accent was drawn as blank space until the name resolved. They now stand in as the letter underneath: é as e, ğ as g.",
+            "The settings window can draw Turkish, Polish, Czech, Romanian and their neighbours, where before it had eight letters of Latin Extended-A and blanks for the rest.",
+        ]),
+
         new(new Version("0.4.2.0"),
         [
             "Presets and share codes made by older versions apply the way they were saved. One from before the header gap became a slider was landing on the default spacing rather than the spacing it was saved with, and one from before the weather line had its own size was leaving that size behind as well.",
