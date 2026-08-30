@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV;
 
@@ -53,19 +54,24 @@ internal static class PresetCode
 
         if (trimmed.Length == 0)
         {
-            error = "There is nothing on the clipboard to import.";
+            error = Loc.Get(
+                "presetcode.empty", "There is nothing on the clipboard to import.");
             return false;
         }
 
         if (trimmed.Length > MaxCodeLength)
         {
-            error = "That code is too long to be one of ours.";
+            error = Loc.Get(
+                "presetcode.toolong", "That code is too long to be one of ours.");
             return false;
         }
 
         if (!trimmed.StartsWith(Prefix, StringComparison.OrdinalIgnoreCase))
         {
-            error = $"That does not look like a preset code — they start with \"{Prefix}\".";
+            error = Loc.Format(
+                "presetcode.notacode",
+                "That does not look like a preset code — they start with \"{0}\".",
+                Prefix);
             return false;
         }
 
@@ -75,7 +81,8 @@ internal static class PresetCode
 
             if (json == null)
             {
-                error = "That code did not unpack to anything readable.";
+                error = Loc.Get(
+                    "presetcode.unreadable", "That code did not unpack to anything readable.");
                 return false;
             }
 
@@ -84,7 +91,8 @@ internal static class PresetCode
 
             if (root.ValueKind != JsonValueKind.Object)
             {
-                error = "That code did not unpack to a preset.";
+                error = Loc.Get(
+                    "presetcode.notapreset", "That code did not unpack to a preset.");
                 return false;
             }
 
@@ -94,7 +102,8 @@ internal static class PresetCode
 
             if (string.IsNullOrWhiteSpace(name))
             {
-                error = "That code carries no preset name.";
+                error = Loc.Get(
+                    "presetcode.noname", "That code carries no preset name.");
                 return false;
             }
 
@@ -116,8 +125,10 @@ internal static class PresetCode
         }
         catch (Exception)
         {
-            error = "That code is damaged — some of it went missing on the way here. "
-                    + "Ask for it again and copy the whole line in one go.";
+            error = Loc.Get(
+                "presetcode.damaged",
+                "That code is damaged — some of it went missing on the way here. "
+                + "Ask for it again and copy the whole line in one go.");
             return false;
         }
     }

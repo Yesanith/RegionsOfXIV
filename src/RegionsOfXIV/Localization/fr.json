@@ -1,0 +1,600 @@
+{
+  "_status": "machine-drafted -- not reviewed by a French speaker. Wording is plain and in places stiff, and the tu/vous choice was made once (tu, matching FFXIV's own French) without checking it reads well everywhere. Correct freely. Keys listed under _untranslated were left in English on purpose, see the reasons there.",
+  "_untranslated": [
+    "general.hideduty: 'duty' is FFXIV's term for instanced content. French FFXIV has a set word for it; guessing would put a word in the window the game itself never uses.",
+    "general.decode and general.decode.tooltip: the Eorzean script has an established French name in FFXIV. Left for someone who can check it against the game.",
+    "notifications.subarea, general.skipfast and general.skipfast.tooltip: 'sub-area' is the finest place tier and carries the whole meaning of those labels.",
+    "general.showheader.tooltip: turns on the region/zone/area/sub-area vocabulary, so it waits on the same decision.",
+    "notifications.banners.tooltip: translated, but 'Quest Accepted', 'Duty Commenced' and 'Level Up!' were left in English inside it -- the game already translates those three and its own wording must win.",
+    "'Eorzean' is kept as-is throughout; FFXIV's French localisation should be checked.",
+    "Typeface names (Noto Sans CJK, Trump Gothic, Jupiter, Axis), product names (Discord, GitHub, Dalamud, Guild Wars 2, Square Enix), commands and the AGPL identifier are never translated."
+  ],
+  "durations.tab": {
+    "message": "Durées"
+  },
+  "durations.intro": {
+    "message": "La ligne arrive, se pose, puis se décode. Le mouvement et le décodage sont des étapes distinctes et chacune prend son propre temps."
+  },
+  "durations.fadein": {
+    "message": "Apparition"
+  },
+  "durations.fadein.tooltip": {
+    "message": "Le temps que met la ligne à atteindre sa pleine intensité en apparaissant."
+  },
+  "durations.motion": {
+    "message": "Mouvement"
+  },
+  "durations.motion.tooltip": {
+    "message": "Le temps que mettent les lettres à arriver. Se déroule en même temps que\nl'apparition, et ne fait rien si le mouvement de l'onglet Effets est sur Aucun."
+  },
+  "durations.decode": {
+    "message": "Décodage"
+  },
+  "durations.decode.tooltip": {
+    "message": "Le temps que met l'eorzéen à se résoudre, une fois les lettres posées.\nNécessite l'effet de décodage de l'onglet Effets."
+  },
+  "durations.hold": {
+    "message": "Maintien"
+  },
+  "durations.hold.tooltip": {
+    "message": "Le temps que la ligne terminée reste affichée avant de commencer à s'effacer."
+  },
+  "durations.fadeout": {
+    "message": "Disparition"
+  },
+  "durations.fadeout.tooltip": {
+    "message": "Le temps que met la ligne à disparaître une fois son temps écoulé."
+  },
+  "effects.tab": {
+    "message": "Effets"
+  },
+  "effects.motion.intro": {
+    "message": "Comment les lettres bougent en arrivant."
+  },
+  "effects.motion": {
+    "message": "Mouvement"
+  },
+  "effects.motion.tooltip": {
+    "message": "Aucun — les lettres apparaissent simplement à leur place.\nMachine à écrire — une lettre après l'autre, sans fondu.\nMontée — les lettres s'élèvent en place depuis le bas.\nVague — une vague parcourt la ligne à son apparition.\nCombustion — les lettres s'enflamment puis refroidissent vers leur couleur.\n\nSe déroule en même temps que le décodage eorzéen, et non à sa place."
+  },
+  "effects.motion.none": {
+    "message": "Aucun"
+  },
+  "effects.motion.typewriter": {
+    "message": "Machine à écrire"
+  },
+  "effects.motion.rise": {
+    "message": "Montée"
+  },
+  "effects.motion.wave": {
+    "message": "Vague"
+  },
+  "effects.motion.burn": {
+    "message": "Combustion"
+  },
+  "effects.particles.intro": {
+    "message": "Ce qui se joue autour, tant qu'elle est à l'écran."
+  },
+  "effects.particles": {
+    "message": "Particules"
+  },
+  "effects.particles.none": {
+    "message": "Aucune"
+  },
+  "effects.particles.hearts": {
+    "message": "Cœurs"
+  },
+  "effects.particles.embers": {
+    "message": "Braises"
+  },
+  "effects.particles.sparkles": {
+    "message": "Étincelles"
+  },
+  "effects.particles.petals": {
+    "message": "Pétales"
+  },
+  "effects.density": {
+    "message": "Densité"
+  },
+  "effects.particlecolour": {
+    "message": "Couleur des particules"
+  },
+  "effects.particlecolour.tooltip": {
+    "message": "L'ambre par défaut va bien aux braises et aux étincelles. Les cœurs et\nles pétales demandent plutôt du rose."
+  },
+  "effects.embers.note": {
+    "message": "Les braises vont avec le mouvement Combustion, mais elles n'en ont pas besoin."
+  },
+  "effects.preview": {
+    "message": "Aperçu"
+  },
+  "sharecodes.heading": {
+    "message": "Codes de partage"
+  },
+  "sharecodes.intro": {
+    "message": "Un code est le préréglage entier sur une seule ligne de texte. Colle-en un dans le chat pour le donner à quelqu'un."
+  },
+  "sharecodes.copy": {
+    "message": "Copier les réglages actuels"
+  },
+  "sharecodes.copied": {
+    "message": "Copié. Colle-le où tu veux."
+  },
+  "sharecodes.copy.tooltip.named": {
+    "message": "Met dans le presse-papiers un code pour tout ce qui est réglé en ce moment,\nsous le nom \"{0}\"."
+  },
+  "sharecodes.copy.tooltip.unnamed": {
+    "message": "Saisis d'abord un nom dans la case ci-dessus — il voyage avec le code, et\nc'est tout ce dont disposera la personne à qui tu l'envoies.\n\nPour partager un préréglage déjà enregistré, fais plutôt un clic droit dessus."
+  },
+  "sharecodes.paste": {
+    "message": "Coller un code"
+  },
+  "sharecodes.paste.tooltip.named": {
+    "message": "Lit un code depuis le presse-papiers, l'enregistre parmi tes préréglages et\nl'applique. Il sera classé sous \"{0}\" plutôt que sous\nle nom avec lequel il est arrivé."
+  },
+  "sharecodes.paste.tooltip.unnamed": {
+    "message": "Lit un code depuis le presse-papiers, l'enregistre parmi tes préréglages et\nl'applique sous le nom avec lequel il est arrivé.\n\nSaisis d'abord un nom ci-dessus pour le classer sous celui-là à la place."
+  },
+  "sharecodes.clipboard.unreadable": {
+    "message": "Impossible de lire le presse-papiers. Réessaie dans un instant."
+  },
+  "sharecodes.imported": {
+    "message": "\"{0}\" importé et appliqué."
+  },
+  "about.tab": {
+    "message": "À propos"
+  },
+  "about.title": {
+    "message": "Regions of XIV {0}"
+  },
+  "about.author": {
+    "message": "par {0}"
+  },
+  "about.summary": {
+    "message": "Annonce la région, la zone, le secteur et le sous-secteur où tu entres, ainsi que le temps qu'il y fait, en remplaçant l'affichage de lieu du jeu plutôt qu'en dessinant à côté."
+  },
+  "about.whatsnew": {
+    "message": "Nouveautés"
+  },
+  "about.whatsnew.tooltip": {
+    "message": "Chaque version, la plus récente en premier. Aussi via \"/regions changelog\"."
+  },
+  "about.discord": {
+    "message": "Rejoindre le Discord"
+  },
+  "about.discord.tooltip": {
+    "message": "Idées, rapports de bugs et codes de préréglages."
+  },
+  "about.github": {
+    "message": "GitHub"
+  },
+  "about.github.tooltip": {
+    "message": "Les sources, les versions et la licence."
+  },
+  "about.issue": {
+    "message": "Signaler un problème"
+  },
+  "about.issue.tooltip": {
+    "message": "Quelque chose ne va pas, ou quelque chose manque."
+  },
+  "about.commands": {
+    "message": "Commandes"
+  },
+  "about.command.settings": {
+    "message": "Ouvre ces réglages."
+  },
+  "about.command.test": {
+    "message": "Affiche une notification pour l'endroit où tu te trouves."
+  },
+  "about.command.changelog": {
+    "message": "Ouvre la fenêtre Nouveautés."
+  },
+  "about.inspiration": {
+    "message": "Inspiré de Regions of Tyria de Nekres, pour Guild Wars 2."
+  },
+  "about.inspiration.tooltip": {
+    "message": "Cliquer pour ouvrir {0}"
+  },
+  "about.licence": {
+    "message": "Sous licence AGPL-3.0-or-later."
+  },
+  "about.notaffiliated": {
+    "message": "Les noms de lieux, la météo et les polices proviennent des données du jeu. Sans lien avec Square Enix."
+  },
+  "notifications.tab": {
+    "message": "Notifications"
+  },
+  "notifications.intro": {
+    "message": "Ce plugin remplace l'affichage de lieu du jeu plutôt que de dessiner à côté. Si tu désactives la suppression ci-dessous, la version du jeu revient."
+  },
+  "notifications.zone": {
+    "message": "Changements de zone"
+  },
+  "notifications.area": {
+    "message": "Changements de secteur"
+  },
+  "notifications.weather": {
+    "message": "Changements de météo"
+  },
+  "notifications.weather.tooltip": {
+    "message": "Annonce le changement de météo, sur sa propre ligne juste au-dessus du nom de lieu, de sorte qu'elle n'interrompe jamais une annonce de lieu.\n\nLa météo suit un cycle fixe d'environ 23 minutes, et arriver quelque part annonce ce qu'elle y fait — elle apparaît donc avec le nom de lieu à ton entrée."
+  },
+  "notifications.weathericon": {
+    "message": "Afficher l'icône de météo"
+  },
+  "notifications.weathericon.tooltip": {
+    "message": "Dessine l'icône du jeu pour la météo à gauche de son nom."
+  },
+  "notifications.banners": {
+    "message": "Bannières"
+  },
+  "notifications.banners.tooltip": {
+    "message": "Redessine les bannières plein écran du jeu — \"Quest Accepted\", \"Duty Commenced\", \"Level Up!\" — dans la typographie de ce plugin.\n\nLe texte est peint dans l'image du jeu plutôt que stocké comme texte, donc seules les bannières dont ce plugin connaît les mots sont reprises. Celles qu'il ne reconnaît pas gardent celles du jeu."
+  },
+  "notifications.hidebanner": {
+    "message": "Masquer la bannière du jeu"
+  },
+  "notifications.hidebanner.tooltip": {
+    "message": "Estompe l'image du jeu pour ne laisser voir que la version de ce plugin.\n\nDésactive ceci pour voir les deux, ce qui est un moyen rapide de vérifier que le texte correspond."
+  },
+  "notifications.hideareatext": {
+    "message": "Masquer le texte de secteur du jeu"
+  },
+  "notifications.hideareatext.tooltip": {
+    "message": "Supprime le \"_AreaText\" natif, qui se dessine sous ce plugin."
+  },
+  "notifications.hideloadingtitle": {
+    "message": "Masquer le titre de zone de l'écran de chargement"
+  },
+  "notifications.hideloadingtitle.tooltip": {
+    "message": "Supprime \"_LocationTitle\" et \"_LocationTitleShort\", le titre doré\ndessiné sur l'écran de chargement, et affiche les mêmes noms dans le\nstyle de ce plugin à la place."
+  },
+  "presets.tab": {
+    "message": "Préréglages"
+  },
+  "presets.intro": {
+    "message": "Un préréglage couvre tous les réglages des onglets Général, Polices, Effets, Notifications et Durées — la fonte et la taille de chaque ligne, la position, les couleurs, le mouvement et les particules, les niveaux annoncés, les temps, et quand rester silencieux."
+  },
+  "presets.intro.warning": {
+    "message": "En appliquer un les remplace tous, donc tout ce que tu as modifié est écrasé."
+  },
+  "presets.builtin": {
+    "message": "Styles fournis"
+  },
+  "presets.builtin.hint": {
+    "message": "Les réglages par défaut, plus le style dont chacun porte le nom."
+  },
+  "presets.builtin.tooltip": {
+    "message": "{0}\nTout le reste revient à sa valeur par défaut."
+  },
+  "presets.classic.description": {
+    "message": "Le plugin tel qu'il est livré : un décodage, aucun mouvement, aucune particule."
+  },
+  "presets.inferno.description": {
+    "message": "Les lettres s'enflamment et refroidissent en place, des braises s'en élèvent."
+  },
+  "presets.sweetheart.description": {
+    "message": "Les lettres s'élèvent en place, des cœurs flottant autour d'elles."
+  },
+  "presets.starlight.description": {
+    "message": "La ligne arrive sur une vague, des étincelles suspendues dans l'air autour d'elle."
+  },
+  "presets.sakura.description": {
+    "message": "Une montée douce sous des pétales qui tombent."
+  },
+  "presets.dispatch.description": {
+    "message": "Tapé lettre par lettre, en majuscules serrées. Aucune particule."
+  },
+  "presets.tyria.description": {
+    "message": "De larges majuscules dorées, immobiles et sans hâte — un clin d'œil à l'original."
+  },
+  "presets.saved": {
+    "message": "Tes préréglages"
+  },
+  "presets.saved.hint": {
+    "message": "Tes réglages, enregistrés exactement tels qu'ils étaient."
+  },
+  "presets.saved.none": {
+    "message": "Tu n'en as encore enregistré aucun."
+  },
+  "presets.saved.tooltip": {
+    "message": "Appliquer ce préréglage.\nClic droit pour le partager, l'écraser ou le supprimer."
+  },
+  "presets.menu.share": {
+    "message": "Copier le code de partage"
+  },
+  "presets.menu.overwrite": {
+    "message": "Écraser avec les réglages actuels"
+  },
+  "presets.menu.delete": {
+    "message": "Supprimer"
+  },
+  "presets.copied": {
+    "message": "Code copié pour \"{0}\"."
+  },
+  "presets.name.hint": {
+    "message": "Donne-lui un nom — pour enregistrer, copier ou importer"
+  },
+  "presets.save": {
+    "message": "Enregistrer"
+  },
+  "presets.replace": {
+    "message": "Remplacer"
+  },
+  "presets.save.tooltip": {
+    "message": "Enregistre tous les réglages des onglets Général, Polices, Effets, Notifications et Durées."
+  },
+  "presets.discord": {
+    "message": "Rejoindre le Discord"
+  },
+  "presets.discord.tooltip": {
+    "message": "Échanger des codes de préréglages, signaler un bug ou proposer une idée."
+  },
+  "presets.customfont.warning": {
+    "message": "Ces réglages utilisent une police de ce PC. Un préréglage enregistre où se trouve ce fichier, pas la police elle-même : sur la machine de quelqu'un d'autre le chemin n'existera pas et ces lignes retomberont sur Noto Sans CJK — tout le reste du préréglage s'applique quand même. Remets la ligne sur une fonte fournie si tu veux qu'un préréglage ait le même aspect chez la personne à qui tu le donnes."
+  },
+  "presets.customfont.missing": {
+    "message": "Il transporte un fichier de police du PC de l'expéditeur que tu n'as pas, donc ces lignes sont dessinées avec Noto Sans CJK. Choisis la tienne dans l'onglet Polices."
+  },
+  "fonts.tab": {
+    "message": "Polices"
+  },
+  "fonts.intro": {
+    "message": "Chaque ligne d'une notification a sa propre fonte et sa propre taille. Choisis une des fontes fournies, ou indique au plugin un fichier de police sur ce PC."
+  },
+  "fonts.role.text": {
+    "message": "Texte"
+  },
+  "fonts.role.text.hint": {
+    "message": "Le nom de lieu lui-même, la plus grande ligne."
+  },
+  "fonts.role.header": {
+    "message": "En-tête"
+  },
+  "fonts.role.header.hint": {
+    "message": "La ligne plus petite au-dessus du nom, indiquant la région ou le secteur où il se trouve."
+  },
+  "fonts.role.weather": {
+    "message": "Météo"
+  },
+  "fonts.role.weather.hint": {
+    "message": "La ligne de météo au-dessus de l'en-tête, affichée quand les annonces de météo sont activées."
+  },
+  "fonts.size": {
+    "message": "Taille"
+  },
+  "fonts.face": {
+    "message": "Police"
+  },
+  "fonts.face.tooltip": {
+    "message": "Noto Sans CJK est vectorielle — nette à toute taille, et elle couvre toutes les langues.\n\nLes fontes du jeu conviennent mieux à FFXIV, mais chacune est une bitmap avec un plafond :\nTrump Gothic — latin seulement, jusqu'à 91 px.\nJupiter — latin seulement, jusqu'à 61 px.\nAxis — jusqu'à 48 px, la seule avec des caractères japonais.\n\nFichier personnalisé charge une police à toi depuis ce PC."
+  },
+  "fonts.choice.noto": {
+    "message": "{0} (recommandée)"
+  },
+  "fonts.choice.custom": {
+    "message": "Fichier personnalisé"
+  },
+  "fonts.preview": {
+    "message": "Aperçu"
+  },
+  "fonts.path.hint": {
+    "message": "Chemin vers un fichier .ttf, .otf ou .ttc"
+  },
+  "fonts.browse": {
+    "message": "Parcourir"
+  },
+  "fonts.browse.tooltip": {
+    "message": "Ouvre ton dossier de polices Windows. N'importe quel fichier .ttf, .otf ou .ttc convient."
+  },
+  "fonts.clear": {
+    "message": "Effacer"
+  },
+  "fonts.dialog.title": {
+    "message": "Choisir un fichier de police"
+  },
+  "fonts.drawingwith": {
+    "message": "Dessine avec {0}."
+  },
+  "fonts.custom.notice": {
+    "message": "Une police que tu fournis est chargée exactement telle quelle, et elle reste à ta charge. Caractères manquants, espacement bizarre, contours mous, fichier que le jeu ne sait pas lire, ou licence que tu n'as pas : cela te revient et non à Regions of XIV, et aucun support n'est offert pour ce qui en découle. Si une ligne cesse d'avoir bonne allure, remets-la sur une des fontes fournies."
+  },
+  "fonts.nojapanese": {
+    "message": "{0} n'a pas de caractères japonais. Sur ce client, cela veut dire que les noms de lieux apparaîtront comme des cases vides, et pas seulement flous. Choisis plutôt Axis ou Noto Sans CJK."
+  },
+  "fonts.upscaled": {
+    "message": "Cette police n'a pas de bitmap au-dessus de {0:F0} px, donc à {1:F0} px elle est agrandie et paraîtra molle. Réduis la taille, ou passe à Noto Sans CJK, qui reste nette à toute taille."
+  },
+  "general.tab": {
+    "message": "Général"
+  },
+  "general.language": {
+    "message": "Langue"
+  },
+  "general.language.follow": {
+    "message": "Suivre Dalamud"
+  },
+  "general.language.tooltip": {
+    "message": "Suivre Dalamud prend la langue sur laquelle Dalamud lui-même est réglé,\net change avec elle.\n\nSeule cette fenêtre est concernée. Les noms de lieux et de météo viennent du\njeu et restent dans la langue de ton client."
+  },
+  "general.preview": {
+    "message": "Aperçu"
+  },
+  "general.vertical": {
+    "message": "Position verticale"
+  },
+  "general.horizontal": {
+    "message": "Position horizontale"
+  },
+  "general.horizontal.tooltip": {
+    "message": "Le texte est centré sur ce point, donc 50% est le milieu de l'écran.\nUn nom de lieu long placé près d'un bord dépassera."
+  },
+  "general.letterspacing": {
+    "message": "Espacement des lettres"
+  },
+  "general.letterspacing.tooltip": {
+    "message": "Espace supplémentaire entre les lettres, en pourcentage de la taille de police,\nde sorte qu'il garde ses proportions quand la taille change et que l'en-tête\nreçoive sa part. Un espacement large fait beaucoup du style de l'original\nGuild Wars 2."
+  },
+  "general.uppercase": {
+    "message": "Majuscules"
+  },
+  "general.textcolour": {
+    "message": "Couleur du texte"
+  },
+  "general.headercolour": {
+    "message": "Couleur de l'en-tête"
+  },
+  "general.outlinecolour": {
+    "message": "Couleur du contour"
+  },
+  "general.separatecolours": {
+    "message": "Colorer chaque ligne séparément"
+  },
+  "general.separatecolours.tooltip": {
+    "message": "Désactivé, la ligne de météo suit l'en-tête, et une seule couleur de contour\ncouvre les trois lignes.\n\nActivé, la ligne de météo et les contours prennent les couleurs ci-dessous,\nce qui permet de repousser une ligne vers le fond sans toucher aux autres."
+  },
+  "general.weathercolour": {
+    "message": "Couleur de la météo"
+  },
+  "general.headeroutlinecolour": {
+    "message": "Couleur du contour de l'en-tête"
+  },
+  "general.weatheroutlinecolour": {
+    "message": "Couleur du contour de la météo"
+  },
+  "general.outlinethickness": {
+    "message": "Épaisseur du contour"
+  },
+  "general.outlinethickness.tooltip": {
+    "message": "Zéro désactive le contour."
+  },
+  "general.shadow": {
+    "message": "Ombre portée"
+  },
+  "general.shadow.tooltip": {
+    "message": "Une deuxième copie de chaque ligne, décalée derrière elle. Elle se place sous\nle contour, les deux peuvent donc servir ensemble — un contour serré pour la\nlisibilité et une ombre douce pour la profondeur.\n\nUne seule ombre couvre les trois lignes ; elle ne suit pas les couleurs séparées."
+  },
+  "general.shadowcolour": {
+    "message": "Couleur de l'ombre"
+  },
+  "general.shadowacross": {
+    "message": "Ombre latérale"
+  },
+  "general.shadowacross.tooltip": {
+    "message": "Une valeur négative déplace l'ombre vers la gauche."
+  },
+  "general.shadowdown": {
+    "message": "Ombre verticale"
+  },
+  "general.shadowdown.tooltip": {
+    "message": "Une valeur négative remonte l'ombre au-dessus du texte."
+  },
+  "general.shadowspread": {
+    "message": "Étalement de l'ombre"
+  },
+  "general.shadowspread.tooltip": {
+    "message": "Épaissit l'ombre vers l'extérieur. Zéro lui garde la forme des lettres ;\ndes valeurs plus élevées l'épaississent en un halo derrière elles."
+  },
+  "general.showheader": {
+    "message": "Afficher l'en-tête"
+  },
+  "general.underlineheader": {
+    "message": "Souligner l'en-tête"
+  },
+  "general.headergap": {
+    "message": "Écart de l'en-tête"
+  },
+  "general.headergap.tooltip": {
+    "message": "À quelle distance le nom se place sous l'en-tête, mesurée en lignes d'en-tête.\n\nDes valeurs basses rapprochent les deux jusqu'à ce qu'ils se touchent presque,\nce qui est le style plus serré livré depuis toujours. Des valeurs plus élevées\nouvrent l'écart et donnent de l'air à chaque ligne."
+  },
+  "general.hidecombat": {
+    "message": "Masquer pendant le combat"
+  },
+  "command.help": {
+    "message": "Ouvre les réglages de Regions of XIV. \"{0}\" déclenche une notification d'exemple, \"{1}\" montre ce qui a changé."
+  },
+  "changelog.title": {
+    "message": "Regions of XIV — Nouveautés"
+  },
+  "changelog.all": {
+    "message": "Chaque version, la plus récente en premier :"
+  },
+  "changelog.updated": {
+    "message": "Regions of XIV a été mis à jour. Voici ce qui a changé :"
+  },
+  "changelog.updated.away": {
+    "message": "Regions of XIV a été mis à jour. Voici ce qui a changé pendant ton absence :"
+  },
+  "changelog.close": {
+    "message": "Fermer"
+  },
+  "changelog.discord": {
+    "message": "Rejoindre le Discord"
+  },
+  "changelog.discord.tooltip": {
+    "message": "Idées, rapports de bugs et codes de préréglages.\n{0}"
+  },
+  "changelog.onceonly": {
+    "message": "Tu ne reverras ceci qu'à la prochaine mise à jour."
+  },
+  "changelog.onrequest": {
+    "message": "Affiché parce que tu l'as demandé — \"{0}\"."
+  },
+  "window.editing": {
+    "message": "Mode édition"
+  },
+  "window.editing.tooltip": {
+    "message": "Garde une notification d'exemple à l'écran pendant que tu travailles, au lieu\nd'en lancer une nouvelle à chaque modification.\n\nLes annonces de zone sont retenues tant que c'est activé. Cela se désactive\ntout seul quand tu fermes cette fenêtre."
+  },
+  "window.discord": {
+    "message": "Rejoindre le Discord\n{0}"
+  },
+  "common.opens": {
+    "message": "{0}\n\nOuvre {1} dans ton navigateur."
+  },
+  "common.colour.tooltip": {
+    "message": "Actuellement {0:F0}% opaque.\n\nClique pour le sélecteur complet. La bande étroite à damier à droite de l'arc-en-ciel est l'alpha — l'opacité de cette couleur — et elle s'arrête à {1:F0}%, assez en retrait pour se placer derrière les autres lignes mais pas au point que la ligne disparaisse et ressemble à un défaut."
+  },
+  "units.px": {
+    "message": "px"
+  },
+  "units.lines": {
+    "message": "lignes"
+  },
+  "units.seconds": {
+    "message": "s"
+  },
+  "units.times": {
+    "message": "x"
+  },
+  "presetcode.empty": {
+    "message": "Il n'y a rien à importer dans le presse-papiers."
+  },
+  "presetcode.toolong": {
+    "message": "Ce code est trop long pour être un des nôtres."
+  },
+  "presetcode.notacode": {
+    "message": "Cela ne ressemble pas à un code de préréglage — ils commencent par \"{0}\"."
+  },
+  "presetcode.unreadable": {
+    "message": "Ce code ne s'est décompressé en rien de lisible."
+  },
+  "presetcode.notapreset": {
+    "message": "Ce code ne s'est pas décompressé en un préréglage."
+  },
+  "presetcode.noname": {
+    "message": "Ce code ne porte aucun nom de préréglage."
+  },
+  "presetcode.damaged": {
+    "message": "Ce code est endommagé — une partie s'est perdue en route. Redemande-le et copie toute la ligne d'un seul coup."
+  },
+  "sharecodes.customfont.note": {
+    "message": "\n\nLe code transporte un fichier de police de ce PC. La personne qui le recevra\nn'aura pas ce fichier, et ces lignes retomberont sur Noto Sans CJK chez elle."
+  },
+  "notice.dismiss": {
+    "message": "Masquer"
+  },
+  "notice.translation": {
+    "message": "Cette traduction a été rédigée par une machine et n'a été vérifiée par personne qui parle la langue. Si quelque chose sonne mal, les corrections sont les bienvenues :\n{0}"
+  }
+}

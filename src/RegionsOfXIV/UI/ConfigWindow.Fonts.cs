@@ -41,12 +41,13 @@ internal sealed partial class ConfigWindow
 
     private void DrawFontsTab()
     {
-        using var tab = ImRaii.TabItem("Fonts");
+        using var tab = ImRaii.TabItem(Loc.Label("fonts.tab", "Fonts"));
         if (!tab) return;
 
-        ImGui.TextWrapped(
+        UiText.Wrapped(Loc.Get(
+            "fonts.intro",
             "Every line of a notification has its own face and size. Pick one of the built-in "
-            + "faces, or point the plugin at a font file on this PC.");
+            + "faces, or point the plugin at a font file on this PC."));
 
         ImGui.Spacing();
 
@@ -55,32 +56,38 @@ internal sealed partial class ConfigWindow
 
         DrawFontRole(
             FontRole.Text,
-            "Text",
-            "The place name itself, the largest line.",
+            Loc.Get("fonts.role.text", "Text"),
+            Loc.Get("fonts.role.text.hint", "The place name itself, the largest line."),
             24f,
             140f);
 
         DrawFontRole(
             FontRole.Header,
-            "Header",
-            "The smaller line above the name, giving the region or area it sits in.",
+            Loc.Get("fonts.role.header", "Header"),
+            Loc.Get(
+                "fonts.role.header.hint",
+                "The smaller line above the name, giving the region or area it sits in."),
             10f,
             72f);
 
         DrawFontRole(
             FontRole.Weather,
-            "Weather",
-            "The forecast line above the header, shown when weather announcements are on.",
+            Loc.Get("fonts.role.weather", "Weather"),
+            Loc.Get(
+                "fonts.role.weather.hint",
+                "The forecast line above the header, shown when weather announcements are on."),
             10f,
             72f);
     }
 
+    // Every identity here is built from the role rather than from the label. The label is
+    // translated, and an identity that moves with the language is a different widget in each one.
     private void DrawFontRole(FontRole role, string label, string describes, float minSize, float maxSize)
     {
-        using var tab = ImRaii.TabItem(label);
+        using var tab = ImRaii.TabItem($"{label}###font-role-{role}");
         if (!tab) return;
 
-        ImGui.TextDisabled(describes);
+        UiText.Disabled(describes);
         ImGui.Spacing();
 
         var changed = false;
@@ -89,32 +96,37 @@ internal sealed partial class ConfigWindow
         font = font with
         {
             SizePx = Slider(
-                $"Size##font-size-{label}", font.SizePx, minSize, maxSize, "%.0f px", ref changed),
+                Loc.Get("fonts.size", "Size") + $"###font-size-{role}",
+                font.SizePx, minSize, maxSize,
+                "%.0f " + Loc.Unit("units.px", "px"), ref changed),
         };
 
         font = font with
         {
-            Choice = Choice($"Font##font-choice-{label}", font.Choice, Label, ref changed),
+            Choice = Choice(
+                Loc.Get("fonts.face", "Font") + $"###font-choice-{role}",
+                font.Choice, Label, ref changed),
         };
 
         this.config.SetFontFor(role, font);
 
-        Tooltip(
+        UiText.Tooltip(Loc.Get(
+            "fonts.face.tooltip",
             "Noto Sans CJK is vector — sharp at any size, and it covers every language.\n\n"
             + "The game's own faces suit FFXIV better, but each is a bitmap with a ceiling:\n"
             + "Trump Gothic — Latin only, to 91 px.\n"
             + "Jupiter — Latin only, to 61 px.\n"
             + "Axis — to 48 px, the only one with Japanese glyphs.\n\n"
-            + "Custom file loads a font of your own from this PC.");
+            + "Custom file loads a font of your own from this PC."));
 
         if (font.IsCustom)
-            changed |= DrawCustomFont(role, label, font);
+            changed |= DrawCustomFont(role, font);
         else
             DrawStockFontWarnings(font);
 
         ImGui.Spacing();
 
-        if (ImGui.Button($"Preview##font-preview-{label}"))
+        if (ImGui.Button(Loc.Get("fonts.preview", "Preview") + $"###font-preview-{role}"))
             this.actions.Preview(Sample);
 
         if (!changed)
@@ -125,18 +137,28 @@ internal sealed partial class ConfigWindow
         this.actions.LivePreview(Sample);
     }
 
-    private bool DrawCustomFont(FontRole role, string label, FontSetting font)
+    private bool DrawCustomFont(FontRole role, FontSetting font)
     {
         var editor = this.pathEditors[(int)role];
         var stored = font.Path;
         var buffer = editor.Buffer ??= stored;
         var changed = false;
 
-        ImGui.SetNextItemWidth(
-            Math.Max(ImGui.GetContentRegionAvail().X - (150f * ImGuiHelpers.GlobalScale), 120f));
+        // Browse and Clear sit to the right of this field, so the field gets what is left after
+        // measuring them. The floor scales with the interface, which the fixed one it replaced
+        // did not.
+        var browse = Loc.Get("fonts.browse", "Browse") + $"###font-browse-{role}";
+        var clear = Loc.Get("fonts.clear", "Clear") + $"###font-clear-{role}";
+
+        ImGui.SetNextItemWidth(Math.Max(
+            ImGui.GetContentRegionAvail().X - ButtonRowWidth(browse, clear),
+            120f * ImGuiHelpers.GlobalScale));
 
         ImGui.InputTextWithHint(
-            $"##font-path-{label}", "Path to a .ttf, .otf or .ttc file", ref buffer, 512);
+            $"##font-path-{role}",
+            Loc.Get("fonts.path.hint", "Path to a .ttf, .otf or .ttc file"),
+            ref buffer,
+            512);
 
         editor.Buffer = buffer;
 
@@ -154,16 +176,18 @@ internal sealed partial class ConfigWindow
 
         ImGui.SameLine();
 
-        if (ImGui.Button($"Browse##font-browse-{label}"))
+        if (ImGui.Button(browse))
             BrowseForFont(role);
 
-        Tooltip("Opens your Windows font folder. Any .ttf, .otf or .ttc file will do.");
+        UiText.Tooltip(Loc.Get(
+            "fonts.browse.tooltip",
+            "Opens your Windows font folder. Any .ttf, .otf or .ttc file will do."));
 
         ImGui.SameLine();
 
         using (ImRaii.Disabled(stored.Length == 0))
         {
-            if (ImGui.Button($"Clear##font-clear-{label}"))
+            if (ImGui.Button(clear))
             {
                 this.config.SetFontFor(role, font with { Path = string.Empty });
                 editor.Buffer = string.Empty;
@@ -186,7 +210,8 @@ internal sealed partial class ConfigWindow
 
         if (problem == null)
         {
-            ImGui.TextDisabled($"Drawing with {Path.GetFileName(path)}.");
+            UiText.Disabled(Loc.Format(
+                "fonts.drawingwith", "Drawing with {0}.", Path.GetFileName(path)));
             return;
         }
 
@@ -199,11 +224,13 @@ internal sealed partial class ConfigWindow
 
         Warn(
             CautionColor,
-            "A font you supply is loaded exactly as it is, and it stays yours to look after. "
-            + "Missing glyphs, odd spacing, soft edges, a file the game cannot read, or a licence "
-            + "you do not hold are on you rather than on Regions of XIV, and no support is offered "
-            + "for anything that comes of one. If a line stops looking right, put it back on one of "
-            + "the built-in faces.");
+            Loc.Get(
+                "fonts.custom.notice",
+                "A font you supply is loaded exactly as it is, and it stays yours to look after. "
+                + "Missing glyphs, odd spacing, soft edges, a file the game cannot read, or a licence "
+                + "you do not hold are on you rather than on Regions of XIV, and no support is offered "
+                + "for anything that comes of one. If a line stops looking right, put it back on one of "
+                + "the built-in faces."));
     }
 
     private static void DrawStockFontWarnings(FontSetting font)
@@ -213,8 +240,11 @@ internal sealed partial class ConfigWindow
         {
             Warn(
                 FaultColor,
-                $"{Label(font.Choice)} has no Japanese glyphs. On this client that means place names "
-                + "will render as blank boxes, not just look soft. Choose Axis or Noto Sans CJK instead.");
+                Loc.Format(
+                    "fonts.nojapanese",
+                    "{0} has no Japanese glyphs. On this client that means place names "
+                    + "will render as blank boxes, not just look soft. Choose Axis or Noto Sans CJK instead.",
+                    Label(font.Choice)));
         }
 
         var ceiling = FontService.NativeCeilingPx(font.Choice);
@@ -225,15 +255,21 @@ internal sealed partial class ConfigWindow
 
         Warn(
             CautionColor,
-            $"This font has no bitmap above {ceiling:F0} px, so at {size:F0} px it is being "
-            + "upscaled and will look soft. Lower the size, or switch to Noto Sans CJK, which "
-            + "stays sharp at any size.");
+            Loc.Format(
+                "fonts.upscaled",
+                "This font has no bitmap above {0:F0} px, so at {1:F0} px it is being "
+                + "upscaled and will look soft. Lower the size, or switch to Noto Sans CJK, which "
+                + "stays sharp at any size.",
+                ceiling,
+                size));
     }
 
     private void BrowseForFont(FontRole role)
     {
         this.fileDialogs.OpenFileDialog(
-            "Choose a font file",
+            Loc.Get("fonts.dialog.title", "Choose a font file"),
+            // Not translated: the braces are Dalamud's filter syntax rather than punctuation, and a
+            // translator has no way to know that breaking them stops the dialog listing anything.
             "Fonts{.ttf,.otf,.ttc}",
             (picked, chosen) => AdoptFont(role, picked, chosen),
             1,

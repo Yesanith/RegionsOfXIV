@@ -152,6 +152,71 @@ They are wired to four `/regions` subcommands that exist only in a Debug build:
 configuration but Debug, so none of it reaches a release build — the types are
 absent from the Release assembly entirely, not merely unreachable.
 
+### Translating the settings window
+
+Interface strings live in `src/RegionsOfXIV/Localization/`, one JSON file per
+language code — `de.json`, or `pt-BR.json` for a regional one. They are embedded
+by a glob and discovered from the resource names, so **a new language is a file,
+not a code change**. German, French and Japanese ship as machine drafts; every
+one of them wants a speaker's eye.
+
+#### `en.json` is generated
+
+`en.json` is the translators' copy and is never read at runtime. The English the
+plugin shows is compiled into the call sites — `Loc.Get(key, english)` — so a
+missing key, a blank entry or a file that will not parse falls back to English
+rather than showing anything broken. That also means the two can drift, so the
+file is generated rather than edited:
+
+```
+python tools/export-en-json.py            rewrite it from the call sites
+python tools/export-en-json.py --check    report drift, change nothing
+```
+
+The generator carries the `description` fields over untouched, along with the
+order keys appear in and the blank lines between groups, so regenerating a file
+nothing has changed in produces no diff at all.
+
+#### The descriptions are the point
+
+Every entry carries a `description`. It is not documentation — it is the note a
+translator works from, and it is where the traps are recorded: which words are
+identifiers, which are FFXIV's own terms, which line breaks matter, which
+placeholders must survive. Write one for every new key. Some worth reading
+before starting: `notifications.subarea`, `general.hideduty`, `general.uppercase`
+and `notifications.banners.tooltip`.
+
+Four rules that the descriptions repeat, because breaking them is invisible
+until someone hits it:
+
+- **Placeholders survive.** `{0}`, `{1}`, and `{0:F0}` with its format intact. A
+  mangled one falls back to the English sentence and the work is wasted silently.
+- **FFXIV's own terms win.** Duty, aetheryte, sanctuary, the Eorzean script, the
+  banner wording — the game already translates these. Use its words, or leave
+  the entry out and say so, rather than coining new ones.
+- **Identifiers are never translated.** `_AreaText`, `_LocationTitle`, `ROX1-`,
+  `/regions test`, typeface names, product names.
+- **A key you leave out stays English.** That is the intended way to say "not
+  yet" — it reads as partly English rather than as a hole.
+
+A file may carry `_status` and `_untranslated` keys. The loader ignores anything
+beginning with an underscore, except `_status`: a file whose status says
+`machine-drafted` makes the settings window show a dismissible notice saying so,
+which is how a rough translation stops pretending to be finished. Take the
+marker out once the file has been through a speaker, and the notice stops.
+
+#### One hard limit: the font
+
+The window draws with the game's own AXIS font, which carries Latin-1, the
+Russian Cyrillic alphabet, kana and around 6,300 kanji — but only eight
+characters of Latin Extended-A. **Polish, Czech, Turkish, Romanian and
+Vietnamese diacritics have no glyph and would draw as blanks**, and glyph ranges
+are fixed when the font atlas is built, so nothing recovers them at run time.
+The loader warns to the log when a language file uses characters AXIS lacks, and
+`NoBundledLanguageNeedsGlyphsAxisLacks` fails the build before one can ship.
+Adding such a language means giving the window a font of its own, which is a far
+larger change than dropping in a file.
+
 ### How it fits together
 
 `Services/AnnouncementCoordinator.cs` is the brain: everything that decides *what*

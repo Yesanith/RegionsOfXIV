@@ -7,12 +7,16 @@ namespace RegionsOfXIV;
 // new setting travels everywhere the moment it is added to Configuration and nobody has to
 // remember to update three places.
 //
-// NotCopied is what must not travel: identity and bookkeeping, plus settings kept only so an old
-// config can be migrated.
+// NotCopied is what must not travel: identity and bookkeeping, settings kept only so an old
+// config can be migrated, and the interface language -- a preset is a look, and a code arriving
+// from another player has no business changing which language someone reads the window in.
 internal static class ConfigurationCopy
 {
     private static readonly string[] NotCopied =
-        ["Version", "UserPresets", "LastSeenVersion", "OverlapHeader"];
+    [
+        "Version", "UserPresets", "LastSeenVersion", "OverlapHeader",
+        "Language", "TranslationNoticeDismissedFor",
+    ];
 
     // Settings that no longer travel, but that an older preset can still name. Migrate() works
     // from the value the old build wrote, so importing has to be able to set one even though

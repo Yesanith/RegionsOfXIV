@@ -1,0 +1,866 @@
+{
+  "_note": "Source document for translators. Never read at runtime - the English shown by the plugin is compiled into the call sites, so this file cannot disagree with what is drawn. Regenerate it rather than editing it by hand.",
+
+  "durations.tab": {
+    "message": "Durations",
+    "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
+  },
+  "durations.intro": {
+    "message": "The line arrives, lands, then decodes. Motion and decode are separate stages and each takes its own time.",
+    "description": "Paragraph at the top of the tab, explaining that the stages below run in order."
+  },
+
+  "durations.fadein": {
+    "message": "Fade in",
+    "description": "Slider label."
+  },
+  "durations.fadein.tooltip": {
+    "message": "How long the line takes to come up to full strength as it appears.",
+    "description": "Tooltip for the Fade in slider."
+  },
+
+  "durations.motion": {
+    "message": "Motion",
+    "description": "Slider label. The movement the letters make as they arrive."
+  },
+  "durations.motion.tooltip": {
+    "message": "How long the letters take to arrive. Runs alongside the fade in,\nand does nothing when the motion on the Effects tab is None.",
+    "description": "Tooltip for the Motion slider. Keep the line break. \"Effects\" is another tab in this window and \"None\" is one of its choices, so both should match how you translated them there."
+  },
+
+  "durations.decode": {
+    "message": "Decode",
+    "description": "Slider label. The effect where Eorzean script resolves into readable letters."
+  },
+  "durations.decode.tooltip": {
+    "message": "How long the Eorzean takes to resolve, once the letters have landed.\nNeeds the decode effect on the Effects tab.",
+    "description": "Tooltip for the Decode slider. Keep the line break. \"Eorzean\" is the game's own invented alphabet and is usually left as-is."
+  },
+
+  "durations.hold": {
+    "message": "Hold",
+    "description": "Slider label. How long the finished notification stays on screen."
+  },
+  "durations.hold.tooltip": {
+    "message": "How long the finished line stays up before it starts to fade.",
+    "description": "Tooltip for the Hold slider."
+  },
+
+  "durations.fadeout": {
+    "message": "Fade out",
+    "description": "Slider label."
+  },
+  "durations.fadeout.tooltip": {
+    "message": "How long the line takes to disappear once its time is up.",
+    "description": "Tooltip for the Fade out slider."
+  },
+
+  "effects.tab": {
+    "message": "Effects",
+    "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
+  },
+
+  "effects.motion.intro": {
+    "message": "How the letters move as they arrive.",
+    "description": "Heading line above the Motion dropdown."
+  },
+  "effects.motion": {
+    "message": "Motion",
+    "description": "Dropdown label. The movement the letters make as the notification appears."
+  },
+  "effects.motion.tooltip": {
+    "message": "None — the letters simply appear where they belong.\nTypewriter — one letter at a time, no fade.\nRise — letters lift into place from below.\nWave — letters ride a wave through the line as it appears.\nBurn — letters catch alight and cool into their colour.\n\nRuns alongside the Eorzean decode rather than instead of it.",
+    "description": "Tooltip for the Motion dropdown. Keep the line breaks. Each of None, Typewriter, Rise, Wave and Burn is an entry in that dropdown, so use the same wording you gave them in effects.motion.* below. \"Eorzean\" is the game's invented alphabet and is usually left as-is."
+  },
+
+  "effects.motion.none": {
+    "message": "None",
+    "description": "Motion dropdown entry: no movement. Separate from effects.particles.none so the two can be worded differently where grammar needs it."
+  },
+  "effects.motion.typewriter": {
+    "message": "Typewriter",
+    "description": "Motion dropdown entry: letters appear one at a time."
+  },
+  "effects.motion.rise": {
+    "message": "Rise",
+    "description": "Motion dropdown entry: letters lift into place from below."
+  },
+  "effects.motion.wave": {
+    "message": "Wave",
+    "description": "Motion dropdown entry: a wave passes along the line."
+  },
+  "effects.motion.burn": {
+    "message": "Burn",
+    "description": "Motion dropdown entry: letters catch alight and cool into their colour."
+  },
+
+  "effects.particles.intro": {
+    "message": "What plays around it, for as long as it is on screen.",
+    "description": "Heading line above the Particles dropdown."
+  },
+  "effects.particles": {
+    "message": "Particles",
+    "description": "Dropdown label. Small shapes drifting around the text."
+  },
+
+  "effects.particles.none": {
+    "message": "None",
+    "description": "Particles dropdown entry: nothing drifting. Separate from effects.motion.none so the two can be worded differently where grammar needs it."
+  },
+  "effects.particles.hearts": {
+    "message": "Hearts",
+    "description": "Particles dropdown entry."
+  },
+  "effects.particles.embers": {
+    "message": "Embers",
+    "description": "Particles dropdown entry: glowing flecks rising from a fire."
+  },
+  "effects.particles.sparkles": {
+    "message": "Sparkles",
+    "description": "Particles dropdown entry."
+  },
+  "effects.particles.petals": {
+    "message": "Petals",
+    "description": "Particles dropdown entry: falling flower petals."
+  },
+
+  "effects.density": {
+    "message": "Density",
+    "description": "Slider label. How many particles there are, shown as a multiplier like 1.5x."
+  },
+  "effects.particlecolour": {
+    "message": "Particle colour",
+    "description": "Colour picker label."
+  },
+  "effects.particlecolour.tooltip": {
+    "message": "The default amber suits embers and sparkles. Hearts and petals\nwant moving towards pink.",
+    "description": "Tooltip for the particle colour picker. Keep the line break. \"Embers\", \"Sparkles\", \"Hearts\" and \"Petals\" are entries in the Particles dropdown, so match how you translated them in effects.particles.* above."
+  },
+  "effects.embers.note": {
+    "message": "Embers go with the Burn motion, but they do not need it.",
+    "description": "Hint shown only when Embers is picked without the Burn motion. \"Embers\" and \"Burn\" are dropdown entries - match effects.particles.embers and effects.motion.burn."
+  },
+
+  "effects.preview": {
+    "message": "Preview",
+    "description": "Button that fires a sample notification. The Fonts and General tabs have their own button with the same wording and their own key, so each tab can be worded to fit its context."
+  },
+
+  "sharecodes.heading": {
+    "message": "Share codes",
+    "description": "Heading for the share-code row, which sits at the bottom of the Presets tab."
+  },
+  "sharecodes.intro": {
+    "message": "A code is the whole preset as one line of text. Paste one into chat to hand it to someone.",
+    "description": "Explains what a share code is. \"Chat\" means the game's chat window."
+  },
+
+  "sharecodes.copy": {
+    "message": "Copy current settings",
+    "description": "Button. Puts a code for the settings as they stand onto the clipboard."
+  },
+  "sharecodes.copied": {
+    "message": "Copied. Paste it wherever you like.",
+    "description": "Confirmation shown for a few seconds after the copy button is pressed."
+  },
+  "sharecodes.copy.tooltip.named": {
+    "message": "Puts a code for everything as it stands right now on the clipboard,\nunder the name \"{0}\".",
+    "description": "Tooltip on the copy button once a name has been typed. Keep the line break. {0} is the name the player typed, so keep the quotes around it. sharecodes.customfont.note may be appended after this."
+  },
+  "sharecodes.copy.tooltip.unnamed": {
+    "message": "Type a name in the box above first — it travels with the code, and it\nis all the person you send it to will have to go on.\n\nTo share a preset you have already saved, right-click it instead.",
+    "description": "Tooltip on the copy button while it is disabled for want of a name. Keep the line breaks."
+  },
+
+  "sharecodes.paste": {
+    "message": "Paste a code",
+    "description": "Button. Reads a code from the clipboard and applies it."
+  },
+  "sharecodes.paste.tooltip.named": {
+    "message": "Reads a code from the clipboard, saves it as one of your presets, and\napplies it. It will be filed under \"{0}\" rather than\nthe name the code arrived with.",
+    "description": "Tooltip on the paste button once a name has been typed. Keep the line breaks. {0} is the name the player typed, so keep the quotes around it."
+  },
+  "sharecodes.paste.tooltip.unnamed": {
+    "message": "Reads a code from the clipboard, saves it as one of your presets, and\napplies it under the name it arrived with.\n\nType a name above first to file it under that instead.",
+    "description": "Tooltip on the paste button when no name has been typed. Keep the line breaks."
+  },
+
+  "sharecodes.clipboard.unreadable": {
+    "message": "Could not read the clipboard. Try again in a moment.",
+    "description": "Shown when the clipboard cannot be read at all, which is usually another program holding it open."
+  },
+  "sharecodes.imported": {
+    "message": "Imported \"{0}\" and applied it.",
+    "description": "Shown after a code is pasted successfully. {0} is the preset's name - keep the quotes. A further sentence may be appended after this one when the code needs a font the player does not have."
+  },
+
+  "about.tab": {
+    "message": "About",
+    "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
+  },
+  "about.title": {
+    "message": "Regions of XIV {0}",
+    "description": "Heading at the top of the About tab. \"Regions of XIV\" is the plugin's name and stays as-is; {0} is the version number."
+  },
+  "about.author": {
+    "message": "by {0}",
+    "description": "Sits under the title. {0} is the author's name and is never translated - it is passed in separately so it cannot be."
+  },
+  "about.summary": {
+    "message": "Announces the region, zone, area and sub-area you walk into, and the weather while you are there, replacing the game's own location text rather than drawing alongside it.",
+    "description": "One-paragraph description of what the plugin does. \"Region\", \"zone\", \"area\" and \"sub-area\" are the four tiers of place name the plugin announces; the same four words appear on the Notifications tab, so keep them consistent."
+  },
+
+  "about.whatsnew": {
+    "message": "What's new",
+    "description": "Button opening the changelog window. Keep it short - four buttons share one row and wrap when they do not fit."
+  },
+  "about.whatsnew.tooltip": {
+    "message": "Every release, newest first. Also at \"/regions changelog\".",
+    "description": "Tooltip for the What's new button. \"/regions changelog\" is a command typed into the game and is never translated."
+  },
+  "about.discord": {
+    "message": "Join the Discord",
+    "description": "Button opening the project's Discord invite. Keep it short - four buttons share one row."
+  },
+  "about.discord.tooltip": {
+    "message": "Ideas, bug reports and preset codes.",
+    "description": "Tooltip for the Discord button. The address it opens is appended automatically by common.opens."
+  },
+  "about.github": {
+    "message": "GitHub",
+    "description": "Button opening the source repository. \"GitHub\" is a product name and stays as-is."
+  },
+  "about.github.tooltip": {
+    "message": "The source, the releases, and the licence.",
+    "description": "Tooltip for the GitHub button."
+  },
+  "about.issue": {
+    "message": "Report an issue",
+    "description": "Button opening the bug tracker. Keep it short - four buttons share one row."
+  },
+  "about.issue.tooltip": {
+    "message": "Something wrong, or something missing.",
+    "description": "Tooltip for the Report an issue button."
+  },
+
+  "about.commands": {
+    "message": "Commands",
+    "description": "Heading above the list of chat commands."
+  },
+  "about.command.settings": {
+    "message": "Opens these settings.",
+    "description": "What \"/regions\" does. The command itself is not translated."
+  },
+  "about.command.test": {
+    "message": "Shows a notification for where you are standing.",
+    "description": "What \"/regions test\" does. The command itself is not translated."
+  },
+  "about.command.changelog": {
+    "message": "Opens the What's New window.",
+    "description": "What \"/regions changelog\" does. \"What's New\" is that window's title - match about.whatsnew."
+  },
+
+  "about.inspiration": {
+    "message": "Inspired by Nekres' Regions of Tyria for Guild Wars 2.",
+    "description": "Credit line, clickable. \"Nekres\" is a person's name, \"Regions of Tyria\" is their addon and \"Guild Wars 2\" is a game - none of the three are translated."
+  },
+  "about.inspiration.tooltip": {
+    "message": "Click to open {0}",
+    "description": "Tooltip on the credit line. {0} is a web address."
+  },
+  "about.licence": {
+    "message": "Licensed under AGPL-3.0-or-later.",
+    "description": "\"AGPL-3.0-or-later\" is the licence's formal identifier and stays exactly as it is."
+  },
+  "about.notaffiliated": {
+    "message": "Place names, weather and fonts come from the game's own data. Not affiliated with Square Enix.",
+    "description": "Legal note at the foot of the tab. \"Square Enix\" is a company name and stays as-is."
+  },
+
+  "notifications.tab": {
+    "message": "Notifications",
+    "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
+  },
+  "notifications.intro": {
+    "message": "This plugin replaces the game's own location text rather than drawing alongside it. If you turn the suppression below off, the game's version comes back.",
+    "description": "Paragraph at the top of the tab."
+  },
+
+  "notifications.zone": {
+    "message": "Zone changes",
+    "description": "Checkbox. \"Zone\" is the coarsest of the four place tiers the plugin announces - the same four words appear in about.summary, so keep them consistent."
+  },
+  "notifications.area": {
+    "message": "Area changes",
+    "description": "Checkbox. \"Area\" is a place tier - a named part of a zone."
+  },
+  "notifications.subarea": {
+    "message": "Sub-area changes",
+    "description": "Checkbox. \"Sub-area\" is the finest place tier - a named part of an area, which the game itself never announces. FFXIV may have an established term for this in your language; if you are unsure, leave it in English and say so."
+  },
+
+  "notifications.weather": {
+    "message": "Weather changes",
+    "description": "Checkbox."
+  },
+  "notifications.weather.tooltip": {
+    "message": "Announces the weather turning over, on its own line just above the place name, so it never interrupts a location notice.\n\nWeather runs on a fixed cycle of about 23 minutes, and arriving anywhere new announces what it is doing there, so it shows up with the place name as you walk in.",
+    "description": "Tooltip for the Weather changes checkbox. Keep the blank line between the two paragraphs."
+  },
+  "notifications.weathericon": {
+    "message": "Show the weather icon",
+    "description": "Checkbox, only usable while Weather changes is on."
+  },
+  "notifications.weathericon.tooltip": {
+    "message": "Draws the game's own icon for the weather to the left of its name.",
+    "description": "Tooltip for the weather icon checkbox."
+  },
+
+  "notifications.banners": {
+    "message": "Banners",
+    "description": "Checkbox. The game's full-screen announcements - Level Up!, Duty Complete and so on."
+  },
+  "notifications.banners.tooltip": {
+    "message": "Redraws the game's full-screen banners — \"Quest Accepted\", \"Duty Commenced\", \"Level Up!\" — in this plugin's lettering.\n\nThe wording is painted into the game's artwork rather than stored as text, so only banners this plugin has words for are taken over. Any it does not recognise keep the game's own.",
+    "description": "Tooltip for the Banners checkbox. Keep the blank line. \"Quest Accepted\", \"Duty Commenced\" and \"Level Up!\" are banners the game itself shows and the game already translates them - use the exact wording FFXIV uses in your language, not a fresh translation, or players will not recognise them."
+  },
+  "notifications.hidebanner": {
+    "message": "Hide the game's own banner",
+    "description": "Checkbox, only usable while Banners is on."
+  },
+  "notifications.hidebanner.tooltip": {
+    "message": "Fades out the game's artwork so only this plugin's version shows.\n\nTurn this off to see both, which is a quick way to check the wording matches.",
+    "description": "Tooltip for the hide-banner checkbox. Keep the blank line."
+  },
+
+  "notifications.hideareatext": {
+    "message": "Hide the game's own area text",
+    "description": "Checkbox. Suppresses the flash of text the game itself shows on entering an area."
+  },
+  "notifications.hideareatext.tooltip": {
+    "message": "Suppresses the native \"_AreaText\" flash, which draws underneath this plugin.",
+    "description": "Tooltip. \"_AreaText\" is the game's internal name for that piece of interface - it is an identifier, not a word, so never translate it."
+  },
+  "notifications.hideloadingtitle": {
+    "message": "Hide the loading-screen zone title",
+    "description": "Checkbox. Suppresses the gold zone name drawn over the loading screen."
+  },
+  "notifications.hideloadingtitle.tooltip": {
+    "message": "Suppresses \"_LocationTitle\" and \"_LocationTitleShort\", the gold title\ndrawn over the loading screen, and shows the same names in this\nplugin's style instead.",
+    "description": "Tooltip. Keep the line breaks. \"_LocationTitle\" and \"_LocationTitleShort\" are the game's internal names for those pieces of interface - identifiers, not words, so never translate them."
+  },
+
+  "presets.tab": {
+    "message": "Presets",
+    "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
+  },
+  "presets.intro": {
+    "message": "A preset covers every setting on General, Fonts, Effects, Notifications and Durations — the face and size of each line, position, colours, motion and particles, which tiers announce, the timings, and when to stay quiet.",
+    "description": "Paragraph at the top of the tab. General, Fonts, Effects, Notifications and Durations are the names of the other tabs in this window - match how you translated each tab's own label."
+  },
+  "presets.intro.warning": {
+    "message": "Applying one replaces all of them, so anything you have changed is overwritten.",
+    "description": "Greyed line under presets.intro."
+  },
+
+  "presets.builtin": {
+    "message": "Built-in looks",
+    "description": "Heading over the row of presets that ship with the plugin."
+  },
+  "presets.builtin.hint": {
+    "message": "The defaults, plus the look each one is named for.",
+    "description": "Greyed line under the Built-in looks heading."
+  },
+  "presets.builtin.tooltip": {
+    "message": "{0}\nEverything else returns to its default.",
+    "description": "Tooltip on each built-in preset button. {0} is that preset's own description, one of the presets.*.description entries below. Keep the line break."
+  },
+
+  "presets.classic.description": {
+    "message": "The plugin as it ships: a decode, no movement, no particles.",
+    "description": "Describes the Classic preset. The preset NAMES themselves are never translated - they travel inside share codes, so a preset saved as \"Classic\" has to arrive as \"Classic\" on someone else's machine. Only these descriptions are."
+  },
+  "presets.inferno.description": {
+    "message": "Letters catch alight and cool into place, embers rising off them.",
+    "description": "Describes the Inferno preset. \"Embers\" is also a Particles entry - match effects.particles.embers."
+  },
+  "presets.sweetheart.description": {
+    "message": "Letters lift into place with hearts drifting up around them.",
+    "description": "Describes the Sweetheart preset. \"Hearts\" is also a Particles entry - match effects.particles.hearts."
+  },
+  "presets.starlight.description": {
+    "message": "The line rides a wave in, sparkles hanging in the air around it.",
+    "description": "Describes the Starlight preset. \"Wave\" and \"Sparkles\" are dropdown entries - match effects.motion.wave and effects.particles.sparkles."
+  },
+  "presets.sakura.description": {
+    "message": "A gentle rise under falling petals.",
+    "description": "Describes the Sakura preset. \"Rise\" and \"Petals\" are dropdown entries - match effects.motion.rise and effects.particles.petals."
+  },
+  "presets.dispatch.description": {
+    "message": "Typed out one letter at a time, in tight uppercase. No particles.",
+    "description": "Describes the Dispatch preset. Refers to the Typewriter motion - match effects.motion.typewriter if you name it."
+  },
+  "presets.tyria.description": {
+    "message": "Wide uppercase in gold, still and unhurried — a nod to the original.",
+    "description": "Describes the Tyria preset. \"The original\" means Regions of Tyria, the Guild Wars 2 addon this plugin is modelled on."
+  },
+
+  "presets.saved": {
+    "message": "Your presets",
+    "description": "Heading over the presets the player has saved themselves."
+  },
+  "presets.saved.hint": {
+    "message": "Your settings, saved exactly as they were.",
+    "description": "Greyed line under the Your presets heading."
+  },
+  "presets.saved.none": {
+    "message": "You have not saved any yet.",
+    "description": "Shown in place of the list when the player has saved no presets."
+  },
+  "presets.saved.tooltip": {
+    "message": "Apply this preset.\nRight-click to share, overwrite or delete it.",
+    "description": "Tooltip on each saved preset button. Keep the line break."
+  },
+
+  "presets.menu.share": {
+    "message": "Copy share code",
+    "description": "Right-click menu entry on a saved preset."
+  },
+  "presets.menu.overwrite": {
+    "message": "Overwrite with current settings",
+    "description": "Right-click menu entry on a saved preset."
+  },
+  "presets.menu.delete": {
+    "message": "Delete",
+    "description": "Right-click menu entry on a saved preset."
+  },
+  "presets.copied": {
+    "message": "Copied a code for \"{0}\".",
+    "description": "Confirmation after copying a saved preset's share code. {0} is that preset's name - keep the quotes."
+  },
+
+  "presets.name.hint": {
+    "message": "Name it — to save, copy or import",
+    "description": "Placeholder text inside the empty name box. Keep it short; the box is about 180 pixels wide."
+  },
+  "presets.save": {
+    "message": "Save",
+    "description": "Button beside the name box, shown when the typed name is not in use yet."
+  },
+  "presets.replace": {
+    "message": "Replace",
+    "description": "The same button as presets.save, shown instead when the typed name matches a preset that already exists."
+  },
+  "presets.save.tooltip": {
+    "message": "Saves every setting on General, Fonts, Effects, Notifications and Durations.",
+    "description": "Tooltip on the Save/Replace button. Those five words are the names of the other tabs - match their labels."
+  },
+
+  "presets.discord": {
+    "message": "Join the Discord",
+    "description": "Button at the foot of the tab. The About tab has its own button with the same wording under about.discord, so each can be worded to fit its context."
+  },
+  "presets.discord.tooltip": {
+    "message": "Trade preset codes, report a bug, or suggest a feature.",
+    "description": "Tooltip for the Discord button on this tab. The address it opens is appended automatically by common.opens."
+  },
+
+  "presets.customfont.warning": {
+    "message": "These settings use a font from this PC. A preset stores where that file sits, not the font itself, so on anyone else's machine the path will not exist and those lines fall back to Noto Sans CJK — everything else in the preset still applies. Put the line back on a built-in face if you want a preset to look the same for whoever you hand it to.",
+    "description": "Warning shown above the save row when the current settings use a font file from the player's own PC. \"Noto Sans CJK\" is a font name and stays as-is."
+  },
+  "presets.customfont.missing": {
+    "message": "It carries a font file from the sender's PC that is not on yours, so those lines are drawn with Noto Sans CJK. Choose your own on the Fonts tab.",
+    "description": "Appended to sharecodes.imported when an imported code wants a font the player does not have. \"Fonts\" is a tab in this window - match its label. \"Noto Sans CJK\" is a font name and stays as-is."
+  },
+
+  "fonts.tab": {
+    "message": "Fonts",
+    "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
+  },
+  "fonts.intro": {
+    "message": "Every line of a notification has its own face and size. Pick one of the built-in faces, or point the plugin at a font file on this PC.",
+    "description": "Paragraph at the top of the tab. \"Face\" here means typeface."
+  },
+
+  "fonts.role.text": {
+    "message": "Text",
+    "description": "Inner tab label for the largest line of a notification, the place name. Keep it short - three of these sit in one row."
+  },
+  "fonts.role.text.hint": {
+    "message": "The place name itself, the largest line.",
+    "description": "Greyed line under the Text tab."
+  },
+  "fonts.role.header": {
+    "message": "Header",
+    "description": "Inner tab label for the smaller line above the place name. Keep it short."
+  },
+  "fonts.role.header.hint": {
+    "message": "The smaller line above the name, giving the region or area it sits in.",
+    "description": "Greyed line under the Header tab. \"Region\" and \"area\" are two of the place tiers - match notifications.zone and notifications.area."
+  },
+  "fonts.role.weather": {
+    "message": "Weather",
+    "description": "Inner tab label for the forecast line. Keep it short."
+  },
+  "fonts.role.weather.hint": {
+    "message": "The forecast line above the header, shown when weather announcements are on.",
+    "description": "Greyed line under the Weather tab."
+  },
+
+  "fonts.size": {
+    "message": "Size",
+    "description": "Slider label, shown once per role tab."
+  },
+  "fonts.face": {
+    "message": "Font",
+    "description": "Dropdown label for choosing the typeface, shown once per role tab."
+  },
+  "fonts.face.tooltip": {
+    "message": "Noto Sans CJK is vector — sharp at any size, and it covers every language.\n\nThe game's own faces suit FFXIV better, but each is a bitmap with a ceiling:\nTrump Gothic — Latin only, to 91 px.\nJupiter — Latin only, to 61 px.\nAxis — to 48 px, the only one with Japanese glyphs.\n\nCustom file loads a font of your own from this PC.",
+    "description": "Tooltip for the font dropdown. Keep the line breaks. \"Noto Sans CJK\", \"Trump Gothic\", \"Jupiter\" and \"Axis\" are names of typefaces and are never translated. \"Custom file\" is a dropdown entry - match fonts.choice.custom. \"px\" is the pixel abbreviation."
+  },
+
+  "fonts.choice.noto": {
+    "message": "{0} (recommended)",
+    "description": "Dropdown entry. {0} is the typeface name \"Noto Sans CJK\", passed in separately so it cannot be translated by accident. Only \"(recommended)\" is yours to translate."
+  },
+  "fonts.choice.custom": {
+    "message": "Custom file",
+    "description": "Dropdown entry for using a font file from the player's own PC. The other entries in this dropdown are typeface names and are not translated."
+  },
+
+  "fonts.preview": {
+    "message": "Preview",
+    "description": "Button that fires a sample notification, one per role tab. The Effects and General tabs have their own with the same wording and their own keys."
+  },
+
+  "fonts.path.hint": {
+    "message": "Path to a .ttf, .otf or .ttc file",
+    "description": "Placeholder text inside the empty font-path box. The three extensions are file types and stay as they are."
+  },
+  "fonts.browse": {
+    "message": "Browse",
+    "description": "Button opening a file picker. Keep it short - it shares a row with the path box and Clear."
+  },
+  "fonts.browse.tooltip": {
+    "message": "Opens your Windows font folder. Any .ttf, .otf or .ttc file will do.",
+    "description": "Tooltip for the Browse button."
+  },
+  "fonts.clear": {
+    "message": "Clear",
+    "description": "Button that empties the font path. Keep it short - it shares a row with the path box and Browse."
+  },
+  "fonts.dialog.title": {
+    "message": "Choose a font file",
+    "description": "Title of the file picker window opened by Browse."
+  },
+  "fonts.drawingwith": {
+    "message": "Drawing with {0}.",
+    "description": "Confirms which custom font file is in use. {0} is a file name."
+  },
+
+  "fonts.custom.notice": {
+    "message": "A font you supply is loaded exactly as it is, and it stays yours to look after. Missing glyphs, odd spacing, soft edges, a file the game cannot read, or a licence you do not hold are on you rather than on Regions of XIV, and no support is offered for anything that comes of one. If a line stops looking right, put it back on one of the built-in faces.",
+    "description": "Warning shown whenever a custom font is selected. \"Regions of XIV\" is the plugin's name and stays as-is. This one disclaims responsibility, so keep it plain and keep its meaning exactly."
+  },
+  "fonts.nojapanese": {
+    "message": "{0} has no Japanese glyphs. On this client that means place names will render as blank boxes, not just look soft. Choose Axis or Noto Sans CJK instead.",
+    "description": "Shown on a Japanese client when a Latin-only typeface is picked. {0} is that typeface's name. \"Axis\" and \"Noto Sans CJK\" are typeface names and stay as-is."
+  },
+  "fonts.upscaled": {
+    "message": "This font has no bitmap above {0:F0} px, so at {1:F0} px it is being upscaled and will look soft. Lower the size, or switch to Noto Sans CJK, which stays sharp at any size.",
+    "description": "Shown when the chosen size exceeds what a bitmap typeface holds. {0} is the largest size it has, {1} is the size chosen - keep the \":F0\" inside both braces, it rounds them to whole numbers. \"px\" is the pixel abbreviation."
+  },
+
+  "general.tab": {
+    "message": "General",
+    "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
+  },
+  "general.language": {
+    "message": "Language",
+    "description": "Dropdown at the top of the General tab, choosing which language this window is drawn in. Every other entry in the list is a language's own name and is not translated."
+  },
+  "general.language.follow": {
+    "message": "Follow Dalamud",
+    "description": "First entry in the Language dropdown, and the default: take whichever language Dalamud itself is set to. \"Dalamud\" is the name of the plugin framework and stays as-is."
+  },
+  "general.language.tooltip": {
+    "message": "Follow Dalamud takes whichever language Dalamud itself is set to, and\nchanges with it.\n\nOnly this window is affected. Place and weather names come from the game\nand stay in whatever language your client is running in.",
+    "description": "Tooltip for the Language dropdown. Keep the line breaks and the blank line. \"Follow Dalamud\" is the first entry in that dropdown - match general.language.follow."
+  },
+
+  "general.preview": {
+    "message": "Preview",
+    "description": "Button that plays a sample notification. The same word is used on the Fonts and Effects tabs - keep all three the same."
+  },
+  "general.vertical": {
+    "message": "Vertical position",
+    "description": "Slider label. How far down the screen the notification sits, as a percentage."
+  },
+  "general.horizontal": {
+    "message": "Horizontal position",
+    "description": "Slider label. How far across the screen the notification sits, as a percentage."
+  },
+  "general.horizontal.tooltip": {
+    "message": "The text is centred on this point, so 50% is the middle of the screen.\nA long place name set near either end will reach past it.",
+    "description": "Tooltip for the Horizontal position slider. Keep the line break. The per-cent sign after 50 is a literal one, not a placeholder."
+  },
+  "general.letterspacing": {
+    "message": "Letter spacing",
+    "description": "Slider label. The gap between individual letters."
+  },
+  "general.letterspacing.tooltip": {
+    "message": "Extra space between letters, as a percentage of the font size, so it keeps\nits proportions when the size changes and the header gets its own share.\nWide spacing is much of what gives the Guild Wars 2 original its look.",
+    "description": "Tooltip for the Letter spacing slider. Keep the line breaks. \"Guild Wars 2\" is another game's name and is never translated."
+  },
+  "general.uppercase": {
+    "message": "Uppercase",
+    "description": "Checkbox. Draws the place name in capital letters. In a language with no upper and lower case this setting does nothing to the text, but the label still needs a sensible rendering - the word for capital letters is right even so."
+  },
+  "general.decode": {
+    "message": "Decode from Eorzean script",
+    "description": "Checkbox. The line first appears written in Eorzean, the invented alphabet of FFXIV's setting, then resolves into readable text. FFXIV has an established name for that alphabet in your language - use it."
+  },
+  "general.decode.tooltip": {
+    "message": "Requires a bundled Eorzean font. Latin text only.\n\nRuns after the motion on the Effects tab rather than alongside it:\nthe line arrives in Eorzean, lands, then resolves. Turned off, it\narrives already readable. Presets leave this alone, so switching it\noff here switches it off for all of them.",
+    "description": "Tooltip for the Decode checkbox. Keep the line breaks and the blank line. \"Effects\" is another tab in this window and \"Presets\" is another - match how you translated both. \"Latin text only\" means the effect cannot draw Japanese, Chinese or Korean characters."
+  },
+  "general.textcolour": {
+    "message": "Text colour",
+    "description": "Colour swatch label. The place name itself, the largest line."
+  },
+  "general.headercolour": {
+    "message": "Header colour",
+    "description": "Colour swatch label. \"Header\" is the smaller line above the place name - the same word appears on the Fonts tab, so keep them consistent."
+  },
+  "general.outlinecolour": {
+    "message": "Outline colour",
+    "description": "Colour swatch label. The outline drawn around each letter."
+  },
+  "general.separatecolours": {
+    "message": "Colour each line separately",
+    "description": "Checkbox. Turns on the three swatches below it."
+  },
+  "general.separatecolours.tooltip": {
+    "message": "Off, the weather line follows the header, and one outline colour\ncovers all three lines.\n\nOn, the weather line and the outlines take the colours below, so one\nline can be pushed towards the background without touching the others.",
+    "description": "Tooltip for the Colour each line separately checkbox. Keep the line breaks and the blank line. The three lines are the weather, the header and the place name."
+  },
+  "general.weathercolour": {
+    "message": "Weather colour",
+    "description": "Colour swatch label, only usable while Colour each line separately is on."
+  },
+  "general.headeroutlinecolour": {
+    "message": "Header outline colour",
+    "description": "Colour swatch label, only usable while Colour each line separately is on."
+  },
+  "general.weatheroutlinecolour": {
+    "message": "Weather outline colour",
+    "description": "Colour swatch label, only usable while Colour each line separately is on."
+  },
+  "general.outlinethickness": {
+    "message": "Outline thickness",
+    "description": "Slider label. How heavy the outline around each letter is."
+  },
+  "general.outlinethickness.tooltip": {
+    "message": "Zero turns the outline off.",
+    "description": "Tooltip for the Outline thickness slider."
+  },
+  "general.shadow": {
+    "message": "Drop shadow",
+    "description": "Checkbox. A second, offset copy of the text drawn behind it. This is the usual term in image and design software - use whatever that software says in your language."
+  },
+  "general.shadow.tooltip": {
+    "message": "A second copy of every line, offset behind it. Sits under the outline, so\nthe two can be used together — a tight outline for legibility and a soft\nshadow for depth.\n\nOne shadow covers all three lines; it does not follow the separate colours.",
+    "description": "Tooltip for the Drop shadow checkbox. Keep the line breaks and the blank line."
+  },
+  "general.shadowcolour": {
+    "message": "Shadow colour",
+    "description": "Colour swatch label, only usable while Drop shadow is on."
+  },
+  "general.shadowacross": {
+    "message": "Shadow across",
+    "description": "Slider label. Moves the shadow left and right. Kept short to sit beside the slider."
+  },
+  "general.shadowacross.tooltip": {
+    "message": "Negative moves the shadow to the left.",
+    "description": "Tooltip for the Shadow across slider. \"Negative\" means a value below zero."
+  },
+  "general.shadowdown": {
+    "message": "Shadow down",
+    "description": "Slider label. Moves the shadow up and down. Kept short to sit beside the slider."
+  },
+  "general.shadowdown.tooltip": {
+    "message": "Negative lifts the shadow above the text.",
+    "description": "Tooltip for the Shadow down slider. \"Negative\" means a value below zero."
+  },
+  "general.shadowspread": {
+    "message": "Shadow spread",
+    "description": "Slider label. How far the shadow is fattened outwards, making it softer and broader."
+  },
+  "general.shadowspread.tooltip": {
+    "message": "Fattens the shadow outwards. Zero keeps it the same shape as the\nletters; higher values thicken it into a halo behind them.",
+    "description": "Tooltip for the Shadow spread slider. Keep the line break."
+  },
+  "general.showheader": {
+    "message": "Show header",
+    "description": "Checkbox. Draws the smaller line above the place name."
+  },
+  "general.showheader.tooltip": {
+    "message": "The smaller line above the name, giving where the place sits: the region\nabove a zone, the area above a sub-area.\n\nTurned off, only the name itself is shown. The weather line, if you have\nit on, is unaffected — as are the two settings below, which still apply\nto it.",
+    "description": "Tooltip for the Show header checkbox. Keep the line breaks and the blank line. \"Region\", \"zone\", \"area\" and \"sub-area\" are the place tiers the plugin announces - use the same words you used in notifications.zone, notifications.area and notifications.subarea."
+  },
+  "general.underlineheader": {
+    "message": "Underline header",
+    "description": "Checkbox. Draws a rule under the header line."
+  },
+  "general.headergap": {
+    "message": "Header gap",
+    "description": "Slider label. The vertical distance between the header and the place name."
+  },
+  "general.headergap.tooltip": {
+    "message": "How far the name sits below the header, measured in lines of header text.\n\nLow values pull the two together until they almost touch, which is the\ntighter look the plugin has always shipped with. Higher values open the\ngap up and give each line room to breathe.",
+    "description": "Tooltip for the Header gap slider. Keep the line breaks and the blank line. The unit is translated separately as units.lines."
+  },
+  "general.hidecombat": {
+    "message": "Hide during combat",
+    "description": "Checkbox. Stays quiet while the player is fighting."
+  },
+  "general.hideduty": {
+    "message": "Hide inside duties",
+    "description": "Checkbox. \"Duty\" is FFXIV's term for instanced content - dungeons, trials, raids. The game already uses a set word for this in your language; use that one."
+  },
+  "general.skipfast": {
+    "message": "Skip sub-areas while travelling quickly",
+    "description": "Checkbox. \"Sub-area\" is the finest place tier - match notifications.subarea. Long labels are fine here, the checkbox has the width of the window."
+  },
+  "general.skipfast.tooltip": {
+    "message": "Only affects sub-areas, and only above a speed no ground travel reaches,\nso it comes into play when flying. Zone and area changes are always\nannounced however fast you are moving.",
+    "description": "Tooltip for the Skip sub-areas checkbox. Keep the line breaks. \"Sub-area\", \"zone\" and \"area\" are place tiers - match notifications.subarea, notifications.zone and notifications.area."
+  },
+
+  "command.help": {
+    "message": "Open the Regions of XIV settings. \"{0}\" fires a sample notification, \"{1}\" shows what has changed.",
+    "description": "Shown in Dalamud's own list of chat commands. {0} and {1} are the commands themselves, \"/regions test\" and \"/regions changelog\" - they are what the player types, so never translate them, and keep the quotation marks around them. \"Regions of XIV\" is the plugin's name."
+  },
+
+  "changelog.title": {
+    "message": "Regions of XIV — What's New",
+    "description": "Title bar of the What's New window. \"Regions of XIV\" is the plugin's name and stays as-is; only the second half is translated. Match about.whatsnew, which is the button that opens this window."
+  },
+  "changelog.all": {
+    "message": "Every release, newest first:",
+    "description": "Line at the top of the window when the player opened it themselves, above the full list."
+  },
+  "changelog.updated": {
+    "message": "Regions of XIV has updated. Here is what changed:",
+    "description": "Line at the top when the window opened itself after an update and there is exactly one release to show. \"Regions of XIV\" is the plugin's name."
+  },
+  "changelog.updated.away": {
+    "message": "Regions of XIV has updated. Here is what changed while you were away:",
+    "description": "The same line when more than one release is being shown at once, because the player skipped some updates. \"Regions of XIV\" is the plugin's name."
+  },
+  "changelog.close": {
+    "message": "Close",
+    "description": "Button that shuts the window."
+  },
+  "changelog.discord": {
+    "message": "Join the Discord",
+    "description": "Button opening the project's Discord invite. \"Discord\" is a product name and stays as-is. The same words appear on the Presets and About tabs; they are separate entries because each button needs its own identity, but they should read the same."
+  },
+  "changelog.discord.tooltip": {
+    "message": "Ideas, bug reports and preset codes.\n{0}",
+    "description": "Tooltip for the Join the Discord button. {0} is the invite address - keep it on its own line."
+  },
+  "changelog.onceonly": {
+    "message": "You will not see this again until the next update.",
+    "description": "Footer shown when the window opened itself after an update."
+  },
+  "changelog.onrequest": {
+    "message": "Shown because you asked — \"{0}\".",
+    "description": "Footer shown when the player opened the window themselves. {0} is the command they typed; it is never translated, and the quotes around it stay."
+  },
+
+  "window.editing": {
+    "message": "Editing mode",
+    "description": "Checkbox above the row of tabs, which holds a sample notification on screen while the player changes settings."
+  },
+  "window.editing.tooltip": {
+    "message": "Keeps one sample notification on screen while you work, instead of\nstarting a new one every time you change something.\n\nZone announcements are held back while this is on. It switches itself\noff when you close this window.",
+    "description": "Tooltip for the Editing mode checkbox. Keep the line breaks, including the blank line between the two paragraphs."
+  },
+  "window.discord": {
+    "message": "Join the Discord\n{0}",
+    "description": "Tooltip on the speech-bubble button in this window's title bar. {0} is the invite address - keep it on its own line. \"Discord\" is a product name and stays as-is."
+  },
+
+  "common.opens": {
+    "message": "{0}\n\nOpens {1} in your browser.",
+    "description": "Wraps every link button's tooltip. {0} is the sentence about that button, {1} is the web address it opens. Keep the blank line between them."
+  },
+
+  "common.colour.tooltip": {
+    "message": "Currently {0:F0}% solid.\n\nClick for the full picker. The narrow chequered strip right of the rainbow is alpha — how solid this colour is — and it stops at {1:F0}%, far enough back to sit behind the other lines but not so far that the line disappears and looks like a fault.",
+    "description": "Tooltip shown on every colour swatch in this window. {0} is how solid the colour currently is and {1} is the lowest it can go, both as percentages - keep the \":F0\" inside the braces, it rounds them to whole numbers, and keep the per-cent signs after them. \"Alpha\" is the usual word for how solid a colour is; use whatever a painting or image program says in your language. Keep the blank line after the first sentence."
+  },
+
+  "units.px": {
+    "message": "px",
+    "description": "Unit shown after the number on a slider, as in \"12 px\". The abbreviation for pixels. A space is added before it in code, so do not start this with one."
+  },
+  "units.lines": {
+    "message": "lines",
+    "description": "Unit shown after the number on the Header gap slider, as in \"1.50 lines\". The gap is measured in lines of header text. A space is added before it in code, so do not start this with one."
+  },
+  "units.seconds": {
+    "message": "s",
+    "description": "Unit shown after the number on every duration slider, as in \"0.35 s\". The abbreviation for seconds - keep it short, it sits inside a narrow slider. A space is added before it in code, so do not start this with one."
+  },
+  "units.times": {
+    "message": "x",
+    "description": "Unit shown after the number on the particle Density slider, as in \"1.5x\", meaning a multiplier. No space is added before this one, so it sits against the number."
+  },
+
+  "presetcode.empty": {
+    "message": "There is nothing on the clipboard to import.",
+    "description": "Shown when Paste a code is pressed with an empty clipboard. These presetcode.* messages appear in red under the buttons on the Presets tab, and only ever when something has gone wrong - keep them plain and say what the player should do."
+  },
+  "presetcode.toolong": {
+    "message": "That code is too long to be one of ours.",
+    "description": "The clipboard held far more text than any share code contains, so it is almost certainly something else entirely."
+  },
+  "presetcode.notacode": {
+    "message": "That does not look like a preset code — they start with \"{0}\".",
+    "description": "The text does not begin with the marker every code starts with. {0} is that marker - currently \"ROX1-\", including the trailing dash. It is part of the code format, so never translate it, and keep the quotes around it."
+  },
+  "presetcode.unreadable": {
+    "message": "That code did not unpack to anything readable.",
+    "description": "The code had the right shape but the compressed data inside it was not valid."
+  },
+  "presetcode.notapreset": {
+    "message": "That code did not unpack to a preset.",
+    "description": "The code unpacked into readable data, but that data was not a preset."
+  },
+  "presetcode.noname": {
+    "message": "That code carries no preset name.",
+    "description": "A code always travels with a name for the preset, and this one had none."
+  },
+  "presetcode.damaged": {
+    "message": "That code is damaged — some of it went missing on the way here. Ask for it again and copy the whole line in one go.",
+    "description": "Much the most common failure: the player copied only part of a code, because chat wrapped it across lines. That specific claim - part of the code is missing, and the fix is to copy the whole line at once - is the whole point of the message, so keep it rather than smoothing it into a general \"could not read that code\"."
+  },
+
+  "sharecodes.customfont.note": {
+    "message": "\n\nThe code carries a font file from this PC. Whoever you send it to will\nnot have that file, so those lines fall back to Noto Sans CJK for them.",
+    "description": "Appended to sharecodes.copy.tooltip.named when the settings use a font file from this PC. Keep the two blank lines at the start - they separate it from the sentence before. \"Noto Sans CJK\" is a font name and stays as-is."
+  },
+  "notice.dismiss": {
+    "message": "Hide this",
+    "description": "Button that hides the notice above for this language. Short - it sits directly under the notice."
+  },
+  "notice.translation": {
+    "message": "This translation was drafted by a machine and has not been checked by anyone who speaks the language. If something reads badly, corrections are very welcome:\n{0}",
+    "description": "Shown at the top of the settings window when the loaded translation marks itself a machine draft. {0} is the Discord invite address - keep it on its own line. This one matters more than most: it is the only thing telling a reader that what they are looking at has not been checked, so it needs to be plain and unmistakable in your language."
+  }
+}

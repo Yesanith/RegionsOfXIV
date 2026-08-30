@@ -55,6 +55,10 @@ public sealed class Plugin : IDalamudPlugin
         var (loaded, isFirstRun) = LoadConfiguration();
         this.config = loaded;
 
+        // Before anything can draw.
+        ApplyLanguage();
+        PluginInterface.LanguageChanged += OnLanguageChanged;
+
         this.fonts = new FontService(this.config);
         this.nativeUiSuppressor = new NativeUiSuppressor(this.config);
         this.uiVisibilityGuard = new UiVisibilityGuard();
@@ -102,7 +106,8 @@ public sealed class Plugin : IDalamudPlugin
                 this.fonts.ProblemWith,
                 this.changelogWindow.ShowAll,
                 this.nativeUiSuppressor.RestoreAreaText,
-                this.nativeUiSuppressor.RestoreLoadingTitle));
+                this.nativeUiSuppressor.RestoreLoadingTitle,
+                ApplyLanguage));
 
         this.windowSystem.AddWindow(this.overlay);
         this.windowSystem.AddWindow(this.configWindow);
@@ -126,8 +131,20 @@ public sealed class Plugin : IDalamudPlugin
         {
             // Shown in Dalamud's own command list, so it names only the subcommands a release
             // build has -- the debug ones are not there to be found.
-            HelpMessage = "Open the Regions of XIV settings. \"/regions test\" fires a sample notification, "
-                          + "\"/regions changelog\" shows what has changed.",
+            //
+            // The subcommands are passed in rather than written into the sentence: they are what
+            // the player types, so a translated one would name a command that does not exist.
+            //
+            // Built once, here, which is after the ApplyLanguage above -- so it is in the right
+            // language at load. Dalamud keeps the string it was given rather than asking again, so a
+            // language change afterwards leaves this one entry in the old language until the
+            // plugin is reloaded.
+            HelpMessage = Loc.Format(
+                "command.help",
+                "Open the Regions of XIV settings. \"{0}\" fires a sample notification, "
+                + "\"{1}\" shows what has changed.",
+                CommandName + " test",
+                CommandName + " changelog"),
         });
 
         PluginInterface.UiBuilder.Draw += this.windowSystem.Draw;
@@ -157,8 +174,18 @@ public sealed class Plugin : IDalamudPlugin
         this.config.Save();
     }
 
+    // The argument is deliberately ignored. Dalamud reports its own new setting, but the config
+    // may name a language that overrides it, so the answer is recomputed from both rather than
+    // taken from the event -- otherwise changing Dalamud's language would quietly undo an
+    // override the player set here.
+    private void OnLanguageChanged(string languageCode) => ApplyLanguage();
+
+    private void ApplyLanguage() => Loc.Use(this.config.Language ?? PluginInterface.UiLanguage);
+
     public void Dispose()
     {
+        PluginInterface.LanguageChanged -= OnLanguageChanged;
+
         PluginInterface.UiBuilder.Draw -= this.windowSystem.Draw;
         PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUi;
         PluginInterface.UiBuilder.OpenMainUi -= ToggleConfigUi;

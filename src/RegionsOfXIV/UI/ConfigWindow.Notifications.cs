@@ -1,5 +1,6 @@
 ﻿using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility.Raii;
+using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
 
@@ -7,71 +8,86 @@ internal sealed partial class ConfigWindow
 {
     private void DrawNotificationsTab()
     {
-        using var tab = ImRaii.TabItem("Notifications");
+        using var tab = ImRaii.TabItem(Loc.Label("notifications.tab", "Notifications"));
         if (!tab) return;
 
-        ImGui.TextWrapped(
+        UiText.Wrapped(Loc.Get(
+            "notifications.intro",
             "This plugin replaces the game's own location text rather than drawing alongside " +
-            "it. If you turn the suppression below off, the game's version comes back.");
+            "it. If you turn the suppression below off, the game's version comes back."));
         ImGui.Separator();
 
         var changed = false;
         this.config.ZoneNotificationEnabled = Checkbox(
-            "Zone changes", this.config.ZoneNotificationEnabled, ref changed);
+            Loc.Label("notifications.zone", "Zone changes"),
+            this.config.ZoneNotificationEnabled, ref changed);
 
         this.config.AreaNotificationEnabled = Checkbox(
-            "Area changes", this.config.AreaNotificationEnabled, ref changed);
+            Loc.Label("notifications.area", "Area changes"),
+            this.config.AreaNotificationEnabled, ref changed);
 
         this.config.SubAreaNotificationEnabled = Checkbox(
-            "Sub-area changes", this.config.SubAreaNotificationEnabled, ref changed);
+            Loc.Label("notifications.subarea", "Sub-area changes"),
+            this.config.SubAreaNotificationEnabled, ref changed);
 
         ImGui.Separator();
 
         this.config.WeatherNotificationEnabled = Checkbox(
-            "Weather changes", this.config.WeatherNotificationEnabled, ref changed);
+            Loc.Label("notifications.weather", "Weather changes"),
+            this.config.WeatherNotificationEnabled, ref changed);
 
-        Tooltip(
+        UiText.Tooltip(Loc.Get(
+            "notifications.weather.tooltip",
             "Announces the weather turning over, on its own line just above the "
             + "place name, so it never interrupts a location notice.\n\n"
             + "Weather runs on a fixed cycle of about 23 minutes, and arriving anywhere "
             + "new announces what it is doing there, so it shows up with the place name "
-            + "as you walk in.");
+            + "as you walk in."));
 
         using (ImRaii.Disabled(!this.config.WeatherNotificationEnabled))
         {
             this.config.ShowWeatherIcon = Checkbox(
-                "Show the weather icon", this.config.ShowWeatherIcon, ref changed);
+                Loc.Label("notifications.weathericon", "Show the weather icon"),
+                this.config.ShowWeatherIcon, ref changed);
         }
 
-        Tooltip("Draws the game's own icon for the weather to the left of its name.");
+        UiText.Tooltip(Loc.Get(
+            "notifications.weathericon.tooltip",
+            "Draws the game's own icon for the weather to the left of its name."));
 
         ImGui.Separator();
 
         this.config.BannerNotificationEnabled = Checkbox(
-            "Banners", this.config.BannerNotificationEnabled, ref changed);
+            Loc.Label("notifications.banners", "Banners"),
+            this.config.BannerNotificationEnabled, ref changed);
 
-        Tooltip(
+        UiText.Tooltip(Loc.Get(
+            "notifications.banners.tooltip",
             "Redraws the game's full-screen banners — \"Quest Accepted\", "
             + "\"Duty Commenced\", \"Level Up!\" — in this plugin's lettering.\n\n"
             + "The wording is painted into the game's artwork rather than stored as "
             + "text, so only banners this plugin has words for are taken over. Any "
-            + "it does not recognise keep the game's own.");
+            + "it does not recognise keep the game's own."));
 
         using (ImRaii.Disabled(!this.config.BannerNotificationEnabled))
         {
             this.config.HideNativeBanner = Checkbox(
-            "Hide the game's own banner", this.config.HideNativeBanner, ref changed);
+                Loc.Label("notifications.hidebanner", "Hide the game's own banner"),
+                this.config.HideNativeBanner, ref changed);
         }
 
-        Tooltip(
+        UiText.Tooltip(Loc.Get(
+            "notifications.hidebanner.tooltip",
             "Fades out the game's artwork so only this plugin's version shows.\n\n"
             + "Turn this off to see both, which is a quick way to check the "
-            + "wording matches.");
+            + "wording matches."));
 
         ImGui.Separator();
 
         var toggled = false;
-        this.config.HideNativeAreaText = Checkbox("Hide the game's own area text", this.config.HideNativeAreaText, ref toggled);
+        this.config.HideNativeAreaText = Checkbox(
+            Loc.Label("notifications.hideareatext", "Hide the game's own area text"),
+            this.config.HideNativeAreaText, ref toggled);
 
         if (toggled)
         {
@@ -81,11 +97,14 @@ internal sealed partial class ConfigWindow
                 this.actions.RestoreNativeAreaText();
         }
 
-        Tooltip("Suppresses the native \"_AreaText\" flash, which draws underneath this plugin.");
+        UiText.Tooltip(Loc.Get(
+            "notifications.hideareatext.tooltip",
+            "Suppresses the native \"_AreaText\" flash, which draws underneath this plugin."));
 
         var titleToggled = false;
         this.config.HideNativeLoadingTitle = Checkbox(
-            "Hide the loading-screen zone title", this.config.HideNativeLoadingTitle, ref titleToggled);
+            Loc.Label("notifications.hideloadingtitle", "Hide the loading-screen zone title"),
+            this.config.HideNativeLoadingTitle, ref titleToggled);
 
         if (titleToggled)
         {
@@ -95,10 +114,11 @@ internal sealed partial class ConfigWindow
                 this.actions.RestoreNativeLoadingTitle();
         }
 
-        Tooltip(
+        UiText.Tooltip(Loc.Get(
+            "notifications.hideloadingtitle.tooltip",
             "Suppresses \"_LocationTitle\" and \"_LocationTitleShort\", the gold title\n" +
             "drawn over the loading screen, and shows the same names in this\n" +
-            "plugin's style instead.");
+            "plugin's style instead."));
 
         if (!changed)
             return;

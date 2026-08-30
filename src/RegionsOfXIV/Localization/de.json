@@ -1,0 +1,599 @@
+{
+  "_status": "machine-drafted -- not reviewed by a German speaker. Wording is plain and in places stiff; correct it freely. Keys listed under _untranslated were left in English on purpose, see the reasons there.",
+  "_untranslated": [
+    "general.hideduty: 'duty' is FFXIV's term for instanced content. German FFXIV has a set word for it; guessing would put a word in the window that the game itself never uses.",
+    "general.decode: the Eorzean script has an established German name in FFXIV. Left for someone who can check it against the game.",
+    "notifications.subarea and general.skipfast: 'sub-area' is the finest place tier and the whole meaning of both labels. FFXIV may have its own term.",
+    "notifications.banners.tooltip: translated, but 'Quest Accepted', 'Duty Commenced' and 'Level Up!' were left in English inside it -- the game already translates those three and its wording must win.",
+    "'Eorzean' is kept as-is throughout, as FFXIV's German localisation generally does.",
+    "Typeface names (Noto Sans CJK, Trump Gothic, Jupiter, Axis), product names (Discord, GitHub, Dalamud, Guild Wars 2, Square Enix), commands and the AGPL identifier are never translated."
+  ],
+  "durations.tab": {
+    "message": "Dauer"
+  },
+  "durations.intro": {
+    "message": "Die Zeile erscheint, kommt an und wird dann entschlüsselt. Bewegung und Entschlüsselung sind getrennte Schritte und brauchen jeweils ihre eigene Zeit."
+  },
+  "durations.fadein": {
+    "message": "Einblenden"
+  },
+  "durations.fadein.tooltip": {
+    "message": "Wie lange die Zeile braucht, um beim Erscheinen ihre volle Stärke zu erreichen."
+  },
+  "durations.motion": {
+    "message": "Bewegung"
+  },
+  "durations.motion.tooltip": {
+    "message": "Wie lange die Buchstaben zum Ankommen brauchen. Läuft zusammen mit dem\nEinblenden und tut nichts, wenn die Bewegung im Reiter Effekte auf Keine steht."
+  },
+  "durations.decode": {
+    "message": "Entschlüsseln"
+  },
+  "durations.decode.tooltip": {
+    "message": "Wie lange das Eorzeanische zum Auflösen braucht, nachdem die Buchstaben\nangekommen sind. Braucht den Entschlüsselungseffekt im Reiter Effekte."
+  },
+  "durations.hold": {
+    "message": "Halten"
+  },
+  "durations.hold.tooltip": {
+    "message": "Wie lange die fertige Zeile stehen bleibt, bevor sie zu verblassen beginnt."
+  },
+  "durations.fadeout": {
+    "message": "Ausblenden"
+  },
+  "durations.fadeout.tooltip": {
+    "message": "Wie lange die Zeile zum Verschwinden braucht, wenn ihre Zeit um ist."
+  },
+  "effects.tab": {
+    "message": "Effekte"
+  },
+  "effects.motion.intro": {
+    "message": "Wie sich die Buchstaben beim Ankommen bewegen."
+  },
+  "effects.motion": {
+    "message": "Bewegung"
+  },
+  "effects.motion.tooltip": {
+    "message": "Keine — die Buchstaben erscheinen einfach an ihrem Platz.\nSchreibmaschine — ein Buchstabe nach dem anderen, ohne Blende.\nAufsteigen — die Buchstaben heben sich von unten an ihren Platz.\nWelle — eine Welle läuft beim Erscheinen durch die Zeile.\nBrennen — die Buchstaben entzünden sich und kühlen in ihre Farbe ab.\n\nLäuft zusammen mit der eorzeanischen Entschlüsselung, nicht an ihrer Stelle."
+  },
+  "effects.motion.none": {
+    "message": "Keine"
+  },
+  "effects.motion.typewriter": {
+    "message": "Schreibmaschine"
+  },
+  "effects.motion.rise": {
+    "message": "Aufsteigen"
+  },
+  "effects.motion.wave": {
+    "message": "Welle"
+  },
+  "effects.motion.burn": {
+    "message": "Brennen"
+  },
+  "effects.particles.intro": {
+    "message": "Was ringsherum spielt, solange sie zu sehen ist."
+  },
+  "effects.particles": {
+    "message": "Partikel"
+  },
+  "effects.particles.none": {
+    "message": "Keine"
+  },
+  "effects.particles.hearts": {
+    "message": "Herzen"
+  },
+  "effects.particles.embers": {
+    "message": "Glut"
+  },
+  "effects.particles.sparkles": {
+    "message": "Funkeln"
+  },
+  "effects.particles.petals": {
+    "message": "Blütenblätter"
+  },
+  "effects.density": {
+    "message": "Dichte"
+  },
+  "effects.particlecolour": {
+    "message": "Partikelfarbe"
+  },
+  "effects.particlecolour.tooltip": {
+    "message": "Das voreingestellte Bernstein passt zu Glut und Funkeln. Herzen und\nBlütenblätter wollen eher ins Rosa."
+  },
+  "effects.embers.note": {
+    "message": "Glut passt zur Bewegung Brennen, braucht sie aber nicht."
+  },
+  "effects.preview": {
+    "message": "Vorschau"
+  },
+  "sharecodes.heading": {
+    "message": "Freigabecodes"
+  },
+  "sharecodes.intro": {
+    "message": "Ein Code ist die ganze Voreinstellung als eine Zeile Text. Füge einen in den Chat ein, um ihn jemandem zu geben."
+  },
+  "sharecodes.copy": {
+    "message": "Aktuelle Einstellungen kopieren"
+  },
+  "sharecodes.copied": {
+    "message": "Kopiert. Füge ihn ein, wo du magst."
+  },
+  "sharecodes.copy.tooltip.named": {
+    "message": "Legt einen Code für alles, wie es gerade steht, in die Zwischenablage,\nunter dem Namen \"{0}\"."
+  },
+  "sharecodes.copy.tooltip.unnamed": {
+    "message": "Gib zuerst oben einen Namen ein — er reist mit dem Code mit, und mehr\nhat die Person, der du ihn schickst, nicht in der Hand.\n\nUm eine bereits gespeicherte Voreinstellung zu teilen, klicke sie stattdessen mit rechts an."
+  },
+  "sharecodes.paste": {
+    "message": "Code einfügen"
+  },
+  "sharecodes.paste.tooltip.named": {
+    "message": "Liest einen Code aus der Zwischenablage, speichert ihn als eine deiner\nVoreinstellungen und wendet ihn an. Er wird unter \"{0}\" abgelegt\nstatt unter dem Namen, mit dem er kam."
+  },
+  "sharecodes.paste.tooltip.unnamed": {
+    "message": "Liest einen Code aus der Zwischenablage, speichert ihn als eine deiner\nVoreinstellungen und wendet ihn unter dem Namen an, mit dem er kam.\n\nGib zuerst oben einen Namen ein, um ihn stattdessen darunter abzulegen."
+  },
+  "sharecodes.clipboard.unreadable": {
+    "message": "Die Zwischenablage konnte nicht gelesen werden. Versuche es gleich noch einmal."
+  },
+  "sharecodes.imported": {
+    "message": "\"{0}\" importiert und angewendet."
+  },
+  "about.tab": {
+    "message": "Über"
+  },
+  "about.title": {
+    "message": "Regions of XIV {0}"
+  },
+  "about.author": {
+    "message": "von {0}"
+  },
+  "about.summary": {
+    "message": "Kündigt Region, Zone, Gebiet und Untergebiet an, die du betrittst, und das Wetter, während du dort bist. Ersetzt dabei die Ortsanzeige des Spiels, statt daneben zu zeichnen."
+  },
+  "about.whatsnew": {
+    "message": "Neuerungen"
+  },
+  "about.whatsnew.tooltip": {
+    "message": "Jede Version, neueste zuerst. Auch über \"/regions changelog\"."
+  },
+  "about.discord": {
+    "message": "Discord beitreten"
+  },
+  "about.discord.tooltip": {
+    "message": "Ideen, Fehlerberichte und Voreinstellungscodes."
+  },
+  "about.github": {
+    "message": "GitHub"
+  },
+  "about.github.tooltip": {
+    "message": "Der Quelltext, die Veröffentlichungen und die Lizenz."
+  },
+  "about.issue": {
+    "message": "Problem melden"
+  },
+  "about.issue.tooltip": {
+    "message": "Etwas ist falsch, oder etwas fehlt."
+  },
+  "about.commands": {
+    "message": "Befehle"
+  },
+  "about.command.settings": {
+    "message": "Öffnet diese Einstellungen."
+  },
+  "about.command.test": {
+    "message": "Zeigt eine Benachrichtigung für den Ort, an dem du stehst."
+  },
+  "about.command.changelog": {
+    "message": "Öffnet das Fenster Neuerungen."
+  },
+  "about.inspiration": {
+    "message": "Inspiriert von Nekres' Regions of Tyria für Guild Wars 2."
+  },
+  "about.inspiration.tooltip": {
+    "message": "Klicken, um {0} zu öffnen"
+  },
+  "about.licence": {
+    "message": "Lizenziert unter AGPL-3.0-or-later."
+  },
+  "about.notaffiliated": {
+    "message": "Ortsnamen, Wetter und Schriften stammen aus den Daten des Spiels. Nicht mit Square Enix verbunden."
+  },
+  "notifications.tab": {
+    "message": "Benachrichtigungen"
+  },
+  "notifications.intro": {
+    "message": "Dieses Plugin ersetzt die Ortsanzeige des Spiels, statt daneben zu zeichnen. Wenn du die Unterdrückung unten abschaltest, kommt die Version des Spiels zurück."
+  },
+  "notifications.zone": {
+    "message": "Zonenwechsel"
+  },
+  "notifications.area": {
+    "message": "Gebietswechsel"
+  },
+  "notifications.weather": {
+    "message": "Wetterwechsel"
+  },
+  "notifications.weather.tooltip": {
+    "message": "Kündigt den Wetterwechsel an, auf einer eigenen Zeile direkt über dem Ortsnamen, sodass er eine Ortsmeldung nie unterbricht.\n\nDas Wetter läuft in einem festen Zyklus von etwa 23 Minuten, und wer irgendwo neu ankommt, erfährt, was es dort gerade tut — es erscheint also zusammen mit dem Ortsnamen beim Hineingehen."
+  },
+  "notifications.weathericon": {
+    "message": "Wettersymbol anzeigen"
+  },
+  "notifications.weathericon.tooltip": {
+    "message": "Zeichnet das spieleigene Symbol für das Wetter links neben dessen Namen."
+  },
+  "notifications.banners": {
+    "message": "Banner"
+  },
+  "notifications.banners.tooltip": {
+    "message": "Zeichnet die bildschirmfüllenden Banner des Spiels — \"Quest Accepted\", \"Duty Commenced\", \"Level Up!\" — in der Schrift dieses Plugins neu.\n\nDer Wortlaut ist in die Grafik des Spiels gemalt und nicht als Text gespeichert, daher werden nur Banner übernommen, für die dieses Plugin Worte hat. Unbekannte behalten die des Spiels."
+  },
+  "notifications.hidebanner": {
+    "message": "Das spieleigene Banner ausblenden"
+  },
+  "notifications.hidebanner.tooltip": {
+    "message": "Blendet die Grafik des Spiels aus, sodass nur die Fassung dieses Plugins zu sehen ist.\n\nSchalte dies ab, um beide zu sehen — ein schneller Weg zu prüfen, ob der Wortlaut übereinstimmt."
+  },
+  "notifications.hideareatext": {
+    "message": "Die spieleigene Gebietsanzeige ausblenden"
+  },
+  "notifications.hideareatext.tooltip": {
+    "message": "Unterdrückt das native \"_AreaText\", das unter diesem Plugin gezeichnet wird."
+  },
+  "notifications.hideloadingtitle": {
+    "message": "Zonentitel im Ladebildschirm ausblenden"
+  },
+  "notifications.hideloadingtitle.tooltip": {
+    "message": "Unterdrückt \"_LocationTitle\" und \"_LocationTitleShort\", den goldenen Titel\nüber dem Ladebildschirm, und zeigt dieselben Namen stattdessen im Stil\ndieses Plugins."
+  },
+  "presets.tab": {
+    "message": "Voreinstellungen"
+  },
+  "presets.intro": {
+    "message": "Eine Voreinstellung umfasst jede Einstellung unter Allgemein, Schriften, Effekte, Benachrichtigungen und Dauer — Schnitt und Größe jeder Zeile, Position, Farben, Bewegung und Partikel, welche Stufen angekündigt werden, die Zeiten und wann geschwiegen wird."
+  },
+  "presets.intro.warning": {
+    "message": "Eine anzuwenden ersetzt sie alle, alles von dir Geänderte wird also überschrieben."
+  },
+  "presets.builtin": {
+    "message": "Mitgelieferte Looks"
+  },
+  "presets.builtin.hint": {
+    "message": "Die Voreinstellungen, dazu der Look, nach dem jede benannt ist."
+  },
+  "presets.builtin.tooltip": {
+    "message": "{0}\nAlles Übrige kehrt auf seinen Standard zurück."
+  },
+  "presets.classic.description": {
+    "message": "Das Plugin, wie es ausgeliefert wird: eine Entschlüsselung, keine Bewegung, keine Partikel."
+  },
+  "presets.inferno.description": {
+    "message": "Buchstaben entzünden sich und kühlen an ihrem Platz ab, Glut steigt von ihnen auf."
+  },
+  "presets.sweetheart.description": {
+    "message": "Buchstaben heben sich an ihren Platz, Herzen treiben um sie herum nach oben."
+  },
+  "presets.starlight.description": {
+    "message": "Die Zeile reitet auf einer Welle herein, Funkeln hängt in der Luft um sie."
+  },
+  "presets.sakura.description": {
+    "message": "Ein sanftes Aufsteigen unter fallenden Blütenblättern."
+  },
+  "presets.dispatch.description": {
+    "message": "Buchstabe für Buchstabe getippt, in engen Großbuchstaben. Keine Partikel."
+  },
+  "presets.tyria.description": {
+    "message": "Breite Großbuchstaben in Gold, still und ohne Eile — eine Verbeugung vor dem Original."
+  },
+  "presets.saved": {
+    "message": "Deine Voreinstellungen"
+  },
+  "presets.saved.hint": {
+    "message": "Deine Einstellungen, genau so gespeichert, wie sie waren."
+  },
+  "presets.saved.none": {
+    "message": "Du hast noch keine gespeichert."
+  },
+  "presets.saved.tooltip": {
+    "message": "Diese Voreinstellung anwenden.\nRechtsklick zum Teilen, Überschreiben oder Löschen."
+  },
+  "presets.menu.share": {
+    "message": "Freigabecode kopieren"
+  },
+  "presets.menu.overwrite": {
+    "message": "Mit aktuellen Einstellungen überschreiben"
+  },
+  "presets.menu.delete": {
+    "message": "Löschen"
+  },
+  "presets.copied": {
+    "message": "Einen Code für \"{0}\" kopiert."
+  },
+  "presets.name.hint": {
+    "message": "Benenne sie — zum Speichern, Kopieren oder Importieren"
+  },
+  "presets.save": {
+    "message": "Speichern"
+  },
+  "presets.replace": {
+    "message": "Ersetzen"
+  },
+  "presets.save.tooltip": {
+    "message": "Speichert jede Einstellung unter Allgemein, Schriften, Effekte, Benachrichtigungen und Dauer."
+  },
+  "presets.discord": {
+    "message": "Discord beitreten"
+  },
+  "presets.discord.tooltip": {
+    "message": "Voreinstellungscodes tauschen, einen Fehler melden oder etwas vorschlagen."
+  },
+  "presets.customfont.warning": {
+    "message": "Diese Einstellungen nutzen eine Schrift von diesem PC. Eine Voreinstellung speichert, wo die Datei liegt, nicht die Schrift selbst. Auf einem fremden Rechner gibt es den Pfad also nicht, und diese Zeilen fallen auf Noto Sans CJK zurück — alles Übrige der Voreinstellung gilt weiterhin. Stelle die Zeile auf einen mitgelieferten Schnitt zurück, wenn eine Voreinstellung bei allen gleich aussehen soll."
+  },
+  "presets.customfont.missing": {
+    "message": "Sie trägt eine Schriftdatei vom PC des Absenders, die du nicht hast, daher werden diese Zeilen mit Noto Sans CJK gezeichnet. Wähle im Reiter Schriften deine eigene."
+  },
+  "fonts.tab": {
+    "message": "Schriften"
+  },
+  "fonts.intro": {
+    "message": "Jede Zeile einer Benachrichtigung hat ihren eigenen Schnitt und ihre eigene Größe. Wähle einen der mitgelieferten Schnitte, oder verweise das Plugin auf eine Schriftdatei auf diesem PC."
+  },
+  "fonts.role.text": {
+    "message": "Text"
+  },
+  "fonts.role.text.hint": {
+    "message": "Der Ortsname selbst, die größte Zeile."
+  },
+  "fonts.role.header": {
+    "message": "Kopfzeile"
+  },
+  "fonts.role.header.hint": {
+    "message": "Die kleinere Zeile über dem Namen, die Region oder Gebiet nennt, worin er liegt."
+  },
+  "fonts.role.weather": {
+    "message": "Wetter"
+  },
+  "fonts.role.weather.hint": {
+    "message": "Die Wetterzeile über der Kopfzeile, sichtbar wenn Wetterankündigungen an sind."
+  },
+  "fonts.size": {
+    "message": "Größe"
+  },
+  "fonts.face": {
+    "message": "Schrift"
+  },
+  "fonts.face.tooltip": {
+    "message": "Noto Sans CJK ist vektorbasiert — scharf in jeder Größe, und deckt jede Sprache ab.\n\nDie spieleigenen Schnitte passen besser zu FFXIV, sind aber Bitmaps mit einer Obergrenze:\nTrump Gothic — nur Latein, bis 91 px.\nJupiter — nur Latein, bis 61 px.\nAxis — bis 48 px, als einzige mit japanischen Zeichen.\n\nEigene Datei lädt eine eigene Schrift von diesem PC."
+  },
+  "fonts.choice.noto": {
+    "message": "{0} (empfohlen)"
+  },
+  "fonts.choice.custom": {
+    "message": "Eigene Datei"
+  },
+  "fonts.preview": {
+    "message": "Vorschau"
+  },
+  "fonts.path.hint": {
+    "message": "Pfad zu einer .ttf-, .otf- oder .ttc-Datei"
+  },
+  "fonts.browse": {
+    "message": "Durchsuchen"
+  },
+  "fonts.browse.tooltip": {
+    "message": "Öffnet deinen Windows-Schriftenordner. Jede .ttf-, .otf- oder .ttc-Datei geht."
+  },
+  "fonts.clear": {
+    "message": "Leeren"
+  },
+  "fonts.dialog.title": {
+    "message": "Eine Schriftdatei wählen"
+  },
+  "fonts.drawingwith": {
+    "message": "Zeichnet mit {0}."
+  },
+  "fonts.custom.notice": {
+    "message": "Eine Schrift, die du selbst lieferst, wird genau so geladen, wie sie ist, und bleibt deine Sache. Fehlende Zeichen, seltsame Abstände, weiche Kanten, eine Datei, die das Spiel nicht lesen kann, oder eine Lizenz, die du nicht hast, gehen auf dich und nicht auf Regions of XIV, und dafür gibt es keine Unterstützung. Wenn eine Zeile nicht mehr gut aussieht, stelle sie auf einen der mitgelieferten Schnitte zurück."
+  },
+  "fonts.nojapanese": {
+    "message": "{0} hat keine japanischen Zeichen. Auf diesem Client heißt das, dass Ortsnamen als leere Kästchen erscheinen und nicht nur weich aussehen. Wähle stattdessen Axis oder Noto Sans CJK."
+  },
+  "fonts.upscaled": {
+    "message": "Diese Schrift hat keine Bitmap über {0:F0} px, bei {1:F0} px wird sie also hochskaliert und sieht weich aus. Verringere die Größe, oder wechsle zu Noto Sans CJK, das in jeder Größe scharf bleibt."
+  },
+  "general.tab": {
+    "message": "Allgemein"
+  },
+  "general.language": {
+    "message": "Sprache"
+  },
+  "general.language.follow": {
+    "message": "Dalamud folgen"
+  },
+  "general.language.tooltip": {
+    "message": "Dalamud folgen nimmt die Sprache, auf die Dalamud selbst eingestellt ist,\nund ändert sich mit ihr.\n\nNur dieses Fenster ist betroffen. Orts- und Wetternamen kommen aus dem Spiel\nund bleiben in der Sprache, in der dein Client läuft."
+  },
+  "general.preview": {
+    "message": "Vorschau"
+  },
+  "general.vertical": {
+    "message": "Senkrechte Position"
+  },
+  "general.horizontal": {
+    "message": "Waagerechte Position"
+  },
+  "general.horizontal.tooltip": {
+    "message": "Der Text wird auf diesen Punkt zentriert, 50% ist also die Bildschirmmitte.\nEin langer Ortsname nahe einem der Ränder reicht darüber hinaus."
+  },
+  "general.letterspacing": {
+    "message": "Buchstabenabstand"
+  },
+  "general.letterspacing.tooltip": {
+    "message": "Zusätzlicher Abstand zwischen Buchstaben, als Anteil der Schriftgröße, sodass\ner seine Proportionen behält, wenn die Größe sich ändert, und die Kopfzeile\nihren eigenen Anteil bekommt. Weite Abstände machen viel vom Look des\nGuild-Wars-2-Originals aus."
+  },
+  "general.uppercase": {
+    "message": "Großbuchstaben"
+  },
+  "general.textcolour": {
+    "message": "Textfarbe"
+  },
+  "general.headercolour": {
+    "message": "Kopfzeilenfarbe"
+  },
+  "general.outlinecolour": {
+    "message": "Umrissfarbe"
+  },
+  "general.separatecolours": {
+    "message": "Jede Zeile einzeln färben"
+  },
+  "general.separatecolours.tooltip": {
+    "message": "Aus folgt die Wetterzeile der Kopfzeile, und eine Umrissfarbe deckt\nalle drei Zeilen ab.\n\nAn nehmen die Wetterzeile und die Umrisse die Farben unten, sodass eine\nZeile in den Hintergrund geschoben werden kann, ohne die anderen anzurühren."
+  },
+  "general.weathercolour": {
+    "message": "Wetterfarbe"
+  },
+  "general.headeroutlinecolour": {
+    "message": "Umrissfarbe der Kopfzeile"
+  },
+  "general.weatheroutlinecolour": {
+    "message": "Umrissfarbe des Wetters"
+  },
+  "general.outlinethickness": {
+    "message": "Umrissstärke"
+  },
+  "general.outlinethickness.tooltip": {
+    "message": "Null schaltet den Umriss ab."
+  },
+  "general.shadow": {
+    "message": "Schlagschatten"
+  },
+  "general.shadow.tooltip": {
+    "message": "Eine zweite Kopie jeder Zeile, versetzt dahinter. Sitzt unter dem Umriss,\ndie beiden lassen sich also zusammen nutzen — ein enger Umriss für die\nLesbarkeit und ein weicher Schatten für Tiefe.\n\nEin Schatten deckt alle drei Zeilen ab; er folgt den getrennten Farben nicht."
+  },
+  "general.shadowcolour": {
+    "message": "Schattenfarbe"
+  },
+  "general.shadowacross": {
+    "message": "Schatten seitlich"
+  },
+  "general.shadowacross.tooltip": {
+    "message": "Negativ schiebt den Schatten nach links."
+  },
+  "general.shadowdown": {
+    "message": "Schatten nach unten"
+  },
+  "general.shadowdown.tooltip": {
+    "message": "Negativ hebt den Schatten über den Text."
+  },
+  "general.shadowspread": {
+    "message": "Schattenbreite"
+  },
+  "general.shadowspread.tooltip": {
+    "message": "Verdickt den Schatten nach außen. Null behält die Form der Buchstaben;\nhöhere Werte verdicken ihn zu einem Hof dahinter."
+  },
+  "general.showheader": {
+    "message": "Kopfzeile anzeigen"
+  },
+  "general.underlineheader": {
+    "message": "Kopfzeile unterstreichen"
+  },
+  "general.headergap": {
+    "message": "Kopfzeilenabstand"
+  },
+  "general.headergap.tooltip": {
+    "message": "Wie weit der Name unter der Kopfzeile sitzt, gemessen in Zeilen der Kopfzeile.\n\nNiedrige Werte ziehen die beiden zusammen, bis sie sich fast berühren — der\nengere Look, mit dem das Plugin immer ausgeliefert wurde. Höhere Werte öffnen\nden Abstand und geben jeder Zeile Luft."
+  },
+  "general.hidecombat": {
+    "message": "Im Kampf ausblenden"
+  },
+  "command.help": {
+    "message": "Öffnet die Einstellungen von Regions of XIV. \"{0}\" löst eine Beispielbenachrichtigung aus, \"{1}\" zeigt, was sich geändert hat."
+  },
+  "changelog.title": {
+    "message": "Regions of XIV — Neuerungen"
+  },
+  "changelog.all": {
+    "message": "Jede Version, neueste zuerst:"
+  },
+  "changelog.updated": {
+    "message": "Regions of XIV wurde aktualisiert. Das hat sich geändert:"
+  },
+  "changelog.updated.away": {
+    "message": "Regions of XIV wurde aktualisiert. Das hat sich geändert, während du weg warst:"
+  },
+  "changelog.close": {
+    "message": "Schließen"
+  },
+  "changelog.discord": {
+    "message": "Discord beitreten"
+  },
+  "changelog.discord.tooltip": {
+    "message": "Ideen, Fehlerberichte und Voreinstellungscodes.\n{0}"
+  },
+  "changelog.onceonly": {
+    "message": "Du siehst das erst wieder beim nächsten Update."
+  },
+  "changelog.onrequest": {
+    "message": "Gezeigt, weil du gefragt hast — \"{0}\"."
+  },
+  "window.editing": {
+    "message": "Bearbeitungsmodus"
+  },
+  "window.editing.tooltip": {
+    "message": "Hält eine Beispielbenachrichtigung auf dem Bildschirm, während du arbeitest,\nstatt bei jeder Änderung eine neue zu starten.\n\nZonenankündigungen werden zurückgehalten, solange das an ist. Es schaltet sich\nselbst ab, wenn du dieses Fenster schließt."
+  },
+  "window.discord": {
+    "message": "Discord beitreten\n{0}"
+  },
+  "common.opens": {
+    "message": "{0}\n\nÖffnet {1} in deinem Browser."
+  },
+  "common.colour.tooltip": {
+    "message": "Derzeit {0:F0}% deckend.\n\nKlicke für die volle Auswahl. Der schmale karierte Streifen rechts vom Regenbogen ist Alpha — wie deckend diese Farbe ist — und er endet bei {1:F0}%, weit genug zurück, um hinter den anderen Zeilen zu sitzen, aber nicht so weit, dass die Zeile verschwindet und wie ein Fehler aussieht."
+  },
+  "units.px": {
+    "message": "px"
+  },
+  "units.lines": {
+    "message": "Zeilen"
+  },
+  "units.seconds": {
+    "message": "s"
+  },
+  "units.times": {
+    "message": "x"
+  },
+  "presetcode.empty": {
+    "message": "In der Zwischenablage ist nichts zum Importieren."
+  },
+  "presetcode.toolong": {
+    "message": "Dieser Code ist zu lang, um einer von unseren zu sein."
+  },
+  "presetcode.notacode": {
+    "message": "Das sieht nicht nach einem Voreinstellungscode aus — die beginnen mit \"{0}\"."
+  },
+  "presetcode.unreadable": {
+    "message": "Dieser Code ließ sich zu nichts Lesbarem entpacken."
+  },
+  "presetcode.notapreset": {
+    "message": "Dieser Code entpackte sich nicht zu einer Voreinstellung."
+  },
+  "presetcode.noname": {
+    "message": "Dieser Code trägt keinen Voreinstellungsnamen."
+  },
+  "presetcode.damaged": {
+    "message": "Dieser Code ist beschädigt — ein Teil ging unterwegs verloren. Bitte noch einmal darum und kopiere die ganze Zeile in einem Stück."
+  },
+  "sharecodes.customfont.note": {
+    "message": "\n\nDer Code trägt eine Schriftdatei von diesem PC. Wer ihn bekommt, hat diese\nDatei nicht, sodass diese Zeilen dort auf Noto Sans CJK zurückfallen."
+  },
+  "notice.dismiss": {
+    "message": "Ausblenden"
+  },
+  "notice.translation": {
+    "message": "Diese Übersetzung wurde maschinell erstellt und von niemandem geprüft, der die Sprache spricht. Wenn etwas schlecht klingt, sind Korrekturen sehr willkommen:\n{0}"
+  }
+}

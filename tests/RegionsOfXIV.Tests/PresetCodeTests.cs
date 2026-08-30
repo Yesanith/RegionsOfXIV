@@ -3,6 +3,11 @@ using RegionsOfXIV;
 
 namespace RegionsOfXIV.Tests;
 
+// Shares a collection with LocalizationTests so the two cannot run at once. Loc keeps one table for
+// the whole plugin and LocalizationTests swaps it about, while PresetCode.TryDecode now reads it for
+// its error text. Nothing here asserts on that text today -- only that it is non-empty -- but an
+// exact-text assertion added later would flake at random without this.
+[Collection("Localization")]
 public class PresetCodeTests
 {
     private static Configuration Sample() => new()

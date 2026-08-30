@@ -21,6 +21,18 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
     public string? LastSeenVersion { get; set; }
 
+    // Null means follow Dalamud's own interface language, which is what an untouched config holds
+    // and what a config written before this existed deserialises to -- so it needs no migration
+    // step. A code here overrides Dalamud instead, for a player who wants the plugin in one
+    // language and the rest of Dalamud in another.
+    public string? Language { get; set; }
+
+    // The language code the machine-translation notice was last dismissed for, rather than a plain
+    // flag. It is the same one property either way, and keyed by code it says its piece again when
+    // someone moves to a different rough translation instead of staying quiet because some other
+    // one was waved away once.
+    public string? TranslationNoticeDismissedFor { get; set; }
+
     public bool ZoneNotificationEnabled { get; set; } = true;
 
     public bool AreaNotificationEnabled { get; set; } = true;
