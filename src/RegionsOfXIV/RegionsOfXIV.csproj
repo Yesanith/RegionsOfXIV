@@ -1,7 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
   <PropertyGroup>
-    <Version>0.4.1.0</Version>
+    <Version>0.4.2.0</Version>
     <PackageProjectUrl>https://github.com/Yesanith/RegionsOfXIV</PackageProjectUrl>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <IsPackable>false</IsPackable>
@@ -14,9 +14,16 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' != 'Debug'">
-    <Compile Remove="Services\AddonNodeDump.cs" />
     <Compile Remove="Services\SheetSearch.cs" />
     <Compile Remove="UI\IconBrowserWindow.cs" />
+    <Compile Remove="UI\BannerPreviewWindow.cs" />
+  </ItemGroup>
+
+  <!-- One file per language, picked up by the glob and discovered at runtime from the resource
+       names, so a new language needs no code change. en.json is excluded on purpose: English is
+       the fallback compiled into the call sites, and that file is only the translators' copy. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\*.json" Exclude="Localization\en.json" />
   </ItemGroup>
 
   <ItemGroup>

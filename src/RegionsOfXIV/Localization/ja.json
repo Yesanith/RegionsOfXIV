@@ -1,0 +1,598 @@
+{
+  "_status": "machine-drafted -- not reviewed by a Japanese speaker. Register was set to plain polite (です/ます) throughout without checking it suits a settings window, and the loan-word choices are guesses. Correct freely. Keys listed under _untranslated were left in English on purpose, see the reasons there.",
+  "_untranslated": [
+    "general.uppercase: Japanese has no upper and lower case, so the setting does nothing to Japanese text. It still needs a real label -- the word for capital letters is correct even so -- but inventing a descriptive phrase instead would be worse than leaving it. Needs a speaker's judgement.",
+    "general.hideduty: 'duty' is FFXIV's term for instanced content and Japanese FFXIV has its own word for it. Guessing would put a term in the window the game itself never uses.",
+    "general.decode and general.decode.tooltip: the Eorzean script has an established Japanese name in FFXIV. Left for someone who can check it against the game.",
+    "notifications.subarea, general.skipfast and general.skipfast.tooltip: 'sub-area' is the finest place tier and carries the whole meaning of those labels.",
+    "general.showheader.tooltip: turns on the region/zone/area/sub-area vocabulary, so it waits on the same decision.",
+    "notifications.banners.tooltip: translated, but 'Quest Accepted', 'Duty Commenced' and 'Level Up!' were left in English inside it -- Japanese FFXIV shows its own wording for those three and that must win.",
+    "'Eorzean' is written エオルゼア文字 as a guess; check it against the game.",
+    "Typeface names (Noto Sans CJK, Trump Gothic, Jupiter, Axis), product names (Discord, GitHub, Dalamud, Guild Wars 2, Square Enix), commands and the AGPL identifier are never translated."
+  ],
+  "durations.tab": {
+    "message": "時間"
+  },
+  "durations.intro": {
+    "message": "行が現れ、着地し、そのあと解読されます。動きと解読は別々の段階で、それぞれに時間がかかります。"
+  },
+  "durations.fadein": {
+    "message": "フェードイン"
+  },
+  "durations.fadein.tooltip": {
+    "message": "行が現れてから完全な濃さになるまでの時間です。"
+  },
+  "durations.motion": {
+    "message": "動き"
+  },
+  "durations.motion.tooltip": {
+    "message": "文字が届くまでの時間です。フェードインと同時に進み、\n「効果」タブの動きが「なし」のときは何もしません。"
+  },
+  "durations.decode": {
+    "message": "解読"
+  },
+  "durations.decode.tooltip": {
+    "message": "文字が着地したあと、エオルゼア文字が解けるまでの時間です。\n「効果」タブの解読効果が必要です。"
+  },
+  "durations.hold": {
+    "message": "表示"
+  },
+  "durations.hold.tooltip": {
+    "message": "完成した行が消え始めるまで表示され続ける時間です。"
+  },
+  "durations.fadeout": {
+    "message": "フェードアウト"
+  },
+  "durations.fadeout.tooltip": {
+    "message": "時間が来てから行が消えるまでにかかる時間です。"
+  },
+  "effects.tab": {
+    "message": "効果"
+  },
+  "effects.motion.intro": {
+    "message": "文字が現れるときの動き方です。"
+  },
+  "effects.motion": {
+    "message": "動き"
+  },
+  "effects.motion.tooltip": {
+    "message": "なし：文字がそのまま所定の位置に現れます。\nタイプライター：一文字ずつ、フェードなしで現れます。\n浮上：文字が下から所定の位置へ持ち上がります。\n波：現れるときに行を波が走ります。\n燃焼：文字が燃え上がり、冷えて色に落ち着きます。\n\nエオルゼア文字の解読の代わりではなく、同時に進みます。"
+  },
+  "effects.motion.none": {
+    "message": "なし"
+  },
+  "effects.motion.typewriter": {
+    "message": "タイプライター"
+  },
+  "effects.motion.rise": {
+    "message": "浮上"
+  },
+  "effects.motion.wave": {
+    "message": "波"
+  },
+  "effects.motion.burn": {
+    "message": "燃焼"
+  },
+  "effects.particles.intro": {
+    "message": "表示されているあいだ、まわりで動くものです。"
+  },
+  "effects.particles": {
+    "message": "パーティクル"
+  },
+  "effects.particles.none": {
+    "message": "なし"
+  },
+  "effects.particles.hearts": {
+    "message": "ハート"
+  },
+  "effects.particles.embers": {
+    "message": "残り火"
+  },
+  "effects.particles.sparkles": {
+    "message": "きらめき"
+  },
+  "effects.particles.petals": {
+    "message": "花びら"
+  },
+  "effects.density": {
+    "message": "密度"
+  },
+  "effects.particlecolour": {
+    "message": "パーティクルの色"
+  },
+  "effects.particlecolour.tooltip": {
+    "message": "既定の琥珀色は残り火ときらめきに合います。ハートと花びらは\nピンク寄りにするとよいでしょう。"
+  },
+  "effects.embers.note": {
+    "message": "残り火は「燃焼」の動きと合いますが、必須ではありません。"
+  },
+  "effects.preview": {
+    "message": "プレビュー"
+  },
+  "sharecodes.heading": {
+    "message": "共有コード"
+  },
+  "sharecodes.intro": {
+    "message": "コードはプリセット全体を一行のテキストにしたものです。チャットに貼り付けて相手に渡せます。"
+  },
+  "sharecodes.copy": {
+    "message": "現在の設定をコピー"
+  },
+  "sharecodes.copied": {
+    "message": "コピーしました。好きなところに貼り付けてください。"
+  },
+  "sharecodes.copy.tooltip.named": {
+    "message": "現在の設定すべてのコードを、名前「{0}」で\nクリップボードに入れます。"
+  },
+  "sharecodes.copy.tooltip.unnamed": {
+    "message": "先に上の欄へ名前を入力してください。名前はコードと一緒に渡り、\n受け取った相手にはそれしか手がかりがありません。\n\n保存済みのプリセットを共有するときは、右クリックしてください。"
+  },
+  "sharecodes.paste": {
+    "message": "コードを貼り付け"
+  },
+  "sharecodes.paste.tooltip.named": {
+    "message": "クリップボードからコードを読み、プリセットとして保存して適用します。\nコードに付いていた名前ではなく「{0}」として\n保存されます。"
+  },
+  "sharecodes.paste.tooltip.unnamed": {
+    "message": "クリップボードからコードを読み、プリセットとして保存して、\n付いていた名前のまま適用します。\n\n別の名前で保存したいときは、先に上へ名前を入力してください。"
+  },
+  "sharecodes.clipboard.unreadable": {
+    "message": "クリップボードを読めませんでした。少ししてからもう一度お試しください。"
+  },
+  "sharecodes.imported": {
+    "message": "「{0}」を読み込んで適用しました。"
+  },
+  "about.tab": {
+    "message": "情報"
+  },
+  "about.title": {
+    "message": "Regions of XIV {0}"
+  },
+  "about.author": {
+    "message": "作者: {0}"
+  },
+  "about.summary": {
+    "message": "足を踏み入れた地方・地域・エリア・小エリアと、そこの天候をお知らせします。ゲーム自身の地名表示の横に描くのではなく、それを置き換えます。"
+  },
+  "about.whatsnew": {
+    "message": "更新履歴"
+  },
+  "about.whatsnew.tooltip": {
+    "message": "新しい順にすべてのリリースを表示します。「/regions changelog」でも開けます。"
+  },
+  "about.discord": {
+    "message": "Discordに参加"
+  },
+  "about.discord.tooltip": {
+    "message": "アイデア、不具合の報告、プリセットコードの交換に。"
+  },
+  "about.github": {
+    "message": "GitHub"
+  },
+  "about.github.tooltip": {
+    "message": "ソース、リリース、ライセンス。"
+  },
+  "about.issue": {
+    "message": "問題を報告"
+  },
+  "about.issue.tooltip": {
+    "message": "おかしいところ、足りないところがあれば。"
+  },
+  "about.commands": {
+    "message": "コマンド"
+  },
+  "about.command.settings": {
+    "message": "この設定を開きます。"
+  },
+  "about.command.test": {
+    "message": "今いる場所の通知を表示します。"
+  },
+  "about.command.changelog": {
+    "message": "更新履歴のウィンドウを開きます。"
+  },
+  "about.inspiration": {
+    "message": "Nekres氏のGuild Wars 2用 Regions of Tyria に着想を得ています。"
+  },
+  "about.inspiration.tooltip": {
+    "message": "クリックで {0} を開きます"
+  },
+  "about.licence": {
+    "message": "AGPL-3.0-or-later でライセンスされています。"
+  },
+  "about.notaffiliated": {
+    "message": "地名・天候・フォントはゲーム自身のデータによります。スクウェア・エニックスとは関係ありません。"
+  },
+  "notifications.tab": {
+    "message": "通知"
+  },
+  "notifications.intro": {
+    "message": "このプラグインは、ゲーム自身の地名表示の横に描くのではなく、それを置き換えます。下の抑制を切ると、ゲーム側の表示が戻ります。"
+  },
+  "notifications.zone": {
+    "message": "地域の変化"
+  },
+  "notifications.area": {
+    "message": "エリアの変化"
+  },
+  "notifications.weather": {
+    "message": "天候の変化"
+  },
+  "notifications.weather.tooltip": {
+    "message": "天候の切り替わりを、地名のすぐ上の独立した行でお知らせします。地名の通知を遮ることはありません。\n\n天候はおよそ23分の一定周期で変わり、新しい場所に着くとそこの天候も知らされるため、入るときに地名と一緒に表示されます。"
+  },
+  "notifications.weathericon": {
+    "message": "天候アイコンを表示"
+  },
+  "notifications.weathericon.tooltip": {
+    "message": "天候の名前の左に、ゲーム自身のアイコンを描きます。"
+  },
+  "notifications.banners": {
+    "message": "バナー"
+  },
+  "notifications.banners.tooltip": {
+    "message": "ゲームの全画面バナー（\"Quest Accepted\"、\"Duty Commenced\"、\"Level Up!\"）を、このプラグインの書体で描き直します。\n\n文言はテキストとしてではなくゲームの画像に描き込まれているため、このプラグインが文言を持っているバナーだけが置き換わります。分からないものはゲーム側のままです。"
+  },
+  "notifications.hidebanner": {
+    "message": "ゲーム自身のバナーを隠す"
+  },
+  "notifications.hidebanner.tooltip": {
+    "message": "ゲームの画像を消して、このプラグインの表示だけを見せます。\n\n切っておくと両方見えるので、文言が合っているかを手早く確かめられます。"
+  },
+  "notifications.hideareatext": {
+    "message": "ゲーム自身のエリア表示を隠す"
+  },
+  "notifications.hideareatext.tooltip": {
+    "message": "このプラグインの下に描かれる \"_AreaText\" を抑制します。"
+  },
+  "notifications.hideloadingtitle": {
+    "message": "ロード画面の地名表示を隠す"
+  },
+  "notifications.hideloadingtitle.tooltip": {
+    "message": "ロード画面に描かれる金色の見出し \"_LocationTitle\" と\n\"_LocationTitleShort\" を抑制し、同じ名前をこのプラグインの\n書式で表示します。"
+  },
+  "presets.tab": {
+    "message": "プリセット"
+  },
+  "presets.intro": {
+    "message": "プリセットは「一般」「フォント」「効果」「通知」「時間」のすべての設定を含みます。各行の書体と大きさ、位置、色、動きとパーティクル、どの段階を知らせるか、各種の時間、そして黙るべき場面です。"
+  },
+  "presets.intro.warning": {
+    "message": "適用するとそれらすべてが置き換わるため、変更した内容は上書きされます。"
+  },
+  "presets.builtin": {
+    "message": "組み込みの見た目"
+  },
+  "presets.builtin.hint": {
+    "message": "既定の設定と、それぞれの名前が示す見た目です。"
+  },
+  "presets.builtin.tooltip": {
+    "message": "{0}\nそれ以外はすべて既定に戻ります。"
+  },
+  "presets.classic.description": {
+    "message": "出荷時のままのプラグインです。解読あり、動きなし、パーティクルなし。"
+  },
+  "presets.inferno.description": {
+    "message": "文字が燃え上がって冷え、残り火が立ちのぼります。"
+  },
+  "presets.sweetheart.description": {
+    "message": "文字が持ち上がり、まわりをハートが漂います。"
+  },
+  "presets.starlight.description": {
+    "message": "行が波に乗って現れ、まわりにきらめきが漂います。"
+  },
+  "presets.sakura.description": {
+    "message": "花びらの下を、ゆるやかに浮かび上がります。"
+  },
+  "presets.dispatch.description": {
+    "message": "詰めた大文字で、一文字ずつ打ち出されます。パーティクルなし。"
+  },
+  "presets.tyria.description": {
+    "message": "広く空けた金色の大文字で、静かにゆったりと。原作への目配せです。"
+  },
+  "presets.saved": {
+    "message": "自分のプリセット"
+  },
+  "presets.saved.hint": {
+    "message": "そのときの設定をそのまま保存したものです。"
+  },
+  "presets.saved.none": {
+    "message": "まだ保存されていません。"
+  },
+  "presets.saved.tooltip": {
+    "message": "このプリセットを適用します。\n右クリックで共有・上書き・削除ができます。"
+  },
+  "presets.menu.share": {
+    "message": "共有コードをコピー"
+  },
+  "presets.menu.overwrite": {
+    "message": "現在の設定で上書き"
+  },
+  "presets.menu.delete": {
+    "message": "削除"
+  },
+  "presets.copied": {
+    "message": "「{0}」のコードをコピーしました。"
+  },
+  "presets.name.hint": {
+    "message": "名前を付けてください（保存・コピー・読み込み用）"
+  },
+  "presets.save": {
+    "message": "保存"
+  },
+  "presets.replace": {
+    "message": "置き換え"
+  },
+  "presets.save.tooltip": {
+    "message": "「一般」「フォント」「効果」「通知」「時間」のすべての設定を保存します。"
+  },
+  "presets.discord": {
+    "message": "Discordに参加"
+  },
+  "presets.discord.tooltip": {
+    "message": "プリセットコードの交換、不具合の報告、機能の提案に。"
+  },
+  "presets.customfont.warning": {
+    "message": "この設定はこのPCのフォントを使っています。プリセットに入るのはフォント本体ではなくファイルの場所だけなので、他の人のPCではその場所が存在せず、該当する行は Noto Sans CJK になります。それ以外の設定はそのまま適用されます。渡した相手にも同じ見た目にしたい場合は、組み込みの書体に戻してください。"
+  },
+  "presets.customfont.missing": {
+    "message": "送り主のPCにあるフォントファイルを指しており、こちらには無いため、該当する行は Noto Sans CJK で描かれます。「フォント」タブでお好みのものを選んでください。"
+  },
+  "fonts.tab": {
+    "message": "フォント"
+  },
+  "fonts.intro": {
+    "message": "通知の各行には、それぞれ書体と大きさがあります。組み込みの書体から選ぶか、このPC上のフォントファイルを指定してください。"
+  },
+  "fonts.role.text": {
+    "message": "本文"
+  },
+  "fonts.role.text.hint": {
+    "message": "地名そのもので、いちばん大きい行です。"
+  },
+  "fonts.role.header": {
+    "message": "見出し"
+  },
+  "fonts.role.header.hint": {
+    "message": "名前の上の小さい行で、それが属する地方やエリアを示します。"
+  },
+  "fonts.role.weather": {
+    "message": "天候"
+  },
+  "fonts.role.weather.hint": {
+    "message": "見出しの上の天候の行で、天候通知が有効なときに表示されます。"
+  },
+  "fonts.size": {
+    "message": "大きさ"
+  },
+  "fonts.face": {
+    "message": "書体"
+  },
+  "fonts.face.tooltip": {
+    "message": "Noto Sans CJK はベクターで、どの大きさでも鮮明で、あらゆる言語を扱えます。\n\nゲーム自身の書体のほうがFFXIVには合いますが、いずれもビットマップで上限があります。\nTrump Gothic：ラテン文字のみ、91 px まで。\nJupiter：ラテン文字のみ、61 px まで。\nAxis：48 px まで。日本語の字を持つ唯一の書体です。\n\n「カスタムファイル」はこのPCから自分のフォントを読み込みます。"
+  },
+  "fonts.choice.noto": {
+    "message": "{0}（推奨）"
+  },
+  "fonts.choice.custom": {
+    "message": "カスタムファイル"
+  },
+  "fonts.preview": {
+    "message": "プレビュー"
+  },
+  "fonts.path.hint": {
+    "message": ".ttf、.otf、.ttc ファイルのパス"
+  },
+  "fonts.browse": {
+    "message": "参照"
+  },
+  "fonts.browse.tooltip": {
+    "message": "Windowsのフォントフォルダーを開きます。.ttf、.otf、.ttc のいずれでも構いません。"
+  },
+  "fonts.clear": {
+    "message": "クリア"
+  },
+  "fonts.dialog.title": {
+    "message": "フォントファイルを選択"
+  },
+  "fonts.drawingwith": {
+    "message": "{0} で描画しています。"
+  },
+  "fonts.custom.notice": {
+    "message": "自分で用意したフォントはそのまま読み込まれ、扱いは自己責任となります。字が足りない、間隔がおかしい、輪郭がぼやける、ゲームが読めないファイルである、ライセンスを持っていないといったことは、 Regions of XIV ではなく利用者の責任であり、それに起因する問題のサポートはありません。行の見た目が崩れたら、組み込みの書体に戻してください。"
+  },
+  "fonts.nojapanese": {
+    "message": "{0} には日本語の字がありません。このクライアントでは、地名がぼやけるどころか空白の四角として表示されます。Axis か Noto Sans CJK を選んでください。"
+  },
+  "fonts.upscaled": {
+    "message": "このフォントは {0:F0} px を超えるビットマップを持たないため、{1:F0} px では拡大されてぼやけます。大きさを下げるか、どの大きさでも鮮明な Noto Sans CJK に切り替えてください。"
+  },
+  "general.tab": {
+    "message": "一般"
+  },
+  "general.language": {
+    "message": "言語"
+  },
+  "general.language.follow": {
+    "message": "Dalamudに従う"
+  },
+  "general.language.tooltip": {
+    "message": "「Dalamudに従う」は、Dalamud自身に設定された言語を使い、\nその変更に追従します。\n\n変わるのはこのウィンドウだけです。地名と天候の名前はゲームから\n来るため、クライアントの言語のままです。"
+  },
+  "general.preview": {
+    "message": "プレビュー"
+  },
+  "general.vertical": {
+    "message": "垂直位置"
+  },
+  "general.horizontal": {
+    "message": "水平位置"
+  },
+  "general.horizontal.tooltip": {
+    "message": "文字はこの点を中心に置かれるため、50%が画面の中央です。\n長い地名を端の近くに置くと、そこからはみ出します。"
+  },
+  "general.letterspacing": {
+    "message": "字間"
+  },
+  "general.letterspacing.tooltip": {
+    "message": "文字と文字のあいだの追加の空きで、フォントサイズに対する割合です。\n大きさを変えても比率が保たれ、見出しにも応分の空きが入ります。\n広い字間は、Guild Wars 2 の原作らしさの多くを作っています。"
+  },
+  "general.textcolour": {
+    "message": "本文の色"
+  },
+  "general.headercolour": {
+    "message": "見出しの色"
+  },
+  "general.outlinecolour": {
+    "message": "縁取りの色"
+  },
+  "general.separatecolours": {
+    "message": "行ごとに色を分ける"
+  },
+  "general.separatecolours.tooltip": {
+    "message": "切ると、天候の行は見出しに従い、ひとつの縁取り色が三行すべてに\n使われます。\n\n入れると、天候の行と縁取りは下の色を使うため、他の行に触れずに\n一行だけを背景側へ寄せられます。"
+  },
+  "general.weathercolour": {
+    "message": "天候の色"
+  },
+  "general.headeroutlinecolour": {
+    "message": "見出しの縁取りの色"
+  },
+  "general.weatheroutlinecolour": {
+    "message": "天候の縁取りの色"
+  },
+  "general.outlinethickness": {
+    "message": "縁取りの太さ"
+  },
+  "general.outlinethickness.tooltip": {
+    "message": "ゼロにすると縁取りを切ります。"
+  },
+  "general.shadow": {
+    "message": "ドロップシャドウ"
+  },
+  "general.shadow.tooltip": {
+    "message": "各行の二つ目の複製を、後ろにずらして描きます。縁取りの下に入るので、\n両方を併用できます。読みやすさのための細い縁取りと、奥行きのための\n柔らかい影という組み合わせです。\n\n影はひとつで三行すべてを覆い、行ごとの色分けには従いません。"
+  },
+  "general.shadowcolour": {
+    "message": "影の色"
+  },
+  "general.shadowacross": {
+    "message": "影の左右"
+  },
+  "general.shadowacross.tooltip": {
+    "message": "負の値にすると影が左へ動きます。"
+  },
+  "general.shadowdown": {
+    "message": "影の上下"
+  },
+  "general.shadowdown.tooltip": {
+    "message": "負の値にすると影が文字の上へ持ち上がります。"
+  },
+  "general.shadowspread": {
+    "message": "影の広がり"
+  },
+  "general.shadowspread.tooltip": {
+    "message": "影を外側へ太らせます。ゼロなら文字と同じ形のままで、\n値を上げると後ろの光輪のように厚くなります。"
+  },
+  "general.showheader": {
+    "message": "見出しを表示"
+  },
+  "general.underlineheader": {
+    "message": "見出しに下線を引く"
+  },
+  "general.headergap": {
+    "message": "見出しとの間隔"
+  },
+  "general.headergap.tooltip": {
+    "message": "見出しの下に名前をどれだけ離して置くかを、見出しの行数で測ります。\n\n小さい値は両者をほとんど触れるまで近づけます。これはこのプラグインが\nずっと採ってきた詰まった見た目です。大きい値は間隔を開け、各行に\nゆとりを与えます。"
+  },
+  "general.hidecombat": {
+    "message": "戦闘中は表示しない"
+  },
+  "command.help": {
+    "message": "Regions of XIV の設定を開きます。「{0}」でサンプル通知を表示し、「{1}」で更新履歴を表示します。"
+  },
+  "changelog.title": {
+    "message": "Regions of XIV：更新履歴"
+  },
+  "changelog.all": {
+    "message": "新しい順にすべてのリリース:"
+  },
+  "changelog.updated": {
+    "message": "Regions of XIV が更新されました。変更点は次のとおりです:"
+  },
+  "changelog.updated.away": {
+    "message": "Regions of XIV が更新されました。留守のあいだの変更点は次のとおりです:"
+  },
+  "changelog.close": {
+    "message": "閉じる"
+  },
+  "changelog.discord": {
+    "message": "Discordに参加"
+  },
+  "changelog.discord.tooltip": {
+    "message": "アイデア、不具合の報告、プリセットコードの交換に。\n{0}"
+  },
+  "changelog.onceonly": {
+    "message": "次の更新まで、これは表示されません。"
+  },
+  "changelog.onrequest": {
+    "message": "「{0}」で開いたため表示しています。"
+  },
+  "window.editing": {
+    "message": "編集モード"
+  },
+  "window.editing.tooltip": {
+    "message": "変更のたびに新しい通知を出すのではなく、作業のあいだサンプルの通知を\n画面に出したままにします。\n\n有効なあいだ、地域の通知は保留されます。このウィンドウを閉じると\n自動的に解除されます。"
+  },
+  "window.discord": {
+    "message": "Discordに参加\n{0}"
+  },
+  "common.opens": {
+    "message": "{0}\n\n{1} をブラウザーで開きます。"
+  },
+  "common.colour.tooltip": {
+    "message": "現在の不透明度は {0:F0}% です。\n\nクリックすると完全な選択画面が開きます。虹の右にある細い市松模様の帯がアルファ（この色の不透明度）で、{1:F0}% で止まります。他の行の後ろに置けるだけ薄く、しかし行が消えて不具合に見えるほどではない値です。"
+  },
+  "units.px": {
+    "message": "px"
+  },
+  "units.lines": {
+    "message": "行"
+  },
+  "units.seconds": {
+    "message": "秒"
+  },
+  "units.times": {
+    "message": "倍"
+  },
+  "presetcode.empty": {
+    "message": "クリップボードに読み込むものがありません。"
+  },
+  "presetcode.toolong": {
+    "message": "このコードは長すぎて、こちらのものではないようです。"
+  },
+  "presetcode.notacode": {
+    "message": "プリセットコードではないようです。コードは「{0}」で始まります。"
+  },
+  "presetcode.unreadable": {
+    "message": "このコードは読める内容に展開できませんでした。"
+  },
+  "presetcode.notapreset": {
+    "message": "このコードはプリセットに展開されませんでした。"
+  },
+  "presetcode.noname": {
+    "message": "このコードにはプリセット名がありません。"
+  },
+  "presetcode.damaged": {
+    "message": "このコードは壊れています。途中で一部が失われました。もう一度もらって、一行まるごとコピーしてください。"
+  },
+  "sharecodes.customfont.note": {
+    "message": "\n\nこのコードはこのPCのフォントファイルを指しています。受け取った相手には\nそのファイルがないため、該当する行は Noto Sans CJK になります。"
+  },
+  "notice.dismiss": {
+    "message": "非表示"
+  },
+  "notice.translation": {
+    "message": "この翻訳は機械が下書きしたもので、その言語を話す人の確認を受けていません。おかしな表現があれば、修正のご指摘を歓迎します:\n{0}"
+  }
+}

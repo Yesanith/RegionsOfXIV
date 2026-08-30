@@ -17,10 +17,7 @@ TestResults/
 *.md
 !/README.md
 !/LICENSE.md
-
-src/RegionsOfXIV/Services/AddonNodeDump.cs
-src/RegionsOfXIV/Services/SheetSearch.cs
-src/RegionsOfXIV/UI/IconBrowserWindow.cs
+!/TRANSLATING.md
 
 /dispose.txt
 /notes/

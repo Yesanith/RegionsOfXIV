@@ -13,6 +13,12 @@ internal static class Changelog
 {
     public static readonly ChangelogEntry[] All =
     [
+        new(new Version("0.4.2.0"),
+        [
+            "Presets and share codes made by older versions apply the way they were saved. One from before the header gap became a slider was landing on the default spacing rather than the spacing it was saved with, and one from before the weather line had its own size was leaving that size behind as well.",
+            "This covers both the presets you saved yourself and codes someone sends you. Saved ones are brought up to date the next time the plugin loads, so there is nothing to redo.",
+        ]),
+
         new(new Version("0.4.1.0"),
         [
             "Arriving somewhere new while the last notice is still up no longer leaves the two written over each other. The one on its way out now leaves quickly and moves clear of the one arriving, instead of fading at reading pace underneath it.",

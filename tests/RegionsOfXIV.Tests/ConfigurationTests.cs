@@ -86,6 +86,22 @@ public class ConfigurationTests
         Assert.Equal(0.5f, target.HeaderColor.X);
     }
 
+    // Null is both the default and what a config written before this setting existed
+    // deserialises to, which is why the override needs no migration step of its own.
+    [Fact]
+    public void ANewConfigurationFollowsDalamudsLanguage()
+    {
+        Assert.Null(new Configuration().Language);
+    }
+
+    // A preset is a look. One arriving from another player has no business changing which
+    // language the window is read in, so the override stays out of presets and share codes.
+    [Fact]
+    public void TheLanguageOverrideDoesNotTravelInAPreset()
+    {
+        Assert.Null(ConfigurationCopy.Find("Language"));
+    }
+
     [Fact]
     public void AConfigWrittenBeforeWeatherHadItsOwnSizeKeepsTheSizeItWasShowing()
     {

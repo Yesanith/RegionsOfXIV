@@ -56,11 +56,14 @@ internal sealed class NativeUiSuppressor : IAreaTextSource, IDisposable
             OnAreaTextShown?.Invoke(text);
     }
 
-    // The addon has no stable node id for its caption, so the first non-empty text node is taken.
-    // Fragile by nature -- if a patch reorders the nodes this is what will start returning the
-    // wrong string.
+    // The addon has no stable node id for its caption, so every text node is read and the longest
+    // one wins. The caption is the substantial string in there -- the others are decoration and
+    // leftovers -- and picking by length survives a patch reordering the node list, which taking
+    // the first one did not.
     private static unsafe string? ReadLargestText(AtkUnitBase* addon)
     {
+        string? largest = null;
+
         for (var i = 0; i < addon->UldManager.NodeListCount; i++)
         {
             var node = addon->UldManager.NodeList[i];
@@ -68,11 +71,15 @@ internal sealed class NativeUiSuppressor : IAreaTextSource, IDisposable
                 continue;
 
             var text = ((AtkTextNode*)node)->NodeText.ToString();
-            if (!string.IsNullOrWhiteSpace(text))
-                return text.Trim();
+            if (string.IsNullOrWhiteSpace(text))
+                continue;
+
+            var trimmed = text.Trim();
+            if (largest == null || trimmed.Length > largest.Length)
+                largest = trimmed;
         }
 
-        return null;
+        return largest;
     }
 
     private void OnLoadingTitle(AddonEvent type, AddonArgs args) =>

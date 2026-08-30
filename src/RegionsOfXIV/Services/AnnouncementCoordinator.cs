@@ -20,14 +20,16 @@ internal sealed class AnnouncementCoordinator : IDisposable
 
     private string? lastNativeAreaText;
 
+    // The gate arrives rather than being built here because BannerWatcher needs the same one: it
+    // has to know whether a banner will really be replaced before it hides the game's own, and a
+    // second gate would keep its own cooldown and answer differently.
     public AnnouncementCoordinator(
-        Configuration config, IGameState game, INotificationSink sink, AnnouncementSources sources)
+        Configuration config, NotificationGate gate, INotificationSink sink, AnnouncementSources sources)
     {
         this.config = config;
         this.sink = sink;
         this.sources = sources;
-
-        this.gate = new NotificationGate(config, game);
+        this.gate = gate;
 
         sources.Banners.OnBannerShown += HandleBannerShown;
         sources.Weather.OnWeatherChanged += HandleWeatherChanged;
@@ -85,11 +87,20 @@ internal sealed class AnnouncementCoordinator : IDisposable
         this.sink.PushWeather(weather.Name, weather.IconId);
     }
 
-    private void HandleBannerShown(uint iconId, string text)
+    // The gate has already been asked, by the watcher, which needed the answer before this to know
+    // whether to hide the game's own banner. Asking again here would read the clock a second time
+    // and could disagree with it, so the reason it reached is what gets acted on.
+    private void HandleBannerShown(uint iconId, string text, BannerBlock blocked)
     {
-        Log.Debug($"Banner [{iconId}]: {text}");
+        Log.Debug(blocked == BannerBlock.None
+            ? $"Banner [{iconId}]: {text}"
+            : $"Banner [{iconId}]: {text} -- refused: {blocked}");
 
-        this.sink.Push(null, text.ToUpperInvariant());
+        if (blocked != BannerBlock.None)
+            return;
+
+        BannerNotification.PushTo(this.sink, text);
+        this.gate.MarkBannerAnnounced(this.sink.Timing);
     }
 
     private void HandleWeatherChanged(byte weatherId)
@@ -241,7 +252,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
         if (string.Equals(text, native, StringComparison.OrdinalIgnoreCase))
             return (header, text);
 
-        Log.Debug($"TerritoryInfo says \"{text}\", the game says \"{native}\" — taking the game's.");
+        Log.Debug($"TerritoryInfo says \"{text}\", the game says \"{native}\". Taking the game's.");
 
         var parent = names.Area is not null
                      && !string.Equals(names.Area, native, StringComparison.OrdinalIgnoreCase)

@@ -3,6 +3,7 @@ using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
+using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
 
@@ -15,7 +16,7 @@ internal sealed class ChangelogWindow : Window, IDisposable
     private bool afterUpdate;
 
     public ChangelogWindow()
-        : base("Regions of XIV — What's New###RegionsOfXIVChangelog")
+        : base(Title)
     {
         SizeConstraints = new WindowSizeConstraints
         {
@@ -29,12 +30,20 @@ internal sealed class ChangelogWindow : Window, IDisposable
 
     public void Dispose() { }
 
+    // Rebuilt whenever the window opens rather than only in the constructor: the title is
+    // translated, and one set once would keep whichever language the game started in. Everything
+    // after "###" is the identity Dalamud saves this window's position and size against, so it
+    // stays out of the translation.
+    private static string Title =>
+        Loc.Get("changelog.title", "Regions of XIV: What's New") + "###RegionsOfXIVChangelog";
+
     // Shown once after an update, listing only what is new to this player. Opens itself only if
     // there is something to say, so a reinstall at the same version stays quiet.
     public void ShowSince(Version? lastSeen)
     {
         this.entries = Changelog.Since(lastSeen);
         this.afterUpdate = true;
+        WindowName = Title;
         IsOpen = this.entries.Length > 0;
     }
 
@@ -42,6 +51,7 @@ internal sealed class ChangelogWindow : Window, IDisposable
     {
         this.entries = Changelog.All;
         this.afterUpdate = false;
+        WindowName = Title;
         IsOpen = this.entries.Length > 0;
     }
 
@@ -53,11 +63,14 @@ internal sealed class ChangelogWindow : Window, IDisposable
             return;
         }
 
-        ImGui.TextWrapped(!this.afterUpdate
-            ? "Every release, newest first:"
+        UiText.Wrapped(!this.afterUpdate
+            ? Loc.Get("changelog.all", "Every release, newest first:")
             : this.entries.Length == 1
-                ? "Regions of XIV has updated. Here is what changed:"
-                : "Regions of XIV has updated. Here is what changed while you were away:");
+                ? Loc.Get(
+                    "changelog.updated", "Regions of XIV has updated. Here is what changed:")
+                : Loc.Get(
+                    "changelog.updated.away",
+                    "Regions of XIV has updated. Here is what changed while you were away:"));
 
         ImGui.Spacing();
 
@@ -72,29 +85,38 @@ internal sealed class ChangelogWindow : Window, IDisposable
             }
         }
 
-        if (ImGui.Button("Close"))
+        if (ImGui.Button(Loc.Label("changelog.close", "Close")))
             IsOpen = false;
 
         ImGui.SameLine();
-        DiscordLink.DrawButton("Join the Discord");
+        DiscordLink.DrawButton(Loc.Label("changelog.discord", "Join the Discord"));
 
-        if (ImGui.IsItemHovered())
-            ImGui.SetTooltip($"Ideas, bug reports and preset codes.\n{DiscordLink.Invite}");
+        UiText.Tooltip(Loc.Format(
+            "changelog.discord.tooltip",
+            "Ideas, bug reports and preset codes.\n{0}",
+            DiscordLink.Invite));
 
-        ImGui.TextDisabled(this.afterUpdate
-            ? "You will not see this again until the next update."
-            : "Shown because you asked — \"/regions changelog\".");
+        UiText.Disabled(this.afterUpdate
+            ? Loc.Get(
+                "changelog.onceonly", "You will not see this again until the next update.")
+            : Loc.Format(
+                "changelog.onrequest",
+                "Shown because you asked: \"{0}\".",
+                "/regions changelog"));
     }
 
     private static void DrawEntry(ChangelogEntry entry)
     {
-        ImGui.TextColored(VersionColor, entry.Version.ToString());
+        UiText.Colored(VersionColor, entry.Version.ToString());
         ImGui.Separator();
 
         foreach (var change in entry.Changes)
         {
             ImGui.Bullet();
-            ImGui.TextWrapped(change);
+
+            // Release notes stay English, but they go through UiText all the same: a per-cent sign
+            // in one would otherwise be read as a format specifier.
+            UiText.Wrapped(change);
         }
 
         ImGui.Spacing();

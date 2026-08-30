@@ -19,6 +19,8 @@ internal sealed class FakeSettings : IGateSettings
     public bool HideWhileTravellingFast { get; set; } = true;
 
     public bool WeatherNotificationEnabled { get; set; }
+
+    public bool BannerNotificationEnabled { get; set; } = true;
 }
 
 internal sealed class FakeGameState : IGameState

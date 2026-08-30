@@ -33,7 +33,7 @@ public class AnnouncementCoordinatorTests
 
         return new AnnouncementCoordinator(
             this.config,
-            this.game,
+            new NotificationGate(this.config, this.game),
             this.sink,
             new AnnouncementSources(
                 this.locations, this.weather, this.areaText,
@@ -166,6 +166,8 @@ public class AnnouncementCoordinatorTests
     [Fact]
     public void BannersAreAnnouncedInCapitals()
     {
+        this.config.BannerNotificationEnabled = true;
+
         using var _ = Build();
 
         this.banners.Show(120001, "Quest Accepted");
@@ -175,17 +177,23 @@ public class AnnouncementCoordinatorTests
         Assert.Null(announced.Header);
     }
 
+    // Was BannersWaitOutThePacingFromAPlace, which arrived somewhere and then fired two banners to
+    // watch the cooldown hold the second one off. The coordinator no longer asks the gate -- the
+    // watcher asks once and sends the answer with the banner -- so what is left to check here is
+    // that the answer is honoured. The pacing rule itself is covered in NotificationGateTests,
+    // where the clock can be advanced.
     [Fact]
-    public void BannersAreNotHeldBackByThePacingThatGovernsPlaces()
+    public void ABannerTheGateRefusedIsNotPushed()
     {
+        this.config.BannerNotificationEnabled = true;
+
         using var _ = Build();
 
-        this.zones.Arrive(Arrival());
         this.banners.Show(120001, "Quest Accepted");
-        this.banners.Show(120002, "Quest Complete");
+        this.banners.Show(120002, "Quest Complete", BannerBlock.Cooldown);
 
-        Assert.Equal(3, this.sink.Pushed.Count);
-        Assert.Equal("QUEST COMPLETE", this.sink.Last!.Text);
+        var announced = Assert.Single(this.sink.Places);
+        Assert.Equal("QUEST ACCEPTED", announced.Text);
     }
 
     [Fact]

@@ -15,6 +15,32 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v5
 
+    # Runs before anything is downloaded or built, so the only thing on disk is the repository.
+    # The character is built from its codepoint rather than typed, because this file is covered
+    # by the rule it enforces.
+    - name: No em dashes
+      shell: pwsh
+      run: |
+        $dash = [char]0x2014
+        $skip = '[\\/](\.git|bin|obj)[\\/]'
+        $binary = '\.(ttf|otf|ttc|png|jpg|jpeg|ico|zip|dll|pdb|exe|snk)$'
+
+        $hits = Get-ChildItem -Recurse -File -Force |
+          Where-Object { $_.FullName -notmatch $skip -and $_.Name -notmatch $binary } |
+          Select-String -SimpleMatch -Pattern $dash -Encoding utf8
+
+        if ($hits) {
+          foreach ($hit in $hits) {
+            Write-Host ('{0}:{1}: {2}' -f $hit.Path, $hit.LineNumber, $hit.Line.Trim())
+          }
+          Write-Host ''
+          Write-Host ('Found {0} em dash(es). The em dash is banned repo-wide.' -f $hits.Count)
+          Write-Host 'Rewrite the sentence rather than swapping in a hyphen. See Style in .claude/CLAUDE.md.'
+          exit 1
+        }
+
+        Write-Host 'No em dashes.'
+
     - name: Install .NET
       uses: actions/setup-dotnet@v5
       with:
@@ -25,7 +51,14 @@ jobs:
         Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/latest.zip -OutFile latest.zip
         Expand-Archive -Force latest.zip "$env:AppData\XIVLauncher\addon\Hooks\dev"
 
-    - name: Build with dotnet
+    # Debug first, and deliberately. The developer tools live behind #if DEBUG and
+    # are removed from compilation in every other configuration, so a Release-only
+    # pipeline cannot see them break. Debug is also what Rider and Visual Studio
+    # build by default, which makes it the configuration a fresh clone hits first.
+    - name: Build (Debug)
+      run: dotnet build RegionsOfXIV.sln --configuration Debug
+
+    - name: Build (Release)
       run: dotnet build RegionsOfXIV.sln --configuration Release
 
     - name: Test

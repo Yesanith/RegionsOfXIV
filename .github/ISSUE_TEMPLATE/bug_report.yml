@@ -8,7 +8,7 @@ body:
     attributes:
       value: |
         Thanks for taking the time. The fields below are the ones that usually
-        decide whether a problem can be reproduced — the version and the place
+        decide whether a problem can be reproduced: the version and the place
         it happened matter more than anything else, because most of what this
         plugin does depends on where you are standing.
 
@@ -19,7 +19,7 @@ body:
       description: >-
         Shown next to the plugin in `/xlplugins`, or at the bottom of the
         settings window.
-      placeholder: "0.2.1.0"
+      placeholder: "0.4.2.0"
     validations:
       required: true
 
@@ -28,7 +28,7 @@ body:
     attributes:
       label: How did you install it?
       description: >-
-        Worth asking, because a manual install does not update itself — an old
+        Worth asking, because a manual install does not update itself, and an old
         build is a common explanation for something already fixed.
       options:
         - Custom plugin repository
@@ -78,7 +78,7 @@ body:
       label: Log output
       description: >-
         Open `/xllog` and look for lines mentioning RegionsOfXIV, or any errors
-        around the time it happened. Paste what you find — this box formats it
+        around the time it happened. Paste what you find here, and this box formats it
         as code automatically, no backticks needed.
       render: text
     validations:

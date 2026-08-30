@@ -1,0 +1,17 @@
+# Line endings are decided here rather than by whoever cloned the repo.
+#
+# Git for Windows ships with core.autocrlf=true in its system config, so a checkout writes CRLF
+# into the working tree while the blobs stay LF. Clients that do not read that setting then see
+# every checked-out file as wholly rewritten, which buries a real diff under thousands of lines
+# of nothing. Pinning it here settles it for every client, and matches end_of_line = lf in
+# .editorconfig, which the autocrlf behaviour was quietly overriding.
+
+# Normalise every text file to LF in the repository and check it out as LF. That includes the
+# .sln, which is already LF in the index and builds fine as LF -- singling it out for CRLF would
+# change how the one file this project is fussiest about gets written, for no gain.
+* text=auto eol=lf
+
+# Binary. Never examined for line endings, never diffed as text.
+*.ttf binary
+*.otf binary
+*.png binary

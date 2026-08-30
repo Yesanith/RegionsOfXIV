@@ -82,9 +82,12 @@ internal sealed class FakeAreaText : IAreaTextSource
 
 internal sealed class FakeBanners : IBannerSource
 {
-    public event Action<uint, string>? OnBannerShown;
+    public event Action<uint, string, BannerBlock>? OnBannerShown;
 
-    public void Show(uint iconId, string text) => OnBannerShown?.Invoke(iconId, text);
+    // Defaulted, because the gate refusing is the interesting case and every other test wants a
+    // banner that simply arrives. BannerWatcher is what really fills this in.
+    public void Show(uint iconId, string text, BannerBlock blocked = BannerBlock.None) =>
+        OnBannerShown?.Invoke(iconId, text, blocked);
 }
 
 internal sealed class FakeZones : IZoneArrivals
