@@ -44,8 +44,6 @@ internal sealed class FontService : IDisposable
 
     public IFontHandle? EorzeanDisplay => this.faces[(int)FontRole.Text].Eorzean;
 
-    public IFontHandle? EorzeanHeader => this.faces[(int)FontRole.Header].Eorzean;
-
     public IFontHandle? EorzeanWeather => this.faces[(int)FontRole.Weather].Eorzean;
 
     public string? ProblemWith(FontRole role)
@@ -139,7 +137,12 @@ internal sealed class FontService : IDisposable
         // Default ranges on purpose. The Eorzean font is a Latin-only recreation of the in-game
         // alphabet, so asking it for kana and kanji would reserve thousands of glyphs it does not
         // contain and cost atlas space for nothing.
-        face.Eorzean = this.config.DecodeEffectEnabled
+        //
+        // Text and weather only. The header is painted by DrawHeader as a plain run rather than
+        // through a FontPair, so it never scrambles and a face built for it is atlas nothing ever
+        // reads from. If the header is ever given the effect too, this is the line that has to
+        // know about it.
+        face.Eorzean = this.config.DecodeEffectEnabled && role != FontRole.Header
             ? BuildFromFile(BundledEorzeanPath(), wanted.SizePx, glyphRanges: null)
             : null;
     }

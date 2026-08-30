@@ -9,6 +9,11 @@ namespace RegionsOfXIV.Tests;
 //
 // Sets BannerNameResolver.Language directly rather than through a config, because that is what
 // decides the casing and it is the thing under test.
+//
+// In the Localization collection because of that: Language is one static for the whole plugin, so
+// setting it here reaches any class running alongside. AnnouncementCoordinatorTests pushes banners
+// too, and read "LIGHT PARTY" back as "LİGHT PARTY" about one run in six until both joined this.
+[Collection("Localization")]
 public class BannerCasingTests : IDisposable
 {
     private readonly FakeSink sink = new();
