@@ -76,6 +76,18 @@ internal sealed class FontService : IDisposable
     public static bool IsLatinOnly(FontChoice choice) =>
         choice is FontChoice.TrumpGothic or FontChoice.Jupiter;
 
+    // The largest size this client can afford to build a notification face at, in pixels before
+    // the atlas applies the global scale. It depends on the glyph set rather than on the role or
+    // the typeface: a client that needs kanji is asking for ten times the glyphs, and atlas cost
+    // is the glyph count times the square of the size.
+    //
+    // The Fonts tab offers this as the slider maximum, and Build holds to it as well, because a
+    // config can carry a larger number from a time when the client was not Japanese. Honouring
+    // that number would mean a 352 MB atlas where the same settings cost 16 MB in English.
+    public static float MaxAffordablePx(FontRole role) => role == FontRole.Text
+        ? (NeedsCjkGlyphs ? 140f : 280f)
+        : (NeedsCjkGlyphs ? 72f : 144f);
+
     // Checked before the file is handed to the atlas, because a bad path fails asynchronously
     // inside the build and surfaces as a blank line rather than an error anyone can act on.
     // Callers should cache the result -- it touches the disk.
@@ -131,7 +143,7 @@ internal sealed class FontService : IDisposable
             if (!decodingChanged && face.Matches(wanted))
                 continue;
 
-            Build(face, wanted);
+            Build(role, face, wanted);
             rebuilt = true;
         }
 
@@ -152,10 +164,25 @@ internal sealed class FontService : IDisposable
         return face.Fallback ?? Plugin.PluginInterface.UiBuilder.DefaultFontHandle;
     }
 
-    private void Build(Face face, FontSetting wanted)
+    // The stored size is left exactly as the player set it. Only what reaches the atlas is held
+    // down, so switching the game's language back gives them their size again without anything
+    // having been rewritten behind their back.
+    private void Build(FontRole role, Face face, FontSetting wanted)
     {
         face.Release();
+
+        // Recorded before the clamp, not after. Matches compares this against what the config
+        // asks for, so holding the clamped size here would mismatch on every frame and rebuild
+        // the atlas forever.
         face.Built = wanted;
+
+        var ceiling = MaxAffordablePx(role);
+
+        if (wanted.SizePx > ceiling)
+        {
+            face.ReducedTo = ceiling;
+            wanted = wanted with { SizePx = ceiling };
+        }
 
         // Only custom roles get a fallback built, since a stock face cannot fail to load.
         if (wanted.IsCustom)
@@ -329,6 +356,11 @@ internal sealed class FontService : IDisposable
 
         public string? Problem;
 
+        // Separate from Problem, which is only ever drawn on the custom-font path and is coloured
+        // as a fault. This one is neither: the face loaded, it is simply not the size that was
+        // asked for, and it applies to a stock face just as much as a custom one.
+        public float? ReducedTo;
+
         public FontSetting? Built;
 
         // Half a pixel of slack: a size slider passes through many intermediate values on the
@@ -349,6 +381,7 @@ internal sealed class FontService : IDisposable
             this.Fallback = null;
             this.Eorzean = null;
             this.Problem = null;
+            this.ReducedTo = null;
             this.Built = null;
         }
     }

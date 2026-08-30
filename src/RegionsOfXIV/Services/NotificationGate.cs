@@ -13,7 +13,6 @@ internal enum BannerBlock
     Cutscene,
     Pvp,
     GPose,
-    Cooldown,
 }
 
 // Every rule about staying quiet, in one place. Three separate suppression windows overlap here:
@@ -112,9 +111,14 @@ internal sealed class NotificationGate
     // BetweenAreas is not consulted either: Duty Commenced fires around a transition, which is
     // exactly when that flag is set.
     //
-    // What does apply is the unconditional set (a banner has no business drawing over a
-    // cutscene, in PvP or in gpose) and the global cooldown, so two in quick succession cannot
-    // stack and one cannot land on top of a zone arrival.
+    // Nor is the global cooldown, and that one is worth spelling out. Refusing a banner does not
+    // buy quiet, because the game draws its own regardless and the watcher only fades that out
+    // when we are replacing it. A refusal therefore trades our version for theirs rather than for
+    // silence, which is the wrong way round. Light Party arrives about two milliseconds after the
+    // zone arrival that lets you into the duty, so under a cooldown it lost that trade every time.
+    //
+    // What is left is the unconditional set: a banner has no business drawing over a cutscene, in
+    // PvP or in gpose.
     public bool ShouldAnnounceBanner() => BannerBlockReason() == BannerBlock.None;
 
     // The conditions live here rather than in ShouldAnnounceBanner so the debug preview can show
@@ -137,7 +141,7 @@ internal sealed class NotificationGate
         if (this.game.IsGPosing)
             return BannerBlock.GPose;
 
-        return this.now() < this.nextAllowed ? BannerBlock.Cooldown : BannerBlock.None;
+        return BannerBlock.None;
     }
 
     private bool CanAnnounceAnyArea() =>
@@ -204,6 +208,9 @@ internal sealed class NotificationGate
     // The global cooldown only. The finer and coarser windows and the recent-places memory are
     // all about location tiers, and a banner is not a location: muting a sub-area because a
     // Level Up! went past would be the wrong trade.
+    //
+    // So a banner opens this window without answering to it, and that asymmetry is the point. A
+    // location notice held back by it has somewhere quiet to go. A banner does not.
     public void MarkBannerAnnounced(NotificationTiming timing) => HoldOff(this.now(), timing);
 
     private void HoldOff(DateTime now, NotificationTiming timing) =>

@@ -128,7 +128,7 @@ internal static class Loc
     internal static void Apply(string code, Dictionary<string, string> strings, string? status = null)
     {
         if (strings.Count > 0)
-            WarnAboutGlyphsAxisLacks(code, strings);
+            WarnAboutGlyphsTheWindowLacks(code, strings);
 
         active = strings;
         Current = strings.Count > 0 ? code : "en";
@@ -298,34 +298,23 @@ internal static class Loc
         return false;
     }
 
-    // The eight characters of Latin Extended-A that AXIS does carry, measured off AXIS_12 rather
-    // than assumed: the French ligature and a scattering the game itself uses.
-    private static readonly char[] AxisLatinExtras =
-    [
-        'ă', // a-breve
-        'ć', // c-acute
-        'Œ', // OE ligature
-        'œ', // oe ligature
-        'Ş', // S-cedilla
-        'Š', // S-caron
-        'š', // s-caron
-        'Ÿ', // Y-diaeresis
-    ];
-
-    // Dalamud draws plugin windows with the game's own AXIS font unless the player has picked
-    // another, and AXIS was measured, not guessed: Latin-1, the whole Russian Cyrillic alphabet,
-    // kana and about 6300 kanji -- but only the eight above out of Latin Extended-A's 128. So
-    // Polish, Czech, Turkish and Romanian diacritics have no glyph and come out as blanks.
+    // The window no longer draws with the game's AXIS face alone: UI/WindowFont merges the Windows
+    // interface font in behind it for Latin Extended-A, Latin Extended-B and Latin Extended
+    // Additional. Turkish, Polish, Czech, Romanian and Vietnamese are drawable because of that
+    // merge, and were not before it.
     //
-    // Glyph ranges are fixed when the font atlas is built, so nothing recovers them at draw time.
-    // A language needing them needs the config window to carry its own font, which is a far larger
-    // change than dropping in a file -- hence saying so at load, rather than leaving whoever added
-    // that file to work out why half of it is missing.
-    private static void WarnAboutGlyphsAxisLacks(string code, Dictionary<string, string> strings)
+    // What is still missing is what neither face supplies: Cyrillic beyond the Russian alphabet
+    // AXIS carries, and the scripts the merge deliberately leaves out because they are large and
+    // nothing asks for them.
+    //
+    // Glyph ranges are fixed when the atlas is built, so nothing recovers them at draw time, and
+    // widening the merge is a real change rather than a file drop. Hence saying so at load rather
+    // than leaving whoever added the file to work out why half of it is missing.
+    private static void WarnAboutGlyphsTheWindowLacks(string code, Dictionary<string, string> strings)
     {
         var missing = strings.Values
             .SelectMany(text => text)
-            .Where(AxisLacks)
+            .Where(WindowFontLacks)
             .Distinct()
             .Take(12)
             .ToArray();
@@ -339,15 +328,17 @@ internal static class Loc
             + "Showing them would mean giving the config window its own font.");
     }
 
-    // Blocks AXIS was measured to have nothing, or next to nothing, in. Deliberately a list of what
-    // is absent rather than of what is present: a rare kanji outside its ~6300 slips through, but
-    // nothing legitimate gets flagged, and a warning that cries wolf is one nobody reads.
-    internal static bool AxisLacks(char c) =>
-        (c is >= 'Ā' and <= 'ɏ' && Array.IndexOf(AxisLatinExtras, c) < 0) // Latin Ext. A, B
-        || c is >= 'Ḁ' and <= 'ỿ' // Latin Extended Additional -- Vietnamese
-        || (c is >= 'Ѐ' and <= 'ԯ' // Cyrillic, except the Russian alphabet below
-            && c is not ('Ё' or 'ё') // Yo, yo
-            && c is not (>= 'А' and <= 'я')) // A to ya
+    // What the window still cannot draw once the merge in UI/WindowFont is counted. Deliberately a
+    // list of what is absent rather than of what is present: a rare kanji outside AXIS's ~6300
+    // slips through, but nothing legitimate gets flagged, and a warning that cries wolf is one
+    // nobody reads.
+    //
+    // The extended Latin blocks are gone from this list because the merge supplies them. Cyrillic
+    // stays: the merge covers Latin only, so AXIS's Russian alphabet is still the whole of it.
+    internal static bool WindowFontLacks(char c) =>
+        (c is >= 'Ѐ' and <= 'ԯ' // Cyrillic, except the Russian alphabet below
+         && c is not ('Ё' or 'ё') // Yo, yo
+         && c is not (>= 'А' and <= 'я')) // A to ya
         || c is >= '֐' and <= 'ۿ' // Hebrew and Arabic
         || c is >= '฀' and <= '๿' // Thai
         || c is >= '가' and <= '힯'; // Hangul syllables

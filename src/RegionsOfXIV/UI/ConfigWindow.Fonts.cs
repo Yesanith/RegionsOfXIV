@@ -42,18 +42,11 @@ internal sealed partial class ConfigWindow
     // Pixels at 100% Dalamud scale. The atlas multiplies by the global scale when it builds, so a
     // player at 200% sees twice these and pays four times the texture for them.
     //
-    // The ceilings belong to the glyph set rather than to taste. Atlas cost is the glyph count
-    // times the square of the size, and a client that needs kanji is asking for ten times the
-    // glyphs. Measured with the bundled Noto and all three roles at their ceiling: the Latin set
-    // costs 16 MB of atlas texture, the Japanese one 352 MB, and 352 MB is not something to hand
-    // someone for a larger place name. So a Japanese client keeps the ceiling it has always had.
+    // The ceiling is FontService.MaxAffordablePx, read from there rather than repeated here so the
+    // slider cannot offer a size the build would then hold down.
     private const float MinTextPx = 24f;
 
     private const float MinHeaderPx = 10f;
-
-    private static float MaxTextPx => FontService.NeedsCjkGlyphs ? 140f : 280f;
-
-    private static float MaxHeaderPx => FontService.NeedsCjkGlyphs ? 72f : 144f;
 
     private void DrawFontsTab()
     {
@@ -75,7 +68,7 @@ internal sealed partial class ConfigWindow
             Loc.Get("fonts.role.text", "Text"),
             Loc.Get("fonts.role.text.hint", "The place name itself, the largest line."),
             MinTextPx,
-            MaxTextPx);
+            FontService.MaxAffordablePx(FontRole.Text));
 
         DrawFontRole(
             FontRole.Header,
@@ -84,7 +77,7 @@ internal sealed partial class ConfigWindow
                 "fonts.role.header.hint",
                 "The smaller line above the name, giving the region or area it sits in."),
             MinHeaderPx,
-            MaxHeaderPx);
+            FontService.MaxAffordablePx(FontRole.Header));
 
         DrawFontRole(
             FontRole.Weather,
@@ -93,7 +86,7 @@ internal sealed partial class ConfigWindow
                 "fonts.role.weather.hint",
                 "The forecast line above the header, shown when weather announcements are on."),
             MinHeaderPx,
-            MaxHeaderPx);
+            FontService.MaxAffordablePx(FontRole.Weather));
     }
 
     // Every identity here is built from the role rather than from the label. The label is
@@ -138,6 +131,8 @@ internal sealed partial class ConfigWindow
             + "Axis: to 48 px, the only one with Japanese glyphs.\n\n"
             + "Custom file loads a font of your own from this PC."));
 
+        DrawSizeCeilingNote(role, font);
+
         if (font.IsCustom)
             changed |= DrawCustomFont(role, font);
         else
@@ -154,6 +149,28 @@ internal sealed partial class ConfigWindow
         this.actions.RebuildFonts();
         MarkUnsaved();
         this.actions.LivePreview(Sample);
+    }
+
+    // Only reachable by a config that outlived a change of client language, or one edited by
+    // hand. Drawn for every role rather than through ProblemWith, which the stock path never
+    // reaches, and Noto is exactly what someone at a large size will be on.
+    private static void DrawSizeCeilingNote(FontRole role, FontSetting font)
+    {
+        var ceiling = FontService.MaxAffordablePx(role);
+
+        if (font.SizePx <= ceiling)
+            return;
+
+        Warn(
+            CautionColor,
+            Loc.Format(
+                "fonts.reduced",
+                "Drawing at {0:F0} px rather than {1:F0}. This client shows Japanese place names, "
+                + "so every notification font has to carry kanji, and at that size it would be too "
+                + "large to build. Your setting is kept as it is and comes back if the game's "
+                + "language changes.",
+                ceiling,
+                font.SizePx));
     }
 
     private bool DrawCustomFont(FontRole role, FontSetting font)
@@ -277,8 +294,8 @@ internal sealed partial class ConfigWindow
             Loc.Format(
                 "fonts.upscaled",
                 "This font has no bitmap above {0:F0} px, so at {1:F0} px it is being "
-                + "upscaled and will look soft. Lower the size, or switch to Noto Sans CJK, which "
-                + "stays sharp at any size.",
+                + "upscaled and will look soft. Lower the size, or switch to Noto Sans CJK or a "
+                + "font file of your own, either of which stays sharp at any size.",
                 ceiling,
                 size));
     }

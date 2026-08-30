@@ -24,14 +24,20 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
 
     public bool IsDecoding => config.DecodeEffectEnabled && fonts.EorzeanDisplay != null;
 
-    public void Draw(AreaNotification notification)
+    public void Draw(AreaNotification notification) => Draw(notification, 0f);
+
+    // The same paint, dropped clear of the place name. A banner and an arrival can be on screen
+    // together, so they need somewhere separate to be rather than one dismissing the other.
+    public void DrawBanner(AreaNotification notification) => Draw(notification, BannerGap());
+
+    private void Draw(AreaNotification notification, float drop)
     {
         var drawList = ImGui.GetWindowDrawList();
         var viewport = ImGui.GetMainViewport();
 
         var anchor = Anchor(viewport);
         var centerX = anchor.X;
-        var top = anchor.Y + (notification.StackOffset * ImGuiHelpers.GlobalScale);
+        var top = anchor.Y + drop + (notification.StackOffset * ImGuiHelpers.GlobalScale);
 
         notification.ApplyCasing(config.UppercaseText);
 
@@ -177,6 +183,12 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
     }
 
     private float HeaderGap() => ImGui.GetTextLineHeight() * config.HeaderGap;
+
+    // Off the configured display size rather than ImGui.GetTextLineHeight, because no font is
+    // pushed where this is read and the ambient line height would be the interface font's. That
+    // is the same unit the lane spacing in NotificationOverlay is expressed in.
+    private float BannerGap() =>
+        config.DisplayFontSize * config.BannerGap * ImGuiHelpers.GlobalScale;
 
     // An underlined header needs the weather pushed further up, or the underline collides with
     // the descenders of the line above it.

@@ -35,6 +35,7 @@ public sealed class Plugin : IDalamudPlugin
 
     private readonly Configuration config;
     private readonly FontService fonts;
+    private readonly WindowFont windowFont;
     private readonly NativeUiSuppressor nativeUiSuppressor;
     private readonly NotificationOverlay overlay;
     private readonly ConfigWindow configWindow;
@@ -59,7 +60,10 @@ public sealed class Plugin : IDalamudPlugin
         ApplyLanguage();
         PluginInterface.LanguageChanged += OnLanguageChanged;
 
+        BannerNameResolver.Language = this.config.BannerNameLanguage;
+
         this.fonts = new FontService(this.config);
+        this.windowFont = new WindowFont();
         this.nativeUiSuppressor = new NativeUiSuppressor(this.config);
         this.uiVisibilityGuard = new UiVisibilityGuard();
 
@@ -94,7 +98,7 @@ public sealed class Plugin : IDalamudPlugin
                 new GamePlaceNames(),
                 new GameWeatherNames()));
 
-        this.changelogWindow = new ChangelogWindow();
+        this.changelogWindow = new ChangelogWindow(this.windowFont);
 
         this.configWindow = new ConfigWindow(
             this.config,
@@ -107,7 +111,8 @@ public sealed class Plugin : IDalamudPlugin
                 this.changelogWindow.ShowAll,
                 this.nativeUiSuppressor.RestoreAreaText,
                 this.nativeUiSuppressor.RestoreLoadingTitle,
-                ApplyLanguage));
+                ApplyLanguage),
+            this.windowFont);
 
         this.windowSystem.AddWindow(this.overlay);
         this.windowSystem.AddWindow(this.configWindow);
@@ -211,6 +216,7 @@ public sealed class Plugin : IDalamudPlugin
 
         this.uiVisibilityGuard.Dispose();
         this.nativeUiSuppressor.Dispose();
+        this.windowFont.Dispose();
         this.fonts.Dispose();
     }
 

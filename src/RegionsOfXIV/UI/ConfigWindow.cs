@@ -11,7 +11,7 @@ using RegionsOfXIV.Services;
 namespace RegionsOfXIV.UI;
 
 internal readonly record struct PreviewSample(
-    string? Header, string Text, string Weather, uint WeatherIcon);
+    string? Header, string Text, string Weather, uint WeatherIcon, string Banner);
 
 internal readonly record struct ConfigActions(
     Action<PreviewSample> Preview,
@@ -35,7 +35,10 @@ internal sealed partial class ConfigWindow : Window, IDisposable
 {
     private readonly Configuration config;
     private readonly ConfigActions actions;
+    private readonly WindowFont font;
     private readonly FileDialogManager fileDialogs = new();
+
+    private IDisposable? pushedFont;
 
     private bool editing;
 
@@ -43,11 +46,12 @@ internal sealed partial class ConfigWindow : Window, IDisposable
     // version number, so no language changes it. It is also set once here, in the constructor,
     // where a translated one would keep whichever language the game started in. The ### part is
     // the identity Dalamud saves this window's position and size against.
-    public ConfigWindow(Configuration config, ConfigActions actions)
+    public ConfigWindow(Configuration config, ConfigActions actions, WindowFont font)
         : base($"Regions of XIV v{Changelog.Current}###RegionsOfXIVConfig")
     {
         this.config = config;
         this.actions = actions;
+        this.font = font;
 
         SizeConstraints = new WindowSizeConstraints
         {
@@ -74,6 +78,17 @@ internal sealed partial class ConfigWindow : Window, IDisposable
     }
 
     public void Dispose() => this.fileDialogs.Reset();
+
+    // Either side of the ImGui window rather than around Draw, so the title bar is drawn with the
+    // same font as the body. The font itself belongs to Plugin.cs, which is why this only borrows
+    // it. WindowHost calls these two in matching branches, so the push is always popped.
+    public override void PreDraw() => this.pushedFont = this.font.Push();
+
+    public override void PostDraw()
+    {
+        this.pushedFont?.Dispose();
+        this.pushedFont = null;
+    }
 
     public override void OnClose()
     {
@@ -180,6 +195,11 @@ internal sealed partial class ConfigWindow : Window, IDisposable
     // The sample's place names are content rather than the plugin's own words, so they stay as
     // they are. The weather name comes from the game's own sheets; "Fair Skies" is only the
     // fallback for when that lookup finds nothing.
+    //
+    // The banner is Light Party, and not for the sake of an example: it is the one that collides
+    // with an arrival in practice, so previewing it is previewing the case the drop exists for.
+    // It goes through BannerNotification.Format for the same reason the weather goes through the
+    // resolver, so what the preview shows is what the live path would produce.
     private static PreviewSample BuildSample()
     {
         var weather = WeatherNameResolver.Resolve(FairWeather);
@@ -188,10 +208,13 @@ internal sealed partial class ConfigWindow : Window, IDisposable
             "Middle La Noscea",
             "Summerford Farms",
             weather?.Name ?? "Fair Skies",
-            weather?.IconId ?? 0u);
+            weather?.IconId ?? 0u,
+            BannerNotification.Format(BannerNameResolver.Resolve(LightParty) ?? "Light Party"));
     }
 
     private const uint FairWeather = 2;
+
+    private const uint LightParty = 120114;
 
     private const string DiscordInvite = DiscordLink.Invite;
 

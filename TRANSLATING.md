@@ -3,8 +3,13 @@
 This document is for translators. You do not need C#, .NET, git, or a working build to help.
 Everything here can be done in a web browser with a free GitHub account.
 
-The plugin's settings window is translatable. Place names, weather names and the game's own banner
-wording are **not**: those come from your own FFXIV client and are already in your language.
+There are two separate jobs here, in two different files:
+
+- **The settings window**, in the `Localization/*.json` files. Most of this document is about that.
+- **Banner wording**, in `Services/BannerNames.cs`. See [Banner wording](#banner-wording).
+
+Place names and weather names are **not** translatable: those come from your own FFXIV client and
+are already in your language.
 
 ## Key files
 
@@ -13,10 +18,12 @@ wording are **not**: those come from your own FFXIV client and are already in yo
 | `src/RegionsOfXIV/Localization/en.json` | The English source with notes for translators. **Generated, so never edit it** |
 | `src/RegionsOfXIV/Localization/de.json` | German. Edit this to improve German |
 | `src/RegionsOfXIV/Localization/fr.json`, `ja.json` | French and Japanese |
+| `src/RegionsOfXIV/Services/BannerNames.cs` | Banner wording. A different job with different rules |
 | `src/RegionsOfXIV/Services/Localization.cs` | The loader. Developers only |
 | `tools/export-en-json.py` | Regenerates `en.json`. Developers only |
 
-A translation pull request should touch exactly one file.
+A translation pull request should touch exactly one file. Settings-window strings and banner
+wording are separate pull requests, because they are checked in completely different ways.
 
 ## How this differs from most plugins
 
@@ -74,7 +81,8 @@ word for.
 Use the game's word, not a fresh translation, or players will not recognise it:
 
 - **Banner names**: Quest Accepted, Duty Commenced, Level Up! FFXIV shows these in every language.
-  Use exactly what your client shows.
+  Use exactly what your client shows. Several tooltips name them as examples; the banners
+  themselves are translated in a different file, described in [Banner wording](#banner-wording).
 - **"Duty"**: FFXIV's term for instanced content. It has an established word in your language.
 - **"Eorzean script"**: the game's invented alphabet has an official name per language.
 - **Sanctuary, aetheryte, gpose, instance, sub-area**: same category.
@@ -147,27 +155,113 @@ thing a first real review changes.
 **`_untranslated`** is a list of keys deliberately left English and why. Add to it when you skip a
 key, remove entries as you resolve them.
 
+## Banner wording
+
+Banners are the game's full-screen announcements: "Quest Accepted", "Duty Commenced", "Level Up!".
+Translating those is a **second, separate job**, and none of it happens in the JSON files.
+
+The wording is painted into the artwork. It exists nowhere in the game's data as text, so the
+plugin cannot look it up and carries its own list instead, keyed by the artwork's icon id:
+
+```csharp
+// src/RegionsOfXIV/Services/BannerNames.cs
+[120021] = "Duty Commenced",
+[120114] = "Light Party",
+```
+
+Players choose which language their banners are drawn in, under Notifications in the settings
+window, and that dropdown offers exactly the languages with a table here.
+
+This is a C# file rather than JSON, which sounds worse than it is: you are editing a list of
+quoted strings and touching nothing else. Everything in [Contributing through
+GitHub](#contributing-through-github) works the same way on it.
+
+### Transcribe, do not translate
+
+FFXIV already shows these banners in German, French and Japanese. **Read the words off your own
+client and type them in exactly.** A fresh translation of "Duty Commenced" will not match what
+players have been reading for years, and the point of replacing the artwork is that it says the
+same thing in different lettering.
+
+The exception is a language FFXIV does not have. Turkish is one: there is no Turkish client, so
+nothing in that table was transcribed and every string in it is somebody's choice. If you are
+adding a language the game does not ship in, say so in the pull request, because it changes what
+reviewing it means.
+
+### Which id is which
+
+The number is not descriptive, and several banners share wording, so you cannot work it out by
+reading. Two ways to find out:
+
+**Work down the English table.** Every entry is a banner somebody has seen. Fill in the ones you
+recognise from your own client and leave the rest, exactly as you would leave out a JSON key you
+are unsure of. This needs no tools at all.
+
+**Read the id off the log.** Open Dalamud's log window (`/xllog`) and filter on `RegionsOfXIV`.
+
+A banner the plugin has no wording for announces itself there and asks to be reported, so playing
+normally is enough to collect the missing ones. Banners it does recognise are logged too, with
+their id and the wording used, but at debug level, so you will only see those if your log window
+is set to show debug messages.
+
+There is a third way, `/regions preview`, which fires any banner on demand and copies a
+ready-made line to paste in. It is **only present in a development build**, so it is a maintainer's
+tool rather than yours. Ask on the Discord if you want ids fired at you.
+
+### What the code does for you
+
+- **Capitals are applied automatically**, by the rules of the language the wording is written in
+  rather than the player's. Write the names normally, in ordinary sentence case. Turkish is why
+  this is worth spelling out: `i` upcases to `İ` and `ı` to `I`, and getting that from the wrong
+  language produces exactly the wrong letter.
+- **A missing id keeps the game's own banner.** An incomplete table degrades quietly, so add what
+  you can confirm and stop there. Half a table is genuinely useful.
+- **The decode effect handles accents by itself.** The Eorzean face draws ASCII and almost nothing
+  else, so anything beyond it is folded onto the letter it is built from before the scramble is
+  drawn: `ğ` becomes `g`, `é` becomes `e`. Only the scramble is affected. The wording that lands
+  when the decode finishes is exactly what you wrote.
+
+### What it does not do for you
+
+Banner wording is drawn with the **notification** fonts, which are the game's own faces or Noto
+Sans CJK, whichever the player has chosen. Those are not the settings window's font, and the
+Latin Extended merge described in the next section does not reach them. A character a face does
+not carry draws as nothing at all, with no warning and no log line, and different font choices
+will not agree with each other.
+
+So a banner table is worth looking at in game, under more than one font, before you call it done.
+
 ## Which languages can ship
 
-**English, German, French, Japanese and Russian only.**
+**Anything written in Latin script, plus Japanese and Russian.**
 
-The settings window draws with the game's own AXIS font, and that font's glyph coverage is fixed
-when the plugin starts, and nothing can add to it at runtime. AXIS carries Latin-1, kana, about 6,300
-kanji, and the complete Russian Cyrillic alphabet. It carries only eight characters of Latin
-Extended-A.
+This section is about the settings window. Banner wording is drawn with different fonts and has
+its own caveat, above.
 
-So Polish, Czech, Turkish, Romanian and Vietnamese would draw as **blank spaces** where their
-diacritics fall. Ukrainian and Serbian hit the same wall for their non-Russian Cyrillic letters.
-Hebrew, Arabic, Thai, Korean and Chinese have no coverage at all.
+The settings window draws with the game's own AXIS font, which carries Latin-1, kana, about 6,300
+kanji and the complete Russian Cyrillic alphabet, but only eight characters of Latin Extended-A.
+On its own that ruled out most of Europe.
+
+The window no longer draws with AXIS alone. It merges the Windows interface font in behind it for
+Latin Extended-A, Latin Extended-B and Latin Extended Additional, so **Turkish, Polish, Czech,
+Romanian, Vietnamese and their neighbours all draw properly**. Basic Latin still comes from AXIS,
+which means a word can mix two typefaces: `Şık` takes its `Ş` and `ı` from the merged font and its
+`k` from AXIS. Slightly uneven, and a great deal better than blank boxes.
+
+What still cannot ship:
+
+- **Ukrainian, Serbian, Bulgarian and other non-Russian Cyrillic.** The merge covers Latin only,
+  so AXIS's Russian alphabet is still the whole of the Cyrillic coverage.
+- **Hebrew, Arabic, Thai, Korean, and Chinese beyond the kanji AXIS happens to share.** No coverage
+  at all, and each would need its own merge.
 
 The loader logs a warning naming the offending characters when a file uses them, so this fails
-visibly rather than silently. Supporting those languages would mean giving the settings window its
-own font, which is a real change rather than a file drop. If you want your language and it is on that list, open
-an issue and say so; it is the argument for doing that work.
+visibly rather than silently. If you want one of the languages above, open an issue and say so; it
+is the argument for widening the merge.
 
 ## Adding a new language
 
-If your language is on the shippable list above and has no file yet:
+If your language can ship, per the section above, and has no file yet:
 
 1. Copy `en.json` to `xx.json`, where `xx` is the two-letter code (`ru.json` for Russian).
 2. Replace each `message` with your translation. Delete the keys you are unsure of.
@@ -175,6 +269,11 @@ If your language is on the shippable list above and has no file yet:
 4. Open a pull request.
 
 No code change is needed. The plugin discovers languages from the files themselves.
+
+Banner wording is separate and optional. A settings-window translation with no banner table is a
+complete contribution; the banners simply keep the game's own artwork. If you do want to add one,
+it is a second pull request against `BannerNames.cs`, and a maintainer adds the one line that puts
+your language in the dropdown.
 
 ## Contributing through GitHub
 
@@ -241,6 +340,12 @@ as the rest of the project.
   does not.
 - **Preset names are identifiers, not words.** They travel in share codes and must match across
   machines.
+- **Banner wording is not in the JSON at all.** Searching a locale file for "Duty Commenced" finds
+  a tooltip that mentions it, not the banner itself.
+- **A banner table can be half empty.** Ids you leave out keep the game's own artwork, so there is
+  no need to guess at one you have not seen.
+- **Banner characters are not covered by the glyph warning.** The log names characters the settings
+  window cannot draw. It says nothing about the notification fonts, which are what banners use.
 
 ## For developers
 
@@ -259,3 +364,8 @@ language until someone adds it.
 Widget labels go through `Loc.Label`, which appends `###key` so a control's ImGui identity comes
 from the key rather than the translated text. Slider units go through `Loc.Unit`, which escapes
 `%`. Neither is visible to translators.
+
+Banner wording is not part of that system. A new language there is a dictionary in
+`BannerNames.cs` plus one line in `ByLanguage`, which is what the Notifications dropdown is built
+from, and nothing else. The tables are kept separate rather than folded into one id-to-languages
+map so that adding a language does not touch the entries the others already have.

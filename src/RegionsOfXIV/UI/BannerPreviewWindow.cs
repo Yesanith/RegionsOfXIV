@@ -104,7 +104,6 @@ internal sealed class BannerPreviewWindow : Window, IDisposable
         BannerBlock.Cutscene => "a cutscene is playing",
         BannerBlock.Pvp => "this is PvP",
         BannerBlock.GPose => "gpose is open",
-        BannerBlock.Cooldown => "something else was announced too recently",
         _ => reason.ToString(),
     };
 

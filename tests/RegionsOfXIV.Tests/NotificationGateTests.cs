@@ -420,31 +420,43 @@ public class NotificationGateTests
         Assert.True(Gate().ShouldAnnounceBanner());
     }
 
+    // Light Party lands about two milliseconds after the zone arrival that admits you to the duty.
+    // Holding it back would not have been quiet, only a swap of our version for the game's.
     [Fact]
-    public void BannersWaitOutTheGlobalCooldown()
+    public void ABannerLandingOnAZoneArrivalIsStillAnnounced()
     {
         var gate = Gate();
         gate.MarkAnnounced(NextSubArea, LocationTier.SubArea, Timing());
 
-        this.clock.Advance(1);
-        Assert.False(gate.ShouldAnnounceBanner());
+        this.clock.Advance(0.002);
 
-        this.clock.Advance(1.5);
         Assert.True(gate.ShouldAnnounceBanner());
     }
 
     [Fact]
-    public void OneBannerHoldsOffTheNext()
+    public void OneBannerDoesNotHoldOffTheNext()
     {
         var gate = Gate();
 
         Assert.True(gate.ShouldAnnounceBanner());
         gate.MarkBannerAnnounced(Timing());
 
-        Assert.False(gate.ShouldAnnounceBanner());
-
-        this.clock.Advance(2.5);
         Assert.True(gate.ShouldAnnounceBanner());
+    }
+
+    // It opens the window even though it does not answer to it, because a location notice held
+    // back has somewhere quiet to go and a banner does not.
+    [Fact]
+    public void ABannerStillHoldsOffALocationNotice()
+    {
+        var gate = Gate();
+        gate.MarkBannerAnnounced(Timing());
+
+        this.clock.Advance(1);
+        Assert.False(gate.ShouldAnnounce(Here, NextSubArea, LocationTier.SubArea, 0f));
+
+        this.clock.Advance(1.5);
+        Assert.True(gate.ShouldAnnounce(Here, NextSubArea, LocationTier.SubArea, 0f));
     }
 
     // A banner is not a location, so marking one must not mute the area tiers or enter the

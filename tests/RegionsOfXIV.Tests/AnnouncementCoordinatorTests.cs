@@ -172,9 +172,26 @@ public class AnnouncementCoordinatorTests
 
         this.banners.Show(120001, "Quest Accepted");
 
-        var announced = Assert.Single(this.sink.Places);
+        var announced = Assert.Single(this.sink.Banners);
         Assert.Equal("QUEST ACCEPTED", announced.Text);
         Assert.Null(announced.Header);
+    }
+
+    // Both on screen at once, which is the whole reason banners have a lane of their own. Through
+    // Push the later of the two dismissed the earlier, and a duty entry fires them milliseconds
+    // apart.
+    [Fact]
+    public void ABannerDoesNotDisplaceAPlaceName()
+    {
+        this.config.BannerNotificationEnabled = true;
+
+        using var _ = Build();
+
+        this.zones.Arrive(Arrival(duty: true));
+        this.banners.Show(120114, "Light Party");
+
+        Assert.Equal("Middle La Noscea", Assert.Single(this.sink.Places).Text);
+        Assert.Equal("LIGHT PARTY", Assert.Single(this.sink.Banners).Text);
     }
 
     // Was BannersWaitOutThePacingFromAPlace, which arrived somewhere and then fired two banners to
@@ -190,9 +207,9 @@ public class AnnouncementCoordinatorTests
         using var _ = Build();
 
         this.banners.Show(120001, "Quest Accepted");
-        this.banners.Show(120002, "Quest Complete", BannerBlock.Cooldown);
+        this.banners.Show(120002, "Quest Complete", BannerBlock.Cutscene);
 
-        var announced = Assert.Single(this.sink.Places);
+        var announced = Assert.Single(this.sink.Banners);
         Assert.Equal("QUEST ACCEPTED", announced.Text);
     }
 

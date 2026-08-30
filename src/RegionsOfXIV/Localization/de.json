@@ -402,7 +402,7 @@
     "message": "{0} hat keine japanischen Zeichen. Auf diesem Client heißt das, dass Ortsnamen als leere Kästchen erscheinen und nicht nur weich aussehen. Wähle stattdessen Axis oder Noto Sans CJK."
   },
   "fonts.upscaled": {
-    "message": "Diese Schrift hat keine Bitmap über {0:F0} px, bei {1:F0} px wird sie also hochskaliert und sieht weich aus. Verringere die Größe, oder wechsle zu Noto Sans CJK, das in jeder Größe scharf bleibt."
+    "message": "Diese Schrift hat keine Bitmap über {0:F0} px, bei {1:F0} px wird sie also hochskaliert und sieht weich aus. Verringere die Größe, oder wechsle zu Noto Sans CJK oder einer eigenen Schriftdatei; beide bleiben in jeder Größe scharf."
   },
   "general.tab": {
     "message": "Allgemein"
@@ -595,5 +595,24 @@
   },
   "notice.translation": {
     "message": "Diese Übersetzung wurde maschinell erstellt und von niemandem geprüft, der die Sprache spricht. Wenn etwas schlecht klingt, sind Korrekturen sehr willkommen:\n{0}"
+  },
+  "fonts.reduced": {
+    "message": "Wird mit {0:F0} px gezeichnet statt mit {1:F0}. Dieser Client zeigt japanische Ortsnamen, daher muss jede Benachrichtigungsschrift Kanji tragen, und in dieser Größe ließe sie sich nicht bauen. Deine Einstellung bleibt erhalten und kommt zurück, wenn sich die Sprache des Spiels ändert."
+  },
+  "notifications.bannerlanguage": {
+    "message": "Bannersprache"
+  },
+  "notifications.bannerlanguage.follow": {
+    "message": "Dem Client folgen"
+  },
+  "notifications.bannerlanguage.tooltip": {
+    "message": "In welcher Sprache der Bannertext gezeichnet wird.\n\nDem Client folgen nimmt die Sprache, in der das Spiel läuft. Eine andere zu wählen ersetzt das spieleigene Banner durch die Fassung dieses Plugins in jener Sprache: auf einem deutschen Client mit Englisch wird die deutsche Grafik ausgeblendet und englischer Text an ihre Stelle gezeichnet.\n\nAufgeführt sind nur Sprachen, für die dieses Plugin Worte hat. Banner, für die es keine hat, behalten die des Spiels, welche Sprache auch gewählt ist."
+  },
+
+  "notifications.bannergap": {
+    "message": "Bannerabstand"
+  },
+  "notifications.bannergap.tooltip": {
+    "message": "Wie weit unter einem Ortsnamen ein Banner sitzt, gemessen in Zeilen\nder Anzeigeschrift.\n\nBeide können gleichzeitig zu sehen sein: Beim Betreten einer Instanz\nwird zuerst der Ort angesagt und kurz darauf die Gruppengröße. Das hier\nist der Platz dazwischen. Der Abstand bleibt gleich, auch wenn kein Name\nzu sehen ist, ein einzelnes Banner landet also ebenfalls hier."
   }
 }

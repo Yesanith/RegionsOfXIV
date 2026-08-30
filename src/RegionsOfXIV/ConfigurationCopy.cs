@@ -15,7 +15,7 @@ internal static class ConfigurationCopy
     private static readonly string[] NotCopied =
     [
         "Version", "UserPresets", "LastSeenVersion", "OverlapHeader",
-        "Language", "TranslationNoticeDismissedFor",
+        "Language", "TranslationNoticeDismissedFor", "BannerNameLanguage",
     ];
 
     // Settings that no longer travel, but that an older preset can still name. Migrate() works

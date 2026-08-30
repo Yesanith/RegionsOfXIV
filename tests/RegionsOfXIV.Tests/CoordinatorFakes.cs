@@ -4,7 +4,16 @@ using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.Tests;
 
-internal sealed record Announcement(string? Header, string Text, bool IsWeather, uint IconId);
+// Which lane it went to, rather than a bool. Banners have their own now, and a third state was
+// never going to fit in IsWeather.
+internal enum PushedTo
+{
+    Place,
+    Weather,
+    Banner,
+}
+
+internal sealed record Announcement(string? Header, string Text, PushedTo Lane, uint IconId);
 
 internal sealed class FakeSink : INotificationSink
 {
@@ -16,16 +25,22 @@ internal sealed class FakeSink : INotificationSink
     public Announcement? Last => this.Pushed.Count == 0 ? null : this.Pushed[^1];
 
     public List<Announcement> Places =>
-        this.Pushed.Where(p => !p.IsWeather).ToList();
+        this.Pushed.Where(p => p.Lane == PushedTo.Place).ToList();
 
     public List<Announcement> Weather =>
-        this.Pushed.Where(p => p.IsWeather).ToList();
+        this.Pushed.Where(p => p.Lane == PushedTo.Weather).ToList();
+
+    public List<Announcement> Banners =>
+        this.Pushed.Where(p => p.Lane == PushedTo.Banner).ToList();
 
     public void Push(string? header, string text) =>
-        this.Pushed.Add(new Announcement(header, text, false, 0));
+        this.Pushed.Add(new Announcement(header, text, PushedTo.Place, 0));
 
     public void PushWeather(string text, uint iconId) =>
-        this.Pushed.Add(new Announcement(null, text, true, iconId));
+        this.Pushed.Add(new Announcement(null, text, PushedTo.Weather, iconId));
+
+    public void PushBanner(string text) =>
+        this.Pushed.Add(new Announcement(null, text, PushedTo.Banner, 0));
 }
 
 internal sealed class FakeLocations : ILocationSource
