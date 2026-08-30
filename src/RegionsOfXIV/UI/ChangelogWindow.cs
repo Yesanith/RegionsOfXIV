@@ -35,7 +35,7 @@ internal sealed class ChangelogWindow : Window, IDisposable
     // after "###" is the identity Dalamud saves this window's position and size against, so it
     // stays out of the translation.
     private static string Title =>
-        Loc.Get("changelog.title", "Regions of XIV — What's New") + "###RegionsOfXIVChangelog";
+        Loc.Get("changelog.title", "Regions of XIV: What's New") + "###RegionsOfXIVChangelog";
 
     // Shown once after an update, listing only what is new to this player. Opens itself only if
     // there is something to say, so a reinstall at the same version stays quiet.
@@ -101,7 +101,7 @@ internal sealed class ChangelogWindow : Window, IDisposable
                 "changelog.onceonly", "You will not see this again until the next update.")
             : Loc.Format(
                 "changelog.onrequest",
-                "Shown because you asked — \"{0}\".",
+                "Shown because you asked: \"{0}\".",
                 "/regions changelog"));
     }
 

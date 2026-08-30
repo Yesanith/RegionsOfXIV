@@ -108,7 +108,7 @@ internal static class Presets
 
         new(
             "Tyria",
-            "Wide uppercase in gold, still and unhurried — a nod to the original.",
+            "Wide uppercase in gold, still and unhurried. A nod to the original.",
             config =>
             {
                 config.Motion = MotionEffect.None;

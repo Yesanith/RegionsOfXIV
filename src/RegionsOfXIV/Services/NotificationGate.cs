@@ -112,8 +112,8 @@ internal sealed class NotificationGate
     // BetweenAreas is not consulted either: Duty Commenced fires around a transition, which is
     // exactly when that flag is set.
     //
-    // What does apply is the unconditional set — a banner has no business drawing over a
-    // cutscene, in PvP or in gpose — and the global cooldown, so two in quick succession cannot
+    // What does apply is the unconditional set (a banner has no business drawing over a
+    // cutscene, in PvP or in gpose) and the global cooldown, so two in quick succession cannot
     // stack and one cannot land on top of a zone arrival.
     public bool ShouldAnnounceBanner() => BannerBlockReason() == BannerBlock.None;
 
@@ -202,7 +202,7 @@ internal sealed class NotificationGate
     }
 
     // The global cooldown only. The finer and coarser windows and the recent-places memory are
-    // all about location tiers, and a banner is not a location — muting a sub-area because a
+    // all about location tiers, and a banner is not a location: muting a sub-area because a
     // Level Up! went past would be the wrong trade.
     public void MarkBannerAnnounced(NotificationTiming timing) => HoldOff(this.now(), timing);
 

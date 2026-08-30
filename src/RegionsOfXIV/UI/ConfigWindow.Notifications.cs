@@ -63,8 +63,8 @@ internal sealed partial class ConfigWindow
 
         UiText.Tooltip(Loc.Get(
             "notifications.banners.tooltip",
-            "Redraws the game's full-screen banners — \"Quest Accepted\", "
-            + "\"Duty Commenced\", \"Level Up!\" — in this plugin's lettering.\n\n"
+            "Redraws the game's full-screen banners (\"Quest Accepted\", "
+            + "\"Duty Commenced\", \"Level Up!\") in this plugin's lettering.\n\n"
             + "The wording is painted into the game's artwork rather than stored as "
             + "text, so only banners this plugin has words for are taken over. Any "
             + "it does not recognise keep the game's own."));

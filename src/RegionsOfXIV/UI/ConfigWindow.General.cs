@@ -214,7 +214,7 @@ internal sealed partial class ConfigWindow
         UiText.Tooltip(Loc.Get(
             "general.shadow.tooltip",
             "A second copy of every line, offset behind it. Sits under the outline, so\n" +
-            "the two can be used together — a tight outline for legibility and a soft\n" +
+            "the two can be used together: a tight outline for legibility and a soft\n" +
             "shadow for depth.\n\n" +
             "One shadow covers all three lines; it does not follow the separate colours."));
 
@@ -257,7 +257,7 @@ internal sealed partial class ConfigWindow
             "The smaller line above the name, giving where the place sits: the region\n" +
             "above a zone, the area above a sub-area.\n\n" +
             "Turned off, only the name itself is shown. The weather line, if you have\n" +
-            "it on, is unaffected — as are the two settings below, which still apply\n" +
+            "it on, is unaffected, as are the two settings below, which still apply\n" +
             "to it."));
 
         this.config.UnderlineHeader = Checkbox(

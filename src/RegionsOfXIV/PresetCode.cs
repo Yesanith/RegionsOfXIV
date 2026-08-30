@@ -70,7 +70,7 @@ internal static class PresetCode
         {
             error = Loc.Format(
                 "presetcode.notacode",
-                "That does not look like a preset code — they start with \"{0}\".",
+                "That does not look like a preset code. They start with \"{0}\".",
                 Prefix);
             return false;
         }
@@ -127,7 +127,7 @@ internal static class PresetCode
         {
             error = Loc.Get(
                 "presetcode.damaged",
-                "That code is damaged — some of it went missing on the way here. "
+                "That code is damaged. Some of it went missing on the way here. "
                 + "Ask for it again and copy the whole line in one go.");
             return false;
         }

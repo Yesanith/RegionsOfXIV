@@ -77,6 +77,7 @@ def scan():
     """key -> {english, sites}. Calls whose English is not a literal are reported separately."""
     found = {}
     dynamic = []
+    everything = []
 
     for folder, _, names in os.walk(SOURCE):
         for name in sorted(names):
@@ -85,6 +86,7 @@ def scan():
             path = os.path.join(folder, name)
             rel = os.path.relpath(path, ROOT).replace("\\", "/")
             src = io.open(path, encoding="utf-8-sig").read()
+            everything.append(src)
 
             for call in CALLS:
                 at = 0
@@ -111,7 +113,7 @@ def scan():
                             % (key, found[key]["english"], english))
                     found[key]["sites"].append(rel)
 
-    return found, dynamic
+    return found, dynamic, "\n".join(everything)
 
 
 def read_existing():
@@ -161,7 +163,7 @@ def render(keys, english, descriptions, spaced, note):
 def main():
     check = "--check" in sys.argv
 
-    found, dynamic = scan()
+    found, dynamic, all_source = scan()
     descriptions, messages, order, spaced, note = read_existing()
 
     # A handful of call sites pass a variable rather than a literal -- the built-in preset
@@ -199,6 +201,17 @@ def main():
         print("english not a literal, carried from the existing file: %d" % len(carried))
         for key in sorted(carried):
             print("    %s" % key)
+
+    # A carried message cannot be derived, so nothing else would notice it going stale after an
+    # edit to the field it really comes from. Looking for the text anywhere in the sources is
+    # rough, but it is enough to catch a message that has been changed in one place and not the
+    # other.
+    stale = sorted(k for k in carried if messages[k] not in all_source)
+    if stale:
+        print("carried message no longer found in the sources, so probably stale: %d" % len(stale))
+        for key in stale:
+            print("    %s" % key)
+            print("        en.json: %s" % messages[key])
 
     orphaned = sorted({key for _, key in dynamic} - carried)
     if orphaned:

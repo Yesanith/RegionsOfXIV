@@ -15,6 +15,32 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v5
 
+    # Runs before anything is downloaded or built, so the only thing on disk is the repository.
+    # The character is built from its codepoint rather than typed, because this file is covered
+    # by the rule it enforces.
+    - name: No em dashes
+      shell: pwsh
+      run: |
+        $dash = [char]0x2014
+        $skip = '[\\/](\.git|bin|obj)[\\/]'
+        $binary = '\.(ttf|otf|ttc|png|jpg|jpeg|ico|zip|dll|pdb|exe|snk)$'
+
+        $hits = Get-ChildItem -Recurse -File -Force |
+          Where-Object { $_.FullName -notmatch $skip -and $_.Name -notmatch $binary } |
+          Select-String -SimpleMatch -Pattern $dash -Encoding utf8
+
+        if ($hits) {
+          foreach ($hit in $hits) {
+            Write-Host ('{0}:{1}: {2}' -f $hit.Path, $hit.LineNumber, $hit.Line.Trim())
+          }
+          Write-Host ''
+          Write-Host ('Found {0} em dash(es). The em dash is banned repo-wide.' -f $hits.Count)
+          Write-Host 'Rewrite the sentence rather than swapping in a hyphen. See Style in .claude/CLAUDE.md.'
+          exit 1
+        }
+
+        Write-Host 'No em dashes.'
+
     - name: Install .NET
       uses: actions/setup-dotnet@v5
       with:

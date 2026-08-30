@@ -69,7 +69,7 @@
     "description": "Dropdown label. The movement the letters make as the notification appears."
   },
   "effects.motion.tooltip": {
-    "message": "None — the letters simply appear where they belong.\nTypewriter — one letter at a time, no fade.\nRise — letters lift into place from below.\nWave — letters ride a wave through the line as it appears.\nBurn — letters catch alight and cool into their colour.\n\nRuns alongside the Eorzean decode rather than instead of it.",
+    "message": "None: the letters simply appear where they belong.\nTypewriter: one letter at a time, no fade.\nRise: letters lift into place from below.\nWave: letters ride a wave through the line as it appears.\nBurn: letters catch alight and cool into their colour.\n\nRuns alongside the Eorzean decode rather than instead of it.",
     "description": "Tooltip for the Motion dropdown. Keep the line breaks. Each of None, Typewriter, Rise, Wave and Burn is an entry in that dropdown, so use the same wording you gave them in effects.motion.* below. \"Eorzean\" is the game's invented alphabet and is usually left as-is."
   },
 
@@ -168,7 +168,7 @@
     "description": "Tooltip on the copy button once a name has been typed. Keep the line break. {0} is the name the player typed, so keep the quotes around it. sharecodes.customfont.note may be appended after this."
   },
   "sharecodes.copy.tooltip.unnamed": {
-    "message": "Type a name in the box above first — it travels with the code, and it\nis all the person you send it to will have to go on.\n\nTo share a preset you have already saved, right-click it instead.",
+    "message": "Type a name in the box above first: it travels with the code, and it\nis all the person you send it to will have to go on.\n\nTo share a preset you have already saved, right-click it instead.",
     "description": "Tooltip on the copy button while it is disabled for want of a name. Keep the line breaks."
   },
 
@@ -322,7 +322,7 @@
     "description": "Checkbox. The game's full-screen announcements - Level Up!, Duty Complete and so on."
   },
   "notifications.banners.tooltip": {
-    "message": "Redraws the game's full-screen banners — \"Quest Accepted\", \"Duty Commenced\", \"Level Up!\" — in this plugin's lettering.\n\nThe wording is painted into the game's artwork rather than stored as text, so only banners this plugin has words for are taken over. Any it does not recognise keep the game's own.",
+    "message": "Redraws the game's full-screen banners (\"Quest Accepted\", \"Duty Commenced\", \"Level Up!\") in this plugin's lettering.\n\nThe wording is painted into the game's artwork rather than stored as text, so only banners this plugin has words for are taken over. Any it does not recognise keep the game's own.",
     "description": "Tooltip for the Banners checkbox. Keep the blank line. \"Quest Accepted\", \"Duty Commenced\" and \"Level Up!\" are banners the game itself shows and the game already translates them - use the exact wording FFXIV uses in your language, not a fresh translation, or players will not recognise them."
   },
   "notifications.hidebanner": {
@@ -356,7 +356,7 @@
     "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
   },
   "presets.intro": {
-    "message": "A preset covers every setting on General, Fonts, Effects, Notifications and Durations — the face and size of each line, position, colours, motion and particles, which tiers announce, the timings, and when to stay quiet.",
+    "message": "A preset covers every setting on General, Fonts, Effects, Notifications and Durations: the face and size of each line, position, colours, motion and particles, which tiers announce, the timings, and when to stay quiet.",
     "description": "Paragraph at the top of the tab. General, Fonts, Effects, Notifications and Durations are the names of the other tabs in this window - match how you translated each tab's own label."
   },
   "presets.intro.warning": {
@@ -402,7 +402,7 @@
     "description": "Describes the Dispatch preset. Refers to the Typewriter motion - match effects.motion.typewriter if you name it."
   },
   "presets.tyria.description": {
-    "message": "Wide uppercase in gold, still and unhurried — a nod to the original.",
+    "message": "Wide uppercase in gold, still and unhurried. A nod to the original.",
     "description": "Describes the Tyria preset. \"The original\" means Regions of Tyria, the Guild Wars 2 addon this plugin is modelled on."
   },
 
@@ -441,7 +441,7 @@
   },
 
   "presets.name.hint": {
-    "message": "Name it — to save, copy or import",
+    "message": "Name it to save, copy or import",
     "description": "Placeholder text inside the empty name box. Keep it short; the box is about 180 pixels wide."
   },
   "presets.save": {
@@ -467,7 +467,7 @@
   },
 
   "presets.customfont.warning": {
-    "message": "These settings use a font from this PC. A preset stores where that file sits, not the font itself, so on anyone else's machine the path will not exist and those lines fall back to Noto Sans CJK — everything else in the preset still applies. Put the line back on a built-in face if you want a preset to look the same for whoever you hand it to.",
+    "message": "These settings use a font from this PC. A preset stores where that file sits, not the font itself, so on anyone else's machine the path will not exist and those lines fall back to Noto Sans CJK. Everything else in the preset still applies. Put the line back on a built-in face if you want a preset to look the same for whoever you hand it to.",
     "description": "Warning shown above the save row when the current settings use a font file from the player's own PC. \"Noto Sans CJK\" is a font name and stays as-is."
   },
   "presets.customfont.missing": {
@@ -518,7 +518,7 @@
     "description": "Dropdown label for choosing the typeface, shown once per role tab."
   },
   "fonts.face.tooltip": {
-    "message": "Noto Sans CJK is vector — sharp at any size, and it covers every language.\n\nThe game's own faces suit FFXIV better, but each is a bitmap with a ceiling:\nTrump Gothic — Latin only, to 91 px.\nJupiter — Latin only, to 61 px.\nAxis — to 48 px, the only one with Japanese glyphs.\n\nCustom file loads a font of your own from this PC.",
+    "message": "Noto Sans CJK is vector: sharp at any size, and it covers every language.\n\nThe game's own faces suit FFXIV better, but each is a bitmap with a ceiling:\nTrump Gothic: Latin only, to 91 px.\nJupiter: Latin only, to 61 px.\nAxis: to 48 px, the only one with Japanese glyphs.\n\nCustom file loads a font of your own from this PC.",
     "description": "Tooltip for the font dropdown. Keep the line breaks. \"Noto Sans CJK\", \"Trump Gothic\", \"Jupiter\" and \"Axis\" are names of typefaces and are never translated. \"Custom file\" is a dropdown entry - match fonts.choice.custom. \"px\" is the pixel abbreviation."
   },
 
@@ -672,7 +672,7 @@
     "description": "Checkbox. A second, offset copy of the text drawn behind it. This is the usual term in image and design software - use whatever that software says in your language."
   },
   "general.shadow.tooltip": {
-    "message": "A second copy of every line, offset behind it. Sits under the outline, so\nthe two can be used together — a tight outline for legibility and a soft\nshadow for depth.\n\nOne shadow covers all three lines; it does not follow the separate colours.",
+    "message": "A second copy of every line, offset behind it. Sits under the outline, so\nthe two can be used together: a tight outline for legibility and a soft\nshadow for depth.\n\nOne shadow covers all three lines; it does not follow the separate colours.",
     "description": "Tooltip for the Drop shadow checkbox. Keep the line breaks and the blank line."
   },
   "general.shadowcolour": {
@@ -708,7 +708,7 @@
     "description": "Checkbox. Draws the smaller line above the place name."
   },
   "general.showheader.tooltip": {
-    "message": "The smaller line above the name, giving where the place sits: the region\nabove a zone, the area above a sub-area.\n\nTurned off, only the name itself is shown. The weather line, if you have\nit on, is unaffected — as are the two settings below, which still apply\nto it.",
+    "message": "The smaller line above the name, giving where the place sits: the region\nabove a zone, the area above a sub-area.\n\nTurned off, only the name itself is shown. The weather line, if you have\nit on, is unaffected, as are the two settings below, which still apply\nto it.",
     "description": "Tooltip for the Show header checkbox. Keep the line breaks and the blank line. \"Region\", \"zone\", \"area\" and \"sub-area\" are the place tiers the plugin announces - use the same words you used in notifications.zone, notifications.area and notifications.subarea."
   },
   "general.underlineheader": {
@@ -746,7 +746,7 @@
   },
 
   "changelog.title": {
-    "message": "Regions of XIV — What's New",
+    "message": "Regions of XIV: What's New",
     "description": "Title bar of the What's New window. \"Regions of XIV\" is the plugin's name and stays as-is; only the second half is translated. Match about.whatsnew, which is the button that opens this window."
   },
   "changelog.all": {
@@ -778,7 +778,7 @@
     "description": "Footer shown when the window opened itself after an update."
   },
   "changelog.onrequest": {
-    "message": "Shown because you asked — \"{0}\".",
+    "message": "Shown because you asked: \"{0}\".",
     "description": "Footer shown when the player opened the window themselves. {0} is the command they typed; it is never translated, and the quotes around it stay."
   },
 
@@ -801,7 +801,7 @@
   },
 
   "common.colour.tooltip": {
-    "message": "Currently {0:F0}% solid.\n\nClick for the full picker. The narrow chequered strip right of the rainbow is alpha — how solid this colour is — and it stops at {1:F0}%, far enough back to sit behind the other lines but not so far that the line disappears and looks like a fault.",
+    "message": "Currently {0:F0}% solid.\n\nClick for the full picker. The narrow chequered strip right of the rainbow is alpha (how solid this colour is) and it stops at {1:F0}%, far enough back to sit behind the other lines but not so far that the line disappears and looks like a fault.",
     "description": "Tooltip shown on every colour swatch in this window. {0} is how solid the colour currently is and {1} is the lowest it can go, both as percentages - keep the \":F0\" inside the braces, it rounds them to whole numbers, and keep the per-cent signs after them. \"Alpha\" is the usual word for how solid a colour is; use whatever a painting or image program says in your language. Keep the blank line after the first sentence."
   },
 
@@ -831,7 +831,7 @@
     "description": "The clipboard held far more text than any share code contains, so it is almost certainly something else entirely."
   },
   "presetcode.notacode": {
-    "message": "That does not look like a preset code — they start with \"{0}\".",
+    "message": "That does not look like a preset code. They start with \"{0}\".",
     "description": "The text does not begin with the marker every code starts with. {0} is that marker - currently \"ROX1-\", including the trailing dash. It is part of the code format, so never translate it, and keep the quotes around it."
   },
   "presetcode.unreadable": {
@@ -847,7 +847,7 @@
     "description": "A code always travels with a name for the preset, and this one had none."
   },
   "presetcode.damaged": {
-    "message": "That code is damaged — some of it went missing on the way here. Ask for it again and copy the whole line in one go.",
+    "message": "That code is damaged. Some of it went missing on the way here. Ask for it again and copy the whole line in one go.",
     "description": "Much the most common failure: the player copied only part of a code, because chat wrapped it across lines. That specific claim - part of the code is missing, and the fix is to copy the whole line at once - is the whole point of the message, so keep it rather than smoothing it into a general \"could not read that code\"."
   },
 

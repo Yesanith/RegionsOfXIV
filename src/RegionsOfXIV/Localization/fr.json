@@ -55,7 +55,7 @@
     "message": "Mouvement"
   },
   "effects.motion.tooltip": {
-    "message": "Aucun — les lettres apparaissent simplement à leur place.\nMachine à écrire — une lettre après l'autre, sans fondu.\nMontée — les lettres s'élèvent en place depuis le bas.\nVague — une vague parcourt la ligne à son apparition.\nCombustion — les lettres s'enflamment puis refroidissent vers leur couleur.\n\nSe déroule en même temps que le décodage eorzéen, et non à sa place."
+    "message": "Aucun : les lettres apparaissent simplement à leur place.\nMachine à écrire : une lettre après l'autre, sans fondu.\nMontée : les lettres s'élèvent en place depuis le bas.\nVague : une vague parcourt la ligne à son apparition.\nCombustion : les lettres s'enflamment puis refroidissent vers leur couleur.\n\nSe déroule en même temps que le décodage eorzéen, et non à sa place."
   },
   "effects.motion.none": {
     "message": "Aucun"
@@ -124,7 +124,7 @@
     "message": "Met dans le presse-papiers un code pour tout ce qui est réglé en ce moment,\nsous le nom \"{0}\"."
   },
   "sharecodes.copy.tooltip.unnamed": {
-    "message": "Saisis d'abord un nom dans la case ci-dessus — il voyage avec le code, et\nc'est tout ce dont disposera la personne à qui tu l'envoies.\n\nPour partager un préréglage déjà enregistré, fais plutôt un clic droit dessus."
+    "message": "Saisis d'abord un nom dans la case ci-dessus : il voyage avec le code, et\nc'est tout ce dont disposera la personne à qui tu l'envoies.\n\nPour partager un préréglage déjà enregistré, fais plutôt un clic droit dessus."
   },
   "sharecodes.paste": {
     "message": "Coller un code"
@@ -217,7 +217,7 @@
     "message": "Changements de météo"
   },
   "notifications.weather.tooltip": {
-    "message": "Annonce le changement de météo, sur sa propre ligne juste au-dessus du nom de lieu, de sorte qu'elle n'interrompe jamais une annonce de lieu.\n\nLa météo suit un cycle fixe d'environ 23 minutes, et arriver quelque part annonce ce qu'elle y fait — elle apparaît donc avec le nom de lieu à ton entrée."
+    "message": "Annonce le changement de météo, sur sa propre ligne juste au-dessus du nom de lieu, de sorte qu'elle n'interrompe jamais une annonce de lieu.\n\nLa météo suit un cycle fixe d'environ 23 minutes, et arriver quelque part annonce ce qu'elle y fait. Elle apparaît donc avec le nom de lieu à ton entrée."
   },
   "notifications.weathericon": {
     "message": "Afficher l'icône de météo"
@@ -229,7 +229,7 @@
     "message": "Bannières"
   },
   "notifications.banners.tooltip": {
-    "message": "Redessine les bannières plein écran du jeu — \"Quest Accepted\", \"Duty Commenced\", \"Level Up!\" — dans la typographie de ce plugin.\n\nLe texte est peint dans l'image du jeu plutôt que stocké comme texte, donc seules les bannières dont ce plugin connaît les mots sont reprises. Celles qu'il ne reconnaît pas gardent celles du jeu."
+    "message": "Redessine les bannières plein écran du jeu (\"Quest Accepted\", \"Duty Commenced\", \"Level Up!\") dans la typographie de ce plugin.\n\nLe texte est peint dans l'image du jeu plutôt que stocké comme texte, donc seules les bannières dont ce plugin connaît les mots sont reprises. Celles qu'il ne reconnaît pas gardent celles du jeu."
   },
   "notifications.hidebanner": {
     "message": "Masquer la bannière du jeu"
@@ -253,7 +253,7 @@
     "message": "Préréglages"
   },
   "presets.intro": {
-    "message": "Un préréglage couvre tous les réglages des onglets Général, Polices, Effets, Notifications et Durées — la fonte et la taille de chaque ligne, la position, les couleurs, le mouvement et les particules, les niveaux annoncés, les temps, et quand rester silencieux."
+    "message": "Un préréglage couvre tous les réglages des onglets Général, Polices, Effets, Notifications et Durées : la fonte et la taille de chaque ligne, la position, les couleurs, le mouvement et les particules, les niveaux annoncés, les temps, et quand rester silencieux."
   },
   "presets.intro.warning": {
     "message": "En appliquer un les remplace tous, donc tout ce que tu as modifié est écrasé."
@@ -286,7 +286,7 @@
     "message": "Tapé lettre par lettre, en majuscules serrées. Aucune particule."
   },
   "presets.tyria.description": {
-    "message": "De larges majuscules dorées, immobiles et sans hâte — un clin d'œil à l'original."
+    "message": "De larges majuscules dorées, immobiles et sans hâte. Un clin d'œil à l'original."
   },
   "presets.saved": {
     "message": "Tes préréglages"
@@ -313,7 +313,7 @@
     "message": "Code copié pour \"{0}\"."
   },
   "presets.name.hint": {
-    "message": "Donne-lui un nom — pour enregistrer, copier ou importer"
+    "message": "Donne-lui un nom pour enregistrer, copier ou importer"
   },
   "presets.save": {
     "message": "Enregistrer"
@@ -331,7 +331,7 @@
     "message": "Échanger des codes de préréglages, signaler un bug ou proposer une idée."
   },
   "presets.customfont.warning": {
-    "message": "Ces réglages utilisent une police de ce PC. Un préréglage enregistre où se trouve ce fichier, pas la police elle-même : sur la machine de quelqu'un d'autre le chemin n'existera pas et ces lignes retomberont sur Noto Sans CJK — tout le reste du préréglage s'applique quand même. Remets la ligne sur une fonte fournie si tu veux qu'un préréglage ait le même aspect chez la personne à qui tu le donnes."
+    "message": "Ces réglages utilisent une police de ce PC. Un préréglage enregistre où se trouve ce fichier, pas la police elle-même : sur la machine de quelqu'un d'autre le chemin n'existera pas et ces lignes retomberont sur Noto Sans CJK. Tout le reste du préréglage s'applique quand même. Remets la ligne sur une fonte fournie si tu veux qu'un préréglage ait le même aspect chez la personne à qui tu le donnes."
   },
   "presets.customfont.missing": {
     "message": "Il transporte un fichier de police du PC de l'expéditeur que tu n'as pas, donc ces lignes sont dessinées avec Noto Sans CJK. Choisis la tienne dans l'onglet Polices."
@@ -367,7 +367,7 @@
     "message": "Police"
   },
   "fonts.face.tooltip": {
-    "message": "Noto Sans CJK est vectorielle — nette à toute taille, et elle couvre toutes les langues.\n\nLes fontes du jeu conviennent mieux à FFXIV, mais chacune est une bitmap avec un plafond :\nTrump Gothic — latin seulement, jusqu'à 91 px.\nJupiter — latin seulement, jusqu'à 61 px.\nAxis — jusqu'à 48 px, la seule avec des caractères japonais.\n\nFichier personnalisé charge une police à toi depuis ce PC."
+    "message": "Noto Sans CJK est vectorielle : nette à toute taille, et elle couvre toutes les langues.\n\nLes fontes du jeu conviennent mieux à FFXIV, mais chacune est une bitmap avec un plafond :\nTrump Gothic : latin seulement, jusqu'à 91 px.\nJupiter : latin seulement, jusqu'à 61 px.\nAxis : jusqu'à 48 px, la seule avec des caractères japonais.\n\nFichier personnalisé charge une police à toi depuis ce PC."
   },
   "fonts.choice.noto": {
     "message": "{0} (recommandée)"
@@ -472,7 +472,7 @@
     "message": "Ombre portée"
   },
   "general.shadow.tooltip": {
-    "message": "Une deuxième copie de chaque ligne, décalée derrière elle. Elle se place sous\nle contour, les deux peuvent donc servir ensemble — un contour serré pour la\nlisibilité et une ombre douce pour la profondeur.\n\nUne seule ombre couvre les trois lignes ; elle ne suit pas les couleurs séparées."
+    "message": "Une deuxième copie de chaque ligne, décalée derrière elle. Elle se place sous\nle contour, les deux peuvent donc servir ensemble : un contour serré pour la\nlisibilité et une ombre douce pour la profondeur.\n\nUne seule ombre couvre les trois lignes ; elle ne suit pas les couleurs séparées."
   },
   "general.shadowcolour": {
     "message": "Couleur de l'ombre"
@@ -514,7 +514,7 @@
     "message": "Ouvre les réglages de Regions of XIV. \"{0}\" déclenche une notification d'exemple, \"{1}\" montre ce qui a changé."
   },
   "changelog.title": {
-    "message": "Regions of XIV — Nouveautés"
+    "message": "Regions of XIV : Nouveautés"
   },
   "changelog.all": {
     "message": "Chaque version, la plus récente en premier :"
@@ -538,7 +538,7 @@
     "message": "Tu ne reverras ceci qu'à la prochaine mise à jour."
   },
   "changelog.onrequest": {
-    "message": "Affiché parce que tu l'as demandé — \"{0}\"."
+    "message": "Affiché parce que tu l'as demandé : \"{0}\"."
   },
   "window.editing": {
     "message": "Mode édition"
@@ -553,7 +553,7 @@
     "message": "{0}\n\nOuvre {1} dans ton navigateur."
   },
   "common.colour.tooltip": {
-    "message": "Actuellement {0:F0}% opaque.\n\nClique pour le sélecteur complet. La bande étroite à damier à droite de l'arc-en-ciel est l'alpha — l'opacité de cette couleur — et elle s'arrête à {1:F0}%, assez en retrait pour se placer derrière les autres lignes mais pas au point que la ligne disparaisse et ressemble à un défaut."
+    "message": "Actuellement {0:F0}% opaque.\n\nClique pour le sélecteur complet. La bande étroite à damier à droite de l'arc-en-ciel est l'alpha (l'opacité de cette couleur) et elle s'arrête à {1:F0}%, assez en retrait pour se placer derrière les autres lignes mais pas au point que la ligne disparaisse et ressemble à un défaut."
   },
   "units.px": {
     "message": "px"
@@ -574,7 +574,7 @@
     "message": "Ce code est trop long pour être un des nôtres."
   },
   "presetcode.notacode": {
-    "message": "Cela ne ressemble pas à un code de préréglage — ils commencent par \"{0}\"."
+    "message": "Cela ne ressemble pas à un code de préréglage. Ils commencent par \"{0}\"."
   },
   "presetcode.unreadable": {
     "message": "Ce code ne s'est décompressé en rien de lisible."
@@ -586,7 +586,7 @@
     "message": "Ce code ne porte aucun nom de préréglage."
   },
   "presetcode.damaged": {
-    "message": "Ce code est endommagé — une partie s'est perdue en route. Redemande-le et copie toute la ligne d'un seul coup."
+    "message": "Ce code est endommagé. Une partie s'est perdue en route. Redemande-le et copie toute la ligne d'un seul coup."
   },
   "sharecodes.customfont.note": {
     "message": "\n\nLe code transporte un fichier de police de ce PC. La personne qui le recevra\nn'aura pas ce fichier, et ces lignes retomberont sur Noto Sans CJK chez elle."

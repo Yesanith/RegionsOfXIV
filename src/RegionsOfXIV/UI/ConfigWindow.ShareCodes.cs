@@ -47,7 +47,7 @@ internal sealed partial class ConfigWindow
                   this.newPresetName.Trim()) + CustomFontCodeNote()
             : Loc.Get(
                   "sharecodes.copy.tooltip.unnamed",
-                  "Type a name in the box above first — it travels with the code, and it\n" +
+                  "Type a name in the box above first: it travels with the code, and it\n" +
                   "is all the person you send it to will have to go on.\n\n" +
                   "To share a preset you have already saved, right-click it instead."));
 

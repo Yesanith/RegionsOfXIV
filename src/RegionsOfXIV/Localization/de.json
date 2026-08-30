@@ -54,7 +54,7 @@
     "message": "Bewegung"
   },
   "effects.motion.tooltip": {
-    "message": "Keine — die Buchstaben erscheinen einfach an ihrem Platz.\nSchreibmaschine — ein Buchstabe nach dem anderen, ohne Blende.\nAufsteigen — die Buchstaben heben sich von unten an ihren Platz.\nWelle — eine Welle läuft beim Erscheinen durch die Zeile.\nBrennen — die Buchstaben entzünden sich und kühlen in ihre Farbe ab.\n\nLäuft zusammen mit der eorzeanischen Entschlüsselung, nicht an ihrer Stelle."
+    "message": "Keine: die Buchstaben erscheinen einfach an ihrem Platz.\nSchreibmaschine: ein Buchstabe nach dem anderen, ohne Blende.\nAufsteigen: die Buchstaben heben sich von unten an ihren Platz.\nWelle: eine Welle läuft beim Erscheinen durch die Zeile.\nBrennen: die Buchstaben entzünden sich und kühlen in ihre Farbe ab.\n\nLäuft zusammen mit der eorzeanischen Entschlüsselung, nicht an ihrer Stelle."
   },
   "effects.motion.none": {
     "message": "Keine"
@@ -123,7 +123,7 @@
     "message": "Legt einen Code für alles, wie es gerade steht, in die Zwischenablage,\nunter dem Namen \"{0}\"."
   },
   "sharecodes.copy.tooltip.unnamed": {
-    "message": "Gib zuerst oben einen Namen ein — er reist mit dem Code mit, und mehr\nhat die Person, der du ihn schickst, nicht in der Hand.\n\nUm eine bereits gespeicherte Voreinstellung zu teilen, klicke sie stattdessen mit rechts an."
+    "message": "Gib zuerst oben einen Namen ein: er reist mit dem Code mit, und mehr\nhat die Person, der du ihn schickst, nicht in der Hand.\n\nUm eine bereits gespeicherte Voreinstellung zu teilen, klicke sie stattdessen mit rechts an."
   },
   "sharecodes.paste": {
     "message": "Code einfügen"
@@ -216,7 +216,7 @@
     "message": "Wetterwechsel"
   },
   "notifications.weather.tooltip": {
-    "message": "Kündigt den Wetterwechsel an, auf einer eigenen Zeile direkt über dem Ortsnamen, sodass er eine Ortsmeldung nie unterbricht.\n\nDas Wetter läuft in einem festen Zyklus von etwa 23 Minuten, und wer irgendwo neu ankommt, erfährt, was es dort gerade tut — es erscheint also zusammen mit dem Ortsnamen beim Hineingehen."
+    "message": "Kündigt den Wetterwechsel an, auf einer eigenen Zeile direkt über dem Ortsnamen, sodass er eine Ortsmeldung nie unterbricht.\n\nDas Wetter läuft in einem festen Zyklus von etwa 23 Minuten, und wer irgendwo neu ankommt, erfährt, was es dort gerade tut. Es erscheint also zusammen mit dem Ortsnamen beim Hineingehen."
   },
   "notifications.weathericon": {
     "message": "Wettersymbol anzeigen"
@@ -228,13 +228,13 @@
     "message": "Banner"
   },
   "notifications.banners.tooltip": {
-    "message": "Zeichnet die bildschirmfüllenden Banner des Spiels — \"Quest Accepted\", \"Duty Commenced\", \"Level Up!\" — in der Schrift dieses Plugins neu.\n\nDer Wortlaut ist in die Grafik des Spiels gemalt und nicht als Text gespeichert, daher werden nur Banner übernommen, für die dieses Plugin Worte hat. Unbekannte behalten die des Spiels."
+    "message": "Zeichnet die bildschirmfüllenden Banner des Spiels (\"Quest Accepted\", \"Duty Commenced\", \"Level Up!\") in der Schrift dieses Plugins neu.\n\nDer Wortlaut ist in die Grafik des Spiels gemalt und nicht als Text gespeichert, daher werden nur Banner übernommen, für die dieses Plugin Worte hat. Unbekannte behalten die des Spiels."
   },
   "notifications.hidebanner": {
     "message": "Das spieleigene Banner ausblenden"
   },
   "notifications.hidebanner.tooltip": {
-    "message": "Blendet die Grafik des Spiels aus, sodass nur die Fassung dieses Plugins zu sehen ist.\n\nSchalte dies ab, um beide zu sehen — ein schneller Weg zu prüfen, ob der Wortlaut übereinstimmt."
+    "message": "Blendet die Grafik des Spiels aus, sodass nur die Fassung dieses Plugins zu sehen ist.\n\nSchalte dies ab, um beide zu sehen. Das ist ein schneller Weg zu prüfen, ob der Wortlaut übereinstimmt."
   },
   "notifications.hideareatext": {
     "message": "Die spieleigene Gebietsanzeige ausblenden"
@@ -252,7 +252,7 @@
     "message": "Voreinstellungen"
   },
   "presets.intro": {
-    "message": "Eine Voreinstellung umfasst jede Einstellung unter Allgemein, Schriften, Effekte, Benachrichtigungen und Dauer — Schnitt und Größe jeder Zeile, Position, Farben, Bewegung und Partikel, welche Stufen angekündigt werden, die Zeiten und wann geschwiegen wird."
+    "message": "Eine Voreinstellung umfasst jede Einstellung unter Allgemein, Schriften, Effekte, Benachrichtigungen und Dauer: Schnitt und Größe jeder Zeile, Position, Farben, Bewegung und Partikel, welche Stufen angekündigt werden, die Zeiten und wann geschwiegen wird."
   },
   "presets.intro.warning": {
     "message": "Eine anzuwenden ersetzt sie alle, alles von dir Geänderte wird also überschrieben."
@@ -285,7 +285,7 @@
     "message": "Buchstabe für Buchstabe getippt, in engen Großbuchstaben. Keine Partikel."
   },
   "presets.tyria.description": {
-    "message": "Breite Großbuchstaben in Gold, still und ohne Eile — eine Verbeugung vor dem Original."
+    "message": "Breite Großbuchstaben in Gold, still und ohne Eile. Eine Verbeugung vor dem Original."
   },
   "presets.saved": {
     "message": "Deine Voreinstellungen"
@@ -312,7 +312,7 @@
     "message": "Einen Code für \"{0}\" kopiert."
   },
   "presets.name.hint": {
-    "message": "Benenne sie — zum Speichern, Kopieren oder Importieren"
+    "message": "Benenne sie zum Speichern, Kopieren oder Importieren"
   },
   "presets.save": {
     "message": "Speichern"
@@ -330,7 +330,7 @@
     "message": "Voreinstellungscodes tauschen, einen Fehler melden oder etwas vorschlagen."
   },
   "presets.customfont.warning": {
-    "message": "Diese Einstellungen nutzen eine Schrift von diesem PC. Eine Voreinstellung speichert, wo die Datei liegt, nicht die Schrift selbst. Auf einem fremden Rechner gibt es den Pfad also nicht, und diese Zeilen fallen auf Noto Sans CJK zurück — alles Übrige der Voreinstellung gilt weiterhin. Stelle die Zeile auf einen mitgelieferten Schnitt zurück, wenn eine Voreinstellung bei allen gleich aussehen soll."
+    "message": "Diese Einstellungen nutzen eine Schrift von diesem PC. Eine Voreinstellung speichert, wo die Datei liegt, nicht die Schrift selbst. Auf einem fremden Rechner gibt es den Pfad also nicht, und diese Zeilen fallen auf Noto Sans CJK zurück. Alles Übrige der Voreinstellung gilt weiterhin. Stelle die Zeile auf einen mitgelieferten Schnitt zurück, wenn eine Voreinstellung bei allen gleich aussehen soll."
   },
   "presets.customfont.missing": {
     "message": "Sie trägt eine Schriftdatei vom PC des Absenders, die du nicht hast, daher werden diese Zeilen mit Noto Sans CJK gezeichnet. Wähle im Reiter Schriften deine eigene."
@@ -366,7 +366,7 @@
     "message": "Schrift"
   },
   "fonts.face.tooltip": {
-    "message": "Noto Sans CJK ist vektorbasiert — scharf in jeder Größe, und deckt jede Sprache ab.\n\nDie spieleigenen Schnitte passen besser zu FFXIV, sind aber Bitmaps mit einer Obergrenze:\nTrump Gothic — nur Latein, bis 91 px.\nJupiter — nur Latein, bis 61 px.\nAxis — bis 48 px, als einzige mit japanischen Zeichen.\n\nEigene Datei lädt eine eigene Schrift von diesem PC."
+    "message": "Noto Sans CJK ist vektorbasiert: scharf in jeder Größe, und deckt jede Sprache ab.\n\nDie spieleigenen Schnitte passen besser zu FFXIV, sind aber Bitmaps mit einer Obergrenze:\nTrump Gothic: nur Latein, bis 91 px.\nJupiter: nur Latein, bis 61 px.\nAxis: bis 48 px, als einzige mit japanischen Zeichen.\n\nEigene Datei lädt eine eigene Schrift von diesem PC."
   },
   "fonts.choice.noto": {
     "message": "{0} (empfohlen)"
@@ -471,7 +471,7 @@
     "message": "Schlagschatten"
   },
   "general.shadow.tooltip": {
-    "message": "Eine zweite Kopie jeder Zeile, versetzt dahinter. Sitzt unter dem Umriss,\ndie beiden lassen sich also zusammen nutzen — ein enger Umriss für die\nLesbarkeit und ein weicher Schatten für Tiefe.\n\nEin Schatten deckt alle drei Zeilen ab; er folgt den getrennten Farben nicht."
+    "message": "Eine zweite Kopie jeder Zeile, versetzt dahinter. Sitzt unter dem Umriss,\ndie beiden lassen sich also zusammen nutzen: ein enger Umriss für die\nLesbarkeit und ein weicher Schatten für Tiefe.\n\nEin Schatten deckt alle drei Zeilen ab; er folgt den getrennten Farben nicht."
   },
   "general.shadowcolour": {
     "message": "Schattenfarbe"
@@ -504,7 +504,7 @@
     "message": "Kopfzeilenabstand"
   },
   "general.headergap.tooltip": {
-    "message": "Wie weit der Name unter der Kopfzeile sitzt, gemessen in Zeilen der Kopfzeile.\n\nNiedrige Werte ziehen die beiden zusammen, bis sie sich fast berühren — der\nengere Look, mit dem das Plugin immer ausgeliefert wurde. Höhere Werte öffnen\nden Abstand und geben jeder Zeile Luft."
+    "message": "Wie weit der Name unter der Kopfzeile sitzt, gemessen in Zeilen der Kopfzeile.\n\nNiedrige Werte ziehen die beiden zusammen, bis sie sich fast berühren. Das ist der\nengere Look, mit dem das Plugin immer ausgeliefert wurde. Höhere Werte öffnen\nden Abstand und geben jeder Zeile Luft."
   },
   "general.hidecombat": {
     "message": "Im Kampf ausblenden"
@@ -513,7 +513,7 @@
     "message": "Öffnet die Einstellungen von Regions of XIV. \"{0}\" löst eine Beispielbenachrichtigung aus, \"{1}\" zeigt, was sich geändert hat."
   },
   "changelog.title": {
-    "message": "Regions of XIV — Neuerungen"
+    "message": "Regions of XIV: Neuerungen"
   },
   "changelog.all": {
     "message": "Jede Version, neueste zuerst:"
@@ -537,7 +537,7 @@
     "message": "Du siehst das erst wieder beim nächsten Update."
   },
   "changelog.onrequest": {
-    "message": "Gezeigt, weil du gefragt hast — \"{0}\"."
+    "message": "Gezeigt, weil du gefragt hast: \"{0}\"."
   },
   "window.editing": {
     "message": "Bearbeitungsmodus"
@@ -552,7 +552,7 @@
     "message": "{0}\n\nÖffnet {1} in deinem Browser."
   },
   "common.colour.tooltip": {
-    "message": "Derzeit {0:F0}% deckend.\n\nKlicke für die volle Auswahl. Der schmale karierte Streifen rechts vom Regenbogen ist Alpha — wie deckend diese Farbe ist — und er endet bei {1:F0}%, weit genug zurück, um hinter den anderen Zeilen zu sitzen, aber nicht so weit, dass die Zeile verschwindet und wie ein Fehler aussieht."
+    "message": "Derzeit {0:F0}% deckend.\n\nKlicke für die volle Auswahl. Der schmale karierte Streifen rechts vom Regenbogen ist Alpha (wie deckend diese Farbe ist) und er endet bei {1:F0}%, weit genug zurück, um hinter den anderen Zeilen zu sitzen, aber nicht so weit, dass die Zeile verschwindet und wie ein Fehler aussieht."
   },
   "units.px": {
     "message": "px"
@@ -573,7 +573,7 @@
     "message": "Dieser Code ist zu lang, um einer von unseren zu sein."
   },
   "presetcode.notacode": {
-    "message": "Das sieht nicht nach einem Voreinstellungscode aus — die beginnen mit \"{0}\"."
+    "message": "Das sieht nicht nach einem Voreinstellungscode aus. Die beginnen mit \"{0}\"."
   },
   "presetcode.unreadable": {
     "message": "Dieser Code ließ sich zu nichts Lesbarem entpacken."
@@ -585,7 +585,7 @@
     "message": "Dieser Code trägt keinen Voreinstellungsnamen."
   },
   "presetcode.damaged": {
-    "message": "Dieser Code ist beschädigt — ein Teil ging unterwegs verloren. Bitte noch einmal darum und kopiere die ganze Zeile in einem Stück."
+    "message": "Dieser Code ist beschädigt. Ein Teil ging unterwegs verloren. Bitte noch einmal darum und kopiere die ganze Zeile in einem Stück."
   },
   "sharecodes.customfont.note": {
     "message": "\n\nDer Code trägt eine Schriftdatei von diesem PC. Wer ihn bekommt, hat diese\nDatei nicht, sodass diese Zeilen dort auf Noto Sans CJK zurückfallen."

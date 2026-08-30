@@ -299,7 +299,7 @@ public class LocalizationTests : IDisposable
     [InlineData('リ')]
     [InlineData('森')]
     [InlineData('Я')]
-    [InlineData('—')]
+    [InlineData('\u2014')]
     public void AxisDrawsTheLanguagesTheGameItselfShips(char c)
     {
         Assert.False(Loc.AxisLacks(c));

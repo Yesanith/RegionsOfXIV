@@ -14,7 +14,7 @@ with a styled, animated on-screen notification.**
 </div>
 
 Final Fantasy XIV announces zone changes on screen, but changes your **sub-area**
-silently — the only feedback is the small text above the minimap. Regions of XIV
+silently, and the only feedback is the small text above the minimap. Regions of XIV
 surfaces those transitions, and lets you restyle zone announcements to taste.
 
 Inspired by [Nekres' *Regions of Tyria*](https://blishhud.com/modules/?module=Nekres.Regions_Of_Tyria)
@@ -23,7 +23,7 @@ for Guild Wars 2.
 ## Features
 
 - **Four tiers, not one.** Region, zone, area and sub-area, each announced as it
-  changes — including the sub-area changes the game never announces at all.
+  changes, including the sub-area changes the game never announces at all.
 - **Replaces rather than stacks.** Hides the game's own area flash and
   loading-screen title and draws in their place, so an arrival reads as one
   notice instead of two. Both are a checkbox away from coming back.
@@ -35,13 +35,13 @@ for Guild Wars 2.
   banner's wording is painted into its artwork rather than stored as text, so the
   names are transcribed by hand and only English is substantially covered. A
   banner the plugin has no name for keeps the game's own.
-- **Decodes from the Eorzean alphabet** as it reveals, glyph by glyph — and the
+- **Decodes from the Eorzean alphabet** as it reveals, glyph by glyph, and the
   letters can rise, wave, type or catch alight while they resolve.
 - **Hearts, embers, sparkles or petals** drifting around the text, if that is
   your sort of thing. Drawn from primitives, so they cost no download and work
   under every font.
 - **Presets to start from.** Inferno, Sweetheart, Starlight, Sakura, Dispatch,
-  Tyria — each one a motion, a particle and a palette that suit each other.
+  Tyria: each one a motion, a particle and a palette that suit each other.
   Every setting stays yours to change afterwards.
 - **Correct in every language.** Names come from game data rather than from the
   screen, and the default font carries glyphs for every language the client can
@@ -49,7 +49,7 @@ for Guild Wars 2.
 - **Your own fonts.** Name, header and weather each pick their own face and
   size: one of the game's own, Dalamud's Noto, or any `.ttf`, `.otf` or `.ttc`
   sitting on your PC. A font you supply loads exactly as it is and stays yours to
-  look after — and a preset carries where the file sits rather than the font
+  look after, and a preset carries where the file sits rather than the font
   itself, so a shared one falls back to Noto on someone else's machine. It has to
   carry the letters your client needs: the plugin asks for Latin, kana and kanji,
   but it cannot add a glyph a font does not have, so a Latin-only display face on
@@ -90,7 +90,7 @@ Then `/regions` opens the settings.
 3. In Dalamud settings, add that folder to **Dev Plugin Locations**, then enable
    the plugin.
 
-This does not auto-update. Building from source works the same way — see
+This does not auto-update. Building from source works the same way. See
 [Building](#building).
 
 </details>
@@ -119,8 +119,8 @@ Two things come out of that, and they are easy to mix up:
 
 | Path | What it is |
 | --- | --- |
-| `src/RegionsOfXIV/bin/x64/Release/` | the plugin itself — DLL, `Fonts/`, `images/`. Point Dalamud's **Dev Plugin Locations** here |
-| `src/RegionsOfXIV/bin/x64/Release/RegionsOfXIV/` | the packaged layout — `latest.zip`, manifest and icon, for the repository listing. No DLL, so dev-loading from here finds nothing |
+| `src/RegionsOfXIV/bin/x64/Release/` | the plugin itself: DLL, `Fonts/`, `images/`. Point Dalamud's **Dev Plugin Locations** here |
+| `src/RegionsOfXIV/bin/x64/Release/RegionsOfXIV/` | the packaged layout: `latest.zip`, manifest and icon, for the repository listing. No DLL, so dev-loading from here finds nothing |
 
 The tests need neither the game nor Dalamud, so they run anywhere the SDK does:
 
@@ -149,13 +149,13 @@ They are wired to four `/regions` subcommands that exist only in a Debug build:
 | `/regions find <term>` | search the sheets for a term and log the hits |
 
 `RegionsOfXIV.csproj` removes all three files from compilation in every
-configuration but Debug, so none of it reaches a release build — the types are
+configuration but Debug, so none of it reaches a release build. The types are
 absent from the Release assembly entirely, not merely unreachable.
 
 ### Translating the settings window
 
 Interface strings live in `src/RegionsOfXIV/Localization/`, one JSON file per
-language code — `de.json`, or `pt-BR.json` for a regional one. They are embedded
+language code, such as `de.json`, or `pt-BR.json` for a regional one. They are embedded
 by a glob and discovered from the resource names, so **a new language is a file,
 not a code change**. German, French and Japanese ship as machine drafts; every
 one of them wants a speaker's eye.
@@ -163,7 +163,7 @@ one of them wants a speaker's eye.
 #### `en.json` is generated
 
 `en.json` is the translators' copy and is never read at runtime. The English the
-plugin shows is compiled into the call sites — `Loc.Get(key, english)` — so a
+plugin shows is compiled into the call sites (`Loc.Get(key, english)`), so a
 missing key, a blank entry or a file that will not parse falls back to English
 rather than showing anything broken. That also means the two can drift, so the
 file is generated rather than edited:
@@ -179,7 +179,7 @@ nothing has changed in produces no diff at all.
 
 #### The descriptions are the point
 
-Every entry carries a `description`. It is not documentation — it is the note a
+Every entry carries a `description`. It is not documentation. It is the note a
 translator works from, and it is where the traps are recorded: which words are
 identifiers, which are FFXIV's own terms, which line breaks matter, which
 placeholders must survive. Write one for every new key. Some worth reading
@@ -192,12 +192,12 @@ until someone hits it:
 - **Placeholders survive.** `{0}`, `{1}`, and `{0:F0}` with its format intact. A
   mangled one falls back to the English sentence and the work is wasted silently.
 - **FFXIV's own terms win.** Duty, aetheryte, sanctuary, the Eorzean script, the
-  banner wording — the game already translates these. Use its words, or leave
+  banner wording. The game already translates these. Use its words, or leave
   the entry out and say so, rather than coining new ones.
 - **Identifiers are never translated.** `_AreaText`, `_LocationTitle`, `ROX1-`,
   `/regions test`, typeface names, product names.
 - **A key you leave out stays English.** That is the intended way to say "not
-  yet" — it reads as partly English rather than as a hole.
+  yet", and it reads as partly English rather than as a hole.
 
 A file may carry `_status` and `_untranslated` keys. The loader ignores anything
 beginning with an underscore, except `_status`: a file whose status says
@@ -208,7 +208,7 @@ marker out once the file has been through a speaker, and the notice stops.
 #### One hard limit: the font
 
 The window draws with the game's own AXIS font, which carries Latin-1, the
-Russian Cyrillic alphabet, kana and around 6,300 kanji — but only eight
+Russian Cyrillic alphabet, kana and around 6,300 kanji, but only eight
 characters of Latin Extended-A. **Polish, Czech, Turkish, Romanian and
 Vietnamese diacritics have no glyph and would draw as blanks**, and glyph ranges
 are fixed when the font atlas is built, so nothing recovers them at run time.
@@ -223,8 +223,8 @@ larger change than dropping in a file.
 gets announced and *when* lives there, and it is where to start reading.
 
 It never touches the game directly. Everything it listens to arrives through a
-small interface — arrivals, movement, weather, banners, the game's own area text,
-and the two name lookups — bundled as `AnnouncementSources`. `Plugin.cs` is the
+small interface (arrivals, movement, weather, banners, the game's own area text,
+and the two name lookups) bundled as `AnnouncementSources`. `Plugin.cs` is the
 only place that knows which real implementation goes with which, and the tests
 hand it fakes instead. That is why the announcement rules can be exercised without
 launching the game.
@@ -239,8 +239,8 @@ The plugin draws its own text glyph by glyph rather than handing ImGui a string,
 because the effects animate each letter separately. `UI/NotificationRenderer.cs`
 decides where a line goes; `UI/NotificationRenderer.Runs.cs` paints it.
 
-`Services/FontService.cs` keeps one face per `FontRole` — text, header, weather
-— and rebuilds only the roles whose face, size or file actually changed. A role
+`Services/FontService.cs` keeps one face per `FontRole` (text, header, weather)
+and rebuilds only the roles whose face, size or file actually changed. A role
 set to a custom file also holds a Noto fallback, so a font that will not load
 degrades to something readable rather than to nothing.
 
@@ -254,4 +254,4 @@ Issues and suggestions are welcome on the
 AGPL-3.0-or-later. See [LICENSE.md](LICENSE.md).
 
 The licence covers this project's own source. It does **not** extend to third-party
-material the plugin uses or references — see [NOTICE](NOTICE).
+material the plugin uses or references. See [NOTICE](NOTICE).

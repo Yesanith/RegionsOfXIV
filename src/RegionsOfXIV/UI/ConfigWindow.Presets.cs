@@ -22,8 +22,8 @@ internal sealed partial class ConfigWindow
 
         UiText.Wrapped(Loc.Get(
             "presets.intro",
-            "A preset covers every setting on General, Fonts, Effects, Notifications and Durations "
-            + "— the face and size of each line, position, colours, motion and particles, which "
+            "A preset covers every setting on General, Fonts, Effects, Notifications and Durations: "
+            + "the face and size of each line, position, colours, motion and particles, which "
             + "tiers announce, the timings, and when to stay quiet."));
         UiText.Disabled(Loc.Get(
             "presets.intro.warning",
@@ -193,7 +193,7 @@ internal sealed partial class ConfigWindow
             ? Loc.Get("presets.save", "Save")
             : Loc.Get("presets.replace", "Replace")) + "###presets.save";
 
-        var hint = Loc.Get("presets.name.hint", "Name it — to save, copy or import");
+        var hint = Loc.Get("presets.name.hint", "Name it to save, copy or import");
 
         // 180 was picked against the English hint, which a longer one would be cut off inside. The
         // field grows to fit whatever the hint measures, but never past what the button beside it
@@ -236,7 +236,7 @@ internal sealed partial class ConfigWindow
                 "presets.customfont.warning",
                 "These settings use a font from this PC. A preset stores where that file sits, not the "
                 + "font itself, so on anyone else's machine the path will not exist and those lines fall "
-                + "back to Noto Sans CJK — everything else in the preset still applies. Put the line "
+                + "back to Noto Sans CJK. Everything else in the preset still applies. Put the line "
                 + "back on a built-in face if you want a preset to look the same for whoever you hand it to."));
 
         ImGui.Spacing();

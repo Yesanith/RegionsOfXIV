@@ -112,11 +112,11 @@ internal sealed partial class ConfigWindow
 
         UiText.Tooltip(Loc.Get(
             "fonts.face.tooltip",
-            "Noto Sans CJK is vector — sharp at any size, and it covers every language.\n\n"
+            "Noto Sans CJK is vector: sharp at any size, and it covers every language.\n\n"
             + "The game's own faces suit FFXIV better, but each is a bitmap with a ceiling:\n"
-            + "Trump Gothic — Latin only, to 91 px.\n"
-            + "Jupiter — Latin only, to 61 px.\n"
-            + "Axis — to 48 px, the only one with Japanese glyphs.\n\n"
+            + "Trump Gothic: Latin only, to 91 px.\n"
+            + "Jupiter: Latin only, to 61 px.\n"
+            + "Axis: to 48 px, the only one with Japanese glyphs.\n\n"
             + "Custom file loads a font of your own from this PC."));
 
         if (font.IsCustom)

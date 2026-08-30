@@ -307,7 +307,7 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         UiText.Tooltip(Loc.Format(
             "common.colour.tooltip",
             "Currently {0:F0}% solid.\n\nClick for the full picker. The narrow chequered strip "
-            + "right of the rainbow is alpha — how solid this colour is — and it stops at "
+            + "right of the rainbow is alpha (how solid this colour is) and it stops at "
             + "{1:F0}%, far enough back to sit behind the other lines but not so far that the "
             + "line disappears and looks like a fault.",
             value.W * 100f,

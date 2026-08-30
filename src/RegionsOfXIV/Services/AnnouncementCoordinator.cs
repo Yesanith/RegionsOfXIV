@@ -252,7 +252,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
         if (string.Equals(text, native, StringComparison.OrdinalIgnoreCase))
             return (header, text);
 
-        Log.Debug($"TerritoryInfo says \"{text}\", the game says \"{native}\" — taking the game's.");
+        Log.Debug($"TerritoryInfo says \"{text}\", the game says \"{native}\". Taking the game's.");
 
         var parent = names.Area is not null
                      && !string.Equals(names.Area, native, StringComparison.OrdinalIgnoreCase)

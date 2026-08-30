@@ -21,11 +21,11 @@ internal sealed partial class ConfigWindow
             Loc.Label("effects.motion", "Motion"), this.config.Motion, Label, ref restart);
         UiText.Tooltip(Loc.Get(
             "effects.motion.tooltip",
-            "None — the letters simply appear where they belong.\n" +
-            "Typewriter — one letter at a time, no fade.\n" +
-            "Rise — letters lift into place from below.\n" +
-            "Wave — letters ride a wave through the line as it appears.\n" +
-            "Burn — letters catch alight and cool into their colour.\n\n" +
+            "None: the letters simply appear where they belong.\n" +
+            "Typewriter: one letter at a time, no fade.\n" +
+            "Rise: letters lift into place from below.\n" +
+            "Wave: letters ride a wave through the line as it appears.\n" +
+            "Burn: letters catch alight and cool into their colour.\n\n" +
             "Runs alongside the Eorzean decode rather than instead of it."));
 
         ImGui.Separator();
