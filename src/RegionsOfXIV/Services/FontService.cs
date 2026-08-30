@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Dalamud;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Game;
 using Dalamud.Interface.GameFonts;
 using Dalamud.Interface.ManagedFontAtlas;
 
@@ -232,14 +233,33 @@ internal sealed class FontService : IDisposable
 
     private static ushort[]? CachedNotificationGlyphRanges;
 
+    // Whether the notification faces have to carry kanji. A notification only ever draws place,
+    // area and weather names, and those come out of the client's own sheets in the client's own
+    // language, so nothing on an English, German or French client is written in kanji.
+    //
+    // The Fonts tab reads this too: it decides what size ceiling it can afford to offer.
+    internal static bool NeedsCjkGlyphs =>
+        Plugin.ClientState.ClientLanguage == ClientLanguage.Japanese;
+
+    // Latin-1 and Latin Extended-A. Latin-1 alone covers the German and French place names, and
+    // the extension is carried for the handful of ligatures and accents beyond it that cost
+    // nothing to include.
+    private static readonly ushort[] LatinGlyphRanges = [0x0020, 0x017F, 0];
+
     // Every glyph a notification face has to be able to draw. ImGui's "Japanese" set is a misnomer
-    // for our purposes: it carries Latin-1 as well as kana and kanji, which between them cover all
-    // four official client languages -- English, German, French and Japanese. Nothing needs adding
-    // to it; the bug was only ever that the custom path never received it.
+    // for our purposes: it carries Latin-1 as well as kana and kanji.
+    //
+    // Which set is asked for is what decides the size ceiling the Fonts tab can offer, because
+    // atlas cost is the glyph count times the square of the size, and the two sets are about 350
+    // glyphs against 3,736. Measured against the bundled Noto with all three roles at their
+    // ceiling: 16 MB of atlas texture for the Latin set, 352 MB for the Japanese one.
     private static unsafe ushort[] NotificationGlyphRanges()
     {
         if (CachedNotificationGlyphRanges != null)
             return CachedNotificationGlyphRanges;
+
+        if (!NeedsCjkGlyphs)
+            return CachedNotificationGlyphRanges = LatinGlyphRanges;
 
         var source = ImGui.GetIO().Fonts.GetGlyphRangesJapanese();
 

@@ -249,9 +249,10 @@ internal sealed partial class ConfigWindow : Window, IDisposable
     // The unit half goes through Loc.Unit, which doubles any per-cent sign in it. Concatenating
     // on its own only moves the problem one string along: the unit reaches sprintf as well.
     private static float Slider(
-        string label, float value, float min, float max, string format, ref bool changed)
+        string label, float value, float min, float max, string format, ref bool changed,
+        ImGuiSliderFlags flags = ImGuiSliderFlags.None)
     {
-        if (ImGui.SliderFloat(label, ref value, min, max, format))
+        if (ImGui.SliderFloat(label, ref value, min, max, format, flags))
             changed = true;
 
         return value;

@@ -39,6 +39,22 @@ internal sealed partial class ConfigWindow
 
     private readonly FontPathEditor[] pathEditors = [new(), new(), new()];
 
+    // Pixels at 100% Dalamud scale. The atlas multiplies by the global scale when it builds, so a
+    // player at 200% sees twice these and pays four times the texture for them.
+    //
+    // The ceilings belong to the glyph set rather than to taste. Atlas cost is the glyph count
+    // times the square of the size, and a client that needs kanji is asking for ten times the
+    // glyphs. Measured with the bundled Noto and all three roles at their ceiling: the Latin set
+    // costs 16 MB of atlas texture, the Japanese one 352 MB, and 352 MB is not something to hand
+    // someone for a larger place name. So a Japanese client keeps the ceiling it has always had.
+    private const float MinTextPx = 24f;
+
+    private const float MinHeaderPx = 10f;
+
+    private static float MaxTextPx => FontService.NeedsCjkGlyphs ? 140f : 280f;
+
+    private static float MaxHeaderPx => FontService.NeedsCjkGlyphs ? 72f : 144f;
+
     private void DrawFontsTab()
     {
         using var tab = ImRaii.TabItem(Loc.Label("fonts.tab", "Fonts"));
@@ -58,8 +74,8 @@ internal sealed partial class ConfigWindow
             FontRole.Text,
             Loc.Get("fonts.role.text", "Text"),
             Loc.Get("fonts.role.text.hint", "The place name itself, the largest line."),
-            24f,
-            140f);
+            MinTextPx,
+            MaxTextPx);
 
         DrawFontRole(
             FontRole.Header,
@@ -67,8 +83,8 @@ internal sealed partial class ConfigWindow
             Loc.Get(
                 "fonts.role.header.hint",
                 "The smaller line above the name, giving the region or area it sits in."),
-            10f,
-            72f);
+            MinHeaderPx,
+            MaxHeaderPx);
 
         DrawFontRole(
             FontRole.Weather,
@@ -76,8 +92,8 @@ internal sealed partial class ConfigWindow
             Loc.Get(
                 "fonts.role.weather.hint",
                 "The forecast line above the header, shown when weather announcements are on."),
-            10f,
-            72f);
+            MinHeaderPx,
+            MaxHeaderPx);
     }
 
     // Every identity here is built from the role rather than from the label. The label is
@@ -95,10 +111,13 @@ internal sealed partial class ConfigWindow
 
         font = font with
         {
+            // Logarithmic, because the useful range sits near the bottom: a linear slider from
+            // 24 to 280 puts every size anyone actually picks into the first fifth of the track.
             SizePx = Slider(
                 Loc.Get("fonts.size", "Size") + $"###font-size-{role}",
                 font.SizePx, minSize, maxSize,
-                "%.0f " + Loc.Unit("units.px", "px"), ref changed),
+                "%.0f " + Loc.Unit("units.px", "px"), ref changed,
+                ImGuiSliderFlags.Logarithmic),
         };
 
         font = font with
