@@ -1,6 +1,5 @@
 ﻿using System;
-using System.IO;
-using Dalamud.Game.Command;
+using System.Collections.Generic;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
@@ -17,8 +16,6 @@ namespace RegionsOfXIV;
 // anything can draw, and the coordinator is wired last because it needs every source to exist.
 public sealed class Plugin : IDalamudPlugin
 {
-    private const string CommandName = "/regions";
-
     [PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
     [PluginService] internal static IFramework Framework { get; private set; } = null!;
     [PluginService] internal static IClientState ClientState { get; private set; } = null!;
@@ -50,10 +47,11 @@ public sealed class Plugin : IDalamudPlugin
     private readonly WeatherTracker weather;
     private readonly BannerWatcher banners;
     private readonly GameZoneArrivals zones;
+    private readonly CommandRouter commands;
 
     public Plugin()
     {
-        var (loaded, isFirstRun) = LoadConfiguration();
+        var (loaded, isFirstRun) = ConfigurationStore.Load();
         this.config = loaded;
 
         // Before anything can draw.
@@ -132,25 +130,18 @@ public sealed class Plugin : IDalamudPlugin
 
         SettleVersion(isFirstRun);
 
-        CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+        var subcommands = new Dictionary<string, Action>(StringComparer.OrdinalIgnoreCase)
         {
-            // Shown in Dalamud's own command list, so it names only the subcommands a release
-            // build has -- the debug ones are not there to be found.
-            //
-            // The subcommands are passed in rather than written into the sentence: they are what
-            // the player types, so a translated one would name a command that does not exist.
-            //
-            // Built once, here, which is after the ApplyLanguage above -- so it is in the right
-            // language at load. Dalamud keeps the string it was given rather than asking again, so a
-            // language change afterwards leaves this one entry in the old language until the
-            // plugin is reloaded.
-            HelpMessage = Loc.Format(
-                "command.help",
-                "Open the Regions of XIV settings. \"{0}\" fires a sample notification, "
-                + "\"{1}\" shows what has changed.",
-                CommandName + " test",
-                CommandName + " changelog"),
-        });
+            ["test"] = this.coordinator.PushPreview,
+            ["changelog"] = this.changelogWindow.ShowAll,
+        };
+#if DEBUG
+        subcommands["icons"] = this.iconBrowserWindow.Toggle;
+        subcommands["preview"] = this.bannerPreviewWindow.Toggle;
+        subcommands["banners"] = SheetSearch.Banners;
+#endif
+
+        this.commands = new CommandRouter(ToggleConfigUi, subcommands);
 
         PluginInterface.UiBuilder.Draw += this.windowSystem.Draw;
         PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUi;
@@ -196,7 +187,7 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.OpenMainUi -= ToggleConfigUi;
         PluginInterface.UiBuilder.DefaultGlobalScaleChanged -= RebuildFonts;
 
-        CommandManager.RemoveHandler(CommandName);
+        this.commands.Dispose();
 
         this.coordinator.Dispose();
 
@@ -218,124 +209,6 @@ public sealed class Plugin : IDalamudPlugin
         this.nativeUiSuppressor.Dispose();
         this.windowFont.Dispose();
         this.fonts.Dispose();
-    }
-
-    private static (Configuration Config, bool IsFirstRun) LoadConfiguration()
-    {
-        try
-        {
-            if (PluginInterface.GetPluginConfig() is Configuration stored)
-            {
-                var changed = stored.Migrate();
-                changed |= MigrateSavedPresets(stored);
-                changed |= stored.RepairFaintColors();
-
-                if (changed)
-                    stored.Save();
-
-                return (stored, false);
-            }
-
-            return (new Configuration(), true);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Could not read the stored configuration; falling back to defaults.");
-            QuarantineBrokenConfig();
-            return (new Configuration(), false);
-        }
-    }
-
-    // A saved preset is a whole configuration of its own, written by whichever build saved it, so
-    // it is exactly as old as the file it sits in and needs the same migration. Without this,
-    // applying a preset saved before a setting was replaced quietly resets that setting to its
-    // default -- the preset still holds the old value, but nothing reads it any more.
-    private static bool MigrateSavedPresets(Configuration config)
-    {
-        var changed = false;
-
-        foreach (var preset in config.UserPresets)
-        {
-            if (preset.Settings is { } settings)
-                changed |= settings.Migrate();
-        }
-
-        return changed;
-    }
-
-    // A config that cannot be parsed is moved aside rather than deleted or overwritten, so the
-    // plugin starts on defaults and whatever the user had is still recoverable by hand.
-    private static void QuarantineBrokenConfig()
-    {
-        try
-        {
-            var file = PluginInterface.ConfigFile;
-            if (!file.Exists)
-                return;
-
-            var target = Path.Combine(
-                file.DirectoryName!,
-                $"{Path.GetFileNameWithoutExtension(file.Name)}.broken-{DateTime.Now:yyyyMMdd-HHmmss}.json");
-
-            file.MoveTo(target, overwrite: true);
-            Log.Information($"Moved the unreadable configuration to {target}");
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Could not set aside the unreadable configuration.");
-        }
-    }
-
-    private void OnCommand(string command, string args)
-    {
-        var argument = args.Trim();
-
-        // Bare /regions opens the settings, matching the installer's own button for the plugin.
-        if (argument.Length == 0)
-        {
-            ToggleConfigUi();
-            return;
-        }
-
-        if (argument.Equals("test", StringComparison.OrdinalIgnoreCase))
-        {
-            this.coordinator.PushPreview();
-            return;
-        }
-
-        if (argument.Equals("changelog", StringComparison.OrdinalIgnoreCase))
-        {
-            this.changelogWindow.ShowAll();
-            return;
-        }
-
-#if DEBUG
-        if (argument.Equals("icons", StringComparison.OrdinalIgnoreCase))
-        {
-            this.iconBrowserWindow.Toggle();
-            return;
-        }
-
-        if (argument.Equals("preview", StringComparison.OrdinalIgnoreCase))
-        {
-            this.bannerPreviewWindow.Toggle();
-            return;
-        }
-
-        if (argument.Equals("banners", StringComparison.OrdinalIgnoreCase))
-        {
-            SheetSearch.Banners();
-            return;
-        }
-
-        if (argument.StartsWith("find ", StringComparison.OrdinalIgnoreCase))
-        {
-            SheetSearch.Run(argument[5..].Trim());
-            return;
-        }
-#endif
-
-        ToggleConfigUi();
     }
 
     private void ToggleConfigUi() => this.configWindow.Toggle();
