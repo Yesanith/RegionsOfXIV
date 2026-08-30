@@ -152,7 +152,7 @@ public class LocalizationTests : IDisposable
     // Reads the bundled files rather than the loaded table, so it checks every string in them and
     // not just the keys something happens to ask for.
     [Fact]
-    public void NoBundledLanguageNeedsGlyphsAxisLacks()
+    public void NoBundledLanguageNeedsGlyphsTheWindowLacks()
     {
         Assert.NotEmpty(Loc.Shipped);
 
@@ -166,7 +166,7 @@ public class LocalizationTests : IDisposable
             foreach (var (key, text) in Loc.Parse(stream!))
             {
                 foreach (var c in text)
-                    Assert.False(Loc.AxisLacks(c), $"{code}/{key}: U+{(int)c:X4} '{c}'");
+                    Assert.False(Loc.WindowFontLacks(c), $"{code}/{key}: U+{(int)c:X4} '{c}'");
             }
         }
     }
@@ -300,13 +300,14 @@ public class LocalizationTests : IDisposable
     [InlineData('森')]
     [InlineData('Я')]
     [InlineData('\u2014')]
-    public void AxisDrawsTheLanguagesTheGameItselfShips(char c)
+    public void TheWindowDrawsWhatTheGameFontAlreadyCarried(char c)
     {
-        Assert.False(Loc.AxisLacks(c));
+        Assert.False(Loc.WindowFontLacks(c));
     }
 
-    // Polish, Czech, Turkish, Romanian, Vietnamese, Korean. All would draw as blanks, and the
-    // loader says so rather than leaving whoever added the file to work it out.
+    // Polish, Czech, Turkish, Romanian and Vietnamese, none of which the game font carries. They
+    // are drawable because UI/WindowFont merges the Windows interface font in for the extended
+    // Latin blocks, and they were blanks before it.
     [Theory]
     [InlineData('ł')]
     [InlineData('ń')]
@@ -314,25 +315,40 @@ public class LocalizationTests : IDisposable
     [InlineData('č')]
     [InlineData('ř')]
     [InlineData('ı')]
+    [InlineData('İ')]
     [InlineData('ğ')]
+    [InlineData('Ğ')]
+    [InlineData('ş')]
+    [InlineData('Ş')]
     [InlineData('ț')]
     [InlineData('ệ')]
-    [InlineData('한')]
-    public void AxisCannotDrawLanguagesTheGameDoesNotShip(char c)
+    public void TheWindowDrawsWhatTheMergeAddsForLatinLanguages(char c)
     {
-        Assert.True(Loc.AxisLacks(c));
+        Assert.False(Loc.WindowFontLacks(c));
     }
 
-    // AXIS carries the Russian alphabet and nothing else Cyrillic, so Russian is viable and its
-    // neighbours are not. Easy to get wrong in the other direction and warn about all Cyrillic.
+    // The merge is Latin only, so the scripts it leaves out are still worth warning about.
+    [Theory]
+    [InlineData('한')]
+    [InlineData('ก')]
+    [InlineData('א')]
+    [InlineData('ب')]
+    public void TheWindowStillCannotDrawTheScriptsTheMergeLeavesOut(char c)
+    {
+        Assert.True(Loc.WindowFontLacks(c));
+    }
+
+    // The game font carries the Russian alphabet and nothing else Cyrillic, and the merge is Latin
+    // only, so Russian is viable and its neighbours are not. Easy to get wrong in the other
+    // direction and warn about all Cyrillic.
     [Theory]
     [InlineData('А')]
     [InlineData('я')]
     [InlineData('Ё')]
     [InlineData('ё')]
-    public void AxisDrawsRussian(char c)
+    public void TheWindowDrawsRussian(char c)
     {
-        Assert.False(Loc.AxisLacks(c));
+        Assert.False(Loc.WindowFontLacks(c));
     }
 
     // Ukrainian and Serbian sit just outside the Russian range.
@@ -348,9 +364,9 @@ public class LocalizationTests : IDisposable
     [InlineData('Ђ')]
     [InlineData('Љ')]
     [InlineData('Џ')]
-    public void AxisCannotDrawUkrainianOrSerbian(char c)
+    public void TheWindowCannotDrawUkrainianOrSerbian(char c)
     {
-        Assert.True(Loc.AxisLacks(c));
+        Assert.True(Loc.WindowFontLacks(c));
     }
 
     // --- language codes ---

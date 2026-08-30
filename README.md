@@ -205,17 +205,23 @@ beginning with an underscore, except `_status`: a file whose status says
 which is how a rough translation stops pretending to be finished. Take the
 marker out once the file has been through a speaker, and the notice stops.
 
-#### One hard limit: the font
+#### What the window can draw
 
 The window draws with the game's own AXIS font, which carries Latin-1, the
 Russian Cyrillic alphabet, kana and around 6,300 kanji, but only eight
-characters of Latin Extended-A. **Polish, Czech, Turkish, Romanian and
-Vietnamese diacritics have no glyph and would draw as blanks**, and glyph ranges
-are fixed when the font atlas is built, so nothing recovers them at run time.
-The loader warns to the log when a language file uses characters AXIS lacks, and
-`NoBundledLanguageNeedsGlyphsAxisLacks` fails the build before one can ship.
-Adding such a language means giving the window a font of its own, which is a far
-larger change than dropping in a file.
+characters of Latin Extended-A. `UI/WindowFont.cs` therefore merges the Windows
+interface font in behind it for Latin Extended-A, Latin Extended-B and Latin
+Extended Additional, so **Turkish, Polish, Czech, Romanian and Vietnamese all
+draw**. Basic Latin still comes from AXIS, because the first font to claim a code
+point wins the merge, so those languages render in two typefaces at once. Uneven,
+and a great deal better than blank boxes.
+
+Still out of reach: **non-Russian Cyrillic, Hebrew, Arabic, Thai, Korean and
+Chinese**, since the merge is Latin only. Glyph ranges are fixed when the atlas
+is built, so nothing recovers them at run time. The loader warns to the log when
+a language file uses characters the window cannot draw, and
+`NoBundledLanguageNeedsGlyphsTheWindowLacks` fails the build before one can
+ship.
 
 ### How it fits together
 

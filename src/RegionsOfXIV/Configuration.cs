@@ -53,6 +53,11 @@ public class Configuration : IPluginConfiguration, IGateSettings
 
     public bool HideNativeBanner { get; set; } = true;
 
+    // Which language the banner wording is drawn in, or null to follow the client. A code rather
+    // than a flag, so a second language is a value here instead of a shape change. Absent from an
+    // older config file, JSON leaves it null, which is the default, so this needs no migration.
+    public string? BannerNameLanguage { get; set; }
+
     public float VerticalPosition { get; set; } = 25f;
 
     public float HorizontalPosition { get; set; } = 50f;
@@ -90,6 +95,14 @@ public class Configuration : IPluginConfiguration, IGateSettings
     public const float SpacedHeaderGap = 1.6f;
 
     public float HeaderGap { get; set; } = OverlappedHeaderGap;
+
+    // How far below the anchor a banner sits, in display-font line heights, so it clears the
+    // place name when the two are up together. A fixed drop rather than one measured off the
+    // place name: a banner then lands in the same spot whether or not anything else is on
+    // screen, which is the half of it that reads as deliberate.
+    //
+    // The default clears a header plus a line of display text at the stock font sizes.
+    public float BannerGap { get; set; } = 2f;
 
     public bool DecodeEffectEnabled { get; set; } = true;
 

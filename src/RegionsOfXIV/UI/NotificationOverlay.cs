@@ -6,8 +6,11 @@ using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
 
-// Two independent stacks of notifications share one full-screen, click-through window: place
-// names in one lane and weather in the other, so a weather change never displaces an arrival.
+// Three independent stacks of notifications share one full-screen, click-through window: place
+// names in one lane, weather above them and banners below, so none of the three displaces
+// another. Spawn dismisses what a lane is already showing, which is right within a lane and
+// wrong across them: Light Party lands about two milliseconds after the zone arrival that admits
+// you to the duty, and sharing a lane meant one of the two was always thrown away.
 //
 // On top of that sits the config-window preview, which is the same machinery driven by hand.
 // Four entry points feed it and the difference between them matters -- see the note above Touch.
@@ -26,6 +29,7 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
 
     private readonly Lane locations;
     private readonly Lane weather;
+    private readonly Lane banners;
 
     private bool previewHeld;
     private PreviewSample held;
@@ -41,6 +45,9 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
 
         this.weather = new Lane(
             this.renderer.DrawWeather, () => config.WeatherFontSize * StackSpacingRatio);
+
+        this.banners = new Lane(
+            this.renderer.DrawBanner, () => config.DisplayFontSize * StackSpacingRatio);
 
         Flags = ImGuiWindowFlags.NoDecoration
                 | ImGuiWindowFlags.NoInputs
@@ -63,6 +70,7 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     {
         this.locations.Clear();
         this.weather.Clear();
+        this.banners.Clear();
         this.previewHeld = false;
     }
 
@@ -100,12 +108,21 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         Spawn(this.weather, new Line(null, text, iconId));
     }
 
+    public void PushBanner(string text)
+    {
+        if (this.previewHeld)
+            return;
+
+        Spawn(this.banners, new Line(null, text));
+    }
+
     // Called on every frame a setting is being changed. Keeps one preview alive and lets the
     // renderer pick up the new colours, rather than restarting the animation on each keystroke.
     public void TouchPreview(PreviewSample sample)
     {
         Touch(this.locations, LocationLine(sample));
         Touch(this.weather, WeatherLine(sample));
+        Touch(this.banners, BannerLine(sample));
     }
 
     // The "Preview" button, and anything that wants the animation played from the top. While
@@ -117,11 +134,13 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         {
             Restart(this.locations, LocationLine(sample));
             Restart(this.weather, WeatherLine(sample));
+            Restart(this.banners, BannerLine(sample));
             return;
         }
 
         Replay(this.locations, LocationLine(this.held));
         Replay(this.weather, WeatherLine(this.held));
+        Replay(this.banners, BannerLine(this.held));
     }
 
     // Editing mode. While held, Draw keeps re-asserting the preview every frame so it never
@@ -135,13 +154,15 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         {
             Release(this.locations);
             Release(this.weather);
+            Release(this.banners);
             return;
         }
 
         HoldEach();
     }
 
-    public override bool DrawConditions() => !this.locations.IsEmpty || !this.weather.IsEmpty;
+    public override bool DrawConditions() =>
+        !this.locations.IsEmpty || !this.weather.IsEmpty || !this.banners.IsEmpty;
 
     public override void PreDraw()
     {
@@ -162,10 +183,12 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         {
             ReleaseIfIdle(this.locations);
             ReleaseIfIdle(this.weather);
+            ReleaseIfIdle(this.banners);
         }
 
         Advance(this.locations);
         Advance(this.weather);
+        Advance(this.banners);
     }
 
     // Goes through the same Configuration.HeaderFor as a real arrival. Building the preview
@@ -179,10 +202,16 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             ? new Line(null, sample.Weather, sample.WeatherIcon)
             : null;
 
+    // Conditional on the same toggle the weather line is conditional on, so someone with banners
+    // switched off is not shown one, and someone tuning the drop can see what it does.
+    private Line? BannerLine(in PreviewSample sample) =>
+        this.config.BannerNotificationEnabled ? new Line(null, sample.Banner) : null;
+
     private void HoldEach()
     {
         Hold(this.locations, LocationLine(this.held));
         Hold(this.weather, WeatherLine(this.held));
+        Hold(this.banners, BannerLine(this.held));
     }
 
     // Backwards so a notification finishing its fade can be removed without disturbing the

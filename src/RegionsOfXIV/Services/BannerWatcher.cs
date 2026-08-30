@@ -7,7 +7,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace RegionsOfXIV.Services;
 
-// What each _Image addon is currently showing, and what was decided about it. Kept apart from the
+// What each banner addon is currently showing, and what was decided about it. Kept apart from the
 // addon pointers so the ordering rule in OnImage can be exercised without the game running.
 internal sealed class BannerDecisions
 {
@@ -28,7 +28,7 @@ internal sealed class BannerDecisions
         this.showing.TryGetValue(addon, out var state) && state.Taken;
 }
 
-// The game's full-screen banners live in four persistent addons that are created at login and
+// The game's full-screen banners live in five persistent addons that are created at login and
 // hidden between uses, so there is no setup event to hook -- the only way to notice one is to
 // look at them every frame and watch for a change.
 //
@@ -36,7 +36,10 @@ internal sealed class BannerDecisions
 // immediately when the feature is off.
 internal sealed class BannerWatcher : IBannerSource, IDisposable
 {
-    private static readonly string[] ImageAddons = ["_Image", "_Image2", "_Image3", "_Image4"];
+    // _ImageScreen carries the party banners, which is why Light Party and Full Party went neither
+    // announced nor hidden: nothing was watching the addon they arrive on.
+    private static readonly string[] ImageAddons =
+        ["_Image", "_Image2", "_Image3", "_Image4", "_ImageScreen"];
 
     private readonly Configuration config;
 
@@ -75,12 +78,12 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
             return;
         }
 
-        var addon = (AddonImage*)args.Addon.Address;
+        var addon = (AtkUnitBase*)args.Addon.Address;
         if (addon == null)
             return;
 
         var which = (nint)addon;
-        var icon = addon->IsVisible ? IconOf(addon->ImageNode) : 0;
+        var icon = addon->IsVisible ? IconOf(ImageNodeOf(addon, args.AddonName)) : 0;
 
         if (this.decisions.IsNew(which, icon))
             Decide(which, icon, args.AddonName);
@@ -122,6 +125,14 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
 
         this.decisions.Record(which, icon, reason == BannerBlock.None);
 
+        // Which addon showed it, which the coordinator's own line cannot say because the addon is
+        // not on the event. Without it there is no way to tell one banner arriving twice from two
+        // banners arriving on different addons, and that is the difference between a stale read
+        // and a pair the cooldown is separating.
+        Log.Debug(
+            $"Banner [{icon}] on {addonName}: {(reason == BannerBlock.None ? "taken" : $"left alone, {reason}")}"
+            + $", hiding {(this.config.HideNativeBanner ? "on" : "off")}");
+
         // Raised even when the gate refuses. The coordinator logs every banner it hears about, and
         // that line is the only view there is of what gets turned down and why.
         OnBannerShown?.Invoke(icon, name, reason);
@@ -130,12 +141,28 @@ internal sealed class BannerWatcher : IBannerSource, IDisposable
     // Made transparent rather than hidden. Setting IsVisible would make the addon lie about its
     // own state, and the game turns the banner off again on its own once it is done -- which also
     // resets the alpha, so this needs no undo.
-    private static unsafe void Hide(AddonImage* addon)
+    private static unsafe void Hide(AtkUnitBase* addon)
     {
         var root = addon->RootNode;
 
         if (root != null)
             root->Color.A = 0;
+    }
+
+    // ClientStructs has AddonImage and AddonImage3 and nothing for _ImageScreen, so the cast the
+    // other four go through would be reading a layout that has not been confirmed for it. What has
+    // been confirmed, off the live addon, is that it holds a res root with one image node under it
+    // at node id 2. Fetching that by id and checking its type before the cast keeps this to reads
+    // the struct definitions support, and yields null rather than a bad pointer if a patch
+    // reshuffles the tree.
+    private static unsafe AtkImageNode* ImageNodeOf(AtkUnitBase* addon, string name)
+    {
+        if (name != "_ImageScreen")
+            return ((AddonImage*)addon)->ImageNode;
+
+        var node = addon->GetNodeById(2);
+
+        return node != null && node->Type == NodeType.Image ? (AtkImageNode*)node : null;
     }
 
     // IconId is only populated while the texture is loading. Once it has settled the id survives

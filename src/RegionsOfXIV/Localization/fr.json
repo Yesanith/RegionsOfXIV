@@ -403,7 +403,7 @@
     "message": "{0} n'a pas de caractères japonais. Sur ce client, cela veut dire que les noms de lieux apparaîtront comme des cases vides, et pas seulement flous. Choisis plutôt Axis ou Noto Sans CJK."
   },
   "fonts.upscaled": {
-    "message": "Cette police n'a pas de bitmap au-dessus de {0:F0} px, donc à {1:F0} px elle est agrandie et paraîtra molle. Réduis la taille, ou passe à Noto Sans CJK, qui reste nette à toute taille."
+    "message": "Cette police n'a pas de bitmap au-dessus de {0:F0} px, donc à {1:F0} px elle est agrandie et paraîtra molle. Réduis la taille, ou passe à Noto Sans CJK ou à un fichier de police à toi : l'un comme l'autre reste net à toute taille."
   },
   "general.tab": {
     "message": "Général"
@@ -596,5 +596,24 @@
   },
   "notice.translation": {
     "message": "Cette traduction a été rédigée par une machine et n'a été vérifiée par personne qui parle la langue. Si quelque chose sonne mal, les corrections sont les bienvenues :\n{0}"
+  },
+  "fonts.reduced": {
+    "message": "Dessiné à {0:F0} px plutôt qu'à {1:F0}. Ce client affiche des noms de lieux japonais, donc chaque police de notification doit porter des kanji, et à cette taille elle ne pourrait pas être construite. Ton réglage est conservé et revient si la langue du jeu change."
+  },
+  "notifications.bannerlanguage": {
+    "message": "Langue des bannières"
+  },
+  "notifications.bannerlanguage.follow": {
+    "message": "Suivre le client"
+  },
+  "notifications.bannerlanguage.tooltip": {
+    "message": "Dans quelle langue le texte des bannières est dessiné.\n\nSuivre le client prend la langue dans laquelle le jeu tourne. En choisir une autre remplace la bannière du jeu par la version de ce plugin dans cette langue : sur un client allemand réglé sur l'anglais, l'image allemande est estompée et du texte anglais est dessiné à sa place.\n\nSeules les langues pour lesquelles ce plugin a des mots sont proposées. Les bannières dont il n'a pas les mots gardent celles du jeu, quelle que soit la langue choisie."
+  },
+
+  "notifications.bannergap": {
+    "message": "Écart de la bannière"
+  },
+  "notifications.bannergap.tooltip": {
+    "message": "À quelle distance sous un nom de lieu se place une bannière, mesurée en\nlignes du texte d'affichage.\n\nLes deux peuvent être à l'écran en même temps : en entrant dans une\nmission, le jeu annonce l'endroit puis la taille de l'équipe un instant\nplus tard. Voici l'espace entre les deux. L'écart est le même qu'un nom\nsoit affiché ou non, une bannière seule se place donc ici aussi."
   }
 }

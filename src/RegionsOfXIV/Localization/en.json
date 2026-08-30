@@ -570,7 +570,7 @@
     "description": "Shown on a Japanese client when a Latin-only typeface is picked. {0} is that typeface's name. \"Axis\" and \"Noto Sans CJK\" are typeface names and stay as-is."
   },
   "fonts.upscaled": {
-    "message": "This font has no bitmap above {0:F0} px, so at {1:F0} px it is being upscaled and will look soft. Lower the size, or switch to Noto Sans CJK, which stays sharp at any size.",
+    "message": "This font has no bitmap above {0:F0} px, so at {1:F0} px it is being upscaled and will look soft. Lower the size, or switch to Noto Sans CJK or a font file of your own, either of which stays sharp at any size.",
     "description": "Shown when the chosen size exceeds what a bitmap typeface holds. {0} is the largest size it has, {1} is the size chosen - keep the \":F0\" inside both braces, it rounds them to whole numbers. \"px\" is the pixel abbreviation."
   },
 
@@ -811,7 +811,7 @@
   },
   "units.lines": {
     "message": "lines",
-    "description": "Unit shown after the number on the Header gap slider, as in \"1.50 lines\". The gap is measured in lines of header text. A space is added before it in code, so do not start this with one."
+    "description": "Unit shown after the number on the Header gap and Banner drop sliders, as in \"1.50 lines\". Both are measured in lines of text. A space is added before it in code, so do not start this with one."
   },
   "units.seconds": {
     "message": "s",
@@ -862,5 +862,30 @@
   "notice.translation": {
     "message": "This translation was drafted by a machine and has not been checked by anyone who speaks the language. If something reads badly, corrections are very welcome:\n{0}",
     "description": "Shown at the top of the settings window when the loaded translation marks itself a machine draft. {0} is the Discord invite address - keep it on its own line. This one matters more than most: it is the only thing telling a reader that what they are looking at has not been checked, so it needs to be plain and unmistakable in your language."
+  },
+  "fonts.reduced": {
+    "message": "Drawing at {0:F0} px rather than {1:F0}. This client shows Japanese place names, so every notification font has to carry kanji, and at that size it would be too large to build. Your setting is kept as it is and comes back if the game's language changes.",
+    "description": "Shown under the size slider when the stored size is larger than this client can build. It only appears on a Japanese client, and only for someone whose config was set while the game was in another language. {0} is the size actually used and {1} the size they asked for; keep the \":F0\" inside both braces, it rounds them to whole numbers. The reassurance in the last sentence matters: nothing has been rewritten, so say so plainly."
+  },
+  "notifications.bannerlanguage": {
+    "message": "Banner language",
+    "description": "Dropdown under the banner checkboxes, choosing which language the full-screen banner wording is drawn in. Only usable while Banners is on."
+  },
+  "notifications.bannerlanguage.follow": {
+    "message": "Follow the client",
+    "description": "First entry in the Banner language dropdown, and the default: use whichever language the FFXIV client itself is running in. Every other entry is a language's own name and is not translated."
+  },
+  "notifications.bannerlanguage.tooltip": {
+    "message": "Which language the banner wording is drawn in.\n\nFollowing the client uses the language the game is in. Choosing another replaces the game's own banner with this plugin's version in that language, so on a German client set to English the German artwork is faded out and English words are drawn in its place.\n\nOnly languages this plugin has wording for are listed. Banners it has no wording for keep the game's own, whichever language is chosen.",
+    "description": "Tooltip for the Banner language dropdown. Keep the two blank lines. The middle paragraph is the important one: it warns that picking a language the client is not in means the game's own artwork is faded out and replaced, which is a visible change the player should not meet by surprise. \"Following the client\" refers to the first dropdown entry, so match notifications.bannerlanguage.follow."
+  },
+
+  "notifications.bannergap": {
+    "message": "Banner drop",
+    "description": "Slider under the banner checkboxes, setting how far below a place name a banner is drawn. Only usable while Banners is on. The unit is translated separately as units.lines."
+  },
+  "notifications.bannergap.tooltip": {
+    "message": "How far below a place name a banner sits, measured in lines of the\ndisplay text.\n\nThe two can be on screen together: entering a duty announces where you\nare and then the party size a moment later. This is the room between\nthem. The drop is the same whether or not a name is up, so a banner on\nits own also lands here.",
+    "description": "Tooltip for the Banner drop slider. Keep the line breaks and the blank line. \"Duty\" is the game's own word for an instanced dungeon or raid - use the wording FFXIV uses in your language."
   }
 }

@@ -17,6 +17,7 @@ public class PresetCodeTests
         DisplayFont = FontChoice.Jupiter,
         DisplayFontSize = 61f,
         LetterSpacing = 12.5f,
+        BannerGap = 3.25f,
         UppercaseText = true,
         HideInCombat = true,
         TextColor = new Vector4(0.1f, 0.2f, 0.3f, 0.4f),

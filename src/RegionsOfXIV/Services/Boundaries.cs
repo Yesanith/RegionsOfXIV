@@ -124,6 +124,11 @@ internal interface INotificationSink
 
     void PushWeather(string text, uint iconId);
 
+    // Separate from Push because a banner and a place name can be on screen at the same moment.
+    // Light Party arrives about two milliseconds after the zone arrival that admits you to the
+    // duty, and through Push the later of the two dismissed the earlier.
+    void PushBanner(string text);
+
     NotificationTiming Timing { get; }
 }
 

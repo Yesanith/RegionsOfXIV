@@ -11,13 +11,19 @@ internal sealed class ChangelogWindow : Window, IDisposable
 {
     private static readonly Vector4 VersionColor = new(0.875f, 0.761f, 0.584f, 1f);
 
+    private readonly WindowFont font;
+
+    private IDisposable? pushedFont;
+
     private ChangelogEntry[] entries = [];
 
     private bool afterUpdate;
 
-    public ChangelogWindow()
+    public ChangelogWindow(WindowFont font)
         : base(Title)
     {
+        this.font = font;
+
         SizeConstraints = new WindowSizeConstraints
         {
             MinimumSize = new Vector2(380, 180),
@@ -29,6 +35,16 @@ internal sealed class ChangelogWindow : Window, IDisposable
     }
 
     public void Dispose() { }
+
+    // See ConfigWindow: the title is translated too, so the font has to be up before the window
+    // begins rather than only around its body.
+    public override void PreDraw() => this.pushedFont = this.font.Push();
+
+    public override void PostDraw()
+    {
+        this.pushedFont?.Dispose();
+        this.pushedFont = null;
+    }
 
     // Rebuilt whenever the window opens rather than only in the constructor: the title is
     // translated, and one set once would keep whichever language the game started in. Everything

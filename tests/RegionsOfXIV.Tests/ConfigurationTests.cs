@@ -102,6 +102,24 @@ public class ConfigurationTests
         Assert.Null(ConfigurationCopy.Find("Language"));
     }
 
+    // Null is the default and is also what a config written before this setting existed
+    // deserialises to, which is why it needs no migration step.
+    [Fact]
+    public void ANewConfigurationFollowsTheClientForBannerNames()
+    {
+        Assert.Null(new Configuration().BannerNameLanguage);
+    }
+
+    // Same argument as the interface language: which language someone reads their own banners in
+    // is a property of their installation, not of a look, and a share code arriving from another
+    // player has no business changing it. The round-trip test would carry a string quite happily,
+    // so this is a decision rather than a limitation.
+    [Fact]
+    public void TheBannerLanguageDoesNotTravelInAPreset()
+    {
+        Assert.Null(ConfigurationCopy.Find("BannerNameLanguage"));
+    }
+
     [Fact]
     public void AConfigWrittenBeforeWeatherHadItsOwnSizeKeepsTheSizeItWasShowing()
     {
