@@ -27,11 +27,15 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static ITextureProvider TextureProvider { get; private set; } = null!;
     [PluginService] internal static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
     [PluginService] internal static IPluginLog Log { get; private set; } = null!;
+    [PluginService] internal static IGameConfig GameConfig { get; private set; } = null!;
 
     private readonly WindowSystem windowSystem = new("RegionsOfXIV");
 
     private readonly Configuration config;
     private readonly FontService fonts;
+    private readonly GameAudio gameAudio;
+    private readonly FileSoundPlayer filePlayer;
+    private readonly NotificationSounds sounds;
     private readonly WindowFont windowFont;
     private readonly NativeUiSuppressor nativeUiSuppressor;
     private readonly NotificationOverlay overlay;
@@ -67,7 +71,11 @@ public sealed class Plugin : IDalamudPlugin
 
         this.fonts.Rebuild();
 
-        this.overlay = new NotificationOverlay(this.config, this.fonts);
+        this.gameAudio = new GameAudio();
+        this.filePlayer = new FileSoundPlayer(this.gameAudio);
+
+        this.sounds = new NotificationSounds(this.config, playFile: this.filePlayer.Play);
+        this.overlay = new NotificationOverlay(this.config, this.fonts, this.sounds);
 
         var game = new DalamudGameState();
 
@@ -109,7 +117,10 @@ public sealed class Plugin : IDalamudPlugin
                 this.changelogWindow.ShowAll,
                 this.nativeUiSuppressor.RestoreAreaText,
                 this.nativeUiSuppressor.RestoreLoadingTitle,
-                ApplyLanguage),
+                ApplyLanguage,
+                AuditionSound,
+                () => this.filePlayer.Problem,
+                () => GameMixerRules.Decide(this.gameAudio).Reason),
             this.windowFont);
 
         this.windowSystem.AddWindow(this.overlay);
@@ -139,6 +150,7 @@ public sealed class Plugin : IDalamudPlugin
         subcommands["icons"] = this.iconBrowserWindow.Toggle;
         subcommands["preview"] = this.bannerPreviewWindow.Toggle;
         subcommands["banners"] = SheetSearch.Banners;
+        subcommands["sound"] = SoundSweep.Sweep;
 #endif
 
         this.commands = new CommandRouter(ToggleConfigUi, subcommands);
@@ -198,12 +210,17 @@ public sealed class Plugin : IDalamudPlugin
 
         this.windowSystem.RemoveAllWindows();
 #if DEBUG
+        SoundSweep.Stop();
         this.bannerPreviewWindow.Dispose();
         this.iconBrowserWindow.Dispose();
 #endif
         this.changelogWindow.Dispose();
         this.configWindow.Dispose();
         this.overlay.Dispose();
+
+        // Before the rest of the teardown finishes: a WaveOutEvent owns a device handle and a
+        // thread, and a hot reload that left one open would leak both and keep playing.
+        this.filePlayer.Dispose();
 
         this.uiVisibilityGuard.Dispose();
         this.nativeUiSuppressor.Dispose();
@@ -212,6 +229,12 @@ public sealed class Plugin : IDalamudPlugin
     }
 
     private void ToggleConfigUi() => this.configWindow.Toggle();
+
+    // Marshalled, because the settings window draws during the game's present rather than on the
+    // framework tick, and PlayChatSoundEffect is a game function. Every other sound in the plugin
+    // rides a push, which is already on the framework thread.
+    private void AuditionSound() =>
+        _ = Framework.RunOnFrameworkThread(this.sounds.PlayNow);
 
     private void RebuildFonts() =>
         this.fonts.Rebuild();

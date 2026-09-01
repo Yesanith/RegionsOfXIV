@@ -111,6 +111,56 @@ internal interface IGateSettings
     bool BannerNotificationEnabled { get; }
 }
 
+// The slice of the config NotificationSounds can see, narrow for the same reason IGateSettings is:
+// it lets the interval rule be exercised against a fake without a Configuration or a game.
+internal interface ISoundSettings
+{
+    SoundSource SoundSource { get; }
+
+    int GameSoundId { get; }
+
+    string SoundFilePath { get; }
+
+    bool SoundOnLocation { get; }
+
+    bool SoundOnWeather { get; }
+
+    bool SoundOnBanner { get; }
+}
+
+// The game's own sound settings, as far as playing a file has to care about them.
+//
+// Only the file path reads any of this. A game sound is mixed by the game and obeys all of it
+// without being asked; a file goes out through NAudio into the process's Windows audio session,
+// where none of it applies unless something puts it back. GameMixerRules is that something, and
+// this is the interface that lets it be tested without a client.
+//
+// The volumes are the raw 0 to 100 the game stores. The mute flags are true when muted, which is
+// the way round the client was observed to write them rather than the way the names read.
+internal interface IGameAudio
+{
+    // False when the options could not be read at all, which is the state before the game's config
+    // is up. Separate from the settings themselves so that "not known" is not silently answered as
+    // "not muted, full volume".
+    bool Readable { get; }
+
+    bool SoundDisabled { get; }
+
+    bool MasterMuted { get; }
+
+    bool SystemMuted { get; }
+
+    int MasterVolume { get; }
+
+    int SystemVolume { get; }
+
+    bool WindowFocused { get; }
+
+    bool UnfocusedSoundAllowed { get; }
+
+    bool UnfocusedSystemSoundAllowed { get; }
+}
+
 internal readonly record struct NotificationTiming(TimeSpan UntilReadable, TimeSpan OnScreen);
 
 // Where an announcement goes once it has been decided on. The overlay implements it; the tests

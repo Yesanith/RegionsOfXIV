@@ -615,5 +615,130 @@
   },
   "notifications.bannergap.tooltip": {
     "message": "À quelle distance sous un nom de lieu se place une bannière, mesurée en\nlignes du texte d'affichage.\n\nLes deux peuvent être à l'écran en même temps : en entrant dans une\nmission, le jeu annonce l'endroit puis la taille de l'équipe un instant\nplus tard. Voici l'espace entre les deux. L'écart est le même qu'un nom\nsoit affiché ou non, une bannière seule se place donc ici aussi."
+  },
+
+  "notifications.sound": {
+    "message": "Son"
+  },
+  "notifications.sound.off": {
+    "message": "Aucun"
+  },
+  "notifications.sound.game": {
+    "message": "Un son du jeu"
+  },
+  "notifications.sound.tooltip": {
+    "message": "Joue un son quand une notification apparaît. Désactivé par défaut.\n\nUn son du jeu est un effet sonore de discussion, mixé par le jeu : le volume général et celui des sons système le contrôlent, et non celui des effets sonores, et baisser les effets sonores ne le rendra pas plus discret.\n\nUn fichier à toi est joué par le plugin, que le jeu ne mixe pas du tout, donc le plugin lit ces mêmes réglages et les suit lui-même. Il reste silencieux quand le jeu est en sourdine, et quand la fenêtre n'est pas au premier plan, sauf si tu as dit au jeu de continuer à jouer dans ce cas."
+  },
+  "notifications.sound.effect": {
+    "message": "Effet sonore {0}"
+  },
+  "notifications.sound.audition": {
+    "message": "Jouer"
+  },
+  "notifications.sound.audition.tooltip": {
+    "message": "Joue le son choisi immédiatement. Le court délai qui empêche deux notifications de sonner en même temps est ignoré, donc appuyer plusieurs fois fait toujours du bruit."
+  },
+  "notifications.soundon.location": {
+    "message": "Son sur les noms de lieu"
+  },
+  "notifications.soundon.weather": {
+    "message": "Son sur la météo"
+  },
+  "notifications.soundon.banner": {
+    "message": "Son sur les bannières"
+  },
+  "notifications.soundon.tooltip": {
+    "message": "Quels types de notification produisent un son. Deux qui arrivent ensemble n'en produisent qu'un seul, celui qui arrive en premier."
+  },
+
+  "notifications.sound.file": {
+    "message": "Un fichier à toi"
+  },
+  "sound.browse": {
+    "message": "Parcourir"
+  },
+  "sound.clear": {
+    "message": "Effacer"
+  },
+  "sound.custom.notice": {
+    "message": "Un fichier que tu fournis est joué tel quel, et il reste à ta charge. Tout ce qui dépasse {0} secondes est coupé, pour qu'un morceau entier ne se joue pas par-dessus une notification déjà partie. Un fichier que le plugin ne sait pas lire, ou une licence que tu n'as pas, te revient et non à Regions of XIV."
+  },
+  "sound.dialog.title": {
+    "message": "Choisir un fichier son"
+  },
+  "sound.path.hint": {
+    "message": "Chemin vers un fichier .wav ou .mp3"
+  },
+  "sound.play": {
+    "message": "Jouer"
+  },
+  "sound.play.tooltip": {
+    "message": "Joue le fichier choisi immédiatement. Le court délai qui empêche deux notifications de sonner en même temps est ignoré, donc appuyer plusieurs fois réessaie à chaque fois."
+  },
+  "sound.playingwith": {
+    "message": "Joue {0}."
+  },
+  "sound.problem.channels": {
+    "message": "Ce fichier a plus de deux canaux, ce qui ne peut pas être joué ici. Un fichier mono ou stéréo fonctionnera."
+  },
+  "sound.problem.decode": {
+    "message": "Ce fichier n'a pas pu être lu. Le journal du plugin indique le format qu'il a vu, c'est le plus rapide pour comprendre pourquoi."
+  },
+  "sound.problem.device": {
+    "message": "Windows n'a pas voulu ouvrir de périphérique audio, donc rien ne peut être joué."
+  },
+  "sound.problem.directory": {
+    "message": "C'est un dossier, pas un fichier son."
+  },
+  "sound.problem.empty": {
+    "message": "Ce fichier est vide."
+  },
+  "sound.problem.format": {
+    "message": "Seuls les fichiers .wav et .mp3 peuvent être joués."
+  },
+  "sound.problem.huge": {
+    "message": "Ce fichier est bien plus gros qu'un son de notification ne devrait l'être, il est donc laissé de côté."
+  },
+  "sound.problem.locked": {
+    "message": "Ce fichier n'a pas pu être ouvert. Un autre programme le tient peut-être ouvert."
+  },
+  "sound.problem.missing": {
+    "message": "Il n'y a plus de fichier à ce chemin."
+  },
+  "sound.problem.none": {
+    "message": "Aucun fichier son n'a encore été choisi."
+  },
+  "sound.problem.unreadable": {
+    "message": "Ce chemin ne peut pas être lu."
+  },
+  "sound.silent.disabled": {
+    "message": "Le son du jeu est coupé, donc rien n'est joué."
+  },
+  "sound.silent.muted": {
+    "message": "Le jeu est en sourdine, donc rien n'est joué. Cela suit les sourdines du volume général et des sons système, car c'est la voie qu'utilise un son de notification."
+  },
+  "sound.silent.unfocused": {
+    "message": "La fenêtre du jeu n'est pas au premier plan et son réglage pour jouer du son quand elle n'est pas active est désactivé, donc rien n'est joué."
+  },
+  "sound.silent.unreadable": {
+    "message": "Les réglages audio du jeu ne peuvent pas encore être lus, donc rien n'est joué. Cela se règle une fois que tu es en jeu."
+  },
+  "sound.silent.zero": {
+    "message": "Le volume général ou celui des sons système est à zéro, donc rien n'est joué."
+  },
+  "sound.problem.encoding": {
+    "message": "Ce fichier est un WAV dans l'encodage {0}, pour lequel Windows n'a pas de convertisseur. Le réenregistrer en PCM ordinaire, ou en MP3, fonctionnera."
+  },
+  "sound.problem.mp3codec": {
+    "message": "Windows n'a aucun décodeur MP3 disponible, donc ce fichier ne peut pas être joué. Un fichier .wav fonctionnera quand même."
+  },
+  "sound.problem.notaudio": {
+    "message": "Ce fichier n'est en réalité ni un WAV ni un MP3, quel que soit son nom."
+  },
+  "sound.problem.samples": {
+    "message": "Ce fichier est sous une forme dont le plugin ne sait pas tirer de son. Le réenregistrer en PCM 16 bits ordinaire fonctionnera."
+  },
+  "sound.problem.truncated": {
+    "message": "Ce fichier s'arrête en plein milieu et n'a pas pu être lu jusqu'au bout."
   }
 }

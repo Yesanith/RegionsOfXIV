@@ -614,5 +614,130 @@
   },
   "notifications.bannergap.tooltip": {
     "message": "Wie weit unter einem Ortsnamen ein Banner sitzt, gemessen in Zeilen\nder Anzeigeschrift.\n\nBeide können gleichzeitig zu sehen sein: Beim Betreten einer Instanz\nwird zuerst der Ort angesagt und kurz darauf die Gruppengröße. Das hier\nist der Platz dazwischen. Der Abstand bleibt gleich, auch wenn kein Name\nzu sehen ist, ein einzelnes Banner landet also ebenfalls hier."
+  },
+
+  "notifications.sound": {
+    "message": "Ton"
+  },
+  "notifications.sound.off": {
+    "message": "Keiner"
+  },
+  "notifications.sound.game": {
+    "message": "Einer des Spiels"
+  },
+  "notifications.sound.tooltip": {
+    "message": "Spielt einen Ton ab, wenn eine Meldung erscheint. Standardmäßig aus.\n\nEiner des Spiels ist ein Chat-Soundeffekt, den das Spiel selbst mischt: gesteuert wird er von der Gesamtlautstärke und der Lautstärke der Systemtöne, nicht von der der Soundeffekte, und die Soundeffekte leiser zu stellen macht ihn nicht leiser.\n\nEine eigene Datei spielt das Plugin ab, und die mischt das Spiel gar nicht, also liest das Plugin dieselben Einstellungen und richtet sich selbst danach. Es bleibt stumm, solange das Spiel stummgeschaltet ist, und solange das Fenster nicht im Vordergrund ist, sofern Sie dem Spiel nicht gesagt haben, dann weiterzuspielen."
+  },
+  "notifications.sound.effect": {
+    "message": "Soundeffekt {0}"
+  },
+  "notifications.sound.audition": {
+    "message": "Abspielen"
+  },
+  "notifications.sound.audition.tooltip": {
+    "message": "Spielt den gewählten Ton sofort ab. Die kurze Pause, die verhindert, dass zwei Meldungen gleichzeitig klingen, wird dabei übergangen, sodass wiederholtes Drücken immer einen Ton ergibt."
+  },
+  "notifications.soundon.location": {
+    "message": "Ton bei Ortsnamen"
+  },
+  "notifications.soundon.weather": {
+    "message": "Ton bei Wetter"
+  },
+  "notifications.soundon.banner": {
+    "message": "Ton bei Bannern"
+  },
+  "notifications.soundon.tooltip": {
+    "message": "Welche Arten von Meldung einen Ton ergeben. Zwei gleichzeitig eintreffende ergeben immer nur einen Ton, nämlich den, der zuerst ankommt."
+  },
+
+  "notifications.sound.file": {
+    "message": "Eine eigene Datei"
+  },
+  "sound.browse": {
+    "message": "Durchsuchen"
+  },
+  "sound.clear": {
+    "message": "Leeren"
+  },
+  "sound.custom.notice": {
+    "message": "Eine Datei, die Sie selbst liefern, wird genau so abgespielt, wie sie ist, und bleibt Ihre Sache. Alles nach {0} Sekunden wird abgeschnitten, damit kein ganzes Stück über eine längst verschwundene Meldung läuft. Eine Datei, die das Plugin nicht lesen kann, oder eine Lizenz, die Sie nicht haben, gehen auf Sie und nicht auf Regions of XIV."
+  },
+  "sound.dialog.title": {
+    "message": "Eine Klangdatei wählen"
+  },
+  "sound.path.hint": {
+    "message": "Pfad zu einer .wav- oder .mp3-Datei"
+  },
+  "sound.play": {
+    "message": "Abspielen"
+  },
+  "sound.play.tooltip": {
+    "message": "Spielt die gewählte Datei sofort ab. Die kurze Pause, die verhindert, dass zwei Meldungen gleichzeitig klingen, wird dabei übergangen, sodass wiederholtes Drücken es immer erneut versucht."
+  },
+  "sound.playingwith": {
+    "message": "Spielt {0}."
+  },
+  "sound.problem.channels": {
+    "message": "Diese Datei hat mehr als zwei Kanäle und kann hier nicht abgespielt werden. Eine Mono- oder Stereodatei funktioniert."
+  },
+  "sound.problem.decode": {
+    "message": "Diese Datei konnte nicht gelesen werden. Im Protokoll des Plugins steht das Format, das es gesehen hat, und das ist der schnellste Weg zur Ursache."
+  },
+  "sound.problem.device": {
+    "message": "Windows hat kein Audiogerät geöffnet, daher kann nichts abgespielt werden."
+  },
+  "sound.problem.directory": {
+    "message": "Das ist ein Ordner, keine Klangdatei."
+  },
+  "sound.problem.empty": {
+    "message": "Diese Datei ist leer."
+  },
+  "sound.problem.format": {
+    "message": "Es können nur .wav- und .mp3-Dateien abgespielt werden."
+  },
+  "sound.problem.huge": {
+    "message": "Diese Datei ist weit größer, als ein Meldungston sein sollte, und wird deshalb nicht angerührt."
+  },
+  "sound.problem.locked": {
+    "message": "Diese Datei konnte nicht geöffnet werden. Möglicherweise hat ein anderes Programm sie geöffnet."
+  },
+  "sound.problem.missing": {
+    "message": "Unter diesem Pfad liegt keine Datei mehr."
+  },
+  "sound.problem.none": {
+    "message": "Es wurde noch keine Klangdatei gewählt."
+  },
+  "sound.problem.unreadable": {
+    "message": "Dieser Pfad kann nicht gelesen werden."
+  },
+  "sound.silent.disabled": {
+    "message": "Der Ton des Spiels ist ausgeschaltet, daher wird nichts abgespielt."
+  },
+  "sound.silent.muted": {
+    "message": "Das Spiel ist stummgeschaltet, daher wird nichts abgespielt. Maßgeblich sind die Stummschaltungen für Gesamtlautstärke und Systemtöne, denn das ist der Kanal, den ein Meldungston benutzt."
+  },
+  "sound.silent.unfocused": {
+    "message": "Das Spielfenster ist nicht im Vordergrund und seine Einstellung, im Hintergrund Ton auszugeben, ist aus, daher wird nichts abgespielt."
+  },
+  "sound.silent.unreadable": {
+    "message": "Die Toneinstellungen des Spiels können noch nicht gelesen werden, daher wird nichts abgespielt. Das erledigt sich, sobald Sie im Spiel sind."
+  },
+  "sound.silent.zero": {
+    "message": "Die Gesamtlautstärke oder die Lautstärke der Systemtöne steht auf null, daher wird nichts abgespielt."
+  },
+  "sound.problem.encoding": {
+    "message": "Diese Datei ist eine WAV in der Kodierung {0}, für die Windows keinen Umwandler hat. Sie erneut als gewöhnliches PCM oder als MP3 zu speichern, funktioniert."
+  },
+  "sound.problem.mp3codec": {
+    "message": "Windows hat keinen MP3-Dekodierer zur Verfügung, daher kann diese Datei nicht abgespielt werden. Eine .wav-Datei funktioniert weiterhin."
+  },
+  "sound.problem.notaudio": {
+    "message": "Diese Datei ist in Wirklichkeit weder eine WAV noch eine MP3, wie auch immer sie heißt."
+  },
+  "sound.problem.samples": {
+    "message": "Diese Datei liegt in einer Form vor, aus der das Plugin keinen Klang machen kann. Sie erneut als gewöhnliches 16-Bit-PCM zu speichern, funktioniert."
+  },
+  "sound.problem.truncated": {
+    "message": "Diese Datei bricht mittendrin ab und konnte nicht bis zum Ende gelesen werden."
   }
 }

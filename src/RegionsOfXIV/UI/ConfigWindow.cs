@@ -22,7 +22,10 @@ internal readonly record struct ConfigActions(
     Action ShowChangelog,
     Action RestoreNativeAreaText,
     Action RestoreNativeLoadingTitle,
-    Action ReloadLanguage);
+    Action ReloadLanguage,
+    Action AuditionSound,
+    Func<string?> SoundFileProblem,
+    Func<string?> SoundSilenceReason);
 
 // Split across ConfigWindow.*.cs, one file per tab, over the widget vocabulary they all share in
 // ConfigWindow.Widgets.cs. This file is the window itself: its lifetime, the font it pushes, the

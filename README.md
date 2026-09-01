@@ -130,7 +130,7 @@ dotnet test RegionsOfXIV.sln -c Release
 
 ### Developer tools
 
-Three files are compiled only in Debug, which is what Rider and Visual Studio
+Four files are compiled only in Debug, which is what Rider and Visual Studio
 build by default:
 
 | File | What it does |
@@ -138,8 +138,9 @@ build by default:
 | `Services/SheetSearch.cs` | searches the game's Excel sheets, writing what it finds to the Dalamud log |
 | `UI/IconBrowserWindow.cs` | a scrollable grid of the game's own icons, for finding an icon ID |
 | `UI/BannerPreviewWindow.cs` | fires any banner on demand, and is where banner names get transcribed |
+| `Services/SoundSweep.cs` | plays the game's chat sound effects, one by number or all of them in turn |
 
-They are wired to four `/regions` subcommands that exist only in a Debug build:
+They are wired to five `/regions` subcommands that exist only in a Debug build:
 
 | Command | Effect |
 | --- | --- |
@@ -147,10 +148,14 @@ They are wired to four `/regions` subcommands that exist only in a Debug build:
 | `/regions icons` | open the icon browser |
 | `/regions banners` | log the banner rows found in the sheets |
 | `/regions find <term>` | search the sheets for a term and log the hits |
+| `/regions sound [n]` | play chat sound effect `n`, or sweep through all of them |
 
-`RegionsOfXIV.csproj` removes all three files from compilation in every
-configuration but Debug, so none of it reaches a release build. The types are
-absent from the Release assembly entirely, not merely unreachable.
+The first three are removed from compilation by `RegionsOfXIV.csproj` in every
+configuration but Debug. `SoundSweep.cs` wraps its own contents in `#if DEBUG`
+instead, which reaches the same end by another route, and the code that wires
+all four up is guarded the same way in `Plugin.cs`, `CommandRouter.cs` and
+`NotificationSounds.cs`. Either way the types are absent from the Release
+assembly entirely, not merely unreachable.
 
 ### Translating the settings window
 

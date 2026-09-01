@@ -120,6 +120,44 @@ public class ConfigurationTests
         Assert.Null(ConfigurationCopy.Find("BannerNameLanguage"));
     }
 
+    // Off is the default and is also what a config written before sound existed deserialises to,
+    // which is why the new settings need no migration step: the property initialisers run before
+    // the stored JSON is read over them, so an absent property keeps the value declared here.
+    [Fact]
+    public void ANewConfigurationMakesNoSound()
+    {
+        var config = new Configuration();
+
+        Assert.Equal(SoundSource.Off, config.SoundSource);
+        Assert.Equal(1, config.GameSoundId);
+        Assert.Equal(string.Empty, config.SoundFilePath);
+    }
+
+    // A colour arriving from a stranger is visible the moment it lands and is undone by looking at
+    // it. A sound is not: it happens while the player is doing something else, and nothing on
+    // screen says a share code turned it on. Switching sound on is a consent decision.
+    [Theory]
+    [InlineData("SoundSource")]
+    [InlineData("GameSoundId")]
+    [InlineData("SoundFilePath")]
+    [InlineData("SoundOnLocation")]
+    [InlineData("SoundOnWeather")]
+    [InlineData("SoundOnBanner")]
+    public void SoundSettingsDoNotTravelInAPreset(string setting)
+    {
+        Assert.Null(ConfigurationCopy.Find(setting));
+    }
+
+    // The reserved member has to keep its number, because a config or a share code written by a
+    // later build will carry it and this one has to read it as the same thing.
+    [Fact]
+    public void TheReservedFileSourceKeepsItsStoredNumber()
+    {
+        Assert.Equal(0, (int)SoundSource.Off);
+        Assert.Equal(1, (int)SoundSource.GameSound);
+        Assert.Equal(2, (int)SoundSource.File);
+    }
+
     [Fact]
     public void AConfigWrittenBeforeWeatherHadItsOwnSizeKeepsTheSizeItWasShowing()
     {

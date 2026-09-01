@@ -887,5 +887,169 @@
   "notifications.bannergap.tooltip": {
     "message": "How far below a place name a banner sits, measured in lines of the\ndisplay text.\n\nThe two can be on screen together: entering a duty announces where you\nare and then the party size a moment later. This is the room between\nthem. The drop is the same whether or not a name is up, so a banner on\nits own also lands here.",
     "description": "Tooltip for the Banner drop slider. Keep the line breaks and the blank line. \"Duty\" is the game's own word for an instanced dungeon or raid - use the wording FFXIV uses in your language."
+  },
+  "notifications.sound": {
+    "message": "Sound",
+    "description": "Dropdown label. Chooses whether a notification makes a sound, and which kind."
+  },
+  "notifications.sound.audition": {
+    "message": "Play",
+    "description": "Button beside the sound dropdown that plays the chosen sound. Very short: it shares a line with the dropdown, and a long word squeezes the dropdown."
+  },
+  "notifications.sound.audition.tooltip": {
+    "message": "Plays the chosen sound now. It ignores the short gap that stops two notifications sounding at once, so pressing it repeatedly always makes a noise.",
+    "description": "Tooltip for the play button."
+  },
+  "notifications.sound.effect": {
+    "message": "Sound effect {0}",
+    "description": "Entry in the sound dropdown, one per effect. {0} is the number, 1 to 16, and it matches what the player types in chat as <se.1>, so it must stay a number."
+  },
+  "notifications.sound.game": {
+    "message": "One of the game's",
+    "description": "Second entry in the Sound dropdown: one of the sound effects the game itself already has. Deliberately possessive rather than naming a file, because the point is that the sound belongs to the game and so obeys the game's own volume settings."
+  },
+  "notifications.sound.off": {
+    "message": "None",
+    "description": "First entry in the Sound dropdown, and the default: no sound at all."
+  },
+  "notifications.sound.tooltip": {
+    "message": "Plays a sound when a notification appears. Off by default.\n\nOne of the game's is a chat sound effect, mixed by the game: the master volume and the System Sounds volume control it, rather than Sound Effects, and turning Sound Effects down will not quieten it.\n\nA file of your own is played by the plugin, which the game does not mix at all, so the plugin reads those same settings and follows them by hand. It stays silent while the game is muted, and while the window is not in front unless you have told the game to keep playing then.",
+    "description": "Tooltip for the Sound dropdown. Keep the blank line. \"Chat sound effect\" is the game's own term for the sounds a player can type as <se.1> to <se.16> in chat, so use whatever FFXIV calls them in your language. \"System Sounds\" and \"Sound Effects\" are two separate sliders on the game's own sound settings screen, and this notification is on the first one: copy the labels your client uses, because naming the wrong one sends people to a slider that will not help."
+  },
+  "notifications.soundon.banner": {
+    "message": "Sound on banners",
+    "description": "Checkbox. Whether a banner makes a sound. \"Banners\" are the game's full-screen announcements, so match notifications.banners."
+  },
+  "notifications.soundon.location": {
+    "message": "Sound on place names",
+    "description": "Checkbox. Whether arriving somewhere makes a sound. \"Place names\" is what this plugin calls the region, zone, area and sub-area announcements, so match the wording used for those elsewhere."
+  },
+  "notifications.soundon.tooltip": {
+    "message": "Which kinds of notification make a sound. Two arriving together only ever make one sound, whichever of them lands first.",
+    "description": "Tooltip covering the three sound checkboxes above it."
+  },
+  "notifications.soundon.weather": {
+    "message": "Sound on weather",
+    "description": "Checkbox. Whether a weather change makes a sound."
+  },
+  "notifications.sound.file": {
+    "message": "A file of your own",
+    "description": "One of three choices in the Sound dropdown, alongside \"None\" and \"One of the game's\". It means a sound file on the player's own PC."
+  },
+  "sound.browse": {
+    "message": "Browse",
+    "description": "Button opening a file picker. Matches the Browse button on the Fonts tab, so use the same word you used there."
+  },
+  "sound.clear": {
+    "message": "Clear",
+    "description": "Button emptying the chosen sound file path. Matches Clear on the Fonts tab."
+  },
+  "sound.custom.notice": {
+    "message": "A file you supply is played as it is, and it stays yours to look after. Anything past {0} seconds is cut off, so a whole track will not play over a notification that has already gone. A file the plugin cannot read, or one you do not hold a licence for, is on you rather than on Regions of XIV.",
+    "description": "A caution under the file row. {0} is a number of seconds, currently 5. It is the plugin's own disclaimer about a file the player supplied, so keep it plain rather than legalistic."
+  },
+  "sound.dialog.title": {
+    "message": "Choose a sound file",
+    "description": "Title bar of the file picker."
+  },
+  "sound.path.hint": {
+    "message": "Path to a .wav or .mp3 file",
+    "description": "Placeholder text inside an empty path box. \".wav\" and \".mp3\" are file extensions and stay as they are."
+  },
+  "sound.play": {
+    "message": "Play",
+    "description": "Button that plays the chosen file straight away so the player can hear what they picked."
+  },
+  "sound.play.tooltip": {
+    "message": "Plays the chosen file now. It ignores the short gap that stops two notifications sounding at once, so pressing it repeatedly always tries again.",
+    "description": "Tooltip for that button. The \"short gap\" is a quarter of a second that stops two notifications arriving together from making two overlapping sounds."
+  },
+  "sound.playingwith": {
+    "message": "Playing {0}.",
+    "description": "Shown under the path box when the file is usable. {0} is the file's name, not its full path."
+  },
+  "sound.problem.channels": {
+    "message": "That file has more than two channels, which cannot be played here. A mono or stereo file will work.",
+    "description": "The file has more than two channels, meaning surround sound. The plugin plays mono and stereo only."
+  },
+  "sound.problem.decode": {
+    "message": "That file could not be read. The plugin's log names the format it saw, which is the quickest way to see why.",
+    "description": "The file could not be decoded. It is a .wav or .mp3 by name but not one the plugin can read, either because it is damaged or because it uses an unusual encoding."
+  },
+  "sound.problem.device": {
+    "message": "Windows would not open an audio device, so nothing can be played.",
+    "description": "Windows would not give the plugin a sound output device. Nothing about the file is wrong."
+  },
+  "sound.problem.directory": {
+    "message": "That is a folder, not a sound file.",
+    "description": "The path points at a folder rather than at a file. Worth keeping distinct from the missing-file message: the player can see the folder is there, so being told it is missing would send them looking in the wrong place."
+  },
+  "sound.problem.empty": {
+    "message": "That file is empty.",
+    "description": "The file is zero bytes."
+  },
+  "sound.problem.format": {
+    "message": "Only .wav and .mp3 files can be played.",
+    "description": "The chosen file is not one the plugin can play. \".wav\" and \".mp3\" are file extensions and stay as they are."
+  },
+  "sound.problem.huge": {
+    "message": "That file is far larger than a notification sound should be, so it is being left alone.",
+    "description": "The file is far too large to be a notification sound, so the plugin will not open it. It is guarding against a video or a disk image typed in by mistake."
+  },
+  "sound.problem.locked": {
+    "message": "That file could not be opened. Another program may have it open.",
+    "description": "The file exists but could not be opened, usually because another program has it open or Windows will not grant access."
+  },
+  "sound.problem.missing": {
+    "message": "There is no file at that path any more.",
+    "description": "There is nothing at that path. \"any more\" because the path was picked at some point, so the file has usually been moved or deleted since."
+  },
+  "sound.problem.none": {
+    "message": "No sound file has been chosen yet.",
+    "description": "Shown when the file source is selected but no file has been picked. Not an error, just a step not done yet."
+  },
+  "sound.problem.unreadable": {
+    "message": "That path cannot be read.",
+    "description": "The text in the box is not a path Windows will accept at all, for instance because of characters that cannot appear in a filename."
+  },
+  "sound.silent.disabled": {
+    "message": "The game's sound is turned off, so nothing is played.",
+    "description": "Shown when the game's own sound is switched off entirely, so pressing Play does nothing. It explains a silent button rather than reporting a fault."
+  },
+  "sound.silent.muted": {
+    "message": "The game is muted, so nothing is played. This follows the master and System Sounds mute settings, because that is the bus a notification sound uses.",
+    "description": "Shown when the game is muted. \"System Sounds\" is a slider and a mute checkbox on the game's own sound settings screen: use the label your client shows, because naming the wrong one sends the player to a setting that will not help."
+  },
+  "sound.silent.unfocused": {
+    "message": "The game window is not in front and its setting for playing sound while it is not active is off, so nothing is played.",
+    "description": "Shown when the game window is not in front and the game is set not to play sound then. The setting is on the game's own sound settings screen and is usually worded as playing sounds while the window is inactive."
+  },
+  "sound.silent.unreadable": {
+    "message": "The game's sound settings cannot be read yet, so nothing is played. This clears once you are in game.",
+    "description": "Shown before the game's settings can be read, which in practice means at the title or character select screen."
+  },
+  "sound.silent.zero": {
+    "message": "The game's master or System Sounds volume is at zero, so nothing is played.",
+    "description": "Shown when a volume slider is at zero rather than muted. \"System Sounds\" is a slider on the game's own sound settings screen, as above."
+  },
+  "sound.problem.encoding": {
+    "message": "This file is a WAV in the {0} encoding, and Windows has no converter for it. Saving it again as ordinary PCM, or as an MP3, will work.",
+    "description": "The WAV holds audio in a compressed or companded encoding and Windows has no converter installed for it. {0} is an encoding name from NAudio, in English, such as Adpcm, MuLaw or Gsm610: leave it as it is."
+  },
+  "sound.problem.mp3codec": {
+    "message": "Windows has no MP3 decoder available, so this file cannot be played. A .wav file will still work.",
+    "description": "Windows itself has no MP3 decoder available. Nothing about the file is wrong, which is why the message points at a .wav as the way round it. \".wav\" is a file extension and stays as it is."
+  },
+  "sound.problem.notaudio": {
+    "message": "That file is not really a WAV or an MP3, whatever its name says.",
+    "description": "The file has a .wav or .mp3 name but its contents are neither: no RIFF header, or no MP3 frames. Distinct from the damaged case, because the fix is to check which file was picked rather than to re-save it."
+  },
+  "sound.problem.samples": {
+    "message": "That file is in a form the plugin cannot turn into sound. Saving it again as ordinary 16 bit PCM will work.",
+    "description": "The file is a WAV in a bit depth the plugin cannot turn into samples. It should not normally be reachable, so keep it plain and actionable rather than technical."
+  },
+  "sound.problem.truncated": {
+    "message": "That file stops part way through and could not be read to the end.",
+    "description": "The file ends part way through, so it was cut off in a download or a copy."
   }
 }

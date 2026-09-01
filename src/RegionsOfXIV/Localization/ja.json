@@ -613,5 +613,130 @@
   },
   "notifications.bannergap.tooltip": {
     "message": "地名の下にバナーをどれだけ離して表示するかを、表示フォントの行数で\n指定します。\n\n両方が同時に表示されることがあります。コンテンツに入ると、まず場所が、\n少し遅れてパーティー人数が表示されます。ここで決めるのはその間隔です。\n地名が出ていなくても間隔は同じなので、バナーだけのときもこの位置に\n表示されます。"
+  },
+
+  "notifications.sound": {
+    "message": "サウンド"
+  },
+  "notifications.sound.off": {
+    "message": "なし"
+  },
+  "notifications.sound.game": {
+    "message": "ゲーム内のサウンド"
+  },
+  "notifications.sound.tooltip": {
+    "message": "通知が表示されたときに音を鳴らします。初期設定ではオフです。\n\nゲーム内のサウンドはチャットサウンドエフェクトで、鳴らしているのはゲーム自身です。音量を決めるのはマスター音量とシステム音の音量で、効果音ではありません。効果音を下げてもこの音は小さくなりません。\n\n自分のファイルはプラグインが鳴らします。ゲームはこれをまったく扱わないため、プラグインが同じ設定を読み取って自分で従います。ゲームがミュートのあいだは鳴らず、ウィンドウが前面にないときも、非アクティブ時に音を鳴らす設定を有効にしていないかぎり鳴りません。"
+  },
+  "notifications.sound.effect": {
+    "message": "サウンドエフェクト {0}"
+  },
+  "notifications.sound.audition": {
+    "message": "再生"
+  },
+  "notifications.sound.audition.tooltip": {
+    "message": "選んだ音をすぐに鳴らします。通知が重なって鳴らないようにする短い間隔は無視されるので、続けて押しても必ず鳴ります。"
+  },
+  "notifications.soundon.location": {
+    "message": "地名で鳴らす"
+  },
+  "notifications.soundon.weather": {
+    "message": "天候で鳴らす"
+  },
+  "notifications.soundon.banner": {
+    "message": "バナーで鳴らす"
+  },
+  "notifications.soundon.tooltip": {
+    "message": "どの種類の通知で音を鳴らすかを決めます。同時に届いた場合でも、先に届いた方の音が一度だけ鳴ります。"
+  },
+
+  "notifications.sound.file": {
+    "message": "自分のファイル"
+  },
+  "sound.browse": {
+    "message": "参照"
+  },
+  "sound.clear": {
+    "message": "クリア"
+  },
+  "sound.custom.notice": {
+    "message": "自分で用意したファイルはそのまま再生され、扱いは自己責任となります。{0} 秒を超える部分は切られるため、すでに消えた通知の上で曲が流れ続けることはありません。プラグインが読めないファイルや、ライセンスを持っていないファイルは、Regions of XIV ではなく利用者の責任です。"
+  },
+  "sound.dialog.title": {
+    "message": "サウンドファイルを選択"
+  },
+  "sound.path.hint": {
+    "message": ".wav または .mp3 ファイルのパス"
+  },
+  "sound.play": {
+    "message": "再生"
+  },
+  "sound.play.tooltip": {
+    "message": "選んだファイルをすぐに鳴らします。通知が重なって鳴らないようにする短い間隔は無視されるので、続けて押すたびに再試行します。"
+  },
+  "sound.playingwith": {
+    "message": "{0} を鳴らします。"
+  },
+  "sound.problem.channels": {
+    "message": "そのファイルは3チャンネル以上あり、ここでは再生できません。モノラルかステレオのファイルなら再生できます。"
+  },
+  "sound.problem.decode": {
+    "message": "そのファイルを読み込めませんでした。プラグインのログに認識した形式が記録されているので、原因を調べるにはそれが一番早道です。"
+  },
+  "sound.problem.device": {
+    "message": "Windows がオーディオデバイスを開かなかったため、何も再生できません。"
+  },
+  "sound.problem.directory": {
+    "message": "それはフォルダーで、サウンドファイルではありません。"
+  },
+  "sound.problem.empty": {
+    "message": "そのファイルは空です。"
+  },
+  "sound.problem.format": {
+    "message": "再生できるのは .wav と .mp3 ファイルだけです。"
+  },
+  "sound.problem.huge": {
+    "message": "そのファイルは通知音としては大きすぎるため、読み込みません。"
+  },
+  "sound.problem.locked": {
+    "message": "そのファイルを開けませんでした。他のプログラムが開いている可能性があります。"
+  },
+  "sound.problem.missing": {
+    "message": "そのパスにはもうファイルがありません。"
+  },
+  "sound.problem.none": {
+    "message": "サウンドファイルがまだ選ばれていません。"
+  },
+  "sound.problem.unreadable": {
+    "message": "そのパスは読み取れません。"
+  },
+  "sound.silent.disabled": {
+    "message": "ゲームのサウンドがオフになっているため、何も鳴りません。"
+  },
+  "sound.silent.muted": {
+    "message": "ゲームがミュートされているため、何も鳴りません。通知音はシステム音を通るので、マスターとシステム音のミュート設定に従います。"
+  },
+  "sound.silent.unfocused": {
+    "message": "ゲームウィンドウが前面になく、非アクティブ時に音を鳴らす設定がオフのため、何も鳴りません。"
+  },
+  "sound.silent.unreadable": {
+    "message": "ゲームのサウンド設定をまだ読み取れないため、何も鳴りません。ゲームに入ると解消します。"
+  },
+  "sound.silent.zero": {
+    "message": "マスター音量またはシステム音の音量が0のため、何も鳴りません。"
+  },
+  "sound.problem.encoding": {
+    "message": "このファイルは {0} エンコードの WAV で、Windows に対応する変換器がありません。通常の PCM か MP3 として保存し直せば再生できます。"
+  },
+  "sound.problem.mp3codec": {
+    "message": "Windows に利用できる MP3 デコーダーがないため、このファイルは再生できません。.wav ファイルであれば再生できます。"
+  },
+  "sound.problem.notaudio": {
+    "message": "そのファイルは名前がどうであれ、実際には WAV でも MP3 でもありません。"
+  },
+  "sound.problem.samples": {
+    "message": "そのファイルはプラグインが音に変換できない形式です。通常の16ビット PCM として保存し直せば再生できます。"
+  },
+  "sound.problem.truncated": {
+    "message": "そのファイルは途中で終わっており、最後まで読み込めませんでした。"
   }
 }

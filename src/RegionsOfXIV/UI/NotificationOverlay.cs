@@ -27,6 +27,13 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     private readonly Configuration config;
     private readonly NotificationRenderer renderer;
 
+    // Sound rides the three Push methods and nothing else. The preview verbs below are
+    // deliberately silent: TouchPreview runs on every frame a slider is being dragged, so a sound
+    // there would be a stutter of beeps rather than a preview, and HoldPreview keeps a sample on
+    // screen for as long as editing mode is on. Auditioning is a button in the settings, which
+    // calls PlayNow directly. Do not "fix" this by moving the call into Spawn.
+    private readonly NotificationSounds sounds;
+
     private readonly Lane locations;
     private readonly Lane weather;
     private readonly Lane banners;
@@ -40,11 +47,12 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     private bool previewHeld;
     private PreviewSample held;
 
-    public NotificationOverlay(Configuration config, FontService fonts)
+    public NotificationOverlay(Configuration config, FontService fonts, NotificationSounds sounds)
         : base("##RegionsOfXIVOverlay")
     {
         this.config = config;
         this.renderer = new NotificationRenderer(config, fonts);
+        this.sounds = sounds;
 
         this.locations = new Lane(
             this.renderer.Draw, () => config.DisplayFontSize * StackSpacingRatio, LocationLine);
@@ -106,6 +114,7 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             return;
 
         Spawn(this.locations, new Line(header, text));
+        this.sounds.Play(SoundCategory.Location);
     }
 
     public void PushWeather(string text, uint iconId)
@@ -114,6 +123,7 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             return;
 
         Spawn(this.weather, new Line(null, text, iconId));
+        this.sounds.Play(SoundCategory.Weather);
     }
 
     public void PushBanner(string text)
@@ -122,6 +132,7 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             return;
 
         Spawn(this.banners, new Line(null, text));
+        this.sounds.Play(SoundCategory.Banner);
     }
 
     // Called on every frame a setting is being changed. Keeps one preview alive and lets the

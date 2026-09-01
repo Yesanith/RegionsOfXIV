@@ -641,5 +641,130 @@
   },
   "notifications.bannergap.tooltip": {
     "message": "Bir yer adının ne kadar altında afiş görüneceğini, görüntü yazısının\nsatır yüksekliği cinsinden belirler.\n\nİkisi aynı anda ekranda olabilir: bir göreve girildiğinde önce\nbulunduğunuz yer, hemen ardından takım büyüklüğü duyurulur. Buradaki\nayar aralarındaki boşluktur. Yer adı görünmese de aynı boşluk uygulanır,\nyani tek başına bir afiş de burada belirir."
+  },
+
+  "notifications.sound": {
+    "message": "Ses"
+  },
+  "notifications.sound.off": {
+    "message": "Yok"
+  },
+  "notifications.sound.game": {
+    "message": "Oyunun kendi sesi"
+  },
+  "notifications.sound.tooltip": {
+    "message": "Bir bildirim göründüğünde ses çalar. Varsayılan olarak kapalıdır.\n\nOyunun kendi sesi bir sohbet ses efektidir ve sesi oyunun kendisi verir: düzeyini ana ses düzeyi ile sistem sesleri düzeyi belirler, ses efektleri değil. Ses efektlerini kısmak bu sesi kısmaz.\n\nKendi dosyanı ise eklenti çalar; oyun buna hiç karışmaz, bu yüzden eklenti aynı ayarları okuyup kendisi uygular. Oyun sessize alınmışken ses çıkmaz; pencere önde değilken de, oyuna arka plandayken ses çalmasını söylemediysen ses çıkmaz."
+  },
+  "notifications.sound.effect": {
+    "message": "Ses efekti {0}"
+  },
+  "notifications.sound.audition": {
+    "message": "Çal"
+  },
+  "notifications.sound.audition.tooltip": {
+    "message": "Seçilen sesi hemen çalar. İki bildirimin aynı anda ses çıkarmasını önleyen kısa aralığı yok sayar, bu yüzden üst üste basmak her seferinde ses çıkarır."
+  },
+  "notifications.soundon.location": {
+    "message": "Yer adlarında ses"
+  },
+  "notifications.soundon.weather": {
+    "message": "Hava durumunda ses"
+  },
+  "notifications.soundon.banner": {
+    "message": "Afişlerde ses"
+  },
+  "notifications.soundon.tooltip": {
+    "message": "Hangi bildirim türlerinin ses çıkaracağı. Aynı anda gelen iki bildirim yalnızca bir ses çıkarır, hangisi önce gelirse o."
+  },
+
+  "notifications.sound.file": {
+    "message": "Kendi dosyan"
+  },
+  "sound.browse": {
+    "message": "Gözat"
+  },
+  "sound.clear": {
+    "message": "Temizle"
+  },
+  "sound.custom.notice": {
+    "message": "Kendi verdiğin bir dosya olduğu gibi çalınır ve sorumluluğu sende kalır. {0} saniyeyi aşan kısım kesilir, böylece çoktan kaybolmuş bir bildirimin üstünde koca bir parça çalmaz. Eklentinin okuyamadığı bir dosya ya da sahip olmadığın bir lisans Regions of XIV'in değil senin sorunundur."
+  },
+  "sound.dialog.title": {
+    "message": "Bir ses dosyası seç"
+  },
+  "sound.path.hint": {
+    "message": "Bir .wav veya .mp3 dosyasının yolu"
+  },
+  "sound.play": {
+    "message": "Çal"
+  },
+  "sound.play.tooltip": {
+    "message": "Seçilen dosyayı hemen çalar. İki bildirimin aynı anda ses çıkarmasını önleyen kısa aralığı yok sayar, bu yüzden üst üste basmak her seferinde yeniden dener."
+  },
+  "sound.playingwith": {
+    "message": "{0} çalınıyor."
+  },
+  "sound.problem.channels": {
+    "message": "Bu dosyanın ikiden fazla kanalı var, burada çalınamaz. Mono ya da stereo bir dosya çalışır."
+  },
+  "sound.problem.decode": {
+    "message": "Bu dosya okunamadı. Eklentinin günlüğünde gördüğü biçim yazıyor, nedenini anlamanın en hızlı yolu odur."
+  },
+  "sound.problem.device": {
+    "message": "Windows bir ses aygıtı açmadı, bu yüzden hiçbir şey çalınamaz."
+  },
+  "sound.problem.directory": {
+    "message": "Bu bir klasör, ses dosyası değil."
+  },
+  "sound.problem.empty": {
+    "message": "Bu dosya boş."
+  },
+  "sound.problem.format": {
+    "message": "Yalnızca .wav ve .mp3 dosyaları çalınabilir."
+  },
+  "sound.problem.huge": {
+    "message": "Bu dosya bir bildirim sesi için olması gerekenden çok daha büyük, bu yüzden açılmıyor."
+  },
+  "sound.problem.locked": {
+    "message": "Bu dosya açılamadı. Başka bir program onu açık tutuyor olabilir."
+  },
+  "sound.problem.missing": {
+    "message": "Bu yolda artık bir dosya yok."
+  },
+  "sound.problem.none": {
+    "message": "Henüz bir ses dosyası seçilmedi."
+  },
+  "sound.problem.unreadable": {
+    "message": "Bu yol okunamıyor."
+  },
+  "sound.silent.disabled": {
+    "message": "Oyunun sesi tamamen kapalı, bu yüzden hiçbir şey çalınmıyor."
+  },
+  "sound.silent.muted": {
+    "message": "Oyun sessize alınmış, bu yüzden hiçbir şey çalınmıyor. Bu, ana ses ve sistem sesleri sessize alma ayarlarını izler, çünkü bildirim sesi o hattı kullanır."
+  },
+  "sound.silent.unfocused": {
+    "message": "Oyun penceresi önde değil ve oyunun pencere etkin değilken ses çalma ayarı kapalı, bu yüzden hiçbir şey çalınmıyor."
+  },
+  "sound.silent.unreadable": {
+    "message": "Oyunun ses ayarları henüz okunamıyor, bu yüzden hiçbir şey çalınmıyor. Oyuna girdiğinde bu düzelir."
+  },
+  "sound.silent.zero": {
+    "message": "Oyunun ana ses düzeyi ya da sistem sesleri düzeyi sıfırda, bu yüzden hiçbir şey çalınmıyor."
+  },
+  "sound.problem.encoding": {
+    "message": "Bu dosya {0} kodlamasında bir WAV ve Windows'ta bunun için bir dönüştürücü yok. Sıradan PCM olarak ya da MP3 olarak yeniden kaydetmek işe yarar."
+  },
+  "sound.problem.mp3codec": {
+    "message": "Windows'ta kullanılabilir bir MP3 çözücü yok, bu yüzden bu dosya çalınamaz. Bir .wav dosyası yine de çalışır."
+  },
+  "sound.problem.notaudio": {
+    "message": "Bu dosya adı ne olursa olsun gerçekte ne WAV ne de MP3."
+  },
+  "sound.problem.samples": {
+    "message": "Bu dosya eklentinin sese dönüştüremeyeceği bir biçimde. Sıradan 16 bit PCM olarak yeniden kaydetmek işe yarar."
+  },
+  "sound.problem.truncated": {
+    "message": "Bu dosya ortasında bitiyor ve sonuna kadar okunamadı."
   }
 }

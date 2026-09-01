@@ -64,10 +64,17 @@ internal sealed class CommandRouter : IDisposable
         }
 
 #if DEBUG
-        // The one subcommand that carries an argument, so it cannot be a dictionary entry.
+        // The two subcommands that carry an argument, so neither can be a dictionary entry. Bare
+        // "sound" is one, and reaches the dictionary above.
         if (argument.StartsWith("find ", StringComparison.OrdinalIgnoreCase))
         {
             SheetSearch.Run(argument[5..].Trim());
+            return;
+        }
+
+        if (argument.StartsWith("sound ", StringComparison.OrdinalIgnoreCase))
+        {
+            SoundSweep.Play(argument[6..].Trim());
             return;
         }
 #endif
