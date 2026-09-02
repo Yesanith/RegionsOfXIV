@@ -41,6 +41,14 @@
       <Visible>false</Visible>
     </Content>
 
+    <!-- The OFL requires its own text to travel with the font it covers, so it ships in the zip
+         beside it rather than only sitting in the repository. -->
+    <Content Include="..\..\assets\fonts\NotoSans-OFL.txt">
+      <Link>Fonts\NotoSans-OFL.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </Content>
+
     <Content Include="..\..\assets\images\icon.png">
       <Link>images\icon.png</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

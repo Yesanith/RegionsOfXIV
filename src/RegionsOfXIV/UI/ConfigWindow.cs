@@ -192,7 +192,13 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         this.actions.HoldPreview(on, Sample);
     }
 
-    private static readonly PreviewSample Sample = BuildSample();
+    // Built on each use rather than once, because the banner language can change while the window
+    // is open and the sample has to change with it. A preview still showing the old language after
+    // the setting moved is worse than no preview: it reads as the setting not having worked.
+    //
+    // Cheap enough to do this way. Both resolvers cache, and this is reached from button presses
+    // and change handlers rather than from the draw loop.
+    private static PreviewSample Sample => BuildSample();
 
     // The sample's place names are content rather than the plugin's own words, so they stay as
     // they are. The weather name comes from the game's own sheets; "Fair Skies" is only the

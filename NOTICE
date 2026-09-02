@@ -75,6 +75,35 @@ DalamudAsset.NotoSansCjkMedium. It carries its own licence from its own
 authors.
 
 
+Noto Sans, Latin Extended-A subset - assets/fonts/NotoSans-LatinExtendedA.ttf
+-----------------------------------------------------------------------------
+Included in this repository and in the released plugin, under the SIL Open Font
+License 1.1. The full licence text travels with it, in the repository and in
+the plugin zip, as assets/fonts/NotoSans-OFL.txt.
+
+    Copyright 2022 The Noto Project Authors
+    https://github.com/notofonts/latin-greek-cyrillic
+
+It is a subset of Noto Sans Medium cut down to one Unicode block, U+0100 to
+U+017F, which is 128 codepoints and about 20 KB. Nothing else from the font is
+included.
+
+It is here because Noto Sans CJK, which Dalamud ships and this plugin draws
+with by default, carries only thirty codepoints from that block: the macrons
+and breves that CJK romanisation needs. Turkish letters are not among them, so
+Turkish banner wording rendered a question mark for every dotted I, S-cedilla
+and G-breve. This subset fills exactly that gap, merged into the stock face at
+build time.
+
+Noto Sans and Noto Sans CJK are one family by design, so the letters it
+supplies match the ones around them rather than reading as a second typeface.
+
+The OFL permits bundling and modification, including subsetting, provided the
+copyright and licence notices travel with the file and the reserved font name
+is not used for a modified version. The file is named for what it is rather
+than carrying a Reserved Font Name.
+
+
 Dalamud and FFXIVClientStructs
 ------------------------------
 This plugin builds against Dalamud (AGPL-3.0) and FFXIVClientStructs (MIT).

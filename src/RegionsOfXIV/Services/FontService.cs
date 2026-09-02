@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Dalamud;
+using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.GameFonts;
 using Dalamud.Interface.ManagedFontAtlas;
 
@@ -149,11 +150,40 @@ internal sealed class FontService : IDisposable
 
     private IFontHandle BuildStock(FontChoice choice, float sizePx) =>
         choice == FontChoice.NotoSansCjk
-            ? this.atlas.NewDelegateFontHandle(e => e.OnPreBuild(tk =>
+            ? this.atlas.NewDelegateFontHandle(e => e.OnPreBuild(tk => MergeLatinExtended(
+                tk,
                 tk.AddDalamudAssetFont(
                     DalamudAsset.NotoSansCjkMedium,
-                    new SafeFontConfig { SizePx = sizePx, GlyphRanges = FontLimits.NotificationGlyphRanges() })))
+                    new SafeFontConfig { SizePx = sizePx, GlyphRanges = FontLimits.NotificationGlyphRanges() }),
+                sizePx)))
             : this.atlas.NewGameFontHandle(new GameFontStyle(ResolveGameFamily(choice), sizePx));
+
+    // Noto Sans CJK carries thirty of the hundred and twenty-eight Latin Extended-A codepoints:
+    // the ones CJK romanisation needs, which are macrons, breves and carons. Turkish is not among
+    // them, so a Turkish banner drew a question mark for every dotted I, S-cedilla and G-breve
+    // while the rest of the word came out fine. Read out of the shipped font's own cmap rather
+    // than assumed, because the obvious explanations -- the glyph range, the game faces -- were
+    // both wrong.
+    //
+    // The bundled file is a subset of Noto Sans, which is the same family as Noto Sans CJK, so the
+    // letters it supplies are the ones the rest of the word is already drawn in rather than a
+    // second typeface appearing mid-word.
+    //
+    // Only the stock face gets this. A game face cannot be merged into, and a custom font is the
+    // player's own to choose and usually covers its own script.
+    private static void MergeLatinExtended(
+        IFontAtlasBuildToolkitPreBuild tk, ImFontPtr into, float sizePx)
+    {
+        if (BundledLatinPath() is not { } path)
+            return;
+
+        tk.AddFontFromFile(path, new SafeFontConfig
+        {
+            SizePx = sizePx,
+            GlyphRanges = FontLimits.LatinExtendedGlyphRanges,
+            MergeFont = into,
+        });
+    }
 
     private IFontHandle? BuildCustom(Face face, string path, float sizePx)
     {
@@ -214,6 +244,23 @@ internal sealed class FontService : IDisposable
         return CachedEorzeanPath;
     }
 
+    // The Latin subset lives in the same folder and must never be mistaken for the Eorzean face:
+    // the last two patterns below take any font at all, so without this an Eorzea.ttf that had
+    // been renamed or removed would leave the decode effect quietly drawing plain letters.
+    private const string LatinFontName = "NotoSans-LatinExtendedA.ttf";
+
+    private static string? BundledLatinPath()
+    {
+        var dir = Plugin.PluginInterface.AssemblyLocation.Directory;
+
+        if (dir == null)
+            return null;
+
+        var path = Path.Combine(dir.FullName, "Fonts", LatinFontName);
+
+        return File.Exists(path) ? path : null;
+    }
+
     private static string? FindBundledFont()
     {
         var dir = Plugin.PluginInterface.AssemblyLocation.Directory;
@@ -226,7 +273,11 @@ internal sealed class FontService : IDisposable
 
         foreach (var pattern in new[] { "*eorzea*.ttf", "*eorzea*.otf", "*.ttf", "*.otf" })
         {
-            var hit = Directory.GetFiles(fontDir, pattern);
+            var hit = Directory.GetFiles(fontDir, pattern)
+                .Where(f => !string.Equals(
+                    Path.GetFileName(f), LatinFontName, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+
             if (hit.Length > 0)
                 return hit[0];
         }

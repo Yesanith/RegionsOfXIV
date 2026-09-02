@@ -370,6 +370,6 @@ from the key rather than the translated text. Slider units go through `Loc.Unit`
 `%`. Neither is visible to translators.
 
 Banner wording is not part of that system. A new language there is a dictionary in
-`BannerNames.cs` plus one line in `ByLanguage`, which is what the Notifications dropdown is built
+`BannerNames.cs` plus one line in `ByLanguage`, which is what the Announcements dropdown is built
 from, and nothing else. The tables are kept separate rather than folded into one id-to-languages
 map so that adding a language does not touch the entries the others already have.
