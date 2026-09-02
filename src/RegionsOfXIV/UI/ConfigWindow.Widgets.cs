@@ -13,7 +13,7 @@ namespace RegionsOfXIV.UI;
 // having: a tab reads as a list of settings rather than as a list of if-edited blocks.
 //
 // The enum Label overloads live here too. They are what Choice is given to turn a value into
-// wording, and no tab owns them: Motion and Particles are drawn on Effects, fonts on Fonts.
+// wording, and no tab owns them: Motion and Particles are drawn on Motion, fonts on Fonts.
 internal sealed partial class ConfigWindow
 {
     // Trump Gothic, Jupiter and Axis are the names of typefaces and are not translated in any
@@ -35,21 +35,21 @@ internal sealed partial class ConfigWindow
     // for gender will not want one word for both.
     private static string Label(MotionEffect effect) => effect switch
     {
-        MotionEffect.None => Loc.Get("effects.motion.none", "None"),
-        MotionEffect.Typewriter => Loc.Get("effects.motion.typewriter", "Typewriter"),
-        MotionEffect.Rise => Loc.Get("effects.motion.rise", "Rise"),
-        MotionEffect.Wave => Loc.Get("effects.motion.wave", "Wave"),
-        MotionEffect.Burn => Loc.Get("effects.motion.burn", "Burn"),
+        MotionEffect.None => Loc.Get("motion.choice.none", "None"),
+        MotionEffect.Typewriter => Loc.Get("motion.choice.typewriter", "Typewriter"),
+        MotionEffect.Rise => Loc.Get("motion.choice.rise", "Rise"),
+        MotionEffect.Wave => Loc.Get("motion.choice.wave", "Wave"),
+        MotionEffect.Burn => Loc.Get("motion.choice.burn", "Burn"),
         _ => effect.ToString(),
     };
 
     private static string Label(ParticleEffect effect) => effect switch
     {
-        ParticleEffect.None => Loc.Get("effects.particles.none", "None"),
-        ParticleEffect.Hearts => Loc.Get("effects.particles.hearts", "Hearts"),
-        ParticleEffect.Embers => Loc.Get("effects.particles.embers", "Embers"),
-        ParticleEffect.Sparkles => Loc.Get("effects.particles.sparkles", "Sparkles"),
-        ParticleEffect.Petals => Loc.Get("effects.particles.petals", "Petals"),
+        ParticleEffect.None => Loc.Get("motion.particles.none", "None"),
+        ParticleEffect.Hearts => Loc.Get("motion.particles.hearts", "Hearts"),
+        ParticleEffect.Embers => Loc.Get("motion.particles.embers", "Embers"),
+        ParticleEffect.Sparkles => Loc.Get("motion.particles.sparkles", "Sparkles"),
+        ParticleEffect.Petals => Loc.Get("motion.particles.petals", "Petals"),
         _ => effect.ToString(),
     };
 

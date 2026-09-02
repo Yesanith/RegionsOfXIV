@@ -1,110 +1,93 @@
 {
   "_status": "machine-drafted -- not reviewed by a German speaker. Wording is plain and in places stiff; correct it freely. Keys listed under _untranslated were left in English on purpose, see the reasons there.",
   "_untranslated": [
-    "general.hideduty: 'duty' is FFXIV's term for instanced content. German FFXIV has a set word for it; guessing would put a word in the window that the game itself never uses.",
-    "general.decode: the Eorzean script has an established German name in FFXIV. Left for someone who can check it against the game.",
-    "notifications.subarea and general.skipfast: 'sub-area' is the finest place tier and the whole meaning of both labels. FFXIV may have its own term.",
-    "notifications.banners.tooltip: translated, but 'Quest Accepted', 'Duty Commenced' and 'Level Up!' were left in English inside it -- the game already translates those three and its wording must win.",
-    "'Eorzean' is kept as-is throughout, as FFXIV's German localisation generally does.",
+    "announcements.banners.tooltip: translated, but 'Quest Accepted', 'Duty Commenced' and 'Level Up!' were left in English inside it -- the game already translates those three and its wording must win.",
     "Typeface names (Noto Sans CJK, Trump Gothic, Jupiter, Axis), product names (Discord, GitHub, Dalamud, Guild Wars 2, Square Enix), commands and the AGPL identifier are never translated."
   ],
-  "durations.tab": {
-    "message": "Dauer"
-  },
-  "durations.intro": {
+  "_uncertain": [
+    "duty (announcements.hideduty). Chosen: 'Inhalte', which is what German FFXIV calls instanced content. Taken from the game rather than from this file, so it is the one word here worth checking against a running client.",
+    "sub-area (announcements.subarea, announcements.skipfast and its tooltip, appearance.showheader.tooltip). Chosen: 'Untergebiet', which about.summary already used. The four tiers are Region, Zone, Gebiet, Untergebiet and have to agree everywhere.",
+    "Eorzean script (motion.decode and its tooltip). Chosen: 'das Eorzeanische' and 'eorzeanisch', which the file already used in motion.decode.duration.tooltip. If FFXIV's German has its own name for the script, it should win over both."
+  ],
+  "motion.intro": {
     "message": "Die Zeile erscheint, kommt an und wird dann entschlüsselt. Bewegung und Entschlüsselung sind getrennte Schritte und brauchen jeweils ihre eigene Zeit."
   },
-  "durations.fadein": {
+  "motion.fadein": {
     "message": "Einblenden"
   },
-  "durations.fadein.tooltip": {
+  "motion.fadein.tooltip": {
     "message": "Wie lange die Zeile braucht, um beim Erscheinen ihre volle Stärke zu erreichen."
   },
-  "durations.motion": {
-    "message": "Bewegung"
-  },
-  "durations.motion.tooltip": {
-    "message": "Wie lange die Buchstaben zum Ankommen brauchen. Läuft zusammen mit dem\nEinblenden und tut nichts, wenn die Bewegung im Reiter Effekte auf Keine steht."
-  },
-  "durations.decode": {
-    "message": "Entschlüsseln"
-  },
-  "durations.decode.tooltip": {
-    "message": "Wie lange das Eorzeanische zum Auflösen braucht, nachdem die Buchstaben\nangekommen sind. Braucht den Entschlüsselungseffekt im Reiter Effekte."
-  },
-  "durations.hold": {
+  "motion.hold": {
     "message": "Halten"
   },
-  "durations.hold.tooltip": {
+  "motion.hold.tooltip": {
     "message": "Wie lange die fertige Zeile stehen bleibt, bevor sie zu verblassen beginnt."
   },
-  "durations.fadeout": {
+  "motion.fadeout": {
     "message": "Ausblenden"
   },
-  "durations.fadeout.tooltip": {
+  "motion.fadeout.tooltip": {
     "message": "Wie lange die Zeile zum Verschwinden braucht, wenn ihre Zeit um ist."
   },
-  "effects.tab": {
-    "message": "Effekte"
-  },
-  "effects.motion.intro": {
+  "motion.choice.intro": {
     "message": "Wie sich die Buchstaben beim Ankommen bewegen."
   },
-  "effects.motion": {
+  "motion.choice": {
     "message": "Bewegung"
   },
-  "effects.motion.tooltip": {
+  "motion.choice.tooltip": {
     "message": "Keine: die Buchstaben erscheinen einfach an ihrem Platz.\nSchreibmaschine: ein Buchstabe nach dem anderen, ohne Blende.\nAufsteigen: die Buchstaben heben sich von unten an ihren Platz.\nWelle: eine Welle läuft beim Erscheinen durch die Zeile.\nBrennen: die Buchstaben entzünden sich und kühlen in ihre Farbe ab.\n\nLäuft zusammen mit der eorzeanischen Entschlüsselung, nicht an ihrer Stelle."
   },
-  "effects.motion.none": {
+  "motion.choice.none": {
     "message": "Keine"
   },
-  "effects.motion.typewriter": {
+  "motion.choice.typewriter": {
     "message": "Schreibmaschine"
   },
-  "effects.motion.rise": {
+  "motion.choice.rise": {
     "message": "Aufsteigen"
   },
-  "effects.motion.wave": {
+  "motion.choice.wave": {
     "message": "Welle"
   },
-  "effects.motion.burn": {
+  "motion.choice.burn": {
     "message": "Brennen"
   },
-  "effects.particles.intro": {
+  "motion.particles.intro": {
     "message": "Was ringsherum spielt, solange sie zu sehen ist."
   },
-  "effects.particles": {
+  "motion.particles": {
     "message": "Partikel"
   },
-  "effects.particles.none": {
+  "motion.particles.none": {
     "message": "Keine"
   },
-  "effects.particles.hearts": {
+  "motion.particles.hearts": {
     "message": "Herzen"
   },
-  "effects.particles.embers": {
+  "motion.particles.embers": {
     "message": "Glut"
   },
-  "effects.particles.sparkles": {
+  "motion.particles.sparkles": {
     "message": "Funkeln"
   },
-  "effects.particles.petals": {
+  "motion.particles.petals": {
     "message": "Blütenblätter"
   },
-  "effects.density": {
+  "motion.density": {
     "message": "Dichte"
   },
-  "effects.particlecolour": {
+  "motion.particlecolour": {
     "message": "Partikelfarbe"
   },
-  "effects.particlecolour.tooltip": {
+  "motion.particlecolour.tooltip": {
     "message": "Das voreingestellte Bernstein passt zu Glut und Funkeln. Herzen und\nBlütenblätter wollen eher ins Rosa."
   },
-  "effects.embers.note": {
+  "motion.embers.note": {
     "message": "Glut passt zur Bewegung Brennen, braucht sie aber nicht."
   },
-  "effects.preview": {
+  "motion.preview": {
     "message": "Vorschau"
   },
   "sharecodes.heading": {
@@ -200,59 +183,53 @@
   "about.notaffiliated": {
     "message": "Ortsnamen, Wetter und Schriften stammen aus den Daten des Spiels. Nicht mit Square Enix verbunden."
   },
-  "notifications.tab": {
-    "message": "Benachrichtigungen"
-  },
-  "notifications.intro": {
+  "announcements.intro": {
     "message": "Dieses Plugin ersetzt die Ortsanzeige des Spiels, statt daneben zu zeichnen. Wenn du die Unterdrückung unten abschaltest, kommt die Version des Spiels zurück."
   },
-  "notifications.zone": {
+  "announcements.zone": {
     "message": "Zonenwechsel"
   },
-  "notifications.area": {
+  "announcements.area": {
     "message": "Gebietswechsel"
   },
-  "notifications.weather": {
+  "announcements.weather": {
     "message": "Wetterwechsel"
   },
-  "notifications.weather.tooltip": {
+  "announcements.weather.tooltip": {
     "message": "Kündigt den Wetterwechsel an, auf einer eigenen Zeile direkt über dem Ortsnamen, sodass er eine Ortsmeldung nie unterbricht.\n\nDas Wetter läuft in einem festen Zyklus von etwa 23 Minuten, und wer irgendwo neu ankommt, erfährt, was es dort gerade tut. Es erscheint also zusammen mit dem Ortsnamen beim Hineingehen."
   },
-  "notifications.weathericon": {
+  "announcements.weathericon": {
     "message": "Wettersymbol anzeigen"
   },
-  "notifications.weathericon.tooltip": {
+  "announcements.weathericon.tooltip": {
     "message": "Zeichnet das spieleigene Symbol für das Wetter links neben dessen Namen."
   },
-  "notifications.banners": {
+  "announcements.banners": {
     "message": "Banner"
   },
-  "notifications.banners.tooltip": {
+  "announcements.banners.tooltip": {
     "message": "Zeichnet die bildschirmfüllenden Banner des Spiels (\"Quest Accepted\", \"Duty Commenced\", \"Level Up!\") in der Schrift dieses Plugins neu.\n\nDer Wortlaut ist in die Grafik des Spiels gemalt und nicht als Text gespeichert, daher werden nur Banner übernommen, für die dieses Plugin Worte hat. Unbekannte behalten die des Spiels."
   },
-  "notifications.hidebanner": {
+  "announcements.hidebanner": {
     "message": "Das spieleigene Banner ausblenden"
   },
-  "notifications.hidebanner.tooltip": {
+  "announcements.hidebanner.tooltip": {
     "message": "Blendet die Grafik des Spiels aus, sodass nur die Fassung dieses Plugins zu sehen ist.\n\nSchalte dies ab, um beide zu sehen. Das ist ein schneller Weg zu prüfen, ob der Wortlaut übereinstimmt."
   },
-  "notifications.hideareatext": {
+  "announcements.hideareatext": {
     "message": "Die spieleigene Gebietsanzeige ausblenden"
   },
-  "notifications.hideareatext.tooltip": {
+  "announcements.hideareatext.tooltip": {
     "message": "Unterdrückt das native \"_AreaText\", das unter diesem Plugin gezeichnet wird."
   },
-  "notifications.hideloadingtitle": {
+  "announcements.hideloadingtitle": {
     "message": "Zonentitel im Ladebildschirm ausblenden"
   },
-  "notifications.hideloadingtitle.tooltip": {
+  "announcements.hideloadingtitle.tooltip": {
     "message": "Unterdrückt \"_LocationTitle\" und \"_LocationTitleShort\", den goldenen Titel\nüber dem Ladebildschirm, und zeigt dieselben Namen stattdessen im Stil\ndieses Plugins."
   },
   "presets.tab": {
     "message": "Voreinstellungen"
-  },
-  "presets.intro": {
-    "message": "Eine Voreinstellung umfasst jede Einstellung unter Allgemein, Schriften, Effekte, Benachrichtigungen und Dauer: Schnitt und Größe jeder Zeile, Position, Farben, Bewegung und Partikel, welche Stufen angekündigt werden, die Zeiten und wann geschwiegen wird."
   },
   "presets.intro.warning": {
     "message": "Eine anzuwenden ersetzt sie alle, alles von dir Geänderte wird also überschrieben."
@@ -319,9 +296,6 @@
   },
   "presets.replace": {
     "message": "Ersetzen"
-  },
-  "presets.save.tooltip": {
-    "message": "Speichert jede Einstellung unter Allgemein, Schriften, Effekte, Benachrichtigungen und Dauer."
   },
   "presets.discord": {
     "message": "Discord beitreten"
@@ -404,109 +378,106 @@
   "fonts.upscaled": {
     "message": "Diese Schrift hat keine Bitmap über {0:F0} px, bei {1:F0} px wird sie also hochskaliert und sieht weich aus. Verringere die Größe, oder wechsle zu Noto Sans CJK oder einer eigenen Schriftdatei; beide bleiben in jeder Größe scharf."
   },
-  "general.tab": {
-    "message": "Allgemein"
-  },
-  "general.language": {
+  "about.language": {
     "message": "Sprache"
   },
-  "general.language.follow": {
+  "about.language.follow": {
     "message": "Dalamud folgen"
   },
-  "general.language.tooltip": {
+  "about.language.tooltip": {
     "message": "Dalamud folgen nimmt die Sprache, auf die Dalamud selbst eingestellt ist,\nund ändert sich mit ihr.\n\nNur dieses Fenster ist betroffen. Orts- und Wetternamen kommen aus dem Spiel\nund bleiben in der Sprache, in der dein Client läuft."
   },
-  "general.preview": {
+  "appearance.preview": {
     "message": "Vorschau"
   },
-  "general.vertical": {
+  "appearance.vertical": {
     "message": "Senkrechte Position"
   },
-  "general.horizontal": {
+  "appearance.horizontal": {
     "message": "Waagerechte Position"
   },
-  "general.horizontal.tooltip": {
+  "appearance.horizontal.tooltip": {
     "message": "Der Text wird auf diesen Punkt zentriert, 50% ist also die Bildschirmmitte.\nEin langer Ortsname nahe einem der Ränder reicht darüber hinaus."
   },
-  "general.letterspacing": {
+  "appearance.letterspacing": {
     "message": "Buchstabenabstand"
   },
-  "general.letterspacing.tooltip": {
+  "appearance.letterspacing.tooltip": {
     "message": "Zusätzlicher Abstand zwischen Buchstaben, als Anteil der Schriftgröße, sodass\ner seine Proportionen behält, wenn die Größe sich ändert, und die Kopfzeile\nihren eigenen Anteil bekommt. Weite Abstände machen viel vom Look des\nGuild-Wars-2-Originals aus."
   },
-  "general.uppercase": {
+  "appearance.uppercase": {
     "message": "Großbuchstaben"
   },
-  "general.textcolour": {
+  "appearance.textcolour": {
     "message": "Textfarbe"
   },
-  "general.headercolour": {
+  "appearance.headercolour": {
     "message": "Kopfzeilenfarbe"
   },
-  "general.outlinecolour": {
+  "appearance.outlinecolour": {
     "message": "Umrissfarbe"
   },
-  "general.separatecolours": {
+  "appearance.separatecolours": {
     "message": "Jede Zeile einzeln färben"
   },
-  "general.separatecolours.tooltip": {
+  "appearance.separatecolours.tooltip": {
     "message": "Aus folgt die Wetterzeile der Kopfzeile, und eine Umrissfarbe deckt\nalle drei Zeilen ab.\n\nAn nehmen die Wetterzeile und die Umrisse die Farben unten, sodass eine\nZeile in den Hintergrund geschoben werden kann, ohne die anderen anzurühren."
   },
-  "general.weathercolour": {
+  "appearance.weathercolour": {
     "message": "Wetterfarbe"
   },
-  "general.headeroutlinecolour": {
+  "appearance.headeroutlinecolour": {
     "message": "Umrissfarbe der Kopfzeile"
   },
-  "general.weatheroutlinecolour": {
+  "appearance.weatheroutlinecolour": {
     "message": "Umrissfarbe des Wetters"
   },
-  "general.outlinethickness": {
+  "appearance.outlinethickness": {
     "message": "Umrissstärke"
   },
-  "general.outlinethickness.tooltip": {
+  "appearance.outlinethickness.tooltip": {
     "message": "Null schaltet den Umriss ab."
   },
-  "general.shadow": {
+  "appearance.shadow": {
     "message": "Schlagschatten"
   },
-  "general.shadow.tooltip": {
+  "appearance.shadow.tooltip": {
     "message": "Eine zweite Kopie jeder Zeile, versetzt dahinter. Sitzt unter dem Umriss,\ndie beiden lassen sich also zusammen nutzen: ein enger Umriss für die\nLesbarkeit und ein weicher Schatten für Tiefe.\n\nEin Schatten deckt alle drei Zeilen ab; er folgt den getrennten Farben nicht."
   },
-  "general.shadowcolour": {
+  "appearance.shadowcolour": {
     "message": "Schattenfarbe"
   },
-  "general.shadowacross": {
+  "appearance.shadowacross": {
     "message": "Schatten seitlich"
   },
-  "general.shadowacross.tooltip": {
+  "appearance.shadowacross.tooltip": {
     "message": "Negativ schiebt den Schatten nach links."
   },
-  "general.shadowdown": {
+  "appearance.shadowdown": {
     "message": "Schatten nach unten"
   },
-  "general.shadowdown.tooltip": {
+  "appearance.shadowdown.tooltip": {
     "message": "Negativ hebt den Schatten über den Text."
   },
-  "general.shadowspread": {
+  "appearance.shadowspread": {
     "message": "Schattenbreite"
   },
-  "general.shadowspread.tooltip": {
+  "appearance.shadowspread.tooltip": {
     "message": "Verdickt den Schatten nach außen. Null behält die Form der Buchstaben;\nhöhere Werte verdicken ihn zu einem Hof dahinter."
   },
-  "general.showheader": {
+  "appearance.showheader": {
     "message": "Kopfzeile anzeigen"
   },
-  "general.underlineheader": {
+  "appearance.underlineheader": {
     "message": "Kopfzeile unterstreichen"
   },
-  "general.headergap": {
+  "appearance.headergap": {
     "message": "Kopfzeilenabstand"
   },
-  "general.headergap.tooltip": {
+  "appearance.headergap.tooltip": {
     "message": "Wie weit der Name unter der Kopfzeile sitzt, gemessen in Zeilen der Kopfzeile.\n\nNiedrige Werte ziehen die beiden zusammen, bis sie sich fast berühren. Das ist der\nengere Look, mit dem das Plugin immer ausgeliefert wurde. Höhere Werte öffnen\nden Abstand und geben jeder Zeile Luft."
   },
-  "general.hidecombat": {
+  "announcements.hidecombat": {
     "message": "Im Kampf ausblenden"
   },
   "command.help": {
@@ -599,58 +570,55 @@
   "fonts.reduced": {
     "message": "Wird mit {0:F0} px gezeichnet statt mit {1:F0}. Dieser Client zeigt japanische Ortsnamen, daher muss jede Benachrichtigungsschrift Kanji tragen, und in dieser Größe ließe sie sich nicht bauen. Deine Einstellung bleibt erhalten und kommt zurück, wenn sich die Sprache des Spiels ändert."
   },
-  "notifications.bannerlanguage": {
+  "announcements.bannerlanguage": {
     "message": "Bannersprache"
   },
-  "notifications.bannerlanguage.follow": {
+  "announcements.bannerlanguage.follow": {
     "message": "Dem Client folgen"
   },
-  "notifications.bannerlanguage.tooltip": {
+  "announcements.bannerlanguage.tooltip": {
     "message": "In welcher Sprache der Bannertext gezeichnet wird.\n\nDem Client folgen nimmt die Sprache, in der das Spiel läuft. Eine andere zu wählen ersetzt das spieleigene Banner durch die Fassung dieses Plugins in jener Sprache: auf einem deutschen Client mit Englisch wird die deutsche Grafik ausgeblendet und englischer Text an ihre Stelle gezeichnet.\n\nAufgeführt sind nur Sprachen, für die dieses Plugin Worte hat. Banner, für die es keine hat, behalten die des Spiels, welche Sprache auch gewählt ist."
   },
 
-  "notifications.bannergap": {
+  "announcements.bannergap": {
     "message": "Bannerabstand"
   },
-  "notifications.bannergap.tooltip": {
+  "announcements.bannergap.tooltip": {
     "message": "Wie weit unter einem Ortsnamen ein Banner sitzt, gemessen in Zeilen\nder Anzeigeschrift.\n\nBeide können gleichzeitig zu sehen sein: Beim Betreten einer Instanz\nwird zuerst der Ort angesagt und kurz darauf die Gruppengröße. Das hier\nist der Platz dazwischen. Der Abstand bleibt gleich, auch wenn kein Name\nzu sehen ist, ein einzelnes Banner landet also ebenfalls hier."
   },
 
-  "notifications.sound": {
+  "sound.source": {
     "message": "Ton"
   },
-  "notifications.sound.off": {
+  "sound.source.off": {
     "message": "Keiner"
   },
-  "notifications.sound.game": {
+  "sound.source.game": {
     "message": "Einer des Spiels"
   },
-  "notifications.sound.tooltip": {
+  "sound.source.tooltip": {
     "message": "Spielt einen Ton ab, wenn eine Meldung erscheint. Standardmäßig aus.\n\nEiner des Spiels ist ein Chat-Soundeffekt, den das Spiel selbst mischt: gesteuert wird er von der Gesamtlautstärke und der Lautstärke der Systemtöne, nicht von der der Soundeffekte, und die Soundeffekte leiser zu stellen macht ihn nicht leiser.\n\nEine eigene Datei spielt das Plugin ab, und die mischt das Spiel gar nicht, also liest das Plugin dieselben Einstellungen und richtet sich selbst danach. Es bleibt stumm, solange das Spiel stummgeschaltet ist, und solange das Fenster nicht im Vordergrund ist, sofern Sie dem Spiel nicht gesagt haben, dann weiterzuspielen."
   },
-  "notifications.sound.effect": {
+  "sound.effect": {
     "message": "Soundeffekt {0}"
   },
-  "notifications.sound.audition": {
-    "message": "Abspielen"
-  },
-  "notifications.sound.audition.tooltip": {
+  "sound.audition.tooltip": {
     "message": "Spielt den gewählten Ton sofort ab. Die kurze Pause, die verhindert, dass zwei Meldungen gleichzeitig klingen, wird dabei übergangen, sodass wiederholtes Drücken immer einen Ton ergibt."
   },
-  "notifications.soundon.location": {
+  "sound.on.location": {
     "message": "Ton bei Ortsnamen"
   },
-  "notifications.soundon.weather": {
+  "sound.on.weather": {
     "message": "Ton bei Wetter"
   },
-  "notifications.soundon.banner": {
+  "sound.on.banner": {
     "message": "Ton bei Bannern"
   },
-  "notifications.soundon.tooltip": {
+  "sound.on.tooltip": {
     "message": "Welche Arten von Meldung einen Ton ergeben. Zwei gleichzeitig eintreffende ergeben immer nur einen Ton, nämlich den, der zuerst ankommt."
   },
 
-  "notifications.sound.file": {
+  "sound.source.file": {
     "message": "Eine eigene Datei"
   },
   "sound.browse": {
@@ -739,5 +707,62 @@
   },
   "sound.problem.truncated": {
     "message": "Diese Datei bricht mittendrin ab und konnte nicht bis zum Ende gelesen werden."
+  },
+  "presets.intro": {
+    "message": "Eine Voreinstellung umfasst Meldungen, Darstellung, Bewegung und Schriften: Schnitt und Größe jeder Zeile, Position, Farben, Bewegung und Partikel, welche Stufen gemeldet werden, die Zeiten und wann geschwiegen wird. Ton ist nicht enthalten."
+  },
+  "presets.save.tooltip": {
+    "message": "Speichert alle Einstellungen aus Meldungen, Darstellung, Bewegung und Schriften. Ton ist nicht enthalten."
+  },
+  "announcements.tab": {
+    "message": "Meldungen"
+  },
+  "appearance.tab": {
+    "message": "Darstellung"
+  },
+  "motion.decode.duration": {
+    "message": "Entschlüsselungsdauer"
+  },
+  "motion.decode.duration.tooltip": {
+    "message": "Wie lange das Eorzeanische zum Auflösen braucht, nachdem die Buchstaben angekommen sind. Braucht den Entschlüsselungseffekt oben."
+  },
+  "motion.duration": {
+    "message": "Bewegungsdauer"
+  },
+  "motion.duration.tooltip": {
+    "message": "Wie lange die Buchstaben zum Ankommen brauchen. Läuft zusammen mit dem Einblenden und tut nichts, wenn die Bewegung oben auf Keine steht."
+  },
+  "motion.tab": {
+    "message": "Bewegung"
+  },
+  "motion.timing.intro": {
+    "message": "Wie lange die ganze Meldung dauert, gleich welche der Einstellungen oben sie nutzt."
+  },
+  "sound.intro": {
+    "message": "Ein kurzer Ton, wenn eine Meldung erscheint, aus den Soundeffekten des Spiels oder aus einer eigenen Datei."
+  },
+  "sound.tab": {
+    "message": "Ton"
+  },
+  "announcements.hideduty": {
+    "message": "In Inhalten ausblenden"
+  },
+  "announcements.skipfast": {
+    "message": "Untergebiete beim schnellen Reisen überspringen"
+  },
+  "announcements.skipfast.tooltip": {
+    "message": "Betrifft nur Untergebiete, und nur oberhalb einer Geschwindigkeit, die kein Reisen\nam Boden erreicht, greift also beim Fliegen. Zonen- und Gebietswechsel werden\nimmer angekündigt, wie schnell du dich auch bewegst."
+  },
+  "announcements.subarea": {
+    "message": "Untergebietswechsel"
+  },
+  "appearance.showheader.tooltip": {
+    "message": "Die kleinere Zeile über dem Namen, die angibt, wo der Ort liegt: die Region\nüber einer Zone, das Gebiet über einem Untergebiet.\n\nAusgeschaltet wird nur der Name selbst angezeigt. Die Wetterzeile, falls du sie\nan hast, bleibt unberührt, ebenso die beiden Einstellungen darunter, die\nweiterhin für sie gelten."
+  },
+  "motion.decode": {
+    "message": "Aus dem Eorzeanischen entschlüsseln"
+  },
+  "motion.decode.tooltip": {
+    "message": "Benötigt eine mitgelieferte eorzeanische Schrift. Nur lateinischer Text.\n\nLäuft nach der Bewegung oben statt gleichzeitig damit: die Zeile kommt\neorzeanisch an, landet und löst sich dann auf. Ausgeschaltet kommt sie\nbereits lesbar an. Voreinstellungen lassen dies unberührt, also schaltet\nes sich hier für alle aus."
   }
 }

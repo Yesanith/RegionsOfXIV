@@ -116,12 +116,12 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         using var tabs = ImRaii.TabBar("##RegionsOfXIVTabs");
         if (!tabs) return;
 
-        DrawGeneralTab();
+        DrawAnnouncementsTab();
+        DrawAppearanceTab();
+        DrawMotionTab();
         DrawFontsTab();
-        DrawEffectsTab();
+        DrawSoundTab();
         DrawPresetsTab();
-        DrawNotificationsTab();
-        DrawDurationsTab();
         DrawAboutTab();
     }
 

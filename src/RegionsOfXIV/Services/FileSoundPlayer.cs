@@ -67,7 +67,7 @@ internal sealed class FileSoundPlayer : IDisposable
 
     public FileSoundPlayer(IGameAudio audio) => this.audio = audio;
 
-    // What the Notifications tab shows under the file row. Null when the last attempt was fine, or
+    // What the Sound tab shows under the file row. Null when the last attempt was fine, or
     // when there has not been one.
     public string? Problem => this.problem;
 

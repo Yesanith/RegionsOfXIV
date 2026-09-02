@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Globalization;
+using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Utility;
@@ -31,6 +32,14 @@ internal sealed partial class ConfigWindow
     {
         using var tab = ImRaii.TabItem(Loc.Label("about.tab", "About"));
         if (!tab) return;
+
+        // First on the tab, above the title, and not because a setting belongs at the top of an
+        // otherwise informational page. Each language is named in its own language so somebody who
+        // has landed in one they cannot read can find their way out, and that only works if the
+        // control is findable by position rather than by reading the prose below it first.
+        DrawLanguage();
+
+        ImGui.Separator();
 
         UiText.Colored(
             HeadingColor,
@@ -104,6 +113,56 @@ internal sealed partial class ConfigWindow
             "about.notaffiliated",
             "Place names, weather and fonts come from the game's own data. "
             + "Not affiliated with Square Enix."));
+    }
+
+    private void DrawLanguage()
+    {
+        using (var combo = ImRaii.Combo(
+                   Loc.Label("about.language", "Language"), LanguageName(this.config.Language)))
+        {
+            if (combo)
+            {
+                foreach (var option in LanguageOptions)
+                {
+                    // The code is the identity, not the name -- two languages whose native names
+                    // happened to render alike would otherwise be one entry.
+                    if (!ImGui.Selectable(
+                            $"{LanguageName(option)}###language-{option ?? "dalamud"}",
+                            option == this.config.Language))
+                        continue;
+
+                    this.config.Language = option;
+                    this.actions.ReloadLanguage();
+                    MarkUnsaved();
+                }
+            }
+        }
+
+        UiText.Tooltip(Loc.Get(
+            "about.language.tooltip",
+            "Follow Dalamud takes whichever language Dalamud itself is set to, and\n" +
+            "changes with it.\n\n" +
+            "Only this window is affected. Place and weather names come from the game\n" +
+            "and stay in whatever language your client is running in."));
+    }
+
+    // Loc.Shipped never contains "en" -- English is the compiled-in fallback rather than a
+    // bundled file -- so listing it here cannot double it up.
+    private static string?[] LanguageOptions => [null, "en", .. Loc.Shipped];
+
+    private static string LanguageName(string? code)
+    {
+        if (code is null)
+            return Loc.Get("about.language.follow", "Follow Dalamud");
+
+        try
+        {
+            return CultureInfo.GetCultureInfo(code).NativeName;
+        }
+        catch (CultureNotFoundException)
+        {
+            return code;
+        }
     }
 
     private static void Link(string label, string url, string tooltip)

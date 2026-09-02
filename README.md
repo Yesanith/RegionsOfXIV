@@ -188,8 +188,8 @@ Every entry carries a `description`. It is not documentation. It is the note a
 translator works from, and it is where the traps are recorded: which words are
 identifiers, which are FFXIV's own terms, which line breaks matter, which
 placeholders must survive. Write one for every new key. Some worth reading
-before starting: `notifications.subarea`, `general.hideduty`, `general.uppercase`
-and `notifications.banners.tooltip`.
+before starting: `announcements.subarea`, `announcements.hideduty`,
+`appearance.uppercase` and `announcements.banners.tooltip`.
 
 Four rules that the descriptions repeat, because breaking them is invisible
 until someone hits it:

@@ -88,7 +88,7 @@ internal static class BannerNames
     // The same banners in Turkish. Unlike English this was not read off a screen: there is no
     // Turkish FFXIV client, so nothing here transcribes anything and every string is a choice.
     // A player picking this is asking for the game's own artwork to be replaced by wording the
-    // plugin invented, which is what the Notifications tab warns about.
+    // plugin invented, which is what the Announcements tab warns about.
     //
     // Two decisions worth knowing about. Quest and Duty both want "görev", and two banners
     // reading alike would be worse than an imperfect word, so Duty is "etkinlik" here and in
@@ -169,7 +169,7 @@ internal static class BannerNames
     // tables separate rather than folding them into one id to (en, de, fr, ja) map means adding
     // German does not touch the ninety entries English already has.
     //
-    // The Notifications tab offers exactly these, so a language cannot be picked that has no words
+    // The Announcements tab offers exactly these, so a language cannot be picked that has no words
     // behind it.
     public static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<uint, string>> ByLanguage =
         new Dictionary<string, IReadOnlyDictionary<uint, string>>(StringComparer.OrdinalIgnoreCase)
