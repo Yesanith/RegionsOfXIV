@@ -13,6 +13,13 @@ internal static class Changelog
 {
     public static readonly ChangelogEntry[] All =
     [
+        new(new Version("0.6.1.0"),
+        [
+            "Turkish banner wording draws properly. The dotted I, the S with a cedilla and the G with a breve were coming out as question marks, so \"ETKINLIK BASLADI\" was missing three of its letters.",
+            "The font the plugin draws with had no Turkish letters in it at all. It ships with a small addition that does, and the letters it fills in are from the same family as the ones around them, so a word does not change typeface halfway through. Polish, Czech, Romanian and Hungarian gain the same.",
+            "The sample notification in the settings window follows the banner language while you are looking at it. Picking a language used to leave the preview showing whichever one the plugin started in.",
+        ]),
+
         new(new Version("0.6.0.0"),
         [
             "Notifications can make a sound. Off until you turn it on, under a Sound tab of its own: one of the game's sixteen chat sound effects, or a .wav or .mp3 of your own.",
