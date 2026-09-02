@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -46,8 +47,15 @@ internal static class Loc
     private static readonly Dictionary<string, string> units = [];
 
     // Bumped whenever the table is swapped. The caches are cleared against it by whoever reads
-    // them next rather than by Apply, for the same reason: Apply is on the framework thread and
-    // clearing a dictionary out from under the thread enumerating it is the hazard being avoided.
+    // them next rather than by Apply, because clearing a dictionary out from under the thread
+    // enumerating it is the hazard being avoided.
+    //
+    // Read and written through Interlocked and Volatile rather than plainly, because Apply runs on
+    // either thread: the framework one for the constructor and Dalamud's own language change, and
+    // the draw one when the combo on About is used. Without that, a reader could see the new table
+    // carrying the old number, or the old table carrying the new one, and the second is the bad
+    // half: the caches would be cleared, refilled from the table that is on its way out, and then
+    // never cleared again, leaving the window in the language it started in.
     private static int generation;
 
     private static int cachedGeneration = -1;
@@ -114,12 +122,12 @@ internal static class Loc
     // and not the other for a reason worth telling apart.
     private static void DropStaleCaches()
     {
-        if (cachedGeneration == generation)
+        if (cachedGeneration == Volatile.Read(ref generation))
             return;
 
         labels.Clear();
         units.Clear();
-        cachedGeneration = generation;
+        cachedGeneration = Volatile.Read(ref generation);
     }
 
     // Placeholders are the one thing a translator writes that the runtime has to execute, so a
@@ -182,9 +190,9 @@ internal static class Loc
         IsMachineDraft = strings.Count > 0
                          && status?.Contains("machine-drafted", StringComparison.OrdinalIgnoreCase) == true;
 
-        // Last, so a reader that has already passed DropStaleCaches on the old generation cannot
-        // fill a cache from the new table and stamp it with the old number.
-        generation++;
+        // Last, and interlocked, so that the table above is published before the number that
+        // announces it and two threads calling Apply at once cannot lose a bump between them.
+        Interlocked.Increment(ref generation);
     }
 
     // Invariant when the runtime has no data for the code, so a language file with a plausible but
