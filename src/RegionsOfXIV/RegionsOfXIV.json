@@ -2,7 +2,7 @@
   "Author": "Yesanith",
   "Name": "Regions of XIV",
   "Punchline": "A beautiful area notification as you walk in and out of zones.",
-  "Description": "Announces the region, zone, area and sub-area you walk into with a styled, animated on-screen notification. It can announce weather changes too, and redraw the game's own banners (Quest Accepted, Duty Commenced, Level Up!) in the same style.\n\nEvery line takes its own colours, outline, drop shadow and font: one of the game's own faces, or any font file on your PC.\n\nInspired by Nekres' \"Regions of Tyria\" for Guild Wars 2.\n\nOpen settings with /regions.",
+  "Description": "Announces the region, zone, area and sub-area you walk into with a styled, animated on-screen notification. It can announce weather changes too, and redraw the game's own banners (Quest Accepted, Duty Commenced, Level Up!) in the same style.\n\nEvery line takes its own colours, outline, drop shadow and font: one of the game's own faces, or any font file on your PC.\n\nA notification can make a sound as it arrives, either one of the game's own chat sound effects or a file of your own. Off until you turn it on, and it follows your in-game volume and mute settings.\n\nInspired by Nekres' \"Regions of Tyria\" for Guild Wars 2.\n\nOpen settings with /regions.",
   "ApplicableVersion": "any",
   "RepoUrl": "https://github.com/Yesanith/RegionsOfXIV",
   "IconUrl": "https://raw.githubusercontent.com/Yesanith/RegionsOfXIV/master/assets/images/icon.png",

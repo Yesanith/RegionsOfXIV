@@ -40,6 +40,9 @@ for Guild Wars 2.
 - **Hearts, embers, sparkles or petals** drifting around the text, if that is
   your sort of thing. Drawn from primitives, so they cost no download and work
   under every font.
+- **A sound, if you want one.** One of the game's own chat effects, or a `.wav`
+  or `.mp3` of yours, off until you ask for it. It follows the game's own volume
+  and mute settings, so it goes quiet when the game does.
 - **Presets to start from.** Inferno, Sweetheart, Starlight, Sakura, Dispatch,
   Tyria: each one a motion, a particle and a palette that suit each other.
   Every setting stays yours to change afterwards.
