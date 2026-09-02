@@ -31,7 +31,7 @@ internal sealed partial class ConfigWindow
                 return this.Problem;
 
             this.Checked = path;
-            this.Problem = FontService.CustomFontProblem(path);
+            this.Problem = FontLimits.CustomFontProblem(path);
 
             return this.Problem;
         }
@@ -42,7 +42,7 @@ internal sealed partial class ConfigWindow
     // Pixels at 100% Dalamud scale. The atlas multiplies by the global scale when it builds, so a
     // player at 200% sees twice these and pays four times the texture for them.
     //
-    // The ceiling is FontService.MaxAffordablePx, read from there rather than repeated here so the
+    // The ceiling is FontLimits.MaxAffordablePx, read from there rather than repeated here so the
     // slider cannot offer a size the build would then hold down.
     private const float MinTextPx = 24f;
 
@@ -68,7 +68,7 @@ internal sealed partial class ConfigWindow
             Loc.Get("fonts.role.text", "Text"),
             Loc.Get("fonts.role.text.hint", "The place name itself, the largest line."),
             MinTextPx,
-            FontService.MaxAffordablePx(FontRole.Text));
+            FontLimits.MaxAffordablePx(FontRole.Text));
 
         DrawFontRole(
             FontRole.Header,
@@ -77,7 +77,7 @@ internal sealed partial class ConfigWindow
                 "fonts.role.header.hint",
                 "The smaller line above the name, giving the region or area it sits in."),
             MinHeaderPx,
-            FontService.MaxAffordablePx(FontRole.Header));
+            FontLimits.MaxAffordablePx(FontRole.Header));
 
         DrawFontRole(
             FontRole.Weather,
@@ -86,7 +86,7 @@ internal sealed partial class ConfigWindow
                 "fonts.role.weather.hint",
                 "The forecast line above the header, shown when weather announcements are on."),
             MinHeaderPx,
-            FontService.MaxAffordablePx(FontRole.Weather));
+            FontLimits.MaxAffordablePx(FontRole.Weather));
     }
 
     // Every identity here is built from the role rather than from the label. The label is
@@ -156,7 +156,7 @@ internal sealed partial class ConfigWindow
     // reaches, and Noto is exactly what someone at a large size will be on.
     private static void DrawSizeCeilingNote(FontRole role, FontSetting font)
     {
-        var ceiling = FontService.MaxAffordablePx(role);
+        var ceiling = FontLimits.MaxAffordablePx(role);
 
         if (font.SizePx <= ceiling)
             return;
@@ -271,7 +271,7 @@ internal sealed partial class ConfigWindow
 
     private static void DrawStockFontWarnings(FontSetting font)
     {
-        if (FontService.IsLatinOnly(font.Choice) &&
+        if (FontLimits.IsLatinOnly(font.Choice) &&
             Plugin.ClientState.ClientLanguage == ClientLanguage.Japanese)
         {
             Warn(
@@ -283,7 +283,7 @@ internal sealed partial class ConfigWindow
                     Label(font.Choice)));
         }
 
-        var ceiling = FontService.NativeCeilingPx(font.Choice);
+        var ceiling = FontLimits.NativeCeilingPx(font.Choice);
         var size = font.SizePx;
 
         if (size <= ceiling)

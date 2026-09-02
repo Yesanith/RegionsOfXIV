@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using Dalamud.Bindings.ImGui;
@@ -9,38 +9,42 @@ namespace RegionsOfXIV.UI;
 
 internal sealed partial class ConfigWindow
 {
-    private void DrawNotificationsTab()
+    // What gets announced, when to stay quiet, and what of the game's own to suppress, in that
+    // order. The tab reads outward: the first three blocks each add something to the screen, the
+    // quiet rules take it away again under conditions, and the suppression is about the game's UI
+    // rather than about this plugin's, so it ends the tab as the least often touched of the four.
+    private void DrawAnnouncementsTab()
     {
-        using var tab = ImRaii.TabItem(Loc.Label("notifications.tab", "Notifications"));
+        using var tab = ImRaii.TabItem(Loc.Label("announcements.tab", "Announcements"));
         if (!tab) return;
 
         UiText.Wrapped(Loc.Get(
-            "notifications.intro",
+            "announcements.intro",
             "This plugin replaces the game's own location text rather than drawing alongside " +
             "it. If you turn the suppression below off, the game's version comes back."));
         ImGui.Separator();
 
         var changed = false;
         this.config.ZoneNotificationEnabled = Checkbox(
-            Loc.Label("notifications.zone", "Zone changes"),
+            Loc.Label("announcements.zone", "Zone changes"),
             this.config.ZoneNotificationEnabled, ref changed);
 
         this.config.AreaNotificationEnabled = Checkbox(
-            Loc.Label("notifications.area", "Area changes"),
+            Loc.Label("announcements.area", "Area changes"),
             this.config.AreaNotificationEnabled, ref changed);
 
         this.config.SubAreaNotificationEnabled = Checkbox(
-            Loc.Label("notifications.subarea", "Sub-area changes"),
+            Loc.Label("announcements.subarea", "Sub-area changes"),
             this.config.SubAreaNotificationEnabled, ref changed);
 
         ImGui.Separator();
 
         this.config.WeatherNotificationEnabled = Checkbox(
-            Loc.Label("notifications.weather", "Weather changes"),
+            Loc.Label("announcements.weather", "Weather changes"),
             this.config.WeatherNotificationEnabled, ref changed);
 
         UiText.Tooltip(Loc.Get(
-            "notifications.weather.tooltip",
+            "announcements.weather.tooltip",
             "Announces the weather turning over, on its own line just above the "
             + "place name, so it never interrupts a location notice.\n\n"
             + "Weather runs on a fixed cycle of about 23 minutes, and arriving anywhere "
@@ -50,22 +54,22 @@ internal sealed partial class ConfigWindow
         using (ImRaii.Disabled(!this.config.WeatherNotificationEnabled))
         {
             this.config.ShowWeatherIcon = Checkbox(
-                Loc.Label("notifications.weathericon", "Show the weather icon"),
+                Loc.Label("announcements.weathericon", "Show the weather icon"),
                 this.config.ShowWeatherIcon, ref changed);
         }
 
         UiText.Tooltip(Loc.Get(
-            "notifications.weathericon.tooltip",
+            "announcements.weathericon.tooltip",
             "Draws the game's own icon for the weather to the left of its name."));
 
         ImGui.Separator();
 
         this.config.BannerNotificationEnabled = Checkbox(
-            Loc.Label("notifications.banners", "Banners"),
+            Loc.Label("announcements.banners", "Banners"),
             this.config.BannerNotificationEnabled, ref changed);
 
         UiText.Tooltip(Loc.Get(
-            "notifications.banners.tooltip",
+            "announcements.banners.tooltip",
             "Redraws the game's full-screen banners (\"Quest Accepted\", "
             + "\"Duty Commenced\", \"Level Up!\") in this plugin's lettering.\n\n"
             + "The wording is painted into the game's artwork rather than stored as "
@@ -75,12 +79,12 @@ internal sealed partial class ConfigWindow
         using (ImRaii.Disabled(!this.config.BannerNotificationEnabled))
         {
             this.config.HideNativeBanner = Checkbox(
-                Loc.Label("notifications.hidebanner", "Hide the game's own banner"),
+                Loc.Label("announcements.hidebanner", "Hide the game's own banner"),
                 this.config.HideNativeBanner, ref changed);
         }
 
         UiText.Tooltip(Loc.Get(
-            "notifications.hidebanner.tooltip",
+            "announcements.hidebanner.tooltip",
             "Fades out the game's artwork so only this plugin's version shows.\n\n"
             + "Turn this off to see both, which is a quick way to check the "
             + "wording matches."));
@@ -88,13 +92,13 @@ internal sealed partial class ConfigWindow
         using (ImRaii.Disabled(!this.config.BannerNotificationEnabled))
         {
             this.config.BannerGap = Slider(
-                Loc.Label("notifications.bannergap", "Banner drop"),
+                Loc.Label("announcements.bannergap", "Banner drop"),
                 this.config.BannerGap, 0.5f, 5f,
                 "%.2f " + Loc.Unit("units.lines", "lines"), ref changed);
         }
 
         UiText.Tooltip(Loc.Get(
-            "notifications.bannergap.tooltip",
+            "announcements.bannergap.tooltip",
             "How far below a place name a banner sits, measured in lines of the\n" +
             "display text.\n\n" +
             "The two can be on screen together: entering a duty announces where you\n" +
@@ -109,9 +113,47 @@ internal sealed partial class ConfigWindow
 
         ImGui.Separator();
 
+        DrawQuietRules(ref changed);
+
+        ImGui.Separator();
+
+        DrawNativeSuppression(ref changed);
+
+        if (!changed)
+            return;
+
+        MarkUnsaved();
+        this.actions.LivePreview(Sample);
+    }
+
+    private void DrawQuietRules(ref bool changed)
+    {
+        this.config.HideInCombat = Checkbox(
+            Loc.Label("announcements.hidecombat", "Hide during combat"),
+            this.config.HideInCombat, ref changed);
+
+        this.config.HideInDuty = Checkbox(
+            Loc.Label("announcements.hideduty", "Hide inside duties"),
+            this.config.HideInDuty, ref changed);
+
+        this.config.HideWhileTravellingFast = Checkbox(
+            Loc.Label("announcements.skipfast", "Skip sub-areas while travelling quickly"),
+            this.config.HideWhileTravellingFast, ref changed);
+        UiText.Tooltip(Loc.Get(
+            "announcements.skipfast.tooltip",
+            "Only affects sub-areas, and only above a speed no ground travel reaches,\n" +
+            "so it comes into play when flying. Zone and area changes are always\n" +
+            "announced however fast you are moving."));
+    }
+
+    // Both toggles have to tell the plugin to put the game's own back when they are switched off,
+    // which is why neither can go through the shared Checkbox flag: the restore happens once, on
+    // the frame the box is cleared, rather than on every frame the setting is false.
+    private void DrawNativeSuppression(ref bool changed)
+    {
         var toggled = false;
         this.config.HideNativeAreaText = Checkbox(
-            Loc.Label("notifications.hideareatext", "Hide the game's own area text"),
+            Loc.Label("announcements.hideareatext", "Hide the game's own area text"),
             this.config.HideNativeAreaText, ref toggled);
 
         if (toggled)
@@ -123,12 +165,12 @@ internal sealed partial class ConfigWindow
         }
 
         UiText.Tooltip(Loc.Get(
-            "notifications.hideareatext.tooltip",
+            "announcements.hideareatext.tooltip",
             "Suppresses the native \"_AreaText\" flash, which draws underneath this plugin."));
 
         var titleToggled = false;
         this.config.HideNativeLoadingTitle = Checkbox(
-            Loc.Label("notifications.hideloadingtitle", "Hide the loading-screen zone title"),
+            Loc.Label("announcements.hideloadingtitle", "Hide the loading-screen zone title"),
             this.config.HideNativeLoadingTitle, ref titleToggled);
 
         if (titleToggled)
@@ -140,16 +182,10 @@ internal sealed partial class ConfigWindow
         }
 
         UiText.Tooltip(Loc.Get(
-            "notifications.hideloadingtitle.tooltip",
+            "announcements.hideloadingtitle.tooltip",
             "Suppresses \"_LocationTitle\" and \"_LocationTitleShort\", the gold title\n" +
             "drawn over the loading screen, and shows the same names in this\n" +
             "plugin's style instead."));
-
-        if (!changed)
-            return;
-
-        MarkUnsaved();
-        this.actions.LivePreview(Sample);
     }
 
     // Offered from BannerNames.ByLanguage rather than from a list written here, so a language
@@ -159,7 +195,7 @@ internal sealed partial class ConfigWindow
     private void DrawBannerLanguage(ref bool changed)
     {
         using (var combo = ImRaii.Combo(
-                   Loc.Label("notifications.bannerlanguage", "Banner language"),
+                   Loc.Label("announcements.bannerlanguage", "Banner language"),
                    BannerLanguageName(this.config.BannerNameLanguage)))
         {
             if (combo)
@@ -181,7 +217,7 @@ internal sealed partial class ConfigWindow
         }
 
         UiText.Tooltip(Loc.Get(
-            "notifications.bannerlanguage.tooltip",
+            "announcements.bannerlanguage.tooltip",
             "Which language the banner wording is drawn in.\n\n"
             + "Following the client uses the language the game is in. Choosing another "
             + "replaces the game's own banner with this plugin's version in that language, "
@@ -197,7 +233,7 @@ internal sealed partial class ConfigWindow
     private static string BannerLanguageName(string? code)
     {
         if (code is null)
-            return Loc.Get("notifications.bannerlanguage.follow", "Follow the client");
+            return Loc.Get("announcements.bannerlanguage.follow", "Follow the client");
 
         try
         {
@@ -208,5 +244,4 @@ internal sealed partial class ConfigWindow
             return code;
         }
     }
-
 }

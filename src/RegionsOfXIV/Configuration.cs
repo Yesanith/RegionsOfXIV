@@ -13,7 +13,7 @@ namespace RegionsOfXIV;
 //
 // Adding a setting here is enough for it to be saved, to travel in presets and share codes, and
 // to be covered by the round-trip tests -- see ConfigurationCopy.
-public class Configuration : IPluginConfiguration, IGateSettings
+public class Configuration : IPluginConfiguration, IGateSettings, ISoundSettings
 {
     public const int CurrentVersion = 3;
 
@@ -52,6 +52,28 @@ public class Configuration : IPluginConfiguration, IGateSettings
     public bool HideNativeLoadingTitle { get; set; } = true;
 
     public bool HideNativeBanner { get; set; } = true;
+
+    // Off by default. This is an atmosphere plugin and a sound is the one thing it can do that
+    // reaches a player who is not looking at the screen, so it is asked for rather than assumed.
+    public SoundSource SoundSource { get; set; } = SoundSource.Off;
+
+    // Which of the game's own chat sound effects to play, as the number the player sees in the
+    // game's own settings and in "<se.1>". NotificationSounds is the only thing that turns this
+    // into whatever the client's own function wants.
+    public int GameSoundId { get; set; } = 1;
+
+    // A .wav or .mp3 on this PC, used when SoundSource is File. Empty until one is chosen. Absent
+    // from a config written before this existed, which JSON leaves as the default, so it needs no
+    // migration. Excluded from ConfigurationCopy: see the note there.
+    public string SoundFilePath { get; set; } = string.Empty;
+
+    // Per category, so someone who wants a sound only when a banner lands can have that. The
+    // three match the three real entry points on INotificationSink.
+    public bool SoundOnLocation { get; set; } = true;
+
+    public bool SoundOnWeather { get; set; } = true;
+
+    public bool SoundOnBanner { get; set; } = true;
 
     // Which language the banner wording is drawn in, or null to follow the client. A code rather
     // than a flag, so a second language is a value here instead of a shape change. Absent from an

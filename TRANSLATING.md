@@ -32,7 +32,7 @@ Two things are unusual here, and both make your job easier.
 **English is not in a file.** It lives in the C# source, at every place a string is drawn:
 
 ```csharp
-Loc.Get("durations.hold", "Hold")
+Loc.Get("motion.hold", "Hold")
 ```
 
 `en.json` is generated from those call sites so translators have something to read. It is never
@@ -50,13 +50,13 @@ always the right answer when you do not know a term.
 ## What a line looks like
 
 ```json
-  "durations.hold": {
+  "motion.hold": {
     "message": "Halten",
     "description": "Slider label. How long the finished notification stays on screen."
   },
 ```
 
-- **The key** (`durations.hold`) is machine-readable. Never translate, rename or invent one.
+- **The key** (`motion.hold`) is machine-readable. Never translate, rename or invent one.
 - **`message`** is what a player sees. This is the only thing you change.
 - **`description`** is a note from the developer to you. It is never shown in game. It explains
   what the string is, where it appears, and anything you need to know: line breaks to preserve,
@@ -133,14 +133,17 @@ language, and the build fails if one appears. Use your own language's punctuatio
 comma, a colon, brackets, or two sentences. Do not swap in a hyphen; in most languages that reads
 as a typo.
 
-## The two underscore keys
+## The three underscore keys
 
 Keys starting with `_` are notes, not strings. The loader skips them.
 
 ```json
 "_status": "machine-drafted -- not reviewed by a German speaker. …",
 "_untranslated": [
-  "general.hideduty: 'duty' is FFXIV's term for instanced content …"
+  "announcements.banners.tooltip: translated, but the three banner names inside it …"
+],
+"_uncertain": [
+  "duty (announcements.hideduty). Chosen: 'Inhalte', which is what German FFXIV calls …"
 ]
 ```
 
@@ -154,6 +157,12 @@ thing a first real review changes.
 
 **`_untranslated`** is a list of keys deliberately left English and why. Add to it when you skip a
 key, remove entries as you resolve them.
+
+**`_uncertain`** is the other half of that: keys you did translate, where the word you picked is a
+judgement call somebody else might make differently. A term FFXIV has its own word for, a coinage
+where the game offers none, a label that means nothing in your language but still needs one. Record
+what you chose and what the alternative was. It costs a line and it saves the next person from
+either second-guessing you or quietly changing half the occurrences.
 
 ## Banner wording
 
@@ -169,7 +178,7 @@ plugin cannot look it up and carries its own list instead, keyed by the artwork'
 [120114] = "Light Party",
 ```
 
-Players choose which language their banners are drawn in, under Notifications in the settings
+Players choose which language their banners are drawn in, under Announcements in the settings
 window, and that dropdown offers exactly the languages with a table here.
 
 This is a C# file rather than JSON, which sounds worse than it is: you are editing a list of

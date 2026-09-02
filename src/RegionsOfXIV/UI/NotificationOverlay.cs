@@ -27,27 +27,43 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     private readonly Configuration config;
     private readonly NotificationRenderer renderer;
 
+    // Sound rides the three Push methods and nothing else. The preview verbs below are
+    // deliberately silent: TouchPreview runs on every frame a slider is being dragged, so a sound
+    // there would be a stutter of beeps rather than a preview, and HoldPreview keeps a sample on
+    // screen for as long as editing mode is on. Auditioning is a button in the settings, which
+    // calls PlayNow directly. Do not "fix" this by moving the call into Spawn.
+    private readonly NotificationSounds sounds;
+
     private readonly Lane locations;
     private readonly Lane weather;
     private readonly Lane banners;
 
+    // The three above again, for everything that treats them alike. Only the three Push methods
+    // care which lane they are addressing; every other verb here runs over all of them, and
+    // naming them one at a time meant a fourth lane had to be remembered in nine places. The one
+    // that would have hurt is Clear: a lane missed there keeps a notification across a logout.
+    private readonly Lane[] lanes;
+
     private bool previewHeld;
     private PreviewSample held;
 
-    public NotificationOverlay(Configuration config, FontService fonts)
+    public NotificationOverlay(Configuration config, FontService fonts, NotificationSounds sounds)
         : base("##RegionsOfXIVOverlay")
     {
         this.config = config;
         this.renderer = new NotificationRenderer(config, fonts);
+        this.sounds = sounds;
 
         this.locations = new Lane(
-            this.renderer.Draw, () => config.DisplayFontSize * StackSpacingRatio);
+            this.renderer.Draw, () => config.DisplayFontSize * StackSpacingRatio, LocationLine);
 
         this.weather = new Lane(
-            this.renderer.DrawWeather, () => config.WeatherFontSize * StackSpacingRatio);
+            this.renderer.DrawWeather, () => config.WeatherFontSize * StackSpacingRatio, WeatherLine);
 
         this.banners = new Lane(
-            this.renderer.DrawBanner, () => config.DisplayFontSize * StackSpacingRatio);
+            this.renderer.DrawBanner, () => config.DisplayFontSize * StackSpacingRatio, BannerLine);
+
+        this.lanes = [this.locations, this.weather, this.banners];
 
         Flags = ImGuiWindowFlags.NoDecoration
                 | ImGuiWindowFlags.NoInputs
@@ -68,9 +84,9 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
 
     public void Dispose()
     {
-        this.locations.Clear();
-        this.weather.Clear();
-        this.banners.Clear();
+        foreach (var lane in this.lanes)
+            lane.Clear();
+
         this.previewHeld = false;
     }
 
@@ -98,6 +114,7 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             return;
 
         Spawn(this.locations, new Line(header, text));
+        this.sounds.Play(SoundCategory.Location);
     }
 
     public void PushWeather(string text, uint iconId)
@@ -106,6 +123,7 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             return;
 
         Spawn(this.weather, new Line(null, text, iconId));
+        this.sounds.Play(SoundCategory.Weather);
     }
 
     public void PushBanner(string text)
@@ -114,15 +132,15 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             return;
 
         Spawn(this.banners, new Line(null, text));
+        this.sounds.Play(SoundCategory.Banner);
     }
 
     // Called on every frame a setting is being changed. Keeps one preview alive and lets the
     // renderer pick up the new colours, rather than restarting the animation on each keystroke.
     public void TouchPreview(PreviewSample sample)
     {
-        Touch(this.locations, LocationLine(sample));
-        Touch(this.weather, WeatherLine(sample));
-        Touch(this.banners, BannerLine(sample));
+        foreach (var lane in this.lanes)
+            Touch(lane, lane.Sample(sample));
     }
 
     // The "Preview" button, and anything that wants the animation played from the top. While
@@ -132,15 +150,14 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
     {
         if (!this.previewHeld)
         {
-            Restart(this.locations, LocationLine(sample));
-            Restart(this.weather, WeatherLine(sample));
-            Restart(this.banners, BannerLine(sample));
+            foreach (var lane in this.lanes)
+                Restart(lane, lane.Sample(sample));
+
             return;
         }
 
-        Replay(this.locations, LocationLine(this.held));
-        Replay(this.weather, WeatherLine(this.held));
-        Replay(this.banners, BannerLine(this.held));
+        foreach (var lane in this.lanes)
+            Replay(lane, lane.Sample(this.held));
     }
 
     // Editing mode. While held, Draw keeps re-asserting the preview every frame so it never
@@ -152,17 +169,16 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
 
         if (!held)
         {
-            Release(this.locations);
-            Release(this.weather);
-            Release(this.banners);
+            foreach (var lane in this.lanes)
+                Release(lane);
+
             return;
         }
 
         HoldEach();
     }
 
-    public override bool DrawConditions() =>
-        !this.locations.IsEmpty || !this.weather.IsEmpty || !this.banners.IsEmpty;
+    public override bool DrawConditions() => Array.Exists(this.lanes, lane => !lane.IsEmpty);
 
     public override void PreDraw()
     {
@@ -181,21 +197,19 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         }
         else
         {
-            ReleaseIfIdle(this.locations);
-            ReleaseIfIdle(this.weather);
-            ReleaseIfIdle(this.banners);
+            foreach (var lane in this.lanes)
+                ReleaseIfIdle(lane);
         }
 
-        Advance(this.locations);
-        Advance(this.weather);
-        Advance(this.banners);
+        foreach (var lane in this.lanes)
+            Advance(lane);
     }
 
     // Goes through the same Configuration.HeaderFor as a real arrival. Building the preview
     // line by hand here is what let "Show header" stop working in the config window while it
     // still worked in game.
-    private Line LocationLine(in PreviewSample sample) =>
-        new(this.config.HeaderFor(sample.Header, sample.Text), sample.Text);
+    private Line? LocationLine(in PreviewSample sample) =>
+        new Line(this.config.HeaderFor(sample.Header, sample.Text), sample.Text);
 
     private Line? WeatherLine(in PreviewSample sample) =>
         this.config.WeatherNotificationEnabled
@@ -209,9 +223,8 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
 
     private void HoldEach()
     {
-        Hold(this.locations, LocationLine(this.held));
-        Hold(this.weather, WeatherLine(this.held));
-        Hold(this.banners, BannerLine(this.held));
+        foreach (var lane in this.lanes)
+            Hold(lane, lane.Sample(this.held));
     }
 
     // Backwards so a notification finishing its fade can be removed without disturbing the
@@ -389,10 +402,15 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
 
     private readonly record struct Line(string? Header, string Text, uint Icon = 0);
 
+    // A named delegate rather than Func, so the sample keeps the `in` the three line builders
+    // take it by. A method group with an `in` parameter will not bind to Func<PreviewSample, _>.
+    private delegate Line? LineFromSample(in PreviewSample sample);
+
     // One stack of notifications plus whichever of them is currently standing in as the preview.
     // PreviewLine is the wording that produced Preview, kept so Touch and Hold can tell a
     // cosmetic change (recolour, keep it) from a content change (rebuild it).
-    private sealed class Lane(Action<AreaNotification> draw, Func<float> spacing)
+    private sealed class Lane(
+        Action<AreaNotification> draw, Func<float> spacing, LineFromSample sample)
     {
         public readonly List<AreaNotification> Items = [];
 
@@ -401,6 +419,11 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         // How far the lane pushes what is already on screen when something new lands. A function
         // rather than a value because it follows the font size, which changes under the sliders.
         public readonly Func<float> Spacing = spacing;
+
+        // What this lane shows in the config-window preview, or null when its feature is switched
+        // off. Held here so the preview verbs can run over every lane without knowing which is
+        // which, which is the whole reason they no longer name the three by hand.
+        public readonly LineFromSample Sample = sample;
 
         public AreaNotification? Preview;
 

@@ -4,6 +4,11 @@ using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.Tests;
 
+// In the Localization collection for the banner tests below. Pushing a banner cases it by
+// BannerNameResolver.Language, which is one static for the whole plugin, and BannerCasingTests
+// sets it to Turkish -- so run in parallel with that, these read their capitals back in a
+// language they never asked for.
+[Collection("Localization")]
 public class AnnouncementCoordinatorTests
 {
     private const uint Region = 10;

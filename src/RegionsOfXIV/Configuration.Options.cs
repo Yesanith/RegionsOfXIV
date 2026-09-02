@@ -34,6 +34,19 @@ public readonly record struct FontSetting(FontChoice Choice, string Path, float 
     public bool IsCustom => this.Choice == FontChoice.Custom;
 }
 
+// Where a notification's sound comes from.
+//
+// File is declared but not yet reachable: nothing offers it and NotificationSounds treats it as
+// silence. It is here so that the value 2 is spoken for now rather than later, which is what keeps
+// adding custom files a matter of writing the playback rather than of migrating everyone's stored
+// number. Do not renumber these.
+public enum SoundSource
+{
+    Off,
+    GameSound,
+    File,
+}
+
 public enum MotionEffect
 {
     None,

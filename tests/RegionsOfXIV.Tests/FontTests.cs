@@ -89,7 +89,7 @@ public class FontTests
     [InlineData("   ")]
     public void APathThatIsNotThereIsRefusedBeforeAnythingLoads(string? path)
     {
-        Assert.NotNull(FontService.CustomFontProblem(path));
+        Assert.NotNull(FontLimits.CustomFontProblem(path));
     }
 
     [Theory]
@@ -98,7 +98,7 @@ public class FontTests
     [InlineData("mine")]
     public void OnlyFontFileTypesAreAccepted(string name)
     {
-        Assert.NotNull(FontService.CustomFontProblem(Path.Combine(Path.GetTempPath(), name)));
+        Assert.NotNull(FontLimits.CustomFontProblem(Path.Combine(Path.GetTempPath(), name)));
     }
 
     [Fact]
@@ -106,7 +106,7 @@ public class FontTests
     {
         var missing = Path.Combine(Path.GetTempPath(), $"regions-{Guid.NewGuid():N}.ttf");
 
-        Assert.NotNull(FontService.CustomFontProblem(missing));
+        Assert.NotNull(FontLimits.CustomFontProblem(missing));
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class FontTests
 
         try
         {
-            Assert.NotNull(FontService.CustomFontProblem(path));
+            Assert.NotNull(FontLimits.CustomFontProblem(path));
         }
         finally
         {
@@ -136,7 +136,7 @@ public class FontTests
 
         try
         {
-            Assert.Null(FontService.CustomFontProblem(path));
+            Assert.Null(FontLimits.CustomFontProblem(path));
         }
         finally
         {
@@ -147,25 +147,25 @@ public class FontTests
     [Fact]
     public void EveryBuiltInFaceReportsWhetherItCoversJapanese()
     {
-        Assert.True(FontService.IsLatinOnly(FontChoice.TrumpGothic));
-        Assert.True(FontService.IsLatinOnly(FontChoice.Jupiter));
-        Assert.False(FontService.IsLatinOnly(FontChoice.Axis));
-        Assert.False(FontService.IsLatinOnly(FontChoice.NotoSansCjk));
+        Assert.True(FontLimits.IsLatinOnly(FontChoice.TrumpGothic));
+        Assert.True(FontLimits.IsLatinOnly(FontChoice.Jupiter));
+        Assert.False(FontLimits.IsLatinOnly(FontChoice.Axis));
+        Assert.False(FontLimits.IsLatinOnly(FontChoice.NotoSansCjk));
     }
 
     [Fact]
     public void ACustomFaceIsNeverWarnedAboutAsLatinOnlyOrUpscaled()
     {
-        Assert.False(FontService.IsLatinOnly(FontChoice.Custom));
-        Assert.Equal(float.PositiveInfinity, FontService.NativeCeilingPx(FontChoice.Custom));
+        Assert.False(FontLimits.IsLatinOnly(FontChoice.Custom));
+        Assert.Equal(float.PositiveInfinity, FontLimits.NativeCeilingPx(FontChoice.Custom));
     }
 
     [Fact]
     public void TheGameFacesKeepTheirBitmapCeilings()
     {
-        Assert.True(FontService.NativeCeilingPx(FontChoice.Jupiter) < 62f);
-        Assert.True(FontService.NativeCeilingPx(FontChoice.Axis) < 49f);
-        Assert.True(FontService.NativeCeilingPx(FontChoice.TrumpGothic) < 92f);
-        Assert.Equal(float.PositiveInfinity, FontService.NativeCeilingPx(FontChoice.NotoSansCjk));
+        Assert.True(FontLimits.NativeCeilingPx(FontChoice.Jupiter) < 62f);
+        Assert.True(FontLimits.NativeCeilingPx(FontChoice.Axis) < 49f);
+        Assert.True(FontLimits.NativeCeilingPx(FontChoice.TrumpGothic) < 92f);
+        Assert.Equal(float.PositiveInfinity, FontLimits.NativeCeilingPx(FontChoice.NotoSansCjk));
     }
 }

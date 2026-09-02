@@ -2,8 +2,6 @@
 using System.IO;
 using System.Linq;
 using Dalamud;
-using Dalamud.Bindings.ImGui;
-using Dalamud.Game;
 using Dalamud.Interface.GameFonts;
 using Dalamud.Interface.ManagedFontAtlas;
 
@@ -14,10 +12,6 @@ namespace RegionsOfXIV.Services;
 // and is far too expensive to do on every frame a slider is being dragged.
 internal sealed class FontService : IDisposable
 {
-    private const long MaxCustomFontBytes = 64L * 1024 * 1024;
-
-    private static readonly string[] CustomFontExtensions = [".ttf", ".otf", ".ttc"];
-
     private const FontChoice FallbackChoice = FontChoice.NotoSansCjk;
 
     private const string CouldNotLoad =
@@ -50,8 +44,6 @@ internal sealed class FontService : IDisposable
 
     public IFontHandle? EorzeanDisplay => this.faces[(int)FontRole.Text].Eorzean;
 
-    public IFontHandle? EorzeanHeader => this.faces[(int)FontRole.Header].Eorzean;
-
     public IFontHandle? EorzeanWeather => this.faces[(int)FontRole.Weather].Eorzean;
 
     public string? ProblemWith(FontRole role)
@@ -62,66 +54,6 @@ internal sealed class FontService : IDisposable
             return face.Problem;
 
         return face.Plain?.LoadException == null ? null : CouldNotLoad;
-    }
-
-    public static float NativeCeilingPx(FontChoice choice) => choice switch
-    {
-        FontChoice.NotoSansCjk => float.PositiveInfinity,
-        FontChoice.Custom => float.PositiveInfinity,
-        FontChoice.Jupiter => 46f * 4f / 3f,
-        FontChoice.Axis => 36f * 4f / 3f,
-        _ => 68f * 4f / 3f,
-    };
-
-    public static bool IsLatinOnly(FontChoice choice) =>
-        choice is FontChoice.TrumpGothic or FontChoice.Jupiter;
-
-    // The largest size this client can afford to build a notification face at, in pixels before
-    // the atlas applies the global scale. It depends on the glyph set rather than on the role or
-    // the typeface: a client that needs kanji is asking for ten times the glyphs, and atlas cost
-    // is the glyph count times the square of the size.
-    //
-    // The Fonts tab offers this as the slider maximum, and Build holds to it as well, because a
-    // config can carry a larger number from a time when the client was not Japanese. Honouring
-    // that number would mean a 352 MB atlas where the same settings cost 16 MB in English.
-    public static float MaxAffordablePx(FontRole role) => role == FontRole.Text
-        ? (NeedsCjkGlyphs ? 140f : 280f)
-        : (NeedsCjkGlyphs ? 72f : 144f);
-
-    // Checked before the file is handed to the atlas, because a bad path fails asynchronously
-    // inside the build and surfaces as a blank line rather than an error anyone can act on.
-    // Callers should cache the result -- it touches the disk.
-    public static string? CustomFontProblem(string? path)
-    {
-        if (string.IsNullOrWhiteSpace(path))
-            return "No font file has been chosen yet.";
-
-        var extension = Path.GetExtension(path);
-
-        if (!CustomFontExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
-            return "Only .ttf, .otf and .ttc files can be used as fonts.";
-
-        FileInfo file;
-
-        try
-        {
-            file = new FileInfo(path);
-        }
-        catch (Exception)
-        {
-            return "That path cannot be read.";
-        }
-
-        if (!file.Exists)
-            return "There is no file at that path any more.";
-
-        if (file.Length == 0)
-            return "That file is empty.";
-
-        if (file.Length > MaxCustomFontBytes)
-            return "That file is far larger than any font, so it is being left alone.";
-
-        return null;
     }
 
     public void Rebuild()
@@ -176,7 +108,7 @@ internal sealed class FontService : IDisposable
         // the atlas forever.
         face.Built = wanted;
 
-        var ceiling = MaxAffordablePx(role);
+        var ceiling = FontLimits.MaxAffordablePx(role);
 
         if (wanted.SizePx > ceiling)
         {
@@ -187,7 +119,7 @@ internal sealed class FontService : IDisposable
         // Only custom roles get a fallback built, since a stock face cannot fail to load.
         if (wanted.IsCustom)
         {
-            face.Problem = CustomFontProblem(wanted.Path);
+            face.Problem = FontLimits.CustomFontProblem(wanted.Path);
             face.Fallback = BuildStock(FallbackChoice, wanted.SizePx);
 
             if (face.Problem == null)
@@ -205,7 +137,12 @@ internal sealed class FontService : IDisposable
         // Default ranges on purpose. The Eorzean font is a Latin-only recreation of the in-game
         // alphabet, so asking it for kana and kanji would reserve thousands of glyphs it does not
         // contain and cost atlas space for nothing.
-        face.Eorzean = this.config.DecodeEffectEnabled
+        //
+        // Text and weather only. The header is painted by DrawHeader as a plain run rather than
+        // through a FontPair, so it never scrambles and a face built for it is atlas nothing ever
+        // reads from. If the header is ever given the effect too, this is the line that has to
+        // know about it.
+        face.Eorzean = this.config.DecodeEffectEnabled && role != FontRole.Header
             ? BuildFromFile(BundledEorzeanPath(), wanted.SizePx, glyphRanges: null)
             : null;
     }
@@ -215,7 +152,7 @@ internal sealed class FontService : IDisposable
             ? this.atlas.NewDelegateFontHandle(e => e.OnPreBuild(tk =>
                 tk.AddDalamudAssetFont(
                     DalamudAsset.NotoSansCjkMedium,
-                    new SafeFontConfig { SizePx = sizePx, GlyphRanges = NotificationGlyphRanges() })))
+                    new SafeFontConfig { SizePx = sizePx, GlyphRanges = FontLimits.NotificationGlyphRanges() })))
             : this.atlas.NewGameFontHandle(new GameFontStyle(ResolveGameFamily(choice), sizePx));
 
     private IFontHandle? BuildCustom(Face face, string path, float sizePx)
@@ -223,7 +160,7 @@ internal sealed class FontService : IDisposable
         // The same ranges the stock face gets. Without them ImGui builds its default set, which is
         // Latin-1 only, and a player on the Japanese client who picks a custom font gets blanks for
         // every place name with nothing anywhere saying why.
-        var handle = BuildFromFile(path, sizePx, NotificationGlyphRanges());
+        var handle = BuildFromFile(path, sizePx, FontLimits.NotificationGlyphRanges());
 
         if (handle == null)
             face.Problem = CouldNotLoad;
@@ -257,49 +194,6 @@ internal sealed class FontService : IDisposable
         FontChoice.Axis => GameFontFamily.Axis,
         _ => GameFontFamily.TrumpGothic,
     };
-
-    private static ushort[]? CachedNotificationGlyphRanges;
-
-    // Whether the notification faces have to carry kanji. A notification only ever draws place,
-    // area and weather names, and those come out of the client's own sheets in the client's own
-    // language, so nothing on an English, German or French client is written in kanji.
-    //
-    // The Fonts tab reads this too: it decides what size ceiling it can afford to offer.
-    internal static bool NeedsCjkGlyphs =>
-        Plugin.ClientState.ClientLanguage == ClientLanguage.Japanese;
-
-    // Latin-1 and Latin Extended-A. Latin-1 alone covers the German and French place names, and
-    // the extension is carried for the handful of ligatures and accents beyond it that cost
-    // nothing to include.
-    private static readonly ushort[] LatinGlyphRanges = [0x0020, 0x017F, 0];
-
-    // Every glyph a notification face has to be able to draw. ImGui's "Japanese" set is a misnomer
-    // for our purposes: it carries Latin-1 as well as kana and kanji.
-    //
-    // Which set is asked for is what decides the size ceiling the Fonts tab can offer, because
-    // atlas cost is the glyph count times the square of the size, and the two sets are about 350
-    // glyphs against 3,736. Measured against the bundled Noto with all three roles at their
-    // ceiling: 16 MB of atlas texture for the Latin set, 352 MB for the Japanese one.
-    private static unsafe ushort[] NotificationGlyphRanges()
-    {
-        if (CachedNotificationGlyphRanges != null)
-            return CachedNotificationGlyphRanges;
-
-        if (!NeedsCjkGlyphs)
-            return CachedNotificationGlyphRanges = LatinGlyphRanges;
-
-        var source = ImGui.GetIO().Fonts.GetGlyphRangesJapanese();
-
-        var length = 0;
-        while (source[length] != 0)
-            length++;
-
-        var ranges = new ushort[length + 1];
-        for (var i = 0; i < length; i++)
-            ranges[i] = source[i];
-
-        return CachedNotificationGlyphRanges = ranges;
-    }
 
     private static string? CachedEorzeanPath;
     private static bool SearchedForEorzean;

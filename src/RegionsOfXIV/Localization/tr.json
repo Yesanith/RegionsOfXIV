@@ -1,116 +1,98 @@
 {
   "_status": "machine-drafted -- a starting point for the repository author, who is a native Turkish speaker and will review every string. Unlike de, fr and ja there is no FFXIV Turkish client to defer to, so the place-tier vocabulary and the FFXIV terms below were chosen without any authority to check them against. See _uncertain: those are decisions, not lookups. Register is informal second person throughout, matching the English.",
   "_untranslated": [
-    "notifications.banners.tooltip: translated, but 'Quest Accepted', 'Duty Commenced' and 'Level Up!' are left in English inside it. Those three are painted into the game's own artwork and the game has no Turkish, so what is on screen really is English.",
+    "announcements.banners.tooltip: translated, but 'Quest Accepted', 'Duty Commenced' and 'Level Up!' are left in English inside it. Those three are painted into the game's own artwork and the game has no Turkish, so what is on screen really is English.",
     "Typeface names (Noto Sans CJK, Trump Gothic, Jupiter, Axis), product names (Discord, GitHub, Dalamud, Guild Wars 2, Square Enix, Windows), commands, the ROX1- prefix, the _AreaText and _LocationTitle identifiers and the AGPL identifier are never translated."
   ],
   "_uncertain": [
     "THE FOUR PLACE TIERS. English has region > zone > area > sub-area, and Turkish 'bolge' is the natural word for both region and zone, so something has to give. Chosen: region = diyar, zone = bolge, area = alan, sub-area = alt alan. Alternatives considered: region = bolge with zone = kusak; or keeping region = bolge and zone = mintika. 'diyar' is archaic and literary, which suits an atmosphere plugin but may read as overwrought. This is the single decision that most needs your judgement, because the four words appear across five tabs and must agree everywhere.",
-    "duty (general.hideduty). FFXIV's term for instanced content. Now 'etkinlik', not 'gorev'. The banner table forced this: Quest Accepted and Duty Commenced are two different banners, and with both words as 'gorev' they would have read identically on screen, which is worse than an imperfect word. The remaining option is leaving 'Duty' in English, on the grounds that Turkish players of an English client use the English word anyway. If you take it, take it in BannerNames.Turkish as well; the two have to agree.",
-    "Eorzean script (general.decode, durations.decode, effects.motion.tooltip). Chosen: 'Eorzea yazisi'. Alternatives: 'Eorzea alfabesi' (alphabet rather than script), or leaving 'Eorzean' untouched as the other locales do. I inflected 'Eorzea' as a Turkish proper noun throughout, which may or may not be what you want for an invented place name.",
-    "decode (durations.decode, general.decode). Chosen: 'cozumleme' for the noun and 'cozulme' for the process. 'desifre' is the more common loan word and might read better to a player.",
+    "duty (announcements.hideduty). FFXIV's term for instanced content. Now 'etkinlik', not 'gorev'. The banner table forced this: Quest Accepted and Duty Commenced are two different banners, and with both words as 'gorev' they would have read identically on screen, which is worse than an imperfect word. The remaining option is leaving 'Duty' in English, on the grounds that Turkish players of an English client use the English word anyway. If you take it, take it in BannerNames.Turkish as well; the two have to agree.",
+    "Eorzean script (motion.decode, motion.decode.duration, motion.choice.tooltip). Chosen: 'Eorzea yazisi'. Alternatives: 'Eorzea alfabesi' (alphabet rather than script), or leaving 'Eorzean' untouched as the other locales do. I inflected 'Eorzea' as a Turkish proper noun throughout, which may or may not be what you want for an invented place name.",
+    "decode (motion.decode.duration, motion.decode). Chosen: 'cozumleme' for the noun and 'cozulme' for the process. 'desifre' is the more common loan word and might read better to a player.",
     "sanctuary, aetheryte, gpose, instance. None of these appear in any current string, so nothing was decided about them. If they arrive later they belong on this list.",
-    "outline (general.outlinecolour and friends). Chosen: 'kontur'. Alternative: 'dis cizgi', which is plainer Turkish but two words where the English is one, and these are slider labels with little room.",
+    "outline (appearance.outlinecolour and friends). Chosen: 'kontur'. Alternative: 'dis cizgi', which is plainer Turkish but two words where the English is one, and these are slider labels with little room.",
     "preset. Chosen: 'hazir ayar'. Alternative: 'on ayar', which is shorter and more common in Turkish software. I went with hazir ayar because on ayar can read as 'default'.",
     "PLACEHOLDER SUFFIXES. Turkish attaches case suffixes to nouns, and a suffix after {0} would have to agree with a word the plugin substitutes at runtime, which cannot be done. Every string here is phrased so no suffix follows a placeholder. If you rewrite one, keep that property or the grammar will be wrong for half the values."
   ],
-  "durations.tab": {
-    "message": "Süreler"
-  },
-  "durations.intro": {
+  "motion.intro": {
     "message": "Satır belirir, yerine oturur, sonra çözülür. Hareket ve çözümleme ayrı aşamalardır ve her biri kendi süresini alır."
   },
-  "durations.fadein": {
+  "motion.fadein": {
     "message": "Belirme"
   },
-  "durations.fadein.tooltip": {
+  "motion.fadein.tooltip": {
     "message": "Satırın belirirken tam yoğunluğuna ulaşması ne kadar sürer."
   },
-  "durations.motion": {
-    "message": "Hareket"
-  },
-  "durations.motion.tooltip": {
-    "message": "Harflerin yerine gelmesi ne kadar sürer. Belirmeyle aynı anda ilerler ve\nEfektler sekmesindeki hareket Yok ise hiçbir şey yapmaz."
-  },
-  "durations.decode": {
-    "message": "Çözümleme"
-  },
-  "durations.decode.tooltip": {
-    "message": "Harfler yerine oturduktan sonra Eorzea yazısının çözülmesi ne kadar sürer.\nEfektler sekmesindeki çözümleme efektini gerektirir."
-  },
-  "durations.hold": {
+  "motion.hold": {
     "message": "Bekleme"
   },
-  "durations.hold.tooltip": {
+  "motion.hold.tooltip": {
     "message": "Tamamlanan satır solmaya başlamadan önce ne kadar ekranda kalır."
   },
-  "durations.fadeout": {
+  "motion.fadeout": {
     "message": "Solma"
   },
-  "durations.fadeout.tooltip": {
+  "motion.fadeout.tooltip": {
     "message": "Süresi dolduğunda satırın kaybolması ne kadar sürer."
   },
-  "effects.tab": {
-    "message": "Efektler"
-  },
-  "effects.motion.intro": {
+  "motion.choice.intro": {
     "message": "Harfler gelirken nasıl hareket eder."
   },
-  "effects.motion": {
+  "motion.choice": {
     "message": "Hareket"
   },
-  "effects.motion.tooltip": {
+  "motion.choice.tooltip": {
     "message": "Yok: harfler doğrudan yerlerinde belirir.\nDaktilo: birer birer, solma olmadan.\nYükselme: harfler aşağıdan yerlerine yükselir.\nDalga: belirirken satır boyunca bir dalga geçer.\nYanma: harfler tutuşur ve soğuyarak rengine döner.\n\nEorzea yazısının çözülmesinin yerine değil, onunla aynı anda ilerler."
   },
-  "effects.motion.none": {
+  "motion.choice.none": {
     "message": "Yok"
   },
-  "effects.motion.typewriter": {
+  "motion.choice.typewriter": {
     "message": "Daktilo"
   },
-  "effects.motion.rise": {
+  "motion.choice.rise": {
     "message": "Yükselme"
   },
-  "effects.motion.wave": {
+  "motion.choice.wave": {
     "message": "Dalga"
   },
-  "effects.motion.burn": {
+  "motion.choice.burn": {
     "message": "Yanma"
   },
-  "effects.particles.intro": {
+  "motion.particles.intro": {
     "message": "Ekranda kaldığı sürece çevresinde ne olup biter."
   },
-  "effects.particles": {
+  "motion.particles": {
     "message": "Parçacıklar"
   },
-  "effects.particles.none": {
+  "motion.particles.none": {
     "message": "Yok"
   },
-  "effects.particles.hearts": {
+  "motion.particles.hearts": {
     "message": "Kalpler"
   },
-  "effects.particles.embers": {
+  "motion.particles.embers": {
     "message": "Kor"
   },
-  "effects.particles.sparkles": {
+  "motion.particles.sparkles": {
     "message": "Işıltı"
   },
-  "effects.particles.petals": {
+  "motion.particles.petals": {
     "message": "Yapraklar"
   },
-  "effects.density": {
+  "motion.density": {
     "message": "Yoğunluk"
   },
-  "effects.particlecolour": {
+  "motion.particlecolour": {
     "message": "Parçacık rengi"
   },
-  "effects.particlecolour.tooltip": {
+  "motion.particlecolour.tooltip": {
     "message": "Varsayılan kehribar rengi kor ve ışıltıya yakışır. Kalpler ve yapraklar\npembeye yaklaştırılmak ister."
   },
-  "effects.embers.note": {
+  "motion.embers.note": {
     "message": "Kor, Yanma hareketiyle iyi gider ama ona ihtiyaç duymaz."
   },
-  "effects.preview": {
+  "motion.preview": {
     "message": "Önizleme"
   },
   "sharecodes.heading": {
@@ -206,62 +188,56 @@
   "about.notaffiliated": {
     "message": "Yer adları, hava durumu ve yazı tipleri oyunun kendi verilerinden gelir. Square Enix ile bağlantılı değildir."
   },
-  "notifications.tab": {
-    "message": "Bildirimler"
-  },
-  "notifications.intro": {
+  "announcements.intro": {
     "message": "Bu eklenti, oyunun kendi konum yazısının yanına çizmek yerine onun yerini alır. Aşağıdaki gizlemeyi kapatırsan oyunun kendi görüntüsü geri gelir."
   },
-  "notifications.zone": {
+  "announcements.zone": {
     "message": "Bölge değişimleri"
   },
-  "notifications.area": {
+  "announcements.area": {
     "message": "Alan değişimleri"
   },
-  "notifications.subarea": {
+  "announcements.subarea": {
     "message": "Alt alan değişimleri"
   },
-  "notifications.weather": {
+  "announcements.weather": {
     "message": "Hava değişimleri"
   },
-  "notifications.weather.tooltip": {
+  "announcements.weather.tooltip": {
     "message": "Havanın değişmesini, yer adının hemen üstünde kendi satırında duyurur; böylece bir konum bildirimini asla kesmez.\n\nHava yaklaşık 23 dakikalık sabit bir döngüyle değişir ve yeni bir yere varınca oranın havası da bildirilir, bu yüzden içeri girerken yer adıyla birlikte görünür."
   },
-  "notifications.weathericon": {
+  "announcements.weathericon": {
     "message": "Hava simgesini göster"
   },
-  "notifications.weathericon.tooltip": {
+  "announcements.weathericon.tooltip": {
     "message": "Havanın adının soluna oyunun kendi simgesini çizer."
   },
-  "notifications.banners": {
+  "announcements.banners": {
     "message": "Afişler"
   },
-  "notifications.banners.tooltip": {
+  "announcements.banners.tooltip": {
     "message": "Oyunun tam ekran afişlerini (\"Quest Accepted\", \"Duty Commenced\", \"Level Up!\") bu eklentinin yazı tipiyle yeniden çizer.\n\nBu yazılar metin olarak değil oyunun görselinin içine boyanmış durumda, bu yüzden yalnızca bu eklentinin sözlerini bildiği afişler değiştirilir. Tanımadıkları oyunun kendi halinde kalır."
   },
-  "notifications.hidebanner": {
+  "announcements.hidebanner": {
     "message": "Oyunun kendi afişini gizle"
   },
-  "notifications.hidebanner.tooltip": {
+  "announcements.hidebanner.tooltip": {
     "message": "Oyunun görselini soldurur, böylece yalnızca bu eklentinin hali görünür.\n\nİkisini birden görmek için bunu kapat; yazının uyuşup uyuşmadığını hızlıca denetlemenin yolu budur."
   },
-  "notifications.hideareatext": {
+  "announcements.hideareatext": {
     "message": "Oyunun kendi alan yazısını gizle"
   },
-  "notifications.hideareatext.tooltip": {
+  "announcements.hideareatext.tooltip": {
     "message": "Bu eklentinin altına çizilen \"_AreaText\" görüntüsünü bastırır."
   },
-  "notifications.hideloadingtitle": {
+  "announcements.hideloadingtitle": {
     "message": "Yükleme ekranındaki bölge başlığını gizle"
   },
-  "notifications.hideloadingtitle.tooltip": {
+  "announcements.hideloadingtitle.tooltip": {
     "message": "Yükleme ekranına çizilen altın renkli \"_LocationTitle\" ve\n\"_LocationTitleShort\" başlıklarını bastırır ve aynı adları bu\neklentinin biçiminde gösterir."
   },
   "presets.tab": {
     "message": "Hazır Ayarlar"
-  },
-  "presets.intro": {
-    "message": "Bir hazır ayar, Genel, Yazı Tipleri, Efektler, Bildirimler ve Süreler sekmelerindeki her ayarı kapsar: her satırın yazı tipi ve boyutu, konum, renkler, hareket ve parçacıklar, hangi katmanların duyurulacağı, süreler ve ne zaman susulacağı."
   },
   "presets.intro.warning": {
     "message": "Birini uygulamak hepsinin yerine geçer, yani değiştirdiğin her şeyin üzerine yazılır."
@@ -328,9 +304,6 @@
   },
   "presets.replace": {
     "message": "Değiştir"
-  },
-  "presets.save.tooltip": {
-    "message": "Genel, Yazı Tipleri, Efektler, Bildirimler ve Süreler sekmelerindeki her ayarı kaydeder."
   },
   "presets.discord": {
     "message": "Discord'a katıl"
@@ -413,127 +386,121 @@
   "fonts.upscaled": {
     "message": "Bu yazı tipinin {0:F0} px üstünde bit eşlemi yok, bu yüzden {1:F0} px'te büyütülüyor ve yumuşak görünecek. Boyutu düşür ya da her boyutta keskin kalan Noto Sans CJK'ya veya kendi yazı tipi dosyana geç."
   },
-  "general.tab": {
-    "message": "Genel"
-  },
-  "general.language": {
+  "about.language": {
     "message": "Dil"
   },
-  "general.language.follow": {
+  "about.language.follow": {
     "message": "Dalamud'u izle"
   },
-  "general.language.tooltip": {
+  "about.language.tooltip": {
     "message": "Dalamud'u izle seçeneği, Dalamud'un kendi ayarlı dilini kullanır ve\nonunla birlikte değişir.\n\nYalnızca bu pencere etkilenir. Yer ve hava adları oyundan gelir ve\nistemcinin çalıştığı dilde kalır."
   },
-  "general.preview": {
+  "appearance.preview": {
     "message": "Önizleme"
   },
-  "general.vertical": {
+  "appearance.vertical": {
     "message": "Dikey konum"
   },
-  "general.horizontal": {
+  "appearance.horizontal": {
     "message": "Yatay konum"
   },
-  "general.horizontal.tooltip": {
+  "appearance.horizontal.tooltip": {
     "message": "Metin bu noktaya ortalanır, yani %50 ekranın ortasıdır.\nKenarlardan birine yakın konan uzun bir yer adı dışarı taşar."
   },
-  "general.letterspacing": {
+  "appearance.letterspacing": {
     "message": "Harf aralığı"
   },
-  "general.letterspacing.tooltip": {
+  "appearance.letterspacing.tooltip": {
     "message": "Harfler arasındaki ek boşluk, yazı tipi boyutunun yüzdesi olarak; böylece\nboyut değiştiğinde oranını korur ve başlık da kendi payını alır.\nGeniş aralık, Guild Wars 2 aslının görünümünün büyük bölümünü oluşturur."
   },
-  "general.uppercase": {
+  "appearance.uppercase": {
     "message": "Büyük harf"
   },
-  "general.decode": {
+  "motion.decode": {
     "message": "Eorzea yazısından çöz"
   },
-  "general.decode.tooltip": {
-    "message": "Birlikte gelen bir Eorzea yazı tipi gerektirir. Yalnızca Latin metin.\n\nEfektler sekmesindeki hareketle aynı anda değil, ondan sonra çalışır:\nsatır Eorzea yazısıyla gelir, yerine oturur, sonra çözülür. Kapalıyken\ndoğrudan okunur halde gelir. Hazır ayarlar buna dokunmaz, yani burada\nkapatmak hepsi için kapatır."
-  },
-  "general.textcolour": {
+  "appearance.textcolour": {
     "message": "Metin rengi"
   },
-  "general.headercolour": {
+  "appearance.headercolour": {
     "message": "Başlık rengi"
   },
-  "general.outlinecolour": {
+  "appearance.outlinecolour": {
     "message": "Kontur rengi"
   },
-  "general.separatecolours": {
+  "appearance.separatecolours": {
     "message": "Her satırı ayrı renklendir"
   },
-  "general.separatecolours.tooltip": {
+  "appearance.separatecolours.tooltip": {
     "message": "Kapalıyken hava satırı başlığı izler ve tek bir kontur rengi\nüç satırı da kapsar.\n\nAçıkken hava satırı ve konturlar aşağıdaki renkleri alır, böylece bir\nsatır diğerlerine dokunmadan arka plana doğru itilebilir."
   },
-  "general.weathercolour": {
+  "appearance.weathercolour": {
     "message": "Hava rengi"
   },
-  "general.headeroutlinecolour": {
+  "appearance.headeroutlinecolour": {
     "message": "Başlık kontur rengi"
   },
-  "general.weatheroutlinecolour": {
+  "appearance.weatheroutlinecolour": {
     "message": "Hava kontur rengi"
   },
-  "general.outlinethickness": {
+  "appearance.outlinethickness": {
     "message": "Kontur kalınlığı"
   },
-  "general.outlinethickness.tooltip": {
+  "appearance.outlinethickness.tooltip": {
     "message": "Sıfır konturu kapatır."
   },
-  "general.shadow": {
+  "appearance.shadow": {
     "message": "Gölge"
   },
-  "general.shadow.tooltip": {
+  "appearance.shadow.tooltip": {
     "message": "Her satırın arkasına kaydırılmış ikinci bir kopyası. Konturun altında\ndurur, bu yüzden ikisi birlikte kullanılabilir: okunurluk için dar bir\nkontur ve derinlik için yumuşak bir gölge.\n\nTek gölge üç satırı da kapsar; ayrı renkleri izlemez."
   },
-  "general.shadowcolour": {
+  "appearance.shadowcolour": {
     "message": "Gölge rengi"
   },
-  "general.shadowacross": {
+  "appearance.shadowacross": {
     "message": "Gölge yatay"
   },
-  "general.shadowacross.tooltip": {
+  "appearance.shadowacross.tooltip": {
     "message": "Negatif değer gölgeyi sola kaydırır."
   },
-  "general.shadowdown": {
+  "appearance.shadowdown": {
     "message": "Gölge dikey"
   },
-  "general.shadowdown.tooltip": {
+  "appearance.shadowdown.tooltip": {
     "message": "Negatif değer gölgeyi metnin üstüne kaldırır."
   },
-  "general.shadowspread": {
+  "appearance.shadowspread": {
     "message": "Gölge yayılımı"
   },
-  "general.shadowspread.tooltip": {
+  "appearance.shadowspread.tooltip": {
     "message": "Gölgeyi dışa doğru kalınlaştırır. Sıfır harflerle aynı biçimde bırakır;\nyüksek değerler onu arkalarında bir hale gibi kalınlaştırır."
   },
-  "general.showheader": {
+  "appearance.showheader": {
     "message": "Başlığı göster"
   },
-  "general.showheader.tooltip": {
+  "appearance.showheader.tooltip": {
     "message": "Adın üstündeki küçük satır; yerin nerede olduğunu belirtir: bölgenin\nüstünde diyar, alt alanın üstünde alan.\n\nKapalıyken yalnızca adın kendisi görünür. Hava satırı, açıksa, bundan\netkilenmez; aşağıdaki iki ayar da öyle, onlar yine de ona uygulanır."
   },
-  "general.underlineheader": {
+  "appearance.underlineheader": {
     "message": "Başlığın altını çiz"
   },
-  "general.headergap": {
+  "appearance.headergap": {
     "message": "Başlık aralığı"
   },
-  "general.headergap.tooltip": {
+  "appearance.headergap.tooltip": {
     "message": "Adın başlığın ne kadar altında durduğu, başlık satırı sayısıyla ölçülür.\n\nDüşük değerler ikisini neredeyse değecek kadar yaklaştırır; eklentinin\nhep birlikte geldiği sıkışık görünüm budur. Yüksek değerler aralığı açar\nve her satıra nefes alacak yer verir."
   },
-  "general.hidecombat": {
+  "announcements.hidecombat": {
     "message": "Savaş sırasında gizle"
   },
-  "general.hideduty": {
+  "announcements.hideduty": {
     "message": "Etkinliklerin içinde gizle"
   },
-  "general.skipfast": {
+  "announcements.skipfast": {
     "message": "Hızlı giderken alt alanları atla"
   },
-  "general.skipfast.tooltip": {
+  "announcements.skipfast.tooltip": {
     "message": "Yalnızca alt alanları etkiler ve yalnızca hiçbir kara yolculuğunun\nulaşamayacağı hızın üstünde, yani uçarken devreye girer. Bölge ve alan\ndeğişimleri ne kadar hızlı gidersen git her zaman duyurulur."
   },
   "command.help": {
@@ -626,20 +593,181 @@
   "fonts.reduced": {
     "message": "{1:F0} px yerine {0:F0} px ile çiziliyor. Bu istemci Japonca yer adları gösterdiği için her bildirim yazı tipinin kanji taşıması gerekir ve o boyutta oluşturulamaz. Ayarın olduğu gibi korunur ve oyunun dili değişirse geri gelir."
   },
-  "notifications.bannerlanguage": {
+  "announcements.bannerlanguage": {
     "message": "Afiş dili"
   },
-  "notifications.bannerlanguage.follow": {
+  "announcements.bannerlanguage.follow": {
     "message": "İstemciyi izle"
   },
-  "notifications.bannerlanguage.tooltip": {
+  "announcements.bannerlanguage.tooltip": {
     "message": "Afiş yazısının hangi dilde çizileceği.\n\nİstemciyi izle seçeneği oyunun çalıştığı dili kullanır. Başka bir dil seçmek, oyunun kendi afişini o dildeki bu eklenti sürümüyle değiştirir: Almanca bir istemcide İngilizce seçilirse Almanca görsel soldurulur ve yerine İngilizce yazı çizilir.\n\nYalnızca bu eklentinin sözlerini bildiği diller listelenir. Sözü olmayan afişler, hangi dil seçilirse seçilsin oyunun kendi halinde kalır."
   },
 
-  "notifications.bannergap": {
+  "announcements.bannergap": {
     "message": "Afiş aralığı"
   },
-  "notifications.bannergap.tooltip": {
+  "announcements.bannergap.tooltip": {
     "message": "Bir yer adının ne kadar altında afiş görüneceğini, görüntü yazısının\nsatır yüksekliği cinsinden belirler.\n\nİkisi aynı anda ekranda olabilir: bir göreve girildiğinde önce\nbulunduğunuz yer, hemen ardından takım büyüklüğü duyurulur. Buradaki\nayar aralarındaki boşluktur. Yer adı görünmese de aynı boşluk uygulanır,\nyani tek başına bir afiş de burada belirir."
+  },
+
+  "sound.source": {
+    "message": "Ses"
+  },
+  "sound.source.off": {
+    "message": "Yok"
+  },
+  "sound.source.game": {
+    "message": "Oyunun kendi sesi"
+  },
+  "sound.source.tooltip": {
+    "message": "Bir bildirim göründüğünde ses çalar. Varsayılan olarak kapalıdır.\n\nOyunun kendi sesi bir sohbet ses efektidir ve sesi oyunun kendisi verir: düzeyini ana ses düzeyi ile sistem sesleri düzeyi belirler, ses efektleri değil. Ses efektlerini kısmak bu sesi kısmaz.\n\nKendi dosyanı ise eklenti çalar; oyun buna hiç karışmaz, bu yüzden eklenti aynı ayarları okuyup kendisi uygular. Oyun sessize alınmışken ses çıkmaz; pencere önde değilken de, oyuna arka plandayken ses çalmasını söylemediysen ses çıkmaz."
+  },
+  "sound.effect": {
+    "message": "Ses efekti {0}"
+  },
+  "sound.audition.tooltip": {
+    "message": "Seçilen sesi hemen çalar. İki bildirimin aynı anda ses çıkarmasını önleyen kısa aralığı yok sayar, bu yüzden üst üste basmak her seferinde ses çıkarır."
+  },
+  "sound.on.location": {
+    "message": "Yer adlarında ses"
+  },
+  "sound.on.weather": {
+    "message": "Hava durumunda ses"
+  },
+  "sound.on.banner": {
+    "message": "Afişlerde ses"
+  },
+  "sound.on.tooltip": {
+    "message": "Hangi bildirim türlerinin ses çıkaracağı. Aynı anda gelen iki bildirim yalnızca bir ses çıkarır, hangisi önce gelirse o."
+  },
+
+  "sound.source.file": {
+    "message": "Kendi dosyan"
+  },
+  "sound.browse": {
+    "message": "Gözat"
+  },
+  "sound.clear": {
+    "message": "Temizle"
+  },
+  "sound.custom.notice": {
+    "message": "Kendi verdiğin bir dosya olduğu gibi çalınır ve sorumluluğu sende kalır. {0} saniyeyi aşan kısım kesilir, böylece çoktan kaybolmuş bir bildirimin üstünde koca bir parça çalmaz. Eklentinin okuyamadığı bir dosya ya da sahip olmadığın bir lisans Regions of XIV'in değil senin sorunundur."
+  },
+  "sound.dialog.title": {
+    "message": "Bir ses dosyası seç"
+  },
+  "sound.path.hint": {
+    "message": "Bir .wav veya .mp3 dosyasının yolu"
+  },
+  "sound.play": {
+    "message": "Çal"
+  },
+  "sound.play.tooltip": {
+    "message": "Seçilen dosyayı hemen çalar. İki bildirimin aynı anda ses çıkarmasını önleyen kısa aralığı yok sayar, bu yüzden üst üste basmak her seferinde yeniden dener."
+  },
+  "sound.playingwith": {
+    "message": "{0} çalınıyor."
+  },
+  "sound.problem.channels": {
+    "message": "Bu dosyanın ikiden fazla kanalı var, burada çalınamaz. Mono ya da stereo bir dosya çalışır."
+  },
+  "sound.problem.decode": {
+    "message": "Bu dosya okunamadı. Eklentinin günlüğünde gördüğü biçim yazıyor, nedenini anlamanın en hızlı yolu odur."
+  },
+  "sound.problem.device": {
+    "message": "Windows bir ses aygıtı açmadı, bu yüzden hiçbir şey çalınamaz."
+  },
+  "sound.problem.directory": {
+    "message": "Bu bir klasör, ses dosyası değil."
+  },
+  "sound.problem.empty": {
+    "message": "Bu dosya boş."
+  },
+  "sound.problem.format": {
+    "message": "Yalnızca .wav ve .mp3 dosyaları çalınabilir."
+  },
+  "sound.problem.huge": {
+    "message": "Bu dosya bir bildirim sesi için olması gerekenden çok daha büyük, bu yüzden açılmıyor."
+  },
+  "sound.problem.locked": {
+    "message": "Bu dosya açılamadı. Başka bir program onu açık tutuyor olabilir."
+  },
+  "sound.problem.missing": {
+    "message": "Bu yolda artık bir dosya yok."
+  },
+  "sound.problem.none": {
+    "message": "Henüz bir ses dosyası seçilmedi."
+  },
+  "sound.problem.unreadable": {
+    "message": "Bu yol okunamıyor."
+  },
+  "sound.silent.disabled": {
+    "message": "Oyunun sesi tamamen kapalı, bu yüzden hiçbir şey çalınmıyor."
+  },
+  "sound.silent.muted": {
+    "message": "Oyun sessize alınmış, bu yüzden hiçbir şey çalınmıyor. Bu, ana ses ve sistem sesleri sessize alma ayarlarını izler, çünkü bildirim sesi o hattı kullanır."
+  },
+  "sound.silent.unfocused": {
+    "message": "Oyun penceresi önde değil ve oyunun pencere etkin değilken ses çalma ayarı kapalı, bu yüzden hiçbir şey çalınmıyor."
+  },
+  "sound.silent.unreadable": {
+    "message": "Oyunun ses ayarları henüz okunamıyor, bu yüzden hiçbir şey çalınmıyor. Oyuna girdiğinde bu düzelir."
+  },
+  "sound.silent.zero": {
+    "message": "Oyunun ana ses düzeyi ya da sistem sesleri düzeyi sıfırda, bu yüzden hiçbir şey çalınmıyor."
+  },
+  "sound.problem.encoding": {
+    "message": "Bu dosya {0} kodlamasında bir WAV ve Windows'ta bunun için bir dönüştürücü yok. Sıradan PCM olarak ya da MP3 olarak yeniden kaydetmek işe yarar."
+  },
+  "sound.problem.mp3codec": {
+    "message": "Windows'ta kullanılabilir bir MP3 çözücü yok, bu yüzden bu dosya çalınamaz. Bir .wav dosyası yine de çalışır."
+  },
+  "sound.problem.notaudio": {
+    "message": "Bu dosya adı ne olursa olsun gerçekte ne WAV ne de MP3."
+  },
+  "sound.problem.samples": {
+    "message": "Bu dosya eklentinin sese dönüştüremeyeceği bir biçimde. Sıradan 16 bit PCM olarak yeniden kaydetmek işe yarar."
+  },
+  "sound.problem.truncated": {
+    "message": "Bu dosya ortasında bitiyor ve sonuna kadar okunamadı."
+  },
+  "presets.intro": {
+    "message": "Bir hazır ayar Duyurular, Görünüm, Hareket ve Yazı Tipleri'ni kapsar: her satırın yazı tipi ve boyutu, konum, renkler, hareket ve parçacıklar, hangi katmanların duyurulacağı, süreler ve ne zaman susulacağı. Ses dahil değildir."
+  },
+  "presets.save.tooltip": {
+    "message": "Duyurular, Görünüm, Hareket ve Yazı Tipleri'ndeki tüm ayarları kaydeder. Ses dahil değildir."
+  },
+  "announcements.tab": {
+    "message": "Duyurular"
+  },
+  "appearance.tab": {
+    "message": "Görünüm"
+  },
+  "motion.decode.duration": {
+    "message": "Çözümleme süresi"
+  },
+  "motion.decode.duration.tooltip": {
+    "message": "Harfler yerine oturduktan sonra Eorzea yazısının çözülmesi ne kadar sürer. Yukarıdaki çözümleme efektini gerektirir."
+  },
+  "motion.decode.tooltip": {
+    "message": "Birlikte gelen bir Eorzea yazı tipi gerektirir. Yalnızca Latin metin.\n\nYukarıdaki hareketle aynı anda değil, ondan sonra çalışır: satır Eorzea yazısıyla gelir, yerine oturur, sonra çözülür. Kapalıyken doğrudan okunur halde gelir. Hazır ayarlar buna dokunmaz, yani burada kapatmak hepsi için kapatır."
+  },
+  "motion.duration": {
+    "message": "Hareket süresi"
+  },
+  "motion.duration.tooltip": {
+    "message": "Harflerin yerine gelmesi ne kadar sürer. Belirmeyle aynı anda ilerler ve yukarıdaki hareket Yok ise hiçbir şey yapmaz."
+  },
+  "motion.tab": {
+    "message": "Hareket"
+  },
+  "motion.timing.intro": {
+    "message": "Yukarıda hangi efekt seçili olursa olsun, bildirimin tamamının ne kadar süreceği."
+  },
+  "sound.intro": {
+    "message": "Bir bildirim geldiğinde çalan kısa bir ses. Oyunun kendi ses efektlerinden ya da kendi dosyandan."
+  },
+  "sound.tab": {
+    "message": "Ses"
   }
 }

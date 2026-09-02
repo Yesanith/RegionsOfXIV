@@ -13,6 +13,14 @@
     <InternalsVisibleTo Include="RegionsOfXIV.Tests" />
   </ItemGroup>
 
+  <!-- Playing a sound file. Core carries the readers and the sample providers, WinMM the
+       WaveOutEvent device and the ACM decoder that Mp3FileReader needs. Wasapi is deliberately
+       not here: it would bring a second output path and a second MP3 decoder for nothing. -->
+  <ItemGroup>
+    <PackageReference Include="NAudio.Core" Version="2.3.0" />
+    <PackageReference Include="NAudio.WinMM" Version="2.3.0" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(Configuration)' != 'Debug'">
     <Compile Remove="Services\SheetSearch.cs" />
     <Compile Remove="UI\IconBrowserWindow.cs" />

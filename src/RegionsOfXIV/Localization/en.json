@@ -1,151 +1,6 @@
 {
   "_note": "Source document for translators. Never read at runtime - the English shown by the plugin is compiled into the call sites, so this file cannot disagree with what is drawn. Regenerate it rather than editing it by hand.",
 
-  "durations.tab": {
-    "message": "Durations",
-    "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
-  },
-  "durations.intro": {
-    "message": "The line arrives, lands, then decodes. Motion and decode are separate stages and each takes its own time.",
-    "description": "Paragraph at the top of the tab, explaining that the stages below run in order."
-  },
-
-  "durations.fadein": {
-    "message": "Fade in",
-    "description": "Slider label."
-  },
-  "durations.fadein.tooltip": {
-    "message": "How long the line takes to come up to full strength as it appears.",
-    "description": "Tooltip for the Fade in slider."
-  },
-
-  "durations.motion": {
-    "message": "Motion",
-    "description": "Slider label. The movement the letters make as they arrive."
-  },
-  "durations.motion.tooltip": {
-    "message": "How long the letters take to arrive. Runs alongside the fade in,\nand does nothing when the motion on the Effects tab is None.",
-    "description": "Tooltip for the Motion slider. Keep the line break. \"Effects\" is another tab in this window and \"None\" is one of its choices, so both should match how you translated them there."
-  },
-
-  "durations.decode": {
-    "message": "Decode",
-    "description": "Slider label. The effect where Eorzean script resolves into readable letters."
-  },
-  "durations.decode.tooltip": {
-    "message": "How long the Eorzean takes to resolve, once the letters have landed.\nNeeds the decode effect on the Effects tab.",
-    "description": "Tooltip for the Decode slider. Keep the line break. \"Eorzean\" is the game's own invented alphabet and is usually left as-is."
-  },
-
-  "durations.hold": {
-    "message": "Hold",
-    "description": "Slider label. How long the finished notification stays on screen."
-  },
-  "durations.hold.tooltip": {
-    "message": "How long the finished line stays up before it starts to fade.",
-    "description": "Tooltip for the Hold slider."
-  },
-
-  "durations.fadeout": {
-    "message": "Fade out",
-    "description": "Slider label."
-  },
-  "durations.fadeout.tooltip": {
-    "message": "How long the line takes to disappear once its time is up.",
-    "description": "Tooltip for the Fade out slider."
-  },
-
-  "effects.tab": {
-    "message": "Effects",
-    "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
-  },
-
-  "effects.motion.intro": {
-    "message": "How the letters move as they arrive.",
-    "description": "Heading line above the Motion dropdown."
-  },
-  "effects.motion": {
-    "message": "Motion",
-    "description": "Dropdown label. The movement the letters make as the notification appears."
-  },
-  "effects.motion.tooltip": {
-    "message": "None: the letters simply appear where they belong.\nTypewriter: one letter at a time, no fade.\nRise: letters lift into place from below.\nWave: letters ride a wave through the line as it appears.\nBurn: letters catch alight and cool into their colour.\n\nRuns alongside the Eorzean decode rather than instead of it.",
-    "description": "Tooltip for the Motion dropdown. Keep the line breaks. Each of None, Typewriter, Rise, Wave and Burn is an entry in that dropdown, so use the same wording you gave them in effects.motion.* below. \"Eorzean\" is the game's invented alphabet and is usually left as-is."
-  },
-
-  "effects.motion.none": {
-    "message": "None",
-    "description": "Motion dropdown entry: no movement. Separate from effects.particles.none so the two can be worded differently where grammar needs it."
-  },
-  "effects.motion.typewriter": {
-    "message": "Typewriter",
-    "description": "Motion dropdown entry: letters appear one at a time."
-  },
-  "effects.motion.rise": {
-    "message": "Rise",
-    "description": "Motion dropdown entry: letters lift into place from below."
-  },
-  "effects.motion.wave": {
-    "message": "Wave",
-    "description": "Motion dropdown entry: a wave passes along the line."
-  },
-  "effects.motion.burn": {
-    "message": "Burn",
-    "description": "Motion dropdown entry: letters catch alight and cool into their colour."
-  },
-
-  "effects.particles.intro": {
-    "message": "What plays around it, for as long as it is on screen.",
-    "description": "Heading line above the Particles dropdown."
-  },
-  "effects.particles": {
-    "message": "Particles",
-    "description": "Dropdown label. Small shapes drifting around the text."
-  },
-
-  "effects.particles.none": {
-    "message": "None",
-    "description": "Particles dropdown entry: nothing drifting. Separate from effects.motion.none so the two can be worded differently where grammar needs it."
-  },
-  "effects.particles.hearts": {
-    "message": "Hearts",
-    "description": "Particles dropdown entry."
-  },
-  "effects.particles.embers": {
-    "message": "Embers",
-    "description": "Particles dropdown entry: glowing flecks rising from a fire."
-  },
-  "effects.particles.sparkles": {
-    "message": "Sparkles",
-    "description": "Particles dropdown entry."
-  },
-  "effects.particles.petals": {
-    "message": "Petals",
-    "description": "Particles dropdown entry: falling flower petals."
-  },
-
-  "effects.density": {
-    "message": "Density",
-    "description": "Slider label. How many particles there are, shown as a multiplier like 1.5x."
-  },
-  "effects.particlecolour": {
-    "message": "Particle colour",
-    "description": "Colour picker label."
-  },
-  "effects.particlecolour.tooltip": {
-    "message": "The default amber suits embers and sparkles. Hearts and petals\nwant moving towards pink.",
-    "description": "Tooltip for the particle colour picker. Keep the line break. \"Embers\", \"Sparkles\", \"Hearts\" and \"Petals\" are entries in the Particles dropdown, so match how you translated them in effects.particles.* above."
-  },
-  "effects.embers.note": {
-    "message": "Embers go with the Burn motion, but they do not need it.",
-    "description": "Hint shown only when Embers is picked without the Burn motion. \"Embers\" and \"Burn\" are dropdown entries - match effects.particles.embers and effects.motion.burn."
-  },
-
-  "effects.preview": {
-    "message": "Preview",
-    "description": "Button that fires a sample notification. The Fonts and General tabs have their own button with the same wording and their own key, so each tab can be worded to fit its context."
-  },
-
   "sharecodes.heading": {
     "message": "Share codes",
     "description": "Heading for the share-code row, which sits at the bottom of the Presets tab."
@@ -208,7 +63,7 @@
   },
   "about.summary": {
     "message": "Announces the region, zone, area and sub-area you walk into, and the weather while you are there, replacing the game's own location text rather than drawing alongside it.",
-    "description": "One-paragraph description of what the plugin does. \"Region\", \"zone\", \"area\" and \"sub-area\" are the four tiers of place name the plugin announces; the same four words appear on the Notifications tab, so keep them consistent."
+    "description": "One-paragraph description of what the plugin does. \"Region\", \"zone\", \"area\" and \"sub-area\" are the four tiers of place name the plugin announces; the same four words appear on the Announcements tab, so keep them consistent."
   },
 
   "about.whatsnew": {
@@ -278,86 +133,13 @@
     "description": "Legal note at the foot of the tab. \"Square Enix\" is a company name and stays as-is."
   },
 
-  "notifications.tab": {
-    "message": "Notifications",
-    "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
-  },
-  "notifications.intro": {
-    "message": "This plugin replaces the game's own location text rather than drawing alongside it. If you turn the suppression below off, the game's version comes back.",
-    "description": "Paragraph at the top of the tab."
-  },
-
-  "notifications.zone": {
-    "message": "Zone changes",
-    "description": "Checkbox. \"Zone\" is the coarsest of the four place tiers the plugin announces - the same four words appear in about.summary, so keep them consistent."
-  },
-  "notifications.area": {
-    "message": "Area changes",
-    "description": "Checkbox. \"Area\" is a place tier - a named part of a zone."
-  },
-  "notifications.subarea": {
-    "message": "Sub-area changes",
-    "description": "Checkbox. \"Sub-area\" is the finest place tier - a named part of an area, which the game itself never announces. FFXIV may have an established term for this in your language; if you are unsure, leave it in English and say so."
-  },
-
-  "notifications.weather": {
-    "message": "Weather changes",
-    "description": "Checkbox."
-  },
-  "notifications.weather.tooltip": {
-    "message": "Announces the weather turning over, on its own line just above the place name, so it never interrupts a location notice.\n\nWeather runs on a fixed cycle of about 23 minutes, and arriving anywhere new announces what it is doing there, so it shows up with the place name as you walk in.",
-    "description": "Tooltip for the Weather changes checkbox. Keep the blank line between the two paragraphs."
-  },
-  "notifications.weathericon": {
-    "message": "Show the weather icon",
-    "description": "Checkbox, only usable while Weather changes is on."
-  },
-  "notifications.weathericon.tooltip": {
-    "message": "Draws the game's own icon for the weather to the left of its name.",
-    "description": "Tooltip for the weather icon checkbox."
-  },
-
-  "notifications.banners": {
-    "message": "Banners",
-    "description": "Checkbox. The game's full-screen announcements - Level Up!, Duty Complete and so on."
-  },
-  "notifications.banners.tooltip": {
-    "message": "Redraws the game's full-screen banners (\"Quest Accepted\", \"Duty Commenced\", \"Level Up!\") in this plugin's lettering.\n\nThe wording is painted into the game's artwork rather than stored as text, so only banners this plugin has words for are taken over. Any it does not recognise keep the game's own.",
-    "description": "Tooltip for the Banners checkbox. Keep the blank line. \"Quest Accepted\", \"Duty Commenced\" and \"Level Up!\" are banners the game itself shows and the game already translates them - use the exact wording FFXIV uses in your language, not a fresh translation, or players will not recognise them."
-  },
-  "notifications.hidebanner": {
-    "message": "Hide the game's own banner",
-    "description": "Checkbox, only usable while Banners is on."
-  },
-  "notifications.hidebanner.tooltip": {
-    "message": "Fades out the game's artwork so only this plugin's version shows.\n\nTurn this off to see both, which is a quick way to check the wording matches.",
-    "description": "Tooltip for the hide-banner checkbox. Keep the blank line."
-  },
-
-  "notifications.hideareatext": {
-    "message": "Hide the game's own area text",
-    "description": "Checkbox. Suppresses the flash of text the game itself shows on entering an area."
-  },
-  "notifications.hideareatext.tooltip": {
-    "message": "Suppresses the native \"_AreaText\" flash, which draws underneath this plugin.",
-    "description": "Tooltip. \"_AreaText\" is the game's internal name for that piece of interface - it is an identifier, not a word, so never translate it."
-  },
-  "notifications.hideloadingtitle": {
-    "message": "Hide the loading-screen zone title",
-    "description": "Checkbox. Suppresses the gold zone name drawn over the loading screen."
-  },
-  "notifications.hideloadingtitle.tooltip": {
-    "message": "Suppresses \"_LocationTitle\" and \"_LocationTitleShort\", the gold title\ndrawn over the loading screen, and shows the same names in this\nplugin's style instead.",
-    "description": "Tooltip. Keep the line breaks. \"_LocationTitle\" and \"_LocationTitleShort\" are the game's internal names for those pieces of interface - identifiers, not words, so never translate them."
-  },
-
   "presets.tab": {
     "message": "Presets",
     "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
   },
   "presets.intro": {
-    "message": "A preset covers every setting on General, Fonts, Effects, Notifications and Durations: the face and size of each line, position, colours, motion and particles, which tiers announce, the timings, and when to stay quiet.",
-    "description": "Paragraph at the top of the tab. General, Fonts, Effects, Notifications and Durations are the names of the other tabs in this window - match how you translated each tab's own label."
+    "message": "A preset covers Announcements, Appearance, Motion and Fonts: the face and size of each line, position, colours, motion and particles, which tiers announce, the timings, and when to stay quiet. Sound is not included.",
+    "description": "Paragraph at the top of the tab. Announcements, Appearance, Motion and Fonts are the names of four other tabs in this window - match how you translated each tab's own label. Sound is a fifth tab, named here because a preset deliberately leaves it alone."
   },
   "presets.intro.warning": {
     "message": "Applying one replaces all of them, so anything you have changed is overwritten.",
@@ -383,23 +165,23 @@
   },
   "presets.inferno.description": {
     "message": "Letters catch alight and cool into place, embers rising off them.",
-    "description": "Describes the Inferno preset. \"Embers\" is also a Particles entry - match effects.particles.embers."
+    "description": "Describes the Inferno preset. \"Embers\" is also a Particles entry - match motion.particles.embers."
   },
   "presets.sweetheart.description": {
     "message": "Letters lift into place with hearts drifting up around them.",
-    "description": "Describes the Sweetheart preset. \"Hearts\" is also a Particles entry - match effects.particles.hearts."
+    "description": "Describes the Sweetheart preset. \"Hearts\" is also a Particles entry - match motion.particles.hearts."
   },
   "presets.starlight.description": {
     "message": "The line rides a wave in, sparkles hanging in the air around it.",
-    "description": "Describes the Starlight preset. \"Wave\" and \"Sparkles\" are dropdown entries - match effects.motion.wave and effects.particles.sparkles."
+    "description": "Describes the Starlight preset. \"Wave\" and \"Sparkles\" are dropdown entries - match motion.choice.wave and motion.particles.sparkles."
   },
   "presets.sakura.description": {
     "message": "A gentle rise under falling petals.",
-    "description": "Describes the Sakura preset. \"Rise\" and \"Petals\" are dropdown entries - match effects.motion.rise and effects.particles.petals."
+    "description": "Describes the Sakura preset. \"Rise\" and \"Petals\" are dropdown entries - match motion.choice.rise and motion.particles.petals."
   },
   "presets.dispatch.description": {
     "message": "Typed out one letter at a time, in tight uppercase. No particles.",
-    "description": "Describes the Dispatch preset. Refers to the Typewriter motion - match effects.motion.typewriter if you name it."
+    "description": "Describes the Dispatch preset. Refers to the Typewriter motion - match motion.choice.typewriter if you name it."
   },
   "presets.tyria.description": {
     "message": "Wide uppercase in gold, still and unhurried. A nod to the original.",
@@ -453,8 +235,8 @@
     "description": "The same button as presets.save, shown instead when the typed name matches a preset that already exists."
   },
   "presets.save.tooltip": {
-    "message": "Saves every setting on General, Fonts, Effects, Notifications and Durations.",
-    "description": "Tooltip on the Save/Replace button. Those five words are the names of the other tabs - match their labels."
+    "message": "Saves every setting on Announcements, Appearance, Motion and Fonts. Sound is not included.",
+    "description": "Tooltip on the Save/Replace button. The four names are other tabs in this window - match their labels. Sound is a fifth, excluded on purpose."
   },
 
   "presets.discord": {
@@ -498,7 +280,7 @@
   },
   "fonts.role.header.hint": {
     "message": "The smaller line above the name, giving the region or area it sits in.",
-    "description": "Greyed line under the Header tab. \"Region\" and \"area\" are two of the place tiers - match notifications.zone and notifications.area."
+    "description": "Greyed line under the Header tab. \"Region\" and \"area\" are two of the place tiers - match announcements.zone and announcements.area."
   },
   "fonts.role.weather": {
     "message": "Weather",
@@ -533,7 +315,7 @@
 
   "fonts.preview": {
     "message": "Preview",
-    "description": "Button that fires a sample notification, one per role tab. The Effects and General tabs have their own with the same wording and their own keys."
+    "description": "Button that fires a sample notification, one per role tab. The Motion and Appearance tabs have their own with the same wording and their own keys."
   },
 
   "fonts.path.hint": {
@@ -572,172 +354,6 @@
   "fonts.upscaled": {
     "message": "This font has no bitmap above {0:F0} px, so at {1:F0} px it is being upscaled and will look soft. Lower the size, or switch to Noto Sans CJK or a font file of your own, either of which stays sharp at any size.",
     "description": "Shown when the chosen size exceeds what a bitmap typeface holds. {0} is the largest size it has, {1} is the size chosen - keep the \":F0\" inside both braces, it rounds them to whole numbers. \"px\" is the pixel abbreviation."
-  },
-
-  "general.tab": {
-    "message": "General",
-    "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
-  },
-  "general.language": {
-    "message": "Language",
-    "description": "Dropdown at the top of the General tab, choosing which language this window is drawn in. Every other entry in the list is a language's own name and is not translated."
-  },
-  "general.language.follow": {
-    "message": "Follow Dalamud",
-    "description": "First entry in the Language dropdown, and the default: take whichever language Dalamud itself is set to. \"Dalamud\" is the name of the plugin framework and stays as-is."
-  },
-  "general.language.tooltip": {
-    "message": "Follow Dalamud takes whichever language Dalamud itself is set to, and\nchanges with it.\n\nOnly this window is affected. Place and weather names come from the game\nand stay in whatever language your client is running in.",
-    "description": "Tooltip for the Language dropdown. Keep the line breaks and the blank line. \"Follow Dalamud\" is the first entry in that dropdown - match general.language.follow."
-  },
-
-  "general.preview": {
-    "message": "Preview",
-    "description": "Button that plays a sample notification. The same word is used on the Fonts and Effects tabs - keep all three the same."
-  },
-  "general.vertical": {
-    "message": "Vertical position",
-    "description": "Slider label. How far down the screen the notification sits, as a percentage."
-  },
-  "general.horizontal": {
-    "message": "Horizontal position",
-    "description": "Slider label. How far across the screen the notification sits, as a percentage."
-  },
-  "general.horizontal.tooltip": {
-    "message": "The text is centred on this point, so 50% is the middle of the screen.\nA long place name set near either end will reach past it.",
-    "description": "Tooltip for the Horizontal position slider. Keep the line break. The per-cent sign after 50 is a literal one, not a placeholder."
-  },
-  "general.letterspacing": {
-    "message": "Letter spacing",
-    "description": "Slider label. The gap between individual letters."
-  },
-  "general.letterspacing.tooltip": {
-    "message": "Extra space between letters, as a percentage of the font size, so it keeps\nits proportions when the size changes and the header gets its own share.\nWide spacing is much of what gives the Guild Wars 2 original its look.",
-    "description": "Tooltip for the Letter spacing slider. Keep the line breaks. \"Guild Wars 2\" is another game's name and is never translated."
-  },
-  "general.uppercase": {
-    "message": "Uppercase",
-    "description": "Checkbox. Draws the place name in capital letters. In a language with no upper and lower case this setting does nothing to the text, but the label still needs a sensible rendering - the word for capital letters is right even so."
-  },
-  "general.decode": {
-    "message": "Decode from Eorzean script",
-    "description": "Checkbox. The line first appears written in Eorzean, the invented alphabet of FFXIV's setting, then resolves into readable text. FFXIV has an established name for that alphabet in your language - use it."
-  },
-  "general.decode.tooltip": {
-    "message": "Requires a bundled Eorzean font. Latin text only.\n\nRuns after the motion on the Effects tab rather than alongside it:\nthe line arrives in Eorzean, lands, then resolves. Turned off, it\narrives already readable. Presets leave this alone, so switching it\noff here switches it off for all of them.",
-    "description": "Tooltip for the Decode checkbox. Keep the line breaks and the blank line. \"Effects\" is another tab in this window and \"Presets\" is another - match how you translated both. \"Latin text only\" means the effect cannot draw Japanese, Chinese or Korean characters."
-  },
-  "general.textcolour": {
-    "message": "Text colour",
-    "description": "Colour swatch label. The place name itself, the largest line."
-  },
-  "general.headercolour": {
-    "message": "Header colour",
-    "description": "Colour swatch label. \"Header\" is the smaller line above the place name - the same word appears on the Fonts tab, so keep them consistent."
-  },
-  "general.outlinecolour": {
-    "message": "Outline colour",
-    "description": "Colour swatch label. The outline drawn around each letter."
-  },
-  "general.separatecolours": {
-    "message": "Colour each line separately",
-    "description": "Checkbox. Turns on the three swatches below it."
-  },
-  "general.separatecolours.tooltip": {
-    "message": "Off, the weather line follows the header, and one outline colour\ncovers all three lines.\n\nOn, the weather line and the outlines take the colours below, so one\nline can be pushed towards the background without touching the others.",
-    "description": "Tooltip for the Colour each line separately checkbox. Keep the line breaks and the blank line. The three lines are the weather, the header and the place name."
-  },
-  "general.weathercolour": {
-    "message": "Weather colour",
-    "description": "Colour swatch label, only usable while Colour each line separately is on."
-  },
-  "general.headeroutlinecolour": {
-    "message": "Header outline colour",
-    "description": "Colour swatch label, only usable while Colour each line separately is on."
-  },
-  "general.weatheroutlinecolour": {
-    "message": "Weather outline colour",
-    "description": "Colour swatch label, only usable while Colour each line separately is on."
-  },
-  "general.outlinethickness": {
-    "message": "Outline thickness",
-    "description": "Slider label. How heavy the outline around each letter is."
-  },
-  "general.outlinethickness.tooltip": {
-    "message": "Zero turns the outline off.",
-    "description": "Tooltip for the Outline thickness slider."
-  },
-  "general.shadow": {
-    "message": "Drop shadow",
-    "description": "Checkbox. A second, offset copy of the text drawn behind it. This is the usual term in image and design software - use whatever that software says in your language."
-  },
-  "general.shadow.tooltip": {
-    "message": "A second copy of every line, offset behind it. Sits under the outline, so\nthe two can be used together: a tight outline for legibility and a soft\nshadow for depth.\n\nOne shadow covers all three lines; it does not follow the separate colours.",
-    "description": "Tooltip for the Drop shadow checkbox. Keep the line breaks and the blank line."
-  },
-  "general.shadowcolour": {
-    "message": "Shadow colour",
-    "description": "Colour swatch label, only usable while Drop shadow is on."
-  },
-  "general.shadowacross": {
-    "message": "Shadow across",
-    "description": "Slider label. Moves the shadow left and right. Kept short to sit beside the slider."
-  },
-  "general.shadowacross.tooltip": {
-    "message": "Negative moves the shadow to the left.",
-    "description": "Tooltip for the Shadow across slider. \"Negative\" means a value below zero."
-  },
-  "general.shadowdown": {
-    "message": "Shadow down",
-    "description": "Slider label. Moves the shadow up and down. Kept short to sit beside the slider."
-  },
-  "general.shadowdown.tooltip": {
-    "message": "Negative lifts the shadow above the text.",
-    "description": "Tooltip for the Shadow down slider. \"Negative\" means a value below zero."
-  },
-  "general.shadowspread": {
-    "message": "Shadow spread",
-    "description": "Slider label. How far the shadow is fattened outwards, making it softer and broader."
-  },
-  "general.shadowspread.tooltip": {
-    "message": "Fattens the shadow outwards. Zero keeps it the same shape as the\nletters; higher values thicken it into a halo behind them.",
-    "description": "Tooltip for the Shadow spread slider. Keep the line break."
-  },
-  "general.showheader": {
-    "message": "Show header",
-    "description": "Checkbox. Draws the smaller line above the place name."
-  },
-  "general.showheader.tooltip": {
-    "message": "The smaller line above the name, giving where the place sits: the region\nabove a zone, the area above a sub-area.\n\nTurned off, only the name itself is shown. The weather line, if you have\nit on, is unaffected, as are the two settings below, which still apply\nto it.",
-    "description": "Tooltip for the Show header checkbox. Keep the line breaks and the blank line. \"Region\", \"zone\", \"area\" and \"sub-area\" are the place tiers the plugin announces - use the same words you used in notifications.zone, notifications.area and notifications.subarea."
-  },
-  "general.underlineheader": {
-    "message": "Underline header",
-    "description": "Checkbox. Draws a rule under the header line."
-  },
-  "general.headergap": {
-    "message": "Header gap",
-    "description": "Slider label. The vertical distance between the header and the place name."
-  },
-  "general.headergap.tooltip": {
-    "message": "How far the name sits below the header, measured in lines of header text.\n\nLow values pull the two together until they almost touch, which is the\ntighter look the plugin has always shipped with. Higher values open the\ngap up and give each line room to breathe.",
-    "description": "Tooltip for the Header gap slider. Keep the line breaks and the blank line. The unit is translated separately as units.lines."
-  },
-  "general.hidecombat": {
-    "message": "Hide during combat",
-    "description": "Checkbox. Stays quiet while the player is fighting."
-  },
-  "general.hideduty": {
-    "message": "Hide inside duties",
-    "description": "Checkbox. \"Duty\" is FFXIV's term for instanced content - dungeons, trials, raids. The game already uses a set word for this in your language; use that one."
-  },
-  "general.skipfast": {
-    "message": "Skip sub-areas while travelling quickly",
-    "description": "Checkbox. \"Sub-area\" is the finest place tier - match notifications.subarea. Long labels are fine here, the checkbox has the width of the window."
-  },
-  "general.skipfast.tooltip": {
-    "message": "Only affects sub-areas, and only above a speed no ground travel reaches,\nso it comes into play when flying. Zone and area changes are always\nannounced however fast you are moving.",
-    "description": "Tooltip for the Skip sub-areas checkbox. Keep the line breaks. \"Sub-area\", \"zone\" and \"area\" are place tiers - match notifications.subarea, notifications.zone and notifications.area."
   },
 
   "command.help": {
@@ -867,25 +483,556 @@
     "message": "Drawing at {0:F0} px rather than {1:F0}. This client shows Japanese place names, so every notification font has to carry kanji, and at that size it would be too large to build. Your setting is kept as it is and comes back if the game's language changes.",
     "description": "Shown under the size slider when the stored size is larger than this client can build. It only appears on a Japanese client, and only for someone whose config was set while the game was in another language. {0} is the size actually used and {1} the size they asked for; keep the \":F0\" inside both braces, it rounds them to whole numbers. The reassurance in the last sentence matters: nothing has been rewritten, so say so plainly."
   },
-  "notifications.bannerlanguage": {
-    "message": "Banner language",
-    "description": "Dropdown under the banner checkboxes, choosing which language the full-screen banner wording is drawn in. Only usable while Banners is on."
+  "sound.browse": {
+    "message": "Browse",
+    "description": "Button opening a file picker. Matches the Browse button on the Fonts tab, so use the same word you used there."
   },
-  "notifications.bannerlanguage.follow": {
-    "message": "Follow the client",
-    "description": "First entry in the Banner language dropdown, and the default: use whichever language the FFXIV client itself is running in. Every other entry is a language's own name and is not translated."
+  "sound.clear": {
+    "message": "Clear",
+    "description": "Button emptying the chosen sound file path. Matches Clear on the Fonts tab."
   },
-  "notifications.bannerlanguage.tooltip": {
-    "message": "Which language the banner wording is drawn in.\n\nFollowing the client uses the language the game is in. Choosing another replaces the game's own banner with this plugin's version in that language, so on a German client set to English the German artwork is faded out and English words are drawn in its place.\n\nOnly languages this plugin has wording for are listed. Banners it has no wording for keep the game's own, whichever language is chosen.",
-    "description": "Tooltip for the Banner language dropdown. Keep the two blank lines. The middle paragraph is the important one: it warns that picking a language the client is not in means the game's own artwork is faded out and replaced, which is a visible change the player should not meet by surprise. \"Following the client\" refers to the first dropdown entry, so match notifications.bannerlanguage.follow."
+  "sound.custom.notice": {
+    "message": "A file you supply is played as it is, and it stays yours to look after. Anything past {0} seconds is cut off, so a whole track will not play over a notification that has already gone. A file the plugin cannot read, or one you do not hold a licence for, is on you rather than on Regions of XIV.",
+    "description": "A caution under the file row. {0} is a number of seconds, currently 5. It is the plugin's own disclaimer about a file the player supplied, so keep it plain rather than legalistic."
   },
-
-  "notifications.bannergap": {
+  "sound.dialog.title": {
+    "message": "Choose a sound file",
+    "description": "Title bar of the file picker."
+  },
+  "sound.path.hint": {
+    "message": "Path to a .wav or .mp3 file",
+    "description": "Placeholder text inside an empty path box. \".wav\" and \".mp3\" are file extensions and stay as they are."
+  },
+  "sound.play": {
+    "message": "Play",
+    "description": "Button that plays the chosen file straight away so the player can hear what they picked."
+  },
+  "sound.play.tooltip": {
+    "message": "Plays the chosen file now. It ignores the short gap that stops two notifications sounding at once, so pressing it repeatedly always tries again.",
+    "description": "Tooltip for that button. The \"short gap\" is a quarter of a second that stops two notifications arriving together from making two overlapping sounds."
+  },
+  "sound.playingwith": {
+    "message": "Playing {0}.",
+    "description": "Shown under the path box when the file is usable. {0} is the file's name, not its full path."
+  },
+  "sound.problem.channels": {
+    "message": "That file has more than two channels, which cannot be played here. A mono or stereo file will work.",
+    "description": "The file has more than two channels, meaning surround sound. The plugin plays mono and stereo only."
+  },
+  "sound.problem.decode": {
+    "message": "That file could not be read. The plugin's log names the format it saw, which is the quickest way to see why.",
+    "description": "The file could not be decoded. It is a .wav or .mp3 by name but not one the plugin can read, either because it is damaged or because it uses an unusual encoding."
+  },
+  "sound.problem.device": {
+    "message": "Windows would not open an audio device, so nothing can be played.",
+    "description": "Windows would not give the plugin a sound output device. Nothing about the file is wrong."
+  },
+  "sound.problem.directory": {
+    "message": "That is a folder, not a sound file.",
+    "description": "The path points at a folder rather than at a file. Worth keeping distinct from the missing-file message: the player can see the folder is there, so being told it is missing would send them looking in the wrong place."
+  },
+  "sound.problem.empty": {
+    "message": "That file is empty.",
+    "description": "The file is zero bytes."
+  },
+  "sound.problem.format": {
+    "message": "Only .wav and .mp3 files can be played.",
+    "description": "The chosen file is not one the plugin can play. \".wav\" and \".mp3\" are file extensions and stay as they are."
+  },
+  "sound.problem.huge": {
+    "message": "That file is far larger than a notification sound should be, so it is being left alone.",
+    "description": "The file is far too large to be a notification sound, so the plugin will not open it. It is guarding against a video or a disk image typed in by mistake."
+  },
+  "sound.problem.locked": {
+    "message": "That file could not be opened. Another program may have it open.",
+    "description": "The file exists but could not be opened, usually because another program has it open or Windows will not grant access."
+  },
+  "sound.problem.missing": {
+    "message": "There is no file at that path any more.",
+    "description": "There is nothing at that path. \"any more\" because the path was picked at some point, so the file has usually been moved or deleted since."
+  },
+  "sound.problem.none": {
+    "message": "No sound file has been chosen yet.",
+    "description": "Shown when the file source is selected but no file has been picked. Not an error, just a step not done yet."
+  },
+  "sound.problem.unreadable": {
+    "message": "That path cannot be read.",
+    "description": "The text in the box is not a path Windows will accept at all, for instance because of characters that cannot appear in a filename."
+  },
+  "sound.silent.disabled": {
+    "message": "The game's sound is turned off, so nothing is played.",
+    "description": "Shown when the game's own sound is switched off entirely, so pressing Play does nothing. It explains a silent button rather than reporting a fault."
+  },
+  "sound.silent.muted": {
+    "message": "The game is muted, so nothing is played. This follows the master and System Sounds mute settings, because that is the bus a notification sound uses.",
+    "description": "Shown when the game is muted. \"System Sounds\" is a slider and a mute checkbox on the game's own sound settings screen: use the label your client shows, because naming the wrong one sends the player to a setting that will not help."
+  },
+  "sound.silent.unfocused": {
+    "message": "The game window is not in front and its setting for playing sound while it is not active is off, so nothing is played.",
+    "description": "Shown when the game window is not in front and the game is set not to play sound then. The setting is on the game's own sound settings screen and is usually worded as playing sounds while the window is inactive."
+  },
+  "sound.silent.unreadable": {
+    "message": "The game's sound settings cannot be read yet, so nothing is played. This clears once you are in game.",
+    "description": "Shown before the game's settings can be read, which in practice means at the title or character select screen."
+  },
+  "sound.silent.zero": {
+    "message": "The game's master or System Sounds volume is at zero, so nothing is played.",
+    "description": "Shown when a volume slider is at zero rather than muted. \"System Sounds\" is a slider on the game's own sound settings screen, as above."
+  },
+  "sound.problem.encoding": {
+    "message": "This file is a WAV in the {0} encoding, and Windows has no converter for it. Saving it again as ordinary PCM, or as an MP3, will work.",
+    "description": "The WAV holds audio in a compressed or companded encoding and Windows has no converter installed for it. {0} is an encoding name from NAudio, in English, such as Adpcm, MuLaw or Gsm610: leave it as it is."
+  },
+  "sound.problem.mp3codec": {
+    "message": "Windows has no MP3 decoder available, so this file cannot be played. A .wav file will still work.",
+    "description": "Windows itself has no MP3 decoder available. Nothing about the file is wrong, which is why the message points at a .wav as the way round it. \".wav\" is a file extension and stays as it is."
+  },
+  "sound.problem.notaudio": {
+    "message": "That file is not really a WAV or an MP3, whatever its name says.",
+    "description": "The file has a .wav or .mp3 name but its contents are neither: no RIFF header, or no MP3 frames. Distinct from the damaged case, because the fix is to check which file was picked rather than to re-save it."
+  },
+  "sound.problem.samples": {
+    "message": "That file is in a form the plugin cannot turn into sound. Saving it again as ordinary 16 bit PCM will work.",
+    "description": "The file is a WAV in a bit depth the plugin cannot turn into samples. It should not normally be reachable, so keep it plain and actionable rather than technical."
+  },
+  "sound.problem.truncated": {
+    "message": "That file stops part way through and could not be read to the end.",
+    "description": "The file ends part way through, so it was cut off in a download or a copy."
+  },
+  "about.language": {
+    "message": "Language",
+    "description": ""
+  },
+  "about.language.follow": {
+    "message": "Follow Dalamud",
+    "description": ""
+  },
+  "about.language.tooltip": {
+    "message": "Follow Dalamud takes whichever language Dalamud itself is set to, and\nchanges with it.\n\nOnly this window is affected. Place and weather names come from the game\nand stay in whatever language your client is running in.",
+    "description": ""
+  },
+  "announcements.area": {
+    "message": "Area changes",
+    "description": ""
+  },
+  "announcements.bannergap": {
     "message": "Banner drop",
-    "description": "Slider under the banner checkboxes, setting how far below a place name a banner is drawn. Only usable while Banners is on. The unit is translated separately as units.lines."
+    "description": ""
   },
-  "notifications.bannergap.tooltip": {
+  "announcements.bannergap.tooltip": {
     "message": "How far below a place name a banner sits, measured in lines of the\ndisplay text.\n\nThe two can be on screen together: entering a duty announces where you\nare and then the party size a moment later. This is the room between\nthem. The drop is the same whether or not a name is up, so a banner on\nits own also lands here.",
-    "description": "Tooltip for the Banner drop slider. Keep the line breaks and the blank line. \"Duty\" is the game's own word for an instanced dungeon or raid - use the wording FFXIV uses in your language."
+    "description": ""
+  },
+  "announcements.bannerlanguage": {
+    "message": "Banner language",
+    "description": ""
+  },
+  "announcements.bannerlanguage.follow": {
+    "message": "Follow the client",
+    "description": ""
+  },
+  "announcements.bannerlanguage.tooltip": {
+    "message": "Which language the banner wording is drawn in.\n\nFollowing the client uses the language the game is in. Choosing another replaces the game's own banner with this plugin's version in that language, so on a German client set to English the German artwork is faded out and English words are drawn in its place.\n\nOnly languages this plugin has wording for are listed. Banners it has no wording for keep the game's own, whichever language is chosen.",
+    "description": ""
+  },
+  "announcements.banners": {
+    "message": "Banners",
+    "description": ""
+  },
+  "announcements.banners.tooltip": {
+    "message": "Redraws the game's full-screen banners (\"Quest Accepted\", \"Duty Commenced\", \"Level Up!\") in this plugin's lettering.\n\nThe wording is painted into the game's artwork rather than stored as text, so only banners this plugin has words for are taken over. Any it does not recognise keep the game's own.",
+    "description": ""
+  },
+  "announcements.hideareatext": {
+    "message": "Hide the game's own area text",
+    "description": ""
+  },
+  "announcements.hideareatext.tooltip": {
+    "message": "Suppresses the native \"_AreaText\" flash, which draws underneath this plugin.",
+    "description": ""
+  },
+  "announcements.hidebanner": {
+    "message": "Hide the game's own banner",
+    "description": ""
+  },
+  "announcements.hidebanner.tooltip": {
+    "message": "Fades out the game's artwork so only this plugin's version shows.\n\nTurn this off to see both, which is a quick way to check the wording matches.",
+    "description": ""
+  },
+  "announcements.hidecombat": {
+    "message": "Hide during combat",
+    "description": ""
+  },
+  "announcements.hideduty": {
+    "message": "Hide inside duties",
+    "description": ""
+  },
+  "announcements.hideloadingtitle": {
+    "message": "Hide the loading-screen zone title",
+    "description": ""
+  },
+  "announcements.hideloadingtitle.tooltip": {
+    "message": "Suppresses \"_LocationTitle\" and \"_LocationTitleShort\", the gold title\ndrawn over the loading screen, and shows the same names in this\nplugin's style instead.",
+    "description": ""
+  },
+  "announcements.intro": {
+    "message": "This plugin replaces the game's own location text rather than drawing alongside it. If you turn the suppression below off, the game's version comes back.",
+    "description": ""
+  },
+  "announcements.skipfast": {
+    "message": "Skip sub-areas while travelling quickly",
+    "description": ""
+  },
+  "announcements.skipfast.tooltip": {
+    "message": "Only affects sub-areas, and only above a speed no ground travel reaches,\nso it comes into play when flying. Zone and area changes are always\nannounced however fast you are moving.",
+    "description": ""
+  },
+  "announcements.subarea": {
+    "message": "Sub-area changes",
+    "description": ""
+  },
+  "announcements.tab": {
+    "message": "Announcements",
+    "description": "Tab label. What the plugin says out loud: which place tiers, the weather, the banners, and when to stay quiet. Tab labels sit in one row, so shorter is better where the language allows it."
+  },
+  "announcements.weather": {
+    "message": "Weather changes",
+    "description": ""
+  },
+  "announcements.weather.tooltip": {
+    "message": "Announces the weather turning over, on its own line just above the place name, so it never interrupts a location notice.\n\nWeather runs on a fixed cycle of about 23 minutes, and arriving anywhere new announces what it is doing there, so it shows up with the place name as you walk in.",
+    "description": ""
+  },
+  "announcements.weathericon": {
+    "message": "Show the weather icon",
+    "description": ""
+  },
+  "announcements.weathericon.tooltip": {
+    "message": "Draws the game's own icon for the weather to the left of its name.",
+    "description": ""
+  },
+  "announcements.zone": {
+    "message": "Zone changes",
+    "description": ""
+  },
+  "appearance.headercolour": {
+    "message": "Header colour",
+    "description": ""
+  },
+  "appearance.headergap": {
+    "message": "Header gap",
+    "description": ""
+  },
+  "appearance.headergap.tooltip": {
+    "message": "How far the name sits below the header, measured in lines of header text.\n\nLow values pull the two together until they almost touch, which is the\ntighter look the plugin has always shipped with. Higher values open the\ngap up and give each line room to breathe.",
+    "description": ""
+  },
+  "appearance.headeroutlinecolour": {
+    "message": "Header outline colour",
+    "description": ""
+  },
+  "appearance.horizontal": {
+    "message": "Horizontal position",
+    "description": ""
+  },
+  "appearance.horizontal.tooltip": {
+    "message": "The text is centred on this point, so 50% is the middle of the screen.\nA long place name set near either end will reach past it.",
+    "description": ""
+  },
+  "appearance.letterspacing": {
+    "message": "Letter spacing",
+    "description": ""
+  },
+  "appearance.letterspacing.tooltip": {
+    "message": "Extra space between letters, as a percentage of the font size, so it keeps\nits proportions when the size changes and the header gets its own share.\nWide spacing is much of what gives the Guild Wars 2 original its look.",
+    "description": ""
+  },
+  "appearance.outlinecolour": {
+    "message": "Outline colour",
+    "description": ""
+  },
+  "appearance.outlinethickness": {
+    "message": "Outline thickness",
+    "description": ""
+  },
+  "appearance.outlinethickness.tooltip": {
+    "message": "Zero turns the outline off.",
+    "description": ""
+  },
+  "appearance.preview": {
+    "message": "Preview",
+    "description": ""
+  },
+  "appearance.separatecolours": {
+    "message": "Colour each line separately",
+    "description": ""
+  },
+  "appearance.separatecolours.tooltip": {
+    "message": "Off, the weather line follows the header, and one outline colour\ncovers all three lines.\n\nOn, the weather line and the outlines take the colours below, so one\nline can be pushed towards the background without touching the others.",
+    "description": ""
+  },
+  "appearance.shadow": {
+    "message": "Drop shadow",
+    "description": ""
+  },
+  "appearance.shadow.tooltip": {
+    "message": "A second copy of every line, offset behind it. Sits under the outline, so\nthe two can be used together: a tight outline for legibility and a soft\nshadow for depth.\n\nOne shadow covers all three lines; it does not follow the separate colours.",
+    "description": ""
+  },
+  "appearance.shadowacross": {
+    "message": "Shadow across",
+    "description": ""
+  },
+  "appearance.shadowacross.tooltip": {
+    "message": "Negative moves the shadow to the left.",
+    "description": ""
+  },
+  "appearance.shadowcolour": {
+    "message": "Shadow colour",
+    "description": ""
+  },
+  "appearance.shadowdown": {
+    "message": "Shadow down",
+    "description": ""
+  },
+  "appearance.shadowdown.tooltip": {
+    "message": "Negative lifts the shadow above the text.",
+    "description": ""
+  },
+  "appearance.shadowspread": {
+    "message": "Shadow spread",
+    "description": ""
+  },
+  "appearance.shadowspread.tooltip": {
+    "message": "Fattens the shadow outwards. Zero keeps it the same shape as the\nletters; higher values thicken it into a halo behind them.",
+    "description": ""
+  },
+  "appearance.showheader": {
+    "message": "Show header",
+    "description": ""
+  },
+  "appearance.showheader.tooltip": {
+    "message": "The smaller line above the name, giving where the place sits: the region\nabove a zone, the area above a sub-area.\n\nTurned off, only the name itself is shown. The weather line, if you have\nit on, is unaffected, as are the two settings below, which still apply\nto it.",
+    "description": ""
+  },
+  "appearance.tab": {
+    "message": "Appearance",
+    "description": "Tab label. How a notification looks: where it sits, its colours, outline, shadow and header. Keep it short."
+  },
+  "appearance.textcolour": {
+    "message": "Text colour",
+    "description": ""
+  },
+  "appearance.underlineheader": {
+    "message": "Underline header",
+    "description": ""
+  },
+  "appearance.uppercase": {
+    "message": "Uppercase",
+    "description": ""
+  },
+  "appearance.vertical": {
+    "message": "Vertical position",
+    "description": ""
+  },
+  "appearance.weathercolour": {
+    "message": "Weather colour",
+    "description": ""
+  },
+  "appearance.weatheroutlinecolour": {
+    "message": "Weather outline colour",
+    "description": ""
+  },
+  "motion.choice": {
+    "message": "Motion",
+    "description": ""
+  },
+  "motion.choice.burn": {
+    "message": "Burn",
+    "description": ""
+  },
+  "motion.choice.intro": {
+    "message": "How the letters move as they arrive.",
+    "description": ""
+  },
+  "motion.choice.none": {
+    "message": "None",
+    "description": ""
+  },
+  "motion.choice.rise": {
+    "message": "Rise",
+    "description": ""
+  },
+  "motion.choice.tooltip": {
+    "message": "None: the letters simply appear where they belong.\nTypewriter: one letter at a time, no fade.\nRise: letters lift into place from below.\nWave: letters ride a wave through the line as it appears.\nBurn: letters catch alight and cool into their colour.\n\nRuns alongside the Eorzean decode rather than instead of it.",
+    "description": ""
+  },
+  "motion.choice.typewriter": {
+    "message": "Typewriter",
+    "description": ""
+  },
+  "motion.choice.wave": {
+    "message": "Wave",
+    "description": ""
+  },
+  "motion.decode": {
+    "message": "Decode from Eorzean script",
+    "description": ""
+  },
+  "motion.decode.duration": {
+    "message": "Decode time",
+    "description": "Slider label, directly under the decode checkbox. Reads as a length of time rather than as a repeat of the checkbox above it."
+  },
+  "motion.decode.duration.tooltip": {
+    "message": "How long the Eorzean takes to resolve, once the letters have landed.\nNeeds the decode effect above.",
+    "description": "Tooltip for that slider. \"Eorzean\" is the game's invented script."
+  },
+  "motion.decode.tooltip": {
+    "message": "Requires a bundled Eorzean font. Latin text only.\n\nRuns after the motion above rather than alongside it: the line\narrives in Eorzean, lands, then resolves. Turned off, it arrives\nalready readable. Presets leave this alone, so switching it off\nhere switches it off for all of them.",
+    "description": "Tooltip for the Eorzean decode checkbox. \"Presets\" is the name of another tab. It used to say the motion was on the Effects tab; the two are now next to each other, which is why it says \"above\"."
+  },
+  "motion.density": {
+    "message": "Density",
+    "description": ""
+  },
+  "motion.duration": {
+    "message": "Motion time",
+    "description": "Slider label, directly under the Motion dropdown. It was \"Motion\" on a tab of its own until the two were put together, and needs to read as a length of time rather than as a second copy of the dropdown above it."
+  },
+  "motion.duration.tooltip": {
+    "message": "How long the letters take to arrive. Runs alongside the fade in, and\ndoes nothing when the motion above is None.",
+    "description": "Tooltip for that slider. \"None\" is an entry in the Motion dropdown above it - match motion.choice.none."
+  },
+  "motion.embers.note": {
+    "message": "Embers go with the Burn motion, but they do not need it.",
+    "description": ""
+  },
+  "motion.fadein": {
+    "message": "Fade in",
+    "description": ""
+  },
+  "motion.fadein.tooltip": {
+    "message": "How long the line takes to come up to full strength as it appears.",
+    "description": ""
+  },
+  "motion.fadeout": {
+    "message": "Fade out",
+    "description": ""
+  },
+  "motion.fadeout.tooltip": {
+    "message": "How long the line takes to disappear once its time is up.",
+    "description": ""
+  },
+  "motion.hold": {
+    "message": "Hold",
+    "description": ""
+  },
+  "motion.hold.tooltip": {
+    "message": "How long the finished line stays up before it starts to fade.",
+    "description": ""
+  },
+  "motion.intro": {
+    "message": "The line arrives, lands, then decodes. Motion and decode are separate stages and each takes its own time.",
+    "description": ""
+  },
+  "motion.particlecolour": {
+    "message": "Particle colour",
+    "description": ""
+  },
+  "motion.particlecolour.tooltip": {
+    "message": "The default amber suits embers and sparkles. Hearts and petals\nwant moving towards pink.",
+    "description": ""
+  },
+  "motion.particles": {
+    "message": "Particles",
+    "description": ""
+  },
+  "motion.particles.embers": {
+    "message": "Embers",
+    "description": ""
+  },
+  "motion.particles.hearts": {
+    "message": "Hearts",
+    "description": ""
+  },
+  "motion.particles.intro": {
+    "message": "What plays around it, for as long as it is on screen.",
+    "description": ""
+  },
+  "motion.particles.none": {
+    "message": "None",
+    "description": ""
+  },
+  "motion.particles.petals": {
+    "message": "Petals",
+    "description": ""
+  },
+  "motion.particles.sparkles": {
+    "message": "Sparkles",
+    "description": ""
+  },
+  "motion.preview": {
+    "message": "Preview",
+    "description": ""
+  },
+  "motion.tab": {
+    "message": "Motion",
+    "description": "Tab label. How a notification moves: the arrival effect, the Eorzean decode, particles and the timings. Keep it short."
+  },
+  "motion.timing.intro": {
+    "message": "How long the whole notification lasts, whichever of the above it is using.",
+    "description": "Greyed heading over the last three sliders on the Motion tab, which apply whatever arrival effect is chosen above them."
+  },
+  "sound.audition.tooltip": {
+    "message": "Plays the chosen sound now. It ignores the short gap that stops two notifications sounding at once, so pressing it repeatedly always makes a noise.",
+    "description": ""
+  },
+  "sound.effect": {
+    "message": "Sound effect {0}",
+    "description": ""
+  },
+  "sound.intro": {
+    "message": "A short noise when a notification arrives, from the game's own sound effects or from a file of your own.",
+    "description": "Paragraph at the top of the Sound tab."
+  },
+  "sound.on.banner": {
+    "message": "Sound on banners",
+    "description": ""
+  },
+  "sound.on.location": {
+    "message": "Sound on place names",
+    "description": ""
+  },
+  "sound.on.tooltip": {
+    "message": "Which kinds of notification make a sound. Two arriving together only ever make one sound, whichever of them lands first.",
+    "description": ""
+  },
+  "sound.on.weather": {
+    "message": "Sound on weather",
+    "description": ""
+  },
+  "sound.source": {
+    "message": "Sound",
+    "description": ""
+  },
+  "sound.source.file": {
+    "message": "A file of your own",
+    "description": ""
+  },
+  "sound.source.game": {
+    "message": "One of the game's",
+    "description": ""
+  },
+  "sound.source.off": {
+    "message": "None",
+    "description": ""
+  },
+  "sound.source.tooltip": {
+    "message": "Plays a sound when a notification appears. Off by default.\n\nOne of the game's is a chat sound effect, mixed by the game: the master volume and the System Sounds volume control it, rather than Sound Effects, and turning Sound Effects down will not quieten it.\n\nA file of your own is played by the plugin, which the game does not mix at all, so the plugin reads those same settings and follows them by hand. It stays silent while the game is muted, and while the window is not in front unless you have told the game to keep playing then.",
+    "description": ""
+  },
+  "sound.tab": {
+    "message": "Sound",
+    "description": "Tab label. The noise a notification makes. Keep it short."
   }
 }

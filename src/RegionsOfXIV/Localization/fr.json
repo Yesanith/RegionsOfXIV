@@ -1,111 +1,93 @@
 {
   "_status": "machine-drafted -- not reviewed by a French speaker. Wording is plain and in places stiff, and the tu/vous choice was made once (tu, matching FFXIV's own French) without checking it reads well everywhere. Correct freely. Keys listed under _untranslated were left in English on purpose, see the reasons there.",
   "_untranslated": [
-    "general.hideduty: 'duty' is FFXIV's term for instanced content. French FFXIV has a set word for it; guessing would put a word in the window the game itself never uses.",
-    "general.decode and general.decode.tooltip: the Eorzean script has an established French name in FFXIV. Left for someone who can check it against the game.",
-    "notifications.subarea, general.skipfast and general.skipfast.tooltip: 'sub-area' is the finest place tier and carries the whole meaning of those labels.",
-    "general.showheader.tooltip: turns on the region/zone/area/sub-area vocabulary, so it waits on the same decision.",
-    "notifications.banners.tooltip: translated, but 'Quest Accepted', 'Duty Commenced' and 'Level Up!' were left in English inside it -- the game already translates those three and its own wording must win.",
-    "'Eorzean' is kept as-is throughout; FFXIV's French localisation should be checked.",
+    "announcements.banners.tooltip: translated, but 'Quest Accepted', 'Duty Commenced' and 'Level Up!' were left in English inside it -- the game already translates those three and its own wording must win.",
     "Typeface names (Noto Sans CJK, Trump Gothic, Jupiter, Axis), product names (Discord, GitHub, Dalamud, Guild Wars 2, Square Enix), commands and the AGPL identifier are never translated."
   ],
-  "durations.tab": {
-    "message": "Durées"
-  },
-  "durations.intro": {
+  "_uncertain": [
+    "duty (announcements.hideduty). Chosen: 'missions', which is what French FFXIV calls instanced content. Taken from the game rather than from this file, so it is the one word here worth checking against a running client.",
+    "sub-area (announcements.subarea, announcements.skipfast and its tooltip, appearance.showheader.tooltip). Chosen: 'sous-secteur', which about.summary already used. The four tiers are region, zone, secteur, sous-secteur and have to agree everywhere.",
+    "Eorzean script (motion.decode and its tooltip). Chosen: 'eorzeen', which the file already used in motion.decode.duration.tooltip. If FFXIV's French has its own name for the script, it should win over both."
+  ],
+  "motion.intro": {
     "message": "La ligne arrive, se pose, puis se décode. Le mouvement et le décodage sont des étapes distinctes et chacune prend son propre temps."
   },
-  "durations.fadein": {
+  "motion.fadein": {
     "message": "Apparition"
   },
-  "durations.fadein.tooltip": {
+  "motion.fadein.tooltip": {
     "message": "Le temps que met la ligne à atteindre sa pleine intensité en apparaissant."
   },
-  "durations.motion": {
-    "message": "Mouvement"
-  },
-  "durations.motion.tooltip": {
-    "message": "Le temps que mettent les lettres à arriver. Se déroule en même temps que\nl'apparition, et ne fait rien si le mouvement de l'onglet Effets est sur Aucun."
-  },
-  "durations.decode": {
-    "message": "Décodage"
-  },
-  "durations.decode.tooltip": {
-    "message": "Le temps que met l'eorzéen à se résoudre, une fois les lettres posées.\nNécessite l'effet de décodage de l'onglet Effets."
-  },
-  "durations.hold": {
+  "motion.hold": {
     "message": "Maintien"
   },
-  "durations.hold.tooltip": {
+  "motion.hold.tooltip": {
     "message": "Le temps que la ligne terminée reste affichée avant de commencer à s'effacer."
   },
-  "durations.fadeout": {
+  "motion.fadeout": {
     "message": "Disparition"
   },
-  "durations.fadeout.tooltip": {
+  "motion.fadeout.tooltip": {
     "message": "Le temps que met la ligne à disparaître une fois son temps écoulé."
   },
-  "effects.tab": {
-    "message": "Effets"
-  },
-  "effects.motion.intro": {
+  "motion.choice.intro": {
     "message": "Comment les lettres bougent en arrivant."
   },
-  "effects.motion": {
+  "motion.choice": {
     "message": "Mouvement"
   },
-  "effects.motion.tooltip": {
+  "motion.choice.tooltip": {
     "message": "Aucun : les lettres apparaissent simplement à leur place.\nMachine à écrire : une lettre après l'autre, sans fondu.\nMontée : les lettres s'élèvent en place depuis le bas.\nVague : une vague parcourt la ligne à son apparition.\nCombustion : les lettres s'enflamment puis refroidissent vers leur couleur.\n\nSe déroule en même temps que le décodage eorzéen, et non à sa place."
   },
-  "effects.motion.none": {
+  "motion.choice.none": {
     "message": "Aucun"
   },
-  "effects.motion.typewriter": {
+  "motion.choice.typewriter": {
     "message": "Machine à écrire"
   },
-  "effects.motion.rise": {
+  "motion.choice.rise": {
     "message": "Montée"
   },
-  "effects.motion.wave": {
+  "motion.choice.wave": {
     "message": "Vague"
   },
-  "effects.motion.burn": {
+  "motion.choice.burn": {
     "message": "Combustion"
   },
-  "effects.particles.intro": {
+  "motion.particles.intro": {
     "message": "Ce qui se joue autour, tant qu'elle est à l'écran."
   },
-  "effects.particles": {
+  "motion.particles": {
     "message": "Particules"
   },
-  "effects.particles.none": {
+  "motion.particles.none": {
     "message": "Aucune"
   },
-  "effects.particles.hearts": {
+  "motion.particles.hearts": {
     "message": "Cœurs"
   },
-  "effects.particles.embers": {
+  "motion.particles.embers": {
     "message": "Braises"
   },
-  "effects.particles.sparkles": {
+  "motion.particles.sparkles": {
     "message": "Étincelles"
   },
-  "effects.particles.petals": {
+  "motion.particles.petals": {
     "message": "Pétales"
   },
-  "effects.density": {
+  "motion.density": {
     "message": "Densité"
   },
-  "effects.particlecolour": {
+  "motion.particlecolour": {
     "message": "Couleur des particules"
   },
-  "effects.particlecolour.tooltip": {
+  "motion.particlecolour.tooltip": {
     "message": "L'ambre par défaut va bien aux braises et aux étincelles. Les cœurs et\nles pétales demandent plutôt du rose."
   },
-  "effects.embers.note": {
+  "motion.embers.note": {
     "message": "Les braises vont avec le mouvement Combustion, mais elles n'en ont pas besoin."
   },
-  "effects.preview": {
+  "motion.preview": {
     "message": "Aperçu"
   },
   "sharecodes.heading": {
@@ -201,59 +183,53 @@
   "about.notaffiliated": {
     "message": "Les noms de lieux, la météo et les polices proviennent des données du jeu. Sans lien avec Square Enix."
   },
-  "notifications.tab": {
-    "message": "Notifications"
-  },
-  "notifications.intro": {
+  "announcements.intro": {
     "message": "Ce plugin remplace l'affichage de lieu du jeu plutôt que de dessiner à côté. Si tu désactives la suppression ci-dessous, la version du jeu revient."
   },
-  "notifications.zone": {
+  "announcements.zone": {
     "message": "Changements de zone"
   },
-  "notifications.area": {
+  "announcements.area": {
     "message": "Changements de secteur"
   },
-  "notifications.weather": {
+  "announcements.weather": {
     "message": "Changements de météo"
   },
-  "notifications.weather.tooltip": {
+  "announcements.weather.tooltip": {
     "message": "Annonce le changement de météo, sur sa propre ligne juste au-dessus du nom de lieu, de sorte qu'elle n'interrompe jamais une annonce de lieu.\n\nLa météo suit un cycle fixe d'environ 23 minutes, et arriver quelque part annonce ce qu'elle y fait. Elle apparaît donc avec le nom de lieu à ton entrée."
   },
-  "notifications.weathericon": {
+  "announcements.weathericon": {
     "message": "Afficher l'icône de météo"
   },
-  "notifications.weathericon.tooltip": {
+  "announcements.weathericon.tooltip": {
     "message": "Dessine l'icône du jeu pour la météo à gauche de son nom."
   },
-  "notifications.banners": {
+  "announcements.banners": {
     "message": "Bannières"
   },
-  "notifications.banners.tooltip": {
+  "announcements.banners.tooltip": {
     "message": "Redessine les bannières plein écran du jeu (\"Quest Accepted\", \"Duty Commenced\", \"Level Up!\") dans la typographie de ce plugin.\n\nLe texte est peint dans l'image du jeu plutôt que stocké comme texte, donc seules les bannières dont ce plugin connaît les mots sont reprises. Celles qu'il ne reconnaît pas gardent celles du jeu."
   },
-  "notifications.hidebanner": {
+  "announcements.hidebanner": {
     "message": "Masquer la bannière du jeu"
   },
-  "notifications.hidebanner.tooltip": {
+  "announcements.hidebanner.tooltip": {
     "message": "Estompe l'image du jeu pour ne laisser voir que la version de ce plugin.\n\nDésactive ceci pour voir les deux, ce qui est un moyen rapide de vérifier que le texte correspond."
   },
-  "notifications.hideareatext": {
+  "announcements.hideareatext": {
     "message": "Masquer le texte de secteur du jeu"
   },
-  "notifications.hideareatext.tooltip": {
+  "announcements.hideareatext.tooltip": {
     "message": "Supprime le \"_AreaText\" natif, qui se dessine sous ce plugin."
   },
-  "notifications.hideloadingtitle": {
+  "announcements.hideloadingtitle": {
     "message": "Masquer le titre de zone de l'écran de chargement"
   },
-  "notifications.hideloadingtitle.tooltip": {
+  "announcements.hideloadingtitle.tooltip": {
     "message": "Supprime \"_LocationTitle\" et \"_LocationTitleShort\", le titre doré\ndessiné sur l'écran de chargement, et affiche les mêmes noms dans le\nstyle de ce plugin à la place."
   },
   "presets.tab": {
     "message": "Préréglages"
-  },
-  "presets.intro": {
-    "message": "Un préréglage couvre tous les réglages des onglets Général, Polices, Effets, Notifications et Durées : la fonte et la taille de chaque ligne, la position, les couleurs, le mouvement et les particules, les niveaux annoncés, les temps, et quand rester silencieux."
   },
   "presets.intro.warning": {
     "message": "En appliquer un les remplace tous, donc tout ce que tu as modifié est écrasé."
@@ -320,9 +296,6 @@
   },
   "presets.replace": {
     "message": "Remplacer"
-  },
-  "presets.save.tooltip": {
-    "message": "Enregistre tous les réglages des onglets Général, Polices, Effets, Notifications et Durées."
   },
   "presets.discord": {
     "message": "Rejoindre le Discord"
@@ -405,109 +378,106 @@
   "fonts.upscaled": {
     "message": "Cette police n'a pas de bitmap au-dessus de {0:F0} px, donc à {1:F0} px elle est agrandie et paraîtra molle. Réduis la taille, ou passe à Noto Sans CJK ou à un fichier de police à toi : l'un comme l'autre reste net à toute taille."
   },
-  "general.tab": {
-    "message": "Général"
-  },
-  "general.language": {
+  "about.language": {
     "message": "Langue"
   },
-  "general.language.follow": {
+  "about.language.follow": {
     "message": "Suivre Dalamud"
   },
-  "general.language.tooltip": {
+  "about.language.tooltip": {
     "message": "Suivre Dalamud prend la langue sur laquelle Dalamud lui-même est réglé,\net change avec elle.\n\nSeule cette fenêtre est concernée. Les noms de lieux et de météo viennent du\njeu et restent dans la langue de ton client."
   },
-  "general.preview": {
+  "appearance.preview": {
     "message": "Aperçu"
   },
-  "general.vertical": {
+  "appearance.vertical": {
     "message": "Position verticale"
   },
-  "general.horizontal": {
+  "appearance.horizontal": {
     "message": "Position horizontale"
   },
-  "general.horizontal.tooltip": {
+  "appearance.horizontal.tooltip": {
     "message": "Le texte est centré sur ce point, donc 50% est le milieu de l'écran.\nUn nom de lieu long placé près d'un bord dépassera."
   },
-  "general.letterspacing": {
+  "appearance.letterspacing": {
     "message": "Espacement des lettres"
   },
-  "general.letterspacing.tooltip": {
+  "appearance.letterspacing.tooltip": {
     "message": "Espace supplémentaire entre les lettres, en pourcentage de la taille de police,\nde sorte qu'il garde ses proportions quand la taille change et que l'en-tête\nreçoive sa part. Un espacement large fait beaucoup du style de l'original\nGuild Wars 2."
   },
-  "general.uppercase": {
+  "appearance.uppercase": {
     "message": "Majuscules"
   },
-  "general.textcolour": {
+  "appearance.textcolour": {
     "message": "Couleur du texte"
   },
-  "general.headercolour": {
+  "appearance.headercolour": {
     "message": "Couleur de l'en-tête"
   },
-  "general.outlinecolour": {
+  "appearance.outlinecolour": {
     "message": "Couleur du contour"
   },
-  "general.separatecolours": {
+  "appearance.separatecolours": {
     "message": "Colorer chaque ligne séparément"
   },
-  "general.separatecolours.tooltip": {
+  "appearance.separatecolours.tooltip": {
     "message": "Désactivé, la ligne de météo suit l'en-tête, et une seule couleur de contour\ncouvre les trois lignes.\n\nActivé, la ligne de météo et les contours prennent les couleurs ci-dessous,\nce qui permet de repousser une ligne vers le fond sans toucher aux autres."
   },
-  "general.weathercolour": {
+  "appearance.weathercolour": {
     "message": "Couleur de la météo"
   },
-  "general.headeroutlinecolour": {
+  "appearance.headeroutlinecolour": {
     "message": "Couleur du contour de l'en-tête"
   },
-  "general.weatheroutlinecolour": {
+  "appearance.weatheroutlinecolour": {
     "message": "Couleur du contour de la météo"
   },
-  "general.outlinethickness": {
+  "appearance.outlinethickness": {
     "message": "Épaisseur du contour"
   },
-  "general.outlinethickness.tooltip": {
+  "appearance.outlinethickness.tooltip": {
     "message": "Zéro désactive le contour."
   },
-  "general.shadow": {
+  "appearance.shadow": {
     "message": "Ombre portée"
   },
-  "general.shadow.tooltip": {
+  "appearance.shadow.tooltip": {
     "message": "Une deuxième copie de chaque ligne, décalée derrière elle. Elle se place sous\nle contour, les deux peuvent donc servir ensemble : un contour serré pour la\nlisibilité et une ombre douce pour la profondeur.\n\nUne seule ombre couvre les trois lignes ; elle ne suit pas les couleurs séparées."
   },
-  "general.shadowcolour": {
+  "appearance.shadowcolour": {
     "message": "Couleur de l'ombre"
   },
-  "general.shadowacross": {
+  "appearance.shadowacross": {
     "message": "Ombre latérale"
   },
-  "general.shadowacross.tooltip": {
+  "appearance.shadowacross.tooltip": {
     "message": "Une valeur négative déplace l'ombre vers la gauche."
   },
-  "general.shadowdown": {
+  "appearance.shadowdown": {
     "message": "Ombre verticale"
   },
-  "general.shadowdown.tooltip": {
+  "appearance.shadowdown.tooltip": {
     "message": "Une valeur négative remonte l'ombre au-dessus du texte."
   },
-  "general.shadowspread": {
+  "appearance.shadowspread": {
     "message": "Étalement de l'ombre"
   },
-  "general.shadowspread.tooltip": {
+  "appearance.shadowspread.tooltip": {
     "message": "Épaissit l'ombre vers l'extérieur. Zéro lui garde la forme des lettres ;\ndes valeurs plus élevées l'épaississent en un halo derrière elles."
   },
-  "general.showheader": {
+  "appearance.showheader": {
     "message": "Afficher l'en-tête"
   },
-  "general.underlineheader": {
+  "appearance.underlineheader": {
     "message": "Souligner l'en-tête"
   },
-  "general.headergap": {
+  "appearance.headergap": {
     "message": "Écart de l'en-tête"
   },
-  "general.headergap.tooltip": {
+  "appearance.headergap.tooltip": {
     "message": "À quelle distance le nom se place sous l'en-tête, mesurée en lignes d'en-tête.\n\nDes valeurs basses rapprochent les deux jusqu'à ce qu'ils se touchent presque,\nce qui est le style plus serré livré depuis toujours. Des valeurs plus élevées\nouvrent l'écart et donnent de l'air à chaque ligne."
   },
-  "general.hidecombat": {
+  "announcements.hidecombat": {
     "message": "Masquer pendant le combat"
   },
   "command.help": {
@@ -600,20 +570,199 @@
   "fonts.reduced": {
     "message": "Dessiné à {0:F0} px plutôt qu'à {1:F0}. Ce client affiche des noms de lieux japonais, donc chaque police de notification doit porter des kanji, et à cette taille elle ne pourrait pas être construite. Ton réglage est conservé et revient si la langue du jeu change."
   },
-  "notifications.bannerlanguage": {
+  "announcements.bannerlanguage": {
     "message": "Langue des bannières"
   },
-  "notifications.bannerlanguage.follow": {
+  "announcements.bannerlanguage.follow": {
     "message": "Suivre le client"
   },
-  "notifications.bannerlanguage.tooltip": {
+  "announcements.bannerlanguage.tooltip": {
     "message": "Dans quelle langue le texte des bannières est dessiné.\n\nSuivre le client prend la langue dans laquelle le jeu tourne. En choisir une autre remplace la bannière du jeu par la version de ce plugin dans cette langue : sur un client allemand réglé sur l'anglais, l'image allemande est estompée et du texte anglais est dessiné à sa place.\n\nSeules les langues pour lesquelles ce plugin a des mots sont proposées. Les bannières dont il n'a pas les mots gardent celles du jeu, quelle que soit la langue choisie."
   },
 
-  "notifications.bannergap": {
+  "announcements.bannergap": {
     "message": "Écart de la bannière"
   },
-  "notifications.bannergap.tooltip": {
+  "announcements.bannergap.tooltip": {
     "message": "À quelle distance sous un nom de lieu se place une bannière, mesurée en\nlignes du texte d'affichage.\n\nLes deux peuvent être à l'écran en même temps : en entrant dans une\nmission, le jeu annonce l'endroit puis la taille de l'équipe un instant\nplus tard. Voici l'espace entre les deux. L'écart est le même qu'un nom\nsoit affiché ou non, une bannière seule se place donc ici aussi."
+  },
+
+  "sound.source": {
+    "message": "Son"
+  },
+  "sound.source.off": {
+    "message": "Aucun"
+  },
+  "sound.source.game": {
+    "message": "Un son du jeu"
+  },
+  "sound.source.tooltip": {
+    "message": "Joue un son quand une notification apparaît. Désactivé par défaut.\n\nUn son du jeu est un effet sonore de discussion, mixé par le jeu : le volume général et celui des sons système le contrôlent, et non celui des effets sonores, et baisser les effets sonores ne le rendra pas plus discret.\n\nUn fichier à toi est joué par le plugin, que le jeu ne mixe pas du tout, donc le plugin lit ces mêmes réglages et les suit lui-même. Il reste silencieux quand le jeu est en sourdine, et quand la fenêtre n'est pas au premier plan, sauf si tu as dit au jeu de continuer à jouer dans ce cas."
+  },
+  "sound.effect": {
+    "message": "Effet sonore {0}"
+  },
+  "sound.audition.tooltip": {
+    "message": "Joue le son choisi immédiatement. Le court délai qui empêche deux notifications de sonner en même temps est ignoré, donc appuyer plusieurs fois fait toujours du bruit."
+  },
+  "sound.on.location": {
+    "message": "Son sur les noms de lieu"
+  },
+  "sound.on.weather": {
+    "message": "Son sur la météo"
+  },
+  "sound.on.banner": {
+    "message": "Son sur les bannières"
+  },
+  "sound.on.tooltip": {
+    "message": "Quels types de notification produisent un son. Deux qui arrivent ensemble n'en produisent qu'un seul, celui qui arrive en premier."
+  },
+
+  "sound.source.file": {
+    "message": "Un fichier à toi"
+  },
+  "sound.browse": {
+    "message": "Parcourir"
+  },
+  "sound.clear": {
+    "message": "Effacer"
+  },
+  "sound.custom.notice": {
+    "message": "Un fichier que tu fournis est joué tel quel, et il reste à ta charge. Tout ce qui dépasse {0} secondes est coupé, pour qu'un morceau entier ne se joue pas par-dessus une notification déjà partie. Un fichier que le plugin ne sait pas lire, ou une licence que tu n'as pas, te revient et non à Regions of XIV."
+  },
+  "sound.dialog.title": {
+    "message": "Choisir un fichier son"
+  },
+  "sound.path.hint": {
+    "message": "Chemin vers un fichier .wav ou .mp3"
+  },
+  "sound.play": {
+    "message": "Jouer"
+  },
+  "sound.play.tooltip": {
+    "message": "Joue le fichier choisi immédiatement. Le court délai qui empêche deux notifications de sonner en même temps est ignoré, donc appuyer plusieurs fois réessaie à chaque fois."
+  },
+  "sound.playingwith": {
+    "message": "Joue {0}."
+  },
+  "sound.problem.channels": {
+    "message": "Ce fichier a plus de deux canaux, ce qui ne peut pas être joué ici. Un fichier mono ou stéréo fonctionnera."
+  },
+  "sound.problem.decode": {
+    "message": "Ce fichier n'a pas pu être lu. Le journal du plugin indique le format qu'il a vu, c'est le plus rapide pour comprendre pourquoi."
+  },
+  "sound.problem.device": {
+    "message": "Windows n'a pas voulu ouvrir de périphérique audio, donc rien ne peut être joué."
+  },
+  "sound.problem.directory": {
+    "message": "C'est un dossier, pas un fichier son."
+  },
+  "sound.problem.empty": {
+    "message": "Ce fichier est vide."
+  },
+  "sound.problem.format": {
+    "message": "Seuls les fichiers .wav et .mp3 peuvent être joués."
+  },
+  "sound.problem.huge": {
+    "message": "Ce fichier est bien plus gros qu'un son de notification ne devrait l'être, il est donc laissé de côté."
+  },
+  "sound.problem.locked": {
+    "message": "Ce fichier n'a pas pu être ouvert. Un autre programme le tient peut-être ouvert."
+  },
+  "sound.problem.missing": {
+    "message": "Il n'y a plus de fichier à ce chemin."
+  },
+  "sound.problem.none": {
+    "message": "Aucun fichier son n'a encore été choisi."
+  },
+  "sound.problem.unreadable": {
+    "message": "Ce chemin ne peut pas être lu."
+  },
+  "sound.silent.disabled": {
+    "message": "Le son du jeu est coupé, donc rien n'est joué."
+  },
+  "sound.silent.muted": {
+    "message": "Le jeu est en sourdine, donc rien n'est joué. Cela suit les sourdines du volume général et des sons système, car c'est la voie qu'utilise un son de notification."
+  },
+  "sound.silent.unfocused": {
+    "message": "La fenêtre du jeu n'est pas au premier plan et son réglage pour jouer du son quand elle n'est pas active est désactivé, donc rien n'est joué."
+  },
+  "sound.silent.unreadable": {
+    "message": "Les réglages audio du jeu ne peuvent pas encore être lus, donc rien n'est joué. Cela se règle une fois que tu es en jeu."
+  },
+  "sound.silent.zero": {
+    "message": "Le volume général ou celui des sons système est à zéro, donc rien n'est joué."
+  },
+  "sound.problem.encoding": {
+    "message": "Ce fichier est un WAV dans l'encodage {0}, pour lequel Windows n'a pas de convertisseur. Le réenregistrer en PCM ordinaire, ou en MP3, fonctionnera."
+  },
+  "sound.problem.mp3codec": {
+    "message": "Windows n'a aucun décodeur MP3 disponible, donc ce fichier ne peut pas être joué. Un fichier .wav fonctionnera quand même."
+  },
+  "sound.problem.notaudio": {
+    "message": "Ce fichier n'est en réalité ni un WAV ni un MP3, quel que soit son nom."
+  },
+  "sound.problem.samples": {
+    "message": "Ce fichier est sous une forme dont le plugin ne sait pas tirer de son. Le réenregistrer en PCM 16 bits ordinaire fonctionnera."
+  },
+  "sound.problem.truncated": {
+    "message": "Ce fichier s'arrête en plein milieu et n'a pas pu être lu jusqu'au bout."
+  },
+  "presets.intro": {
+    "message": "Un préréglage couvre Annonces, Apparence, Mouvement et Polices : la fonte et la taille de chaque ligne, la position, les couleurs, le mouvement et les particules, quels niveaux sont annoncés, les durées, et quand se taire. Le son n'est pas inclus."
+  },
+  "presets.save.tooltip": {
+    "message": "Enregistre tous les réglages d'Annonces, Apparence, Mouvement et Polices. Le son n'est pas inclus."
+  },
+  "announcements.tab": {
+    "message": "Annonces"
+  },
+  "appearance.tab": {
+    "message": "Apparence"
+  },
+  "motion.decode.duration": {
+    "message": "Durée du décodage"
+  },
+  "motion.decode.duration.tooltip": {
+    "message": "Le temps que met l'eorzéen à se résoudre, une fois les lettres posées. Nécessite l'effet de décodage au-dessus."
+  },
+  "motion.duration": {
+    "message": "Durée du mouvement"
+  },
+  "motion.duration.tooltip": {
+    "message": "Le temps que mettent les lettres à arriver. Se déroule en même temps que l'apparition, et ne fait rien si le mouvement au-dessus est sur Aucun."
+  },
+  "motion.tab": {
+    "message": "Mouvement"
+  },
+  "motion.timing.intro": {
+    "message": "Combien de temps dure la notification entière, quel que soit le réglage choisi au-dessus."
+  },
+  "sound.intro": {
+    "message": "Un bref son quand une notification arrive, tiré des effets sonores du jeu ou d'un fichier à toi."
+  },
+  "sound.tab": {
+    "message": "Son"
+  },
+  "announcements.hideduty": {
+    "message": "Masquer pendant les missions"
+  },
+  "announcements.skipfast": {
+    "message": "Ignorer les sous-secteurs en déplacement rapide"
+  },
+  "announcements.skipfast.tooltip": {
+    "message": "N'affecte que les sous-secteurs, et seulement au-dessus d'une vitesse qu'aucun\ndéplacement au sol n'atteint, donc cela intervient en vol. Les changements de\nzone et de secteur sont toujours annoncés, quelle que soit ta vitesse."
+  },
+  "announcements.subarea": {
+    "message": "Changements de sous-secteur"
+  },
+  "appearance.showheader.tooltip": {
+    "message": "La ligne plus petite au-dessus du nom, indiquant où se situe le lieu : la\nrégion au-dessus d'une zone, le secteur au-dessus d'un sous-secteur.\n\nDésactivé, seul le nom lui-même est affiché. La ligne de météo, si tu l'as\nactivée, n'est pas touchée, pas plus que les deux réglages en dessous, qui\ns'y appliquent toujours."
+  },
+  "motion.decode": {
+    "message": "Décoder depuis l'eorzéen"
+  },
+  "motion.decode.tooltip": {
+    "message": "Nécessite une police eorzéenne fournie. Texte latin uniquement.\n\nSe déroule après le mouvement au-dessus plutôt qu'en même temps : la ligne\narrive en eorzéen, se pose, puis se résout. Désactivé, elle arrive déjà\nlisible. Les préréglages n'y touchent pas, donc le désactiver ici le\ndésactive pour tous."
   }
 }

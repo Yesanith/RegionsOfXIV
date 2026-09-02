@@ -1,112 +1,94 @@
 {
   "_status": "machine-drafted -- not reviewed by a Japanese speaker. Register was set to plain polite (です/ます) throughout without checking it suits a settings window, and the loan-word choices are guesses. Correct freely. Keys listed under _untranslated were left in English on purpose, see the reasons there.",
   "_untranslated": [
-    "general.uppercase: Japanese has no upper and lower case, so the setting does nothing to Japanese text. It still needs a real label -- the word for capital letters is correct even so -- but inventing a descriptive phrase instead would be worse than leaving it. Needs a speaker's judgement.",
-    "general.hideduty: 'duty' is FFXIV's term for instanced content and Japanese FFXIV has its own word for it. Guessing would put a term in the window the game itself never uses.",
-    "general.decode and general.decode.tooltip: the Eorzean script has an established Japanese name in FFXIV. Left for someone who can check it against the game.",
-    "notifications.subarea, general.skipfast and general.skipfast.tooltip: 'sub-area' is the finest place tier and carries the whole meaning of those labels.",
-    "general.showheader.tooltip: turns on the region/zone/area/sub-area vocabulary, so it waits on the same decision.",
-    "notifications.banners.tooltip: translated, but 'Quest Accepted', 'Duty Commenced' and 'Level Up!' were left in English inside it -- Japanese FFXIV shows its own wording for those three and that must win.",
-    "'Eorzean' is written エオルゼア文字 as a guess; check it against the game.",
+    "announcements.banners.tooltip: translated, but 'Quest Accepted', 'Duty Commenced' and 'Level Up!' were left in English inside it -- Japanese FFXIV shows its own wording for those three and that must win.",
     "Typeface names (Noto Sans CJK, Trump Gothic, Jupiter, Axis), product names (Discord, GitHub, Dalamud, Guild Wars 2, Square Enix), commands and the AGPL identifier are never translated."
   ],
-  "durations.tab": {
-    "message": "時間"
-  },
-  "durations.intro": {
+  "_uncertain": [
+    "duty (announcements.hideduty). Chosen: コンテンツ, which is what Japanese FFXIV calls instanced content. Taken from the game rather than from this file, so it is the one word here worth checking against a running client.",
+    "sub-area (announcements.subarea, announcements.skipfast and its tooltip, appearance.showheader.tooltip). Chosen: 小エリア, which about.summary already used. The four tiers are 地方, 地域, エリア, 小エリア and have to agree everywhere.",
+    "Eorzean script (motion.decode and its tooltip). Chosen: エオルゼア文字, which the file already used in motion.decode.duration.tooltip. Still a guess at the game's own name for the script.",
+    "appearance.uppercase. Chosen: 大文字にする. Japanese has no upper and lower case, so the setting does nothing to Japanese text, but it still applies to Latin place names and the label has to say something. A speaker may prefer a phrase that says it only affects Latin script."
+  ],
+  "motion.intro": {
     "message": "行が現れ、着地し、そのあと解読されます。動きと解読は別々の段階で、それぞれに時間がかかります。"
   },
-  "durations.fadein": {
+  "motion.fadein": {
     "message": "フェードイン"
   },
-  "durations.fadein.tooltip": {
+  "motion.fadein.tooltip": {
     "message": "行が現れてから完全な濃さになるまでの時間です。"
   },
-  "durations.motion": {
-    "message": "動き"
-  },
-  "durations.motion.tooltip": {
-    "message": "文字が届くまでの時間です。フェードインと同時に進み、\n「効果」タブの動きが「なし」のときは何もしません。"
-  },
-  "durations.decode": {
-    "message": "解読"
-  },
-  "durations.decode.tooltip": {
-    "message": "文字が着地したあと、エオルゼア文字が解けるまでの時間です。\n「効果」タブの解読効果が必要です。"
-  },
-  "durations.hold": {
+  "motion.hold": {
     "message": "表示"
   },
-  "durations.hold.tooltip": {
+  "motion.hold.tooltip": {
     "message": "完成した行が消え始めるまで表示され続ける時間です。"
   },
-  "durations.fadeout": {
+  "motion.fadeout": {
     "message": "フェードアウト"
   },
-  "durations.fadeout.tooltip": {
+  "motion.fadeout.tooltip": {
     "message": "時間が来てから行が消えるまでにかかる時間です。"
   },
-  "effects.tab": {
-    "message": "効果"
-  },
-  "effects.motion.intro": {
+  "motion.choice.intro": {
     "message": "文字が現れるときの動き方です。"
   },
-  "effects.motion": {
+  "motion.choice": {
     "message": "動き"
   },
-  "effects.motion.tooltip": {
+  "motion.choice.tooltip": {
     "message": "なし：文字がそのまま所定の位置に現れます。\nタイプライター：一文字ずつ、フェードなしで現れます。\n浮上：文字が下から所定の位置へ持ち上がります。\n波：現れるときに行を波が走ります。\n燃焼：文字が燃え上がり、冷えて色に落ち着きます。\n\nエオルゼア文字の解読の代わりではなく、同時に進みます。"
   },
-  "effects.motion.none": {
+  "motion.choice.none": {
     "message": "なし"
   },
-  "effects.motion.typewriter": {
+  "motion.choice.typewriter": {
     "message": "タイプライター"
   },
-  "effects.motion.rise": {
+  "motion.choice.rise": {
     "message": "浮上"
   },
-  "effects.motion.wave": {
+  "motion.choice.wave": {
     "message": "波"
   },
-  "effects.motion.burn": {
+  "motion.choice.burn": {
     "message": "燃焼"
   },
-  "effects.particles.intro": {
+  "motion.particles.intro": {
     "message": "表示されているあいだ、まわりで動くものです。"
   },
-  "effects.particles": {
+  "motion.particles": {
     "message": "パーティクル"
   },
-  "effects.particles.none": {
+  "motion.particles.none": {
     "message": "なし"
   },
-  "effects.particles.hearts": {
+  "motion.particles.hearts": {
     "message": "ハート"
   },
-  "effects.particles.embers": {
+  "motion.particles.embers": {
     "message": "残り火"
   },
-  "effects.particles.sparkles": {
+  "motion.particles.sparkles": {
     "message": "きらめき"
   },
-  "effects.particles.petals": {
+  "motion.particles.petals": {
     "message": "花びら"
   },
-  "effects.density": {
+  "motion.density": {
     "message": "密度"
   },
-  "effects.particlecolour": {
+  "motion.particlecolour": {
     "message": "パーティクルの色"
   },
-  "effects.particlecolour.tooltip": {
+  "motion.particlecolour.tooltip": {
     "message": "既定の琥珀色は残り火ときらめきに合います。ハートと花びらは\nピンク寄りにするとよいでしょう。"
   },
-  "effects.embers.note": {
+  "motion.embers.note": {
     "message": "残り火は「燃焼」の動きと合いますが、必須ではありません。"
   },
-  "effects.preview": {
+  "motion.preview": {
     "message": "プレビュー"
   },
   "sharecodes.heading": {
@@ -202,59 +184,53 @@
   "about.notaffiliated": {
     "message": "地名・天候・フォントはゲーム自身のデータによります。スクウェア・エニックスとは関係ありません。"
   },
-  "notifications.tab": {
-    "message": "通知"
-  },
-  "notifications.intro": {
+  "announcements.intro": {
     "message": "このプラグインは、ゲーム自身の地名表示の横に描くのではなく、それを置き換えます。下の抑制を切ると、ゲーム側の表示が戻ります。"
   },
-  "notifications.zone": {
+  "announcements.zone": {
     "message": "地域の変化"
   },
-  "notifications.area": {
+  "announcements.area": {
     "message": "エリアの変化"
   },
-  "notifications.weather": {
+  "announcements.weather": {
     "message": "天候の変化"
   },
-  "notifications.weather.tooltip": {
+  "announcements.weather.tooltip": {
     "message": "天候の切り替わりを、地名のすぐ上の独立した行でお知らせします。地名の通知を遮ることはありません。\n\n天候はおよそ23分の一定周期で変わり、新しい場所に着くとそこの天候も知らされるため、入るときに地名と一緒に表示されます。"
   },
-  "notifications.weathericon": {
+  "announcements.weathericon": {
     "message": "天候アイコンを表示"
   },
-  "notifications.weathericon.tooltip": {
+  "announcements.weathericon.tooltip": {
     "message": "天候の名前の左に、ゲーム自身のアイコンを描きます。"
   },
-  "notifications.banners": {
+  "announcements.banners": {
     "message": "バナー"
   },
-  "notifications.banners.tooltip": {
+  "announcements.banners.tooltip": {
     "message": "ゲームの全画面バナー（\"Quest Accepted\"、\"Duty Commenced\"、\"Level Up!\"）を、このプラグインの書体で描き直します。\n\n文言はテキストとしてではなくゲームの画像に描き込まれているため、このプラグインが文言を持っているバナーだけが置き換わります。分からないものはゲーム側のままです。"
   },
-  "notifications.hidebanner": {
+  "announcements.hidebanner": {
     "message": "ゲーム自身のバナーを隠す"
   },
-  "notifications.hidebanner.tooltip": {
+  "announcements.hidebanner.tooltip": {
     "message": "ゲームの画像を消して、このプラグインの表示だけを見せます。\n\n切っておくと両方見えるので、文言が合っているかを手早く確かめられます。"
   },
-  "notifications.hideareatext": {
+  "announcements.hideareatext": {
     "message": "ゲーム自身のエリア表示を隠す"
   },
-  "notifications.hideareatext.tooltip": {
+  "announcements.hideareatext.tooltip": {
     "message": "このプラグインの下に描かれる \"_AreaText\" を抑制します。"
   },
-  "notifications.hideloadingtitle": {
+  "announcements.hideloadingtitle": {
     "message": "ロード画面の地名表示を隠す"
   },
-  "notifications.hideloadingtitle.tooltip": {
+  "announcements.hideloadingtitle.tooltip": {
     "message": "ロード画面に描かれる金色の見出し \"_LocationTitle\" と\n\"_LocationTitleShort\" を抑制し、同じ名前をこのプラグインの\n書式で表示します。"
   },
   "presets.tab": {
     "message": "プリセット"
-  },
-  "presets.intro": {
-    "message": "プリセットは「一般」「フォント」「効果」「通知」「時間」のすべての設定を含みます。各行の書体と大きさ、位置、色、動きとパーティクル、どの段階を知らせるか、各種の時間、そして黙るべき場面です。"
   },
   "presets.intro.warning": {
     "message": "適用するとそれらすべてが置き換わるため、変更した内容は上書きされます。"
@@ -321,9 +297,6 @@
   },
   "presets.replace": {
     "message": "置き換え"
-  },
-  "presets.save.tooltip": {
-    "message": "「一般」「フォント」「効果」「通知」「時間」のすべての設定を保存します。"
   },
   "presets.discord": {
     "message": "Discordに参加"
@@ -406,106 +379,103 @@
   "fonts.upscaled": {
     "message": "このフォントは {0:F0} px を超えるビットマップを持たないため、{1:F0} px では拡大されてぼやけます。大きさを下げるか、どの大きさでも鮮明な Noto Sans CJK か自分で用意したフォントファイルに切り替えてください。"
   },
-  "general.tab": {
-    "message": "一般"
-  },
-  "general.language": {
+  "about.language": {
     "message": "言語"
   },
-  "general.language.follow": {
+  "about.language.follow": {
     "message": "Dalamudに従う"
   },
-  "general.language.tooltip": {
+  "about.language.tooltip": {
     "message": "「Dalamudに従う」は、Dalamud自身に設定された言語を使い、\nその変更に追従します。\n\n変わるのはこのウィンドウだけです。地名と天候の名前はゲームから\n来るため、クライアントの言語のままです。"
   },
-  "general.preview": {
+  "appearance.preview": {
     "message": "プレビュー"
   },
-  "general.vertical": {
+  "appearance.vertical": {
     "message": "垂直位置"
   },
-  "general.horizontal": {
+  "appearance.horizontal": {
     "message": "水平位置"
   },
-  "general.horizontal.tooltip": {
+  "appearance.horizontal.tooltip": {
     "message": "文字はこの点を中心に置かれるため、50%が画面の中央です。\n長い地名を端の近くに置くと、そこからはみ出します。"
   },
-  "general.letterspacing": {
+  "appearance.letterspacing": {
     "message": "字間"
   },
-  "general.letterspacing.tooltip": {
+  "appearance.letterspacing.tooltip": {
     "message": "文字と文字のあいだの追加の空きで、フォントサイズに対する割合です。\n大きさを変えても比率が保たれ、見出しにも応分の空きが入ります。\n広い字間は、Guild Wars 2 の原作らしさの多くを作っています。"
   },
-  "general.textcolour": {
+  "appearance.textcolour": {
     "message": "本文の色"
   },
-  "general.headercolour": {
+  "appearance.headercolour": {
     "message": "見出しの色"
   },
-  "general.outlinecolour": {
+  "appearance.outlinecolour": {
     "message": "縁取りの色"
   },
-  "general.separatecolours": {
+  "appearance.separatecolours": {
     "message": "行ごとに色を分ける"
   },
-  "general.separatecolours.tooltip": {
+  "appearance.separatecolours.tooltip": {
     "message": "切ると、天候の行は見出しに従い、ひとつの縁取り色が三行すべてに\n使われます。\n\n入れると、天候の行と縁取りは下の色を使うため、他の行に触れずに\n一行だけを背景側へ寄せられます。"
   },
-  "general.weathercolour": {
+  "appearance.weathercolour": {
     "message": "天候の色"
   },
-  "general.headeroutlinecolour": {
+  "appearance.headeroutlinecolour": {
     "message": "見出しの縁取りの色"
   },
-  "general.weatheroutlinecolour": {
+  "appearance.weatheroutlinecolour": {
     "message": "天候の縁取りの色"
   },
-  "general.outlinethickness": {
+  "appearance.outlinethickness": {
     "message": "縁取りの太さ"
   },
-  "general.outlinethickness.tooltip": {
+  "appearance.outlinethickness.tooltip": {
     "message": "ゼロにすると縁取りを切ります。"
   },
-  "general.shadow": {
+  "appearance.shadow": {
     "message": "ドロップシャドウ"
   },
-  "general.shadow.tooltip": {
+  "appearance.shadow.tooltip": {
     "message": "各行の二つ目の複製を、後ろにずらして描きます。縁取りの下に入るので、\n両方を併用できます。読みやすさのための細い縁取りと、奥行きのための\n柔らかい影という組み合わせです。\n\n影はひとつで三行すべてを覆い、行ごとの色分けには従いません。"
   },
-  "general.shadowcolour": {
+  "appearance.shadowcolour": {
     "message": "影の色"
   },
-  "general.shadowacross": {
+  "appearance.shadowacross": {
     "message": "影の左右"
   },
-  "general.shadowacross.tooltip": {
+  "appearance.shadowacross.tooltip": {
     "message": "負の値にすると影が左へ動きます。"
   },
-  "general.shadowdown": {
+  "appearance.shadowdown": {
     "message": "影の上下"
   },
-  "general.shadowdown.tooltip": {
+  "appearance.shadowdown.tooltip": {
     "message": "負の値にすると影が文字の上へ持ち上がります。"
   },
-  "general.shadowspread": {
+  "appearance.shadowspread": {
     "message": "影の広がり"
   },
-  "general.shadowspread.tooltip": {
+  "appearance.shadowspread.tooltip": {
     "message": "影を外側へ太らせます。ゼロなら文字と同じ形のままで、\n値を上げると後ろの光輪のように厚くなります。"
   },
-  "general.showheader": {
+  "appearance.showheader": {
     "message": "見出しを表示"
   },
-  "general.underlineheader": {
+  "appearance.underlineheader": {
     "message": "見出しに下線を引く"
   },
-  "general.headergap": {
+  "appearance.headergap": {
     "message": "見出しとの間隔"
   },
-  "general.headergap.tooltip": {
+  "appearance.headergap.tooltip": {
     "message": "見出しの下に名前をどれだけ離して置くかを、見出しの行数で測ります。\n\n小さい値は両者をほとんど触れるまで近づけます。これはこのプラグインが\nずっと採ってきた詰まった見た目です。大きい値は間隔を開け、各行に\nゆとりを与えます。"
   },
-  "general.hidecombat": {
+  "announcements.hidecombat": {
     "message": "戦闘中は表示しない"
   },
   "command.help": {
@@ -598,20 +568,202 @@
   "fonts.reduced": {
     "message": "{1:F0} px ではなく {0:F0} px で描画しています。このクライアントは日本語の地名を表示するため、通知用のフォントは漢字を含む必要があり、その大きさでは構築できません。設定はそのまま保持され、ゲームの言語が変わればまた使われます。"
   },
-  "notifications.bannerlanguage": {
+  "announcements.bannerlanguage": {
     "message": "バナーの言語"
   },
-  "notifications.bannerlanguage.follow": {
+  "announcements.bannerlanguage.follow": {
     "message": "クライアントに合わせる"
   },
-  "notifications.bannerlanguage.tooltip": {
+  "announcements.bannerlanguage.tooltip": {
     "message": "バナーの文言をどの言語で描くかを決めます。\n\n「クライアントに合わせる」はゲームが動作している言語を使います。別の言語を選ぶと、ゲーム自身のバナーがその言語のこのプラグインの表示に置き換わります。たとえばドイツ語クライアントで英語を選ぶと、ドイツ語の画像が消えて英語の文字がその場所に描かれます。\n\n一覧に出るのは、このプラグインが文言を持っている言語だけです。文言のないバナーは、どの言語を選んでもゲーム側のままです。"
   },
 
-  "notifications.bannergap": {
+  "announcements.bannergap": {
     "message": "バナーとの間隔"
   },
-  "notifications.bannergap.tooltip": {
+  "announcements.bannergap.tooltip": {
     "message": "地名の下にバナーをどれだけ離して表示するかを、表示フォントの行数で\n指定します。\n\n両方が同時に表示されることがあります。コンテンツに入ると、まず場所が、\n少し遅れてパーティー人数が表示されます。ここで決めるのはその間隔です。\n地名が出ていなくても間隔は同じなので、バナーだけのときもこの位置に\n表示されます。"
+  },
+
+  "sound.source": {
+    "message": "サウンド"
+  },
+  "sound.source.off": {
+    "message": "なし"
+  },
+  "sound.source.game": {
+    "message": "ゲーム内のサウンド"
+  },
+  "sound.source.tooltip": {
+    "message": "通知が表示されたときに音を鳴らします。初期設定ではオフです。\n\nゲーム内のサウンドはチャットサウンドエフェクトで、鳴らしているのはゲーム自身です。音量を決めるのはマスター音量とシステム音の音量で、効果音ではありません。効果音を下げてもこの音は小さくなりません。\n\n自分のファイルはプラグインが鳴らします。ゲームはこれをまったく扱わないため、プラグインが同じ設定を読み取って自分で従います。ゲームがミュートのあいだは鳴らず、ウィンドウが前面にないときも、非アクティブ時に音を鳴らす設定を有効にしていないかぎり鳴りません。"
+  },
+  "sound.effect": {
+    "message": "サウンドエフェクト {0}"
+  },
+  "sound.audition.tooltip": {
+    "message": "選んだ音をすぐに鳴らします。通知が重なって鳴らないようにする短い間隔は無視されるので、続けて押しても必ず鳴ります。"
+  },
+  "sound.on.location": {
+    "message": "地名で鳴らす"
+  },
+  "sound.on.weather": {
+    "message": "天候で鳴らす"
+  },
+  "sound.on.banner": {
+    "message": "バナーで鳴らす"
+  },
+  "sound.on.tooltip": {
+    "message": "どの種類の通知で音を鳴らすかを決めます。同時に届いた場合でも、先に届いた方の音が一度だけ鳴ります。"
+  },
+
+  "sound.source.file": {
+    "message": "自分のファイル"
+  },
+  "sound.browse": {
+    "message": "参照"
+  },
+  "sound.clear": {
+    "message": "クリア"
+  },
+  "sound.custom.notice": {
+    "message": "自分で用意したファイルはそのまま再生され、扱いは自己責任となります。{0} 秒を超える部分は切られるため、すでに消えた通知の上で曲が流れ続けることはありません。プラグインが読めないファイルや、ライセンスを持っていないファイルは、Regions of XIV ではなく利用者の責任です。"
+  },
+  "sound.dialog.title": {
+    "message": "サウンドファイルを選択"
+  },
+  "sound.path.hint": {
+    "message": ".wav または .mp3 ファイルのパス"
+  },
+  "sound.play": {
+    "message": "再生"
+  },
+  "sound.play.tooltip": {
+    "message": "選んだファイルをすぐに鳴らします。通知が重なって鳴らないようにする短い間隔は無視されるので、続けて押すたびに再試行します。"
+  },
+  "sound.playingwith": {
+    "message": "{0} を鳴らします。"
+  },
+  "sound.problem.channels": {
+    "message": "そのファイルは3チャンネル以上あり、ここでは再生できません。モノラルかステレオのファイルなら再生できます。"
+  },
+  "sound.problem.decode": {
+    "message": "そのファイルを読み込めませんでした。プラグインのログに認識した形式が記録されているので、原因を調べるにはそれが一番早道です。"
+  },
+  "sound.problem.device": {
+    "message": "Windows がオーディオデバイスを開かなかったため、何も再生できません。"
+  },
+  "sound.problem.directory": {
+    "message": "それはフォルダーで、サウンドファイルではありません。"
+  },
+  "sound.problem.empty": {
+    "message": "そのファイルは空です。"
+  },
+  "sound.problem.format": {
+    "message": "再生できるのは .wav と .mp3 ファイルだけです。"
+  },
+  "sound.problem.huge": {
+    "message": "そのファイルは通知音としては大きすぎるため、読み込みません。"
+  },
+  "sound.problem.locked": {
+    "message": "そのファイルを開けませんでした。他のプログラムが開いている可能性があります。"
+  },
+  "sound.problem.missing": {
+    "message": "そのパスにはもうファイルがありません。"
+  },
+  "sound.problem.none": {
+    "message": "サウンドファイルがまだ選ばれていません。"
+  },
+  "sound.problem.unreadable": {
+    "message": "そのパスは読み取れません。"
+  },
+  "sound.silent.disabled": {
+    "message": "ゲームのサウンドがオフになっているため、何も鳴りません。"
+  },
+  "sound.silent.muted": {
+    "message": "ゲームがミュートされているため、何も鳴りません。通知音はシステム音を通るので、マスターとシステム音のミュート設定に従います。"
+  },
+  "sound.silent.unfocused": {
+    "message": "ゲームウィンドウが前面になく、非アクティブ時に音を鳴らす設定がオフのため、何も鳴りません。"
+  },
+  "sound.silent.unreadable": {
+    "message": "ゲームのサウンド設定をまだ読み取れないため、何も鳴りません。ゲームに入ると解消します。"
+  },
+  "sound.silent.zero": {
+    "message": "マスター音量またはシステム音の音量が0のため、何も鳴りません。"
+  },
+  "sound.problem.encoding": {
+    "message": "このファイルは {0} エンコードの WAV で、Windows に対応する変換器がありません。通常の PCM か MP3 として保存し直せば再生できます。"
+  },
+  "sound.problem.mp3codec": {
+    "message": "Windows に利用できる MP3 デコーダーがないため、このファイルは再生できません。.wav ファイルであれば再生できます。"
+  },
+  "sound.problem.notaudio": {
+    "message": "そのファイルは名前がどうであれ、実際には WAV でも MP3 でもありません。"
+  },
+  "sound.problem.samples": {
+    "message": "そのファイルはプラグインが音に変換できない形式です。通常の16ビット PCM として保存し直せば再生できます。"
+  },
+  "sound.problem.truncated": {
+    "message": "そのファイルは途中で終わっており、最後まで読み込めませんでした。"
+  },
+  "presets.intro": {
+    "message": "プリセットは「通知内容」「見た目」「動き」「フォント」を対象とします。各行の書体と大きさ、位置、色、動きとパーティクル、どの階層を通知するか、各種の長さ、そして静かにする条件です。サウンドは含まれません。"
+  },
+  "presets.save.tooltip": {
+    "message": "「通知内容」「見た目」「動き」「フォント」の設定をすべて保存します。サウンドは含まれません。"
+  },
+  "announcements.tab": {
+    "message": "通知内容"
+  },
+  "appearance.tab": {
+    "message": "見た目"
+  },
+  "motion.decode.duration": {
+    "message": "解読の長さ"
+  },
+  "motion.decode.duration.tooltip": {
+    "message": "文字が着地したあと、エオルゼア文字が解けるまでの時間です。上の解読効果が必要です。"
+  },
+  "motion.duration": {
+    "message": "動きの長さ"
+  },
+  "motion.duration.tooltip": {
+    "message": "文字が届くまでの時間です。フェードインと同時に進み、上の動きが「なし」のときは何もしません。"
+  },
+  "motion.tab": {
+    "message": "動き"
+  },
+  "motion.timing.intro": {
+    "message": "上でどの演出を選んでいても、通知全体がどれだけ表示されるかを決めます。"
+  },
+  "sound.intro": {
+    "message": "通知が届いたときに鳴らす短い音です。ゲーム内のサウンドエフェクトか、自分で用意したファイルを使えます。"
+  },
+  "sound.tab": {
+    "message": "サウンド"
+  },
+  "announcements.hideduty": {
+    "message": "コンテンツ中は表示しない"
+  },
+  "announcements.skipfast": {
+    "message": "高速移動中は小エリアを飛ばす"
+  },
+  "announcements.skipfast.tooltip": {
+    "message": "小エリアだけに影響し、地上の移動では届かない速度を超えたときにのみ働くため、\n飛行中に効いてきます。地域とエリアの変化は、どれだけ速く移動していても\n必ずお知らせします。"
+  },
+  "announcements.subarea": {
+    "message": "小エリアの変化"
+  },
+  "appearance.showheader.tooltip": {
+    "message": "名前の上の小さい行で、その場所がどこに属するかを示します。地域の上には地方、\n小エリアの上にはエリアが入ります。\n\nオフにすると名前だけが表示されます。天候の行は、有効にしていても影響を\n受けません。下の2つの設定も引き続き天候の行に適用されます。"
+  },
+  "appearance.uppercase": {
+    "message": "大文字にする"
+  },
+  "motion.decode": {
+    "message": "エオルゼア文字から解読する"
+  },
+  "motion.decode.tooltip": {
+    "message": "同梱のエオルゼア文字フォントが必要です。ラテン文字のみ対応します。\n\n上の動きと同時ではなく、その後に実行されます。行はエオルゼア文字で現れ、\n定位置に収まってから解読されます。オフにすると最初から読める状態で現れます。\nプリセットはこの設定に触れないため、ここでオフにするとすべてのプリセットで\nオフになります。"
   }
 }
