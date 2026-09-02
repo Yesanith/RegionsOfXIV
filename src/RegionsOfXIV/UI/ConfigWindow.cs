@@ -24,7 +24,7 @@ internal readonly record struct ConfigActions(
     Action RestoreNativeLoadingTitle,
     Action ReloadLanguage,
     Action AuditionSound,
-    Func<string?> SoundFileProblem,
+    Func<string, string?> SoundFileProblem,
     Func<string?> SoundSilenceReason);
 
 // Split across ConfigWindow.*.cs, one file per tab, over the widget vocabulary they all share in

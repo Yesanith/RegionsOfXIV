@@ -119,7 +119,7 @@ public sealed class Plugin : IDalamudPlugin
                 this.nativeUiSuppressor.RestoreLoadingTitle,
                 ApplyLanguage,
                 AuditionSound,
-                () => this.filePlayer.Problem,
+                this.filePlayer.ProblemFor,
                 () => GameMixerRules.Decide(this.gameAudio).Reason),
             this.windowFont);
 

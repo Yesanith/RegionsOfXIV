@@ -220,7 +220,7 @@ internal sealed partial class ConfigWindow
             this.soundPathProblem = SoundLimits.CustomSoundProblem(path);
         }
 
-        if ((this.soundPathProblem ?? this.actions.SoundFileProblem()) is { } fault)
+        if ((this.soundPathProblem ?? this.actions.SoundFileProblem(path)) is { } fault)
         {
             Warn(FaultColor, fault);
             return;

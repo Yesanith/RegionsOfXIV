@@ -59,17 +59,26 @@ internal sealed class FileSoundPlayer : IDisposable
     private bool playing;
     private bool disposed;
 
+    // A failure and the file it belongs to, held as one reference so the two cannot be read apart.
+    //
+    // The path is half the value. Without it a decode failure outlives the file that caused it:
+    // choosing a working file after a broken one left the broken one's message sitting in red
+    // under a path that was perfectly fine, until something happened to play successfully.
+    private sealed record Fault(string Path, string Message);
+
     // Written on the decode thread, read on the draw thread. A reference assignment is atomic and
     // a settings window one frame behind the truth is not worth a lock.
-    private volatile string? problem;
+    private volatile Fault? fault;
 
     private string? lastLogged;
 
     public FileSoundPlayer(IGameAudio audio) => this.audio = audio;
 
-    // What the Sound tab shows under the file row. Null when the last attempt was fine, or
-    // when there has not been one.
-    public string? Problem => this.problem;
+    // What the Sound tab shows under the file row, for the file it is currently showing. Null when
+    // the last attempt at that file was fine, when there has not been one, or when the last
+    // failure was some other file's.
+    public string? ProblemFor(string path) =>
+        this.fault is { } current && current.Path == path ? current.Message : null;
 
     // Called on the framework thread, which is where the game's settings can be read. Only the
     // decode goes elsewhere: opening and parsing a file is slow enough to be seen as a stutter if
@@ -129,7 +138,7 @@ internal sealed class FileSoundPlayer : IDisposable
 
             Start(chain);
 
-            this.problem = null;
+            this.fault = null;
             this.lastLogged = null;
         }
         catch (Exception ex)
@@ -355,9 +364,26 @@ internal sealed class FileSoundPlayer : IDisposable
 
         mixed.MixerInputEnded += OnInputEnded;
 
-        this.device = new WaveOutEvent { DesiredLatency = DesiredLatencyMs };
-        this.device.Init(mixed);
-        this.device.Play();
+        // Built locally and stored only once it is playing. Init and Play both throw when Windows
+        // will not give up a device, and a half-opened one left in the field would be leaked:
+        // this.mixer is still null at that point, so the next notification opens another and
+        // overwrites it, one device handle and one thread per attempt for as long as the failure
+        // lasts.
+        var opening = new WaveOutEvent { DesiredLatency = DesiredLatencyMs };
+
+        try
+        {
+            opening.Init(mixed);
+            opening.Play();
+        }
+        catch (Exception)
+        {
+            mixed.MixerInputEnded -= OnInputEnded;
+            opening.Dispose();
+            throw;
+        }
+
+        this.device = opening;
 
         return mixed;
     }
@@ -452,7 +478,7 @@ internal sealed class FileSoundPlayer : IDisposable
 
     private void Fail(string path, string message, Exception? ex, WaveFormat? format)
     {
-        this.problem = message;
+        this.fault = new Fault(path, message);
 
         // Once per distinct message. A notification that keeps arriving with the same broken file
         // would otherwise write the same line into the log every few seconds.
