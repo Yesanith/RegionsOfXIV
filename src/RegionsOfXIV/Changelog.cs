@@ -13,6 +13,20 @@ internal static class Changelog
 {
     public static readonly ChangelogEntry[] All =
     [
+        new(new Version("0.6.0.0"),
+        [
+            "Notifications can make a sound. Off until you turn it on, under a Sound tab of its own: one of the game's sixteen chat sound effects, or a .wav or .mp3 of your own.",
+            "It follows the game's own audio settings, including the master and System Sounds volumes and the mute checkboxes. System Sounds rather than Sound Effects is the one to reach for if you want it quieter, because that is the bus the game puts a chat sound effect on.",
+            "A file of your own is played by the plugin rather than by the game, so the plugin reads those same settings and follows them by hand. It stays quiet while the game is muted, and while the window is not in front unless you have told the game to keep playing then. Anything past five seconds is cut off.",
+            "Which kinds of notification make a sound is yours to pick: place names, weather and banners each have their own switch, and two arriving together still only make one sound.",
+            "Sound settings stay on your machine. They do not travel in a preset or a share code, because a noise arriving from a stranger is not something to find out about by accident.",
+            "The settings window is grouped by what you are doing rather than by when things were added. Seven tabs: Announcements, Appearance, Motion, Fonts, Sound, Presets and About.",
+            "Settings that belonged together are together. Motion and its duration sit on one page, as do the Eorzean decode and its duration, where each pair used to be split across two tabs. Colours are grouped by what they colour.",
+            "Nothing you have saved is affected. Presets, share codes and your current settings all carry over exactly as they were; only where a control is drawn has changed.",
+            "The language this window is in has moved to the About tab.",
+            "German, French, Japanese and Turkish are complete. Every string in the window is translated in all four, where before each was missing a handful. They are still machine-drafted and still say so at the top until a speaker has been through them.",
+        ]),
+
         new(new Version("0.5.0.0"),
         [
             "The settings window reads in your language. German, French, Japanese and Turkish ship with the plugin, and it follows the language Dalamud is set to unless you pick one yourself under General.",
