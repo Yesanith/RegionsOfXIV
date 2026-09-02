@@ -163,73 +163,22 @@ assembly entirely, not merely unreachable.
 ### Translating the settings window
 
 Interface strings live in `src/RegionsOfXIV/Localization/`, one JSON file per
-language code, such as `de.json`, or `pt-BR.json` for a regional one. They are embedded
-by a glob and discovered from the resource names, so **a new language is a file,
-not a code change**. German, French and Japanese ship as machine drafts; every
-one of them wants a speaker's eye.
+language code, such as `de.json`, or `pt-BR.json` for a regional one. They are
+embedded by a glob and discovered from the resource names, so **a new language is
+a file, not a code change**. German, French, Japanese and Turkish ship, all four
+complete, and all four still marked machine drafts until a speaker has been
+through them.
 
-#### `en.json` is generated
+**[TRANSLATING.md](TRANSLATING.md) is the guide.** It is written for a translator
+rather than for a developer: what a line looks like, why `en.json` is generated
+from the call sites rather than edited, what the `description` on every entry is
+for, and which scripts the settings window can actually draw.
 
-`en.json` is the translators' copy and is never read at runtime. The English the
-plugin shows is compiled into the call sites (`Loc.Get(key, english)`), so a
-missing key, a blank entry or a file that will not parse falls back to English
-rather than showing anything broken. That also means the two can drift, so the
-file is generated rather than edited:
-
-```
-python tools/export-en-json.py            rewrite it from the call sites
-python tools/export-en-json.py --check    report drift, change nothing
-```
-
-The generator carries the `description` fields over untouched, along with the
-order keys appear in and the blank lines between groups, so regenerating a file
-nothing has changed in produces no diff at all.
-
-#### The descriptions are the point
-
-Every entry carries a `description`. It is not documentation. It is the note a
-translator works from, and it is where the traps are recorded: which words are
-identifiers, which are FFXIV's own terms, which line breaks matter, which
-placeholders must survive. Write one for every new key. Some worth reading
-before starting: `announcements.subarea`, `announcements.hideduty`,
-`appearance.uppercase` and `announcements.banners.tooltip`.
-
-Four rules that the descriptions repeat, because breaking them is invisible
-until someone hits it:
-
-- **Placeholders survive.** `{0}`, `{1}`, and `{0:F0}` with its format intact. A
-  mangled one falls back to the English sentence and the work is wasted silently.
-- **FFXIV's own terms win.** Duty, aetheryte, sanctuary, the Eorzean script, the
-  banner wording. The game already translates these. Use its words, or leave
-  the entry out and say so, rather than coining new ones.
-- **Identifiers are never translated.** `_AreaText`, `_LocationTitle`, `ROX1-`,
-  `/regions test`, typeface names, product names.
-- **A key you leave out stays English.** That is the intended way to say "not
-  yet", and it reads as partly English rather than as a hole.
-
-A file may carry `_status` and `_untranslated` keys. The loader ignores anything
-beginning with an underscore, except `_status`: a file whose status says
-`machine-drafted` makes the settings window show a dismissible notice saying so,
-which is how a rough translation stops pretending to be finished. Take the
-marker out once the file has been through a speaker, and the notice stops.
-
-#### What the window can draw
-
-The window draws with the game's own AXIS font, which carries Latin-1, the
-Russian Cyrillic alphabet, kana and around 6,300 kanji, but only eight
-characters of Latin Extended-A. `UI/WindowFont.cs` therefore merges the Windows
-interface font in behind it for Latin Extended-A, Latin Extended-B and Latin
-Extended Additional, so **Turkish, Polish, Czech, Romanian and Vietnamese all
-draw**. Basic Latin still comes from AXIS, because the first font to claim a code
-point wins the merge, so those languages render in two typefaces at once. Uneven,
-and a great deal better than blank boxes.
-
-Still out of reach: **non-Russian Cyrillic, Hebrew, Arabic, Thai, Korean and
-Chinese**, since the merge is Latin only. Glyph ranges are fixed when the atlas
-is built, so nothing recovers them at run time. The loader warns to the log when
-a language file uses characters the window cannot draw, and
-`NoBundledLanguageNeedsGlyphsTheWindowLacks` fails the build before one can
-ship.
+Two things in there are the code's problem rather than a translator's.
+`UI/WindowFont.cs` merges the Windows interface font in behind the game's AXIS
+face so Latin Extended draws at all, which is what lets Turkish, Polish, Czech,
+Romanian and Vietnamese render. And `NoBundledLanguageNeedsGlyphsTheWindowLacks`
+fails the build before a language the window cannot draw can ship.
 
 ### How it fits together
 

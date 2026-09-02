@@ -96,10 +96,22 @@ internal static class FontLimits
     // nothing to include.
     private static readonly ushort[] LatinGlyphRanges = [0x0020, 0x017F, 0];
 
+    // The half of Latin Extended-A that ImGui's Japanese set leaves out. Turkish needs it for
+    // dotted I, S-cedilla and G-breve, and a player on the Japanese client who picks Turkish
+    // banner wording would otherwise get a question mark for each of them.
+    private static readonly ushort[] LatinExtendedRange = [0x0100, 0x017F];
+
+    // The same block on its own, terminated, for the bundled face that fills it in. Asking for the
+    // whole block rather than only the gaps is deliberate: ImGui keeps the first font to offer a
+    // glyph, so what the CJK face already has still wins, and this does not have to be revisited
+    // if Dalamud ever ships a different asset.
+    public static readonly ushort[] LatinExtendedGlyphRanges = [0x0100, 0x017F, 0];
+
     private static ushort[]? CachedNotificationGlyphRanges;
 
     // Every glyph a notification face has to be able to draw. ImGui's "Japanese" set is a misnomer
-    // for our purposes: it carries Latin-1 as well as kana and kanji.
+    // for our purposes: it carries Latin-1 as well as kana and kanji, and only Latin-1, which is
+    // why Latin Extended-A is added to it here. The Latin set already reaches that far.
     //
     // Which set is asked for is what decides the size ceiling above, because atlas cost is the
     // glyph count times the square of the size, and the two sets are about 350 glyphs against
@@ -119,9 +131,15 @@ internal static class FontLimits
         while (source[length] != 0)
             length++;
 
-        var ranges = new ushort[length + 1];
+        // The extension goes in front, which the range list allows: ImGui reads pairs until the
+        // terminating zero and does not require them in order.
+        var extra = LatinExtendedRange.Length;
+        var ranges = new ushort[extra + length + 1];
+
+        LatinExtendedRange.CopyTo(ranges, 0);
+
         for (var i = 0; i < length; i++)
-            ranges[i] = source[i];
+            ranges[extra + i] = source[i];
 
         return CachedNotificationGlyphRanges = ranges;
     }

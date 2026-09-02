@@ -29,7 +29,7 @@ internal static class Changelog
 
         new(new Version("0.5.0.0"),
         [
-            "The settings window reads in your language. German, French, Japanese and Turkish ship with the plugin, and it follows the language Dalamud is set to unless you pick one yourself under General.",
+            "The settings window reads in your language. German, French, Japanese and Turkish ship with the plugin, and it follows the language Dalamud is set to unless you pick one yourself in the settings.",
             "Those four were drafted by a machine. The window says so at the top until someone who speaks the language has been through it, and correcting one needs nothing but a text editor and a GitHub account. TRANSLATING.md explains how.",
             "Banners can be drawn in a language you choose rather than the one your client runs in. Turkish wording ships. Any banner the plugin has no words for keeps the game's own artwork, whichever language you pick.",
             "Light Party and Full Party are announced and hidden like every other banner. They arrive on a part of the interface the plugin was not watching, which is why those two were always missed.",
@@ -69,7 +69,7 @@ internal static class Changelog
 
         new(new Version("0.3.0.0"),
         [
-            "The game's own banners are yours now. Quest Accepted, Duty Commenced, Level Up! and the rest are redrawn in this plugin's lettering, with the same effects as a place name. Off by default; switch it on under Notifications.",
+            "The game's own banners are yours now. Quest Accepted, Duty Commenced, Level Up! and the rest are redrawn in this plugin's lettering, with the same effects as a place name. Off by default; switch it on in the settings.",
             "Only banners the plugin has words for are taken over. The wording is painted into the game's artwork rather than stored as text, so anything it cannot name keeps the game's own banner instead of losing it.",
             "Letters sit properly after a Q. The game's fonts carry per-pair spacing and the plugin was dropping one pair per letter, which left every line slightly loose and slightly off centre. Plain in Jupiter, subtle everywhere else.",
             "Colour each line separately. The weather line, the header's outline and the weather's outline can each take their own colour, so one line can be faded back without touching the others.",
@@ -81,7 +81,7 @@ internal static class Changelog
 
         new(new Version("0.2.3.0"),
         [
-            "Weather announcements. When the weather turns over it is announced on its own line above the place name, with the game's own icon beside it. Off by default; switch it on under Notifications.",
+            "Weather announcements. When the weather turns over it is announced on its own line above the place name, with the game's own icon beside it. Off by default; switch it on in the settings.",
             "The weather line is styled like everything else, sharing the underline, the motion and decode effects, and your colours and timings.",
             "Arriving somewhere new announces its weather alongside the place name, and the weather turning over while you stand there announces on its own.",
             "The preview shows everything that is switched on, weather included, so what you are adjusting is what you can see.",

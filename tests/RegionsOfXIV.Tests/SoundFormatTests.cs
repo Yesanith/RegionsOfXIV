@@ -45,7 +45,7 @@ public class SoundFormatTests : IDisposable
     {
         using var reader = new WaveFileReader(WriteWav(Extensible, 24, 44100, 2));
 
-        var decoded = FileSoundPlayer.ToPcm(reader);
+        var decoded = SoundFileReader.ToPcm(reader);
 
         Assert.NotNull(decoded.Provider.ToSampleProvider());
     }
@@ -57,7 +57,7 @@ public class SoundFormatTests : IDisposable
     {
         using var reader = new WaveFileReader(WriteWav(Extensible, 24, 44100, 2));
 
-        var decoded = FileSoundPlayer.ToPcm(reader);
+        var decoded = SoundFileReader.ToPcm(reader);
 
         Assert.Equal(WaveFormatEncoding.Pcm, decoded.Provider.WaveFormat.Encoding);
         Assert.Equal(24, decoded.Provider.WaveFormat.BitsPerSample);
@@ -75,7 +75,7 @@ public class SoundFormatTests : IDisposable
     {
         using var reader = new WaveFileReader(WriteWav(Pcm, bits, 44100, 2));
 
-        var decoded = FileSoundPlayer.ToPcm(reader);
+        var decoded = SoundFileReader.ToPcm(reader);
 
         Assert.Same(reader, decoded.Provider);
         Assert.Equal(reader, Assert.Single(decoded.Owned));
@@ -86,7 +86,7 @@ public class SoundFormatTests : IDisposable
     {
         using var reader = new WaveFileReader(WriteWav(Pcm, 16, 22050, 1));
 
-        Assert.Same(reader, FileSoundPlayer.ToPcm(reader).Provider);
+        Assert.Same(reader, SoundFileReader.ToPcm(reader).Provider);
     }
 
     // Writes a RIFF/WAVE container with the given format chunk and a short run of silence.
