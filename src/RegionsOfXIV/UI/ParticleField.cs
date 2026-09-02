@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using Dalamud.Bindings.ImGui;
 
 namespace RegionsOfXIV.UI;
@@ -40,7 +41,11 @@ internal sealed class ParticleField
     {
         var dt = MathF.Min(deltaSeconds, MaxFrameSeconds);
 
-        for (var i = this.particles.Count - 1; i >= 0; i--)
+        // A span over the list's own storage rather than the list itself: Particle is a struct, so
+        // indexing the list would copy one out and the write would have to copy it back.
+        var live = CollectionsMarshal.AsSpan(this.particles);
+
+        for (var i = live.Length - 1; i >= 0; i--)
         {
             var particle = this.particles[i];
 

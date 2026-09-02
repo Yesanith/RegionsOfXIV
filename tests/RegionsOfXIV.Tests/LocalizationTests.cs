@@ -27,6 +27,63 @@ public class LocalizationTests : IDisposable
         Assert.Equal("Halten", Loc.Get("durations.hold", "Hold"));
     }
 
+    // Label and Unit cache what they build, so each of these asks twice: once to fill the cache
+    // and once to read it. A cache that is never read back would pass a single-call test.
+    [Fact]
+    public void ALabelKeepsItsIdentityAndTakesTheTranslation()
+    {
+        Apply("""{ "motion.hold": { "message": "Halten" } }""");
+
+        Assert.Equal("Halten###motion.hold", Loc.Label("motion.hold", "Hold"));
+        Assert.Equal("Halten###motion.hold", Loc.Label("motion.hold", "Hold"));
+    }
+
+    // The one that matters. A cached label that outlived the table would leave the whole window in
+    // the language it started in, with nothing on screen saying so.
+    [Fact]
+    public void ALabelFollowsTheTableWhenTheLanguageChanges()
+    {
+        Apply("""{ "motion.hold": { "message": "Halten" } }""");
+        Assert.Equal("Halten###motion.hold", Loc.Label("motion.hold", "Hold"));
+
+        Apply("""{ "motion.hold": { "message": "Maintien" } }""");
+
+        Assert.Equal("Maintien###motion.hold", Loc.Label("motion.hold", "Hold"));
+    }
+
+    // Back to English is a table swap like any other, and the one a player reaches for when a
+    // translation has gone wrong.
+    [Fact]
+    public void ALabelGoesBackToEnglishWhenTheTableEmpties()
+    {
+        Apply("""{ "motion.hold": { "message": "Halten" } }""");
+        Assert.Equal("Halten###motion.hold", Loc.Label("motion.hold", "Hold"));
+
+        Loc.Use(null);
+
+        Assert.Equal("Hold###motion.hold", Loc.Label("motion.hold", "Hold"));
+    }
+
+    [Fact]
+    public void AUnitDoublesItsPerCentSignEveryTimeItIsAsked()
+    {
+        Apply("""{ "units.percent": { "message": "%" } }""");
+
+        Assert.Equal("%%", Loc.Unit("units.percent", "%"));
+        Assert.Equal("%%", Loc.Unit("units.percent", "%"));
+    }
+
+    [Fact]
+    public void AUnitFollowsTheTableWhenTheLanguageChanges()
+    {
+        Apply("""{ "units.px": { "message": "Px" } }""");
+        Assert.Equal("Px", Loc.Unit("units.px", "px"));
+
+        Apply("""{ "units.px": { "message": "pt" } }""");
+
+        Assert.Equal("pt", Loc.Unit("units.px", "px"));
+    }
+
     [Fact]
     public void AKeyThatIsMissingShowsTheEnglish()
     {

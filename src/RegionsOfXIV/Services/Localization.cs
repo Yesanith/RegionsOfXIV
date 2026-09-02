@@ -34,6 +34,24 @@ internal static class Loc
 
     private static Dictionary<string, string> active = [];
 
+    // Label and Unit build a string every time they are called, and every labelled widget on the
+    // visible tab calls one of them every frame. These hold the built result per key.
+    //
+    // Only those two are cached, and only because every one of their call sites is in UI/ and so
+    // runs on the draw thread. Get and Format are reached from the framework thread and from the
+    // sound decode thread as well, and a dictionary written from three threads is a fault that
+    // shows up once a month and never in a way anyone can reproduce.
+    private static readonly Dictionary<string, string> labels = [];
+
+    private static readonly Dictionary<string, string> units = [];
+
+    // Bumped whenever the table is swapped. The caches are cleared against it by whoever reads
+    // them next rather than by Apply, for the same reason: Apply is on the framework thread and
+    // clearing a dictionary out from under the thread enumerating it is the hazard being avoided.
+    private static int generation;
+
+    private static int cachedGeneration = -1;
+
     // Numbers are formatted in the language of the sentence around them, not in whatever the
     // operating system happens to be set to. A German window reading "50.5 %" while the rest of
     // Windows says "50,5 %" looks like a bug, and the OS culture is what CurrentCulture would have
@@ -65,7 +83,15 @@ internal static class Loc
     // Everything after "###" is the identity and none of it is drawn, so the key does that job. It
     // is already unique and, unlike the label, it never changes. Tooltips have no identity and want
     // Get instead.
-    public static string Label(string key, string english) => Get(key, english) + "###" + key;
+    public static string Label(string key, string english)
+    {
+        DropStaleCaches();
+
+        if (labels.TryGetValue(key, out var cached))
+            return cached;
+
+        return labels[key] = Get(key, english) + "###" + key;
+    }
 
     // For a unit appended to a printf specifier -- the "px" in "%.1f px". That whole string is
     // handed to ImGui and on to sprintf, which reads a per-cent sign as the opening of a
@@ -74,7 +100,27 @@ internal static class Loc
     //
     // Escaped here rather than checked when the file loads: escaping holds for anything a file
     // can contain, where a check only refuses what it was written to look for.
-    public static string Unit(string key, string english) => Get(key, english).Replace("%", "%%");
+    public static string Unit(string key, string english)
+    {
+        DropStaleCaches();
+
+        if (units.TryGetValue(key, out var cached))
+            return cached;
+
+        return units[key] = Get(key, english).Replace("%", "%%");
+    }
+
+    // Both caches go together: they are invalidated by the same event and a key is never in one
+    // and not the other for a reason worth telling apart.
+    private static void DropStaleCaches()
+    {
+        if (cachedGeneration == generation)
+            return;
+
+        labels.Clear();
+        units.Clear();
+        cachedGeneration = generation;
+    }
 
     // Placeholders are the one thing a translator writes that the runtime has to execute, so a
     // mangled "{0}" must not reach the draw as an exception. The English pattern is tried next,
@@ -135,6 +181,10 @@ internal static class Loc
         culture = CultureFor(Current);
         IsMachineDraft = strings.Count > 0
                          && status?.Contains("machine-drafted", StringComparison.OrdinalIgnoreCase) == true;
+
+        // Last, so a reader that has already passed DropStaleCaches on the old generation cannot
+        // fill a cache from the new table and stamp it with the old number.
+        generation++;
     }
 
     // Invariant when the runtime has no data for the code, so a language file with a plausible but
