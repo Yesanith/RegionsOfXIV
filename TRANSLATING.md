@@ -128,11 +128,6 @@ takes effect.
 That still parses, but it makes the file unreadable and the diff impossible to review. Save plain
 UTF-8.
 
-**13. No em dash.** The long dash (U+2014) is banned everywhere in this repository, in every
-language, and the build fails if one appears. Use your own language's punctuation instead: a
-comma, a colon, brackets, or two sentences. Do not swap in a hyphen; in most languages that reads
-as a typo.
-
 ## The three underscore keys
 
 Keys starting with `_` are notes, not strings. The loader skips them.
