@@ -211,12 +211,17 @@ internal sealed partial class ConfigWindow
 
     // Two columns of groups when the page is wide enough for them, one when it is not. Next moves
     // to the top of the next column; End drops the cursor below the taller one.
+    //
+    // A column to the right is an indent rather than a cursor position: ImGui starts every new
+    // line at the window's left margin plus the indent, so placing the cursor once would move
+    // only the first item and leave the rest drawn over the column before.
     private sealed class ColumnLayout
     {
         private Vector2 origin;
         private float width;
         private float gap;
         private float bottom;
+        private float indent;
         private int count;
         private int current;
 
@@ -230,6 +235,7 @@ internal sealed partial class ConfigWindow
             this.count = Math.Clamp(Math.Min(wanted, fit), 1, wanted);
             this.width = (available - (this.gap * (this.count - 1))) / this.count;
             this.bottom = this.origin.Y;
+            this.indent = 0f;
             this.current = -1;
             SettingsGroup.ColumnWidth = this.width;
         }
@@ -237,21 +243,40 @@ internal sealed partial class ConfigWindow
         public void Next()
         {
             Track();
+            Outdent();
             this.current++;
             if (this.count == 1 || this.current >= this.count)
             {
                 return;
             }
 
-            ImGui.SetCursorScreenPos(new Vector2(this.origin.X + (this.current * (this.width + this.gap)), this.origin.Y));
+            this.indent = this.current * (this.width + this.gap);
+            if (this.indent > 0f)
+            {
+                ImGui.Indent(this.indent);
+            }
+
+            ImGui.SetCursorScreenPos(new Vector2(this.origin.X + this.indent, this.origin.Y));
         }
 
         public void End()
         {
             Track();
+            Outdent();
             SettingsGroup.ColumnWidth = 0f;
             ImGui.SetCursorScreenPos(new Vector2(this.origin.X, this.bottom));
             ImGui.Dummy(new Vector2((this.width * this.count) + (this.gap * (this.count - 1)), 0f));
+        }
+
+        private void Outdent()
+        {
+            if (this.indent <= 0f)
+            {
+                return;
+            }
+
+            ImGui.Unindent(this.indent);
+            this.indent = 0f;
         }
 
         private void Track() => this.bottom = MathF.Max(this.bottom, ImGui.GetCursorScreenPos().Y);

@@ -57,7 +57,7 @@ internal sealed partial class ConfigWindow : Window, IDisposable
     private const ImGuiWindowFlags ShellFlags =
         ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse;
 
-    private static readonly Vector2 DefaultSize = new(1020, 820);
+    private static readonly Vector2 DefaultSize = new(1080, 840);
 
     private readonly Configuration config;
     private readonly ConfigActions actions;

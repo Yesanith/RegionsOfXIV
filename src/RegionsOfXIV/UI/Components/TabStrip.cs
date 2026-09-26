@@ -17,8 +17,8 @@ internal static class TabStrip
 
     public const int MaxItems = 10;
 
-    private const float PadX = 14f;
-    private const float IconGap = 8f;
+    private const float PadX = 12f;
+    private const float IconGap = 7f;
     private const float UnderlineHeight = 2.5f;
     private const float UnderlineInset = 10f;
     private const float BadgeRadius = 3f;
@@ -38,6 +38,9 @@ internal static class TabStrip
         var origin = ImGui.GetCursorScreenPos();
         var drawList = ImGui.GetWindowDrawList();
         var current = Math.Clamp(selected, 0, count - 1);
+
+        // Labels in the caption tier: eight of them have to share one row.
+        using var font = Fonts.PushCaption();
         var total = ResolveWidths(items, count, current, width);
         var startX = origin.X + MathF.Max(0f, (width - total) * 0.5f);
 
