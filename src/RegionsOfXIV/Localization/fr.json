@@ -1314,5 +1314,8 @@
   },
   "changelog.1.0.0.0.16": {
     "message": "L'onglet À propos crédite l'auteur du plugin et l'auteur de l'interface."
+  },
+  "changelog.1.0.0.1.01": {
+    "message": "La page Nouveautés et l'avis après une mise à jour s'affichent dans la langue de la fenêtre. C'était la dernière partie de la fenêtre qui restait en anglais, quel que soit ton choix."
   }
 }

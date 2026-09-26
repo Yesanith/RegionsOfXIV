@@ -425,5 +425,6 @@
   "changelog.1.0.0.0.13": { "message": "La ventana se dibuja en Noto Sans, con la Noto Sans CJK de Dalamud fusionada para todo lo que el latino no cubre, así que todos los idiomas incluidos se leen con la misma fuente y el mismo grosor." },
   "changelog.1.0.0.0.14": { "message": "El español, el portugués, el ruso y el chino se unen al alemán, el francés, el japonés y el turco, todos redactados por una máquina y marcados así arriba hasta que un hablante los haya revisado. Todos los textos de la ventana están traducidos a los ocho, y los selectores de idioma escriben el nombre de cada idioma con mayúscula inicial." },
   "changelog.1.0.0.0.15": { "message": "Nada de lo que has guardado se ve afectado. Los preajustes, los códigos para compartir y tus ajustes actuales pasan tal cual, cada ajuste nuevo empieza en el aspecto de siempre, y un preajuste de una versión anterior sigue aplicándose." },
-  "changelog.1.0.0.0.16": { "message": "La pestaña Acerca de acredita al autor del plugin y al autor de la interfaz." }
+  "changelog.1.0.0.0.16": { "message": "La pestaña Acerca de acredita al autor del plugin y al autor de la interfaz." },
+  "changelog.1.0.0.1.01": { "message": "La página de novedades y el aviso tras una actualización se leen en el idioma de la ventana. Eran la última parte de la ventana que seguía en inglés, eligieras lo que eligieras." }
 }

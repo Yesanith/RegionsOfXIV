@@ -1707,5 +1707,9 @@
   "changelog.1.0.0.0.16": {
     "message": "The About tab credits the plugin's author and the interface's author.",
     "description": ""
+  },
+  "changelog.1.0.0.1.01": {
+    "message": "The What's new page and the notice after an update read in the window's language. They were the last part of the window still in English whatever you picked.",
+    "description": ""
   }
 }

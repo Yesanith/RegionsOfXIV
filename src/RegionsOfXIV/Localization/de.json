@@ -1314,5 +1314,8 @@
   },
   "changelog.1.0.0.0.16": {
     "message": "Der Reiter Über nennt den Autor des Plugins und den Autor der Oberfläche."
+  },
+  "changelog.1.0.0.1.01": {
+    "message": "Die Seite Neuerungen und der Hinweis nach einem Update stehen in der Sprache des Fensters. Sie waren der letzte Teil des Fensters, der auf Englisch blieb, was du auch gewählt hattest."
   }
 }

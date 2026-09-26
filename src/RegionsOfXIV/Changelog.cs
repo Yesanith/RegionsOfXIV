@@ -46,6 +46,11 @@ internal static class Changelog
 
     private static ChangelogEntry[] Build() =>
     [
+        new(new Version("1.0.0.1"),
+        [
+            Loc.Get("changelog.1.0.0.1.01", "The What's new page and the notice after an update read in the window's language. They were the last part of the window still in English whatever you picked."),
+        ]),
+
         new(new Version("1.0.0.0"),
         [
             Loc.Get("changelog.1.0.0.0.01", "The settings window is built around a live preview. The notification you are shaping is drawn at the top of the window at its real size, by the same code that draws it in game, and follows every change as you make it. Replay it, send it to the game screen, or pin it there while you work."),

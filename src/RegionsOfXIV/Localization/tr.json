@@ -1319,5 +1319,8 @@
   },
   "changelog.1.0.0.0.16": {
     "message": "Hakkında sekmesi eklentinin yazarını ve arayüzün yazarını belirtiyor."
+  },
+  "changelog.1.0.0.1.01": {
+    "message": "Yenilikler sayfası ve güncelleme sonrası çıkan bildirim pencerenin dilinde okunuyor. Ne seçersen seç İngilizce kalan son bölümdü."
   }
 }
