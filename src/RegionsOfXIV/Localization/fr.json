@@ -770,5 +770,311 @@
   },
   "changelog.tab": {
     "message": "Nouveautés"
+  },
+  "about.community": {
+    "message": "Communauté"
+  },
+  "announcements.group.banners": {
+    "message": "Bannières"
+  },
+  "announcements.group.native": {
+    "message": "Le texte du jeu lui-même"
+  },
+  "announcements.group.places": {
+    "message": "Lieux"
+  },
+  "announcements.group.quiet": {
+    "message": "Quand se taire"
+  },
+  "announcements.group.weather": {
+    "message": "Météo"
+  },
+  "appearance.group.colours": {
+    "message": "Couleurs"
+  },
+  "appearance.group.header": {
+    "message": "En-tête"
+  },
+  "appearance.group.lettering": {
+    "message": "Lettrage"
+  },
+  "appearance.group.outline": {
+    "message": "Contour"
+  },
+  "appearance.group.placement": {
+    "message": "Placement"
+  },
+  "appearance.group.shadow": {
+    "message": "Ombre portée"
+  },
+  "appearance.intro": {
+    "message": "Où se place la notification, comment elle est lettrée, et avec quelles couleurs, quel contour et quelle ombre elle est dessinée. L'aperçu ci-dessus suit chaque changement."
+  },
+  "changelog.latest": {
+    "message": "Dernière"
+  },
+  "changelog.new": {
+    "message": "Nouveau"
+  },
+  "fonts.path": {
+    "message": "Fichier de police"
+  },
+  "motion.group.arrival": {
+    "message": "Arrivée"
+  },
+  "motion.group.decode": {
+    "message": "Décodage"
+  },
+  "motion.group.particles": {
+    "message": "Particules"
+  },
+  "motion.group.timing": {
+    "message": "Durées"
+  },
+  "sound.file": {
+    "message": "Fichier son"
+  },
+  "sound.gamesound": {
+    "message": "Effet sonore"
+  },
+  "sound.group.on": {
+    "message": "Joué pour"
+  },
+  "sound.group.source": {
+    "message": "Source"
+  },
+  "about.credit.interface": {
+    "message": "Interface conçue et réalisée par {0}"
+  },
+  "about.credit.plugin": {
+    "message": "Plugin par {0}"
+  },
+  "about.credits": {
+    "message": "Crédits"
+  },
+  "appearance.position": {
+    "message": "Position à l'écran"
+  },
+  "appearance.position.tooltip": {
+    "message": "Fais glisser le repère pour déplacer la notification. Les deux curseurs\nen dessous règlent exactement la même chose. Le texte est centré sur ce point,\ndonc 50 % en largeur est le milieu de l'écran, et un long nom de lieu placé\nprès d'un bord le dépassera."
+  },
+  "preview.caption": {
+    "message": "Taille réelle. La position verticale s'applique à l'écran du jeu."
+  },
+  "preview.onscreen": {
+    "message": "Afficher à l'écran"
+  },
+  "preview.onscreen.tooltip": {
+    "message": "Lance une notification d'exemple sur l'écran du jeu, là où les curseurs de position la placent."
+  },
+  "preview.pin": {
+    "message": "Épingler à l'écran"
+  },
+  "preview.pin.tooltip": {
+    "message": "Garde une notification d'exemple sur l'écran du jeu pendant que tu travailles,\npour vérifier la position et la taille là où elle apparaîtra vraiment.\n\nLes annonces de zone sont retenues tant que c'est actif. Cela se désactive\ntout seul quand tu fermes cette fenêtre."
+  },
+  "preview.replay": {
+    "message": "Rejouer"
+  },
+  "preview.replay.tooltip": {
+    "message": "Rejoue l'aperçu depuis le début, pour revoir le mouvement et le décodage."
+  },
+  "preview.title": {
+    "message": "Aperçu en direct"
+  },
+  "announcements.hidecities": {
+    "message": "Masquer dans les villes"
+  },
+  "announcements.hidecities.tooltip": {
+    "message": "Les cités-États et les autres villes, où les quartiers changent tous\nles quelques pas."
+  },
+  "announcements.hidehousing": {
+    "message": "Masquer dans les quartiers résidentiels"
+  },
+  "announcements.hidehousing.tooltip": {
+    "message": "Les quartiers résidentiels et l'intérieur des maisons et des appartements."
+  },
+  "announcements.minorhold": {
+    "message": "Secteurs et sous-secteurs, maintien"
+  },
+  "announcements.minorhold.tooltip": {
+    "message": "Combien de temps une annonce de secteur ou de sous-secteur reste affichée,\nen part du maintien réglé sur la page Mouvement."
+  },
+  "announcements.minorsize": {
+    "message": "Secteurs et sous-secteurs, taille"
+  },
+  "announcements.minorsize.tooltip": {
+    "message": "La taille d'une annonce de secteur ou de sous-secteur par rapport à une\narrivée en zone. La taille pleine est l'aspect habituel ; plus petit, les\nannonces fréquentes chuchotent tandis qu'une nouvelle zone s'annonce toujours."
+  },
+  "announcements.quietzones": {
+    "message": "Zones silencieuses"
+  },
+  "announcements.quietzones.add": {
+    "message": "Ajouter la zone où je suis"
+  },
+  "announcements.quietzones.none": {
+    "message": "Aucune pour l'instant."
+  },
+  "announcements.quietzones.tooltip": {
+    "message": "Des zones qui n'annoncent jamais rien, quoi que tu aies activé par ailleurs.\nPlace-toi dedans et ajoute-la ; clique sur une zone ici pour la retirer\nde la liste."
+  },
+  "appearance.backing": {
+    "message": "Derrière le texte"
+  },
+  "appearance.backing.tooltip": {
+    "message": "Quelque chose de sombre derrière les lignes, pour un nom qui tombe sur un\nciel clair.\n\nUne bande a la largeur du texte et s'estompe aux extrémités. Un bandeau\ncourt sur toute la largeur de l'écran, comme le fait l'original."
+  },
+  "appearance.backingcolour": {
+    "message": "Couleur du fond"
+  },
+  "appearance.glow": {
+    "message": "Halo"
+  },
+  "appearance.glow.tooltip": {
+    "message": "Un halo doux derrière chaque ligne, sous le contour. Plus coûteux à dessiner\nque le contour, ce qui ne compte qu'aux très grandes tailles."
+  },
+  "appearance.glowcolour": {
+    "message": "Couleur du halo"
+  },
+  "appearance.glowspread": {
+    "message": "Étendue du halo"
+  },
+  "appearance.gradient": {
+    "message": "Fondre le nom vers une seconde couleur"
+  },
+  "appearance.gradient.tooltip": {
+    "message": "Le nom de lieu passe de sa couleur de texte en haut de chaque lettre à\ncelle-ci en bas. L'en-tête et la météo gardent une couleur unie."
+  },
+  "appearance.gradientcolour": {
+    "message": "Couleur du bas"
+  },
+  "appearance.group.backing": {
+    "message": "Fond"
+  },
+  "appearance.group.glow": {
+    "message": "Halo"
+  },
+  "appearance.group.palette": {
+    "message": "Jeu de couleurs"
+  },
+  "appearance.palette": {
+    "message": "Palette"
+  },
+  "appearance.palette.tooltip": {
+    "message": "Lettre le nom de lieu dans une suite de couleurs plutôt qu'une seule. La\ncouleur du texte ci-dessus règle toujours le contraste du contour et c'est\nelle qu'un préréglage emporte."
+  },
+  "appearance.palettemotion": {
+    "message": "Mouvement"
+  },
+  "appearance.palettespeed": {
+    "message": "Vitesse"
+  },
+  "backing.choice.band": {
+    "message": "Une bande derrière le texte"
+  },
+  "backing.choice.none": {
+    "message": "Aucun"
+  },
+  "backing.choice.vignette": {
+    "message": "Un bandeau en travers de l'écran"
+  },
+  "departure.choice.dissolve": {
+    "message": "Dissolution"
+  },
+  "departure.choice.fade": {
+    "message": "Fondu"
+  },
+  "departure.choice.fall": {
+    "message": "Chute"
+  },
+  "departure.choice.reverse": {
+    "message": "L'arrivée, à l'envers"
+  },
+  "motion.choice.assemble": {
+    "message": "Assemblage"
+  },
+  "motion.choice.drop": {
+    "message": "Chute"
+  },
+  "motion.choice.flicker": {
+    "message": "Scintillement"
+  },
+  "motion.choice.slide": {
+    "message": "Glissement"
+  },
+  "motion.choice.zoom": {
+    "message": "Zoom"
+  },
+  "motion.departure": {
+    "message": "Départ"
+  },
+  "motion.departure.tooltip": {
+    "message": "Comment la ligne s'en va une fois son temps écoulé, joué pendant la\ndisparition.\n\nFondu : la simple disparition.\nL'arrivée, à l'envers : le mouvement qui l'a amenée la remporte.\nDissolution : les lettres se dispersent.\nChute : les lettres s'enfoncent."
+  },
+  "motion.particles.fireflies": {
+    "message": "Lucioles"
+  },
+  "motion.particles.leaves": {
+    "message": "Feuilles"
+  },
+  "motion.particles.rain": {
+    "message": "Pluie"
+  },
+  "motion.particles.snow": {
+    "message": "Neige"
+  },
+  "motion.particles.stars": {
+    "message": "Étoiles"
+  },
+  "motion.spread": {
+    "message": "Étendue"
+  },
+  "motion.spread.tooltip": {
+    "message": "Jusqu'où les particules jouent autour du nom. 1 reste collé au texte ;\ndes valeurs plus hautes remplissent l'écran autour."
+  },
+  "palette.choice.aurora": {
+    "message": "Aurore"
+  },
+  "palette.choice.blossom": {
+    "message": "Fleurs"
+  },
+  "palette.choice.golden": {
+    "message": "Doré"
+  },
+  "palette.choice.none": {
+    "message": "Aucune"
+  },
+  "palette.choice.ocean": {
+    "message": "Océan"
+  },
+  "palette.choice.rainbow": {
+    "message": "Arc-en-ciel"
+  },
+  "palette.choice.sunset": {
+    "message": "Coucher de soleil"
+  },
+  "palettemotion.choice.pulse": {
+    "message": "Toute la ligne ensemble"
+  },
+  "palettemotion.choice.static": {
+    "message": "Posée le long de la ligne"
+  },
+  "palettemotion.choice.wave": {
+    "message": "Défilant le long de la ligne"
+  },
+  "sound.filevolume": {
+    "message": "Volume"
+  },
+  "sound.filevolume.tooltip": {
+    "message": "En plus des volumes principal et Sons système du jeu, qu'un fichier suit\naussi. Un son du jeu n'a pas de curseur ici, parce que les réglages du jeu\nsont déjà son volume."
+  },
+  "sound.gamesound.banner": {
+    "message": "Bannières"
+  },
+  "sound.gamesound.same": {
+    "message": "Le même que pour les lieux"
+  },
+  "sound.gamesound.weather": {
+    "message": "Météo"
   }
 }

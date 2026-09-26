@@ -775,5 +775,311 @@
   },
   "changelog.tab": {
     "message": "Yenilikler"
+  },
+  "about.community": {
+    "message": "Topluluk"
+  },
+  "announcements.group.banners": {
+    "message": "Afişler"
+  },
+  "announcements.group.native": {
+    "message": "Oyunun kendi yazısı"
+  },
+  "announcements.group.places": {
+    "message": "Yerler"
+  },
+  "announcements.group.quiet": {
+    "message": "Ne zaman sessiz kalınacağı"
+  },
+  "announcements.group.weather": {
+    "message": "Hava"
+  },
+  "appearance.group.colours": {
+    "message": "Renkler"
+  },
+  "appearance.group.header": {
+    "message": "Başlık"
+  },
+  "appearance.group.lettering": {
+    "message": "Yazı düzeni"
+  },
+  "appearance.group.outline": {
+    "message": "Kontur"
+  },
+  "appearance.group.placement": {
+    "message": "Konum"
+  },
+  "appearance.group.shadow": {
+    "message": "Gölge"
+  },
+  "appearance.intro": {
+    "message": "Bildirimin nerede durduğu, harflerin nasıl dizildiği ve hangi renk, kontur ve gölgeyle çizildiği. Yukarıdaki önizleme her değişikliği anında yansıtır."
+  },
+  "changelog.latest": {
+    "message": "En yeni"
+  },
+  "changelog.new": {
+    "message": "Yeni"
+  },
+  "fonts.path": {
+    "message": "Yazı tipi dosyası"
+  },
+  "motion.group.arrival": {
+    "message": "Geliş"
+  },
+  "motion.group.decode": {
+    "message": "Çözümleme"
+  },
+  "motion.group.particles": {
+    "message": "Parçacıklar"
+  },
+  "motion.group.timing": {
+    "message": "Zamanlama"
+  },
+  "sound.file": {
+    "message": "Ses dosyası"
+  },
+  "sound.gamesound": {
+    "message": "Ses efekti"
+  },
+  "sound.group.on": {
+    "message": "Ne zaman çalar"
+  },
+  "sound.group.source": {
+    "message": "Kaynak"
+  },
+  "about.credit.interface": {
+    "message": "Arayüz tasarımı ve yapımı: {0}"
+  },
+  "about.credit.plugin": {
+    "message": "Eklenti: {0}"
+  },
+  "about.credits": {
+    "message": "Emeği geçenler"
+  },
+  "appearance.position": {
+    "message": "Ekrandaki konum"
+  },
+  "appearance.position.tooltip": {
+    "message": "Bildirimi taşımak için işareti sürükle. Aşağıdaki iki kaydırıcı da\ntam olarak aynı şeyi ayarlar. Metin bu noktaya ortalanır; yani yatayda %50\nekranın ortasıdır ve uçlara yakın konan uzun bir yer adı kenardan taşar."
+  },
+  "preview.caption": {
+    "message": "Gerçek boyut. Dikey konum oyun ekranında uygulanır."
+  },
+  "preview.onscreen": {
+    "message": "Ekranda göster"
+  },
+  "preview.onscreen.tooltip": {
+    "message": "Oyun ekranında, konum kaydırıcılarının belirlediği yerde örnek bir bildirim gösterir."
+  },
+  "preview.pin": {
+    "message": "Ekrana sabitle"
+  },
+  "preview.pin.tooltip": {
+    "message": "Sen çalışırken oyun ekranında tek bir örnek bildirimi tutar; böylece konumu\nve boyutu gerçekten görüneceği yerde kontrol edebilirsin.\n\nBu açıkken bölge duyuruları bekletilir. Bu pencereyi kapattığında\nkendiliğinden kapanır."
+  },
+  "preview.replay": {
+    "message": "Yeniden oynat"
+  },
+  "preview.replay.tooltip": {
+    "message": "Önizlemeyi baştan oynatır; hareket ve çözümleme yeniden çalışır."
+  },
+  "preview.title": {
+    "message": "Canlı önizleme"
+  },
+  "announcements.hidecities": {
+    "message": "Şehirlerde gizle"
+  },
+  "announcements.hidecities.tooltip": {
+    "message": "Şehir devletleri ve diğer kasabalar; buralarda mahalleler ve semtler\nbirkaç adımda bir değişir."
+  },
+  "announcements.hidehousing": {
+    "message": "Konut bölgelerinde gizle"
+  },
+  "announcements.hidehousing.tooltip": {
+    "message": "Konut bölgeleri ile evlerin ve dairelerin içi."
+  },
+  "announcements.minorhold": {
+    "message": "Alan ve alt alan bekleme süresi"
+  },
+  "announcements.minorhold.tooltip": {
+    "message": "Bir alan veya alt alan bildiriminin ne kadar süre kalacağı; Hareket\nsayfasındaki bekleme süresinin yüzdesi olarak."
+  },
+  "announcements.minorsize": {
+    "message": "Alan ve alt alan boyutu"
+  },
+  "announcements.minorsize.tooltip": {
+    "message": "Bir alan veya alt alan bildiriminin bölge girişine göre büyüklüğü. Tam boyut\neklentinin her zamanki görünümüdür; küçültürsen sık gelen bildirimler fısıldar,\nyeni bir bölge ise kendini yine tam sesle duyurur."
+  },
+  "announcements.quietzones": {
+    "message": "Sessiz bölgeler"
+  },
+  "announcements.quietzones.add": {
+    "message": "Bulunduğum bölgeyi ekle"
+  },
+  "announcements.quietzones.none": {
+    "message": "Henüz yok."
+  },
+  "announcements.quietzones.tooltip": {
+    "message": "Başka ne açık olursa olsun hiçbir şey duyurmayan bölgeler. Birinin içinde\ndururken ekle; listeden çıkarmak için buradaki bölgeye tıkla."
+  },
+  "appearance.backing": {
+    "message": "Metnin arkası"
+  },
+  "appearance.backing.tooltip": {
+    "message": "Satırların arkasına koyu bir zemin; parlak bir gökyüzüne düşen adlar için.\n\nŞerit metnin genişliğindedir ve uçlarında solar. Bant ekranın tüm\ngenişliğini kaplar, orijinalin yaptığı gibi."
+  },
+  "appearance.backingcolour": {
+    "message": "Zemin rengi"
+  },
+  "appearance.glow": {
+    "message": "Parıltı"
+  },
+  "appearance.glow.tooltip": {
+    "message": "Her satırın arkasında, konturun altında yumuşak bir hale. Çizmesi konturdan\ndaha pahalıdır; bu yalnızca çok büyük boyutlarda fark eder."
+  },
+  "appearance.glowcolour": {
+    "message": "Parıltı rengi"
+  },
+  "appearance.glowspread": {
+    "message": "Parıltı yayılımı"
+  },
+  "appearance.gradient": {
+    "message": "Adı ikinci bir renge geçir"
+  },
+  "appearance.gradient.tooltip": {
+    "message": "Yer adı her harfin üstünde metin rengiyle başlar, altında bu renge geçer.\nBaşlık ve hava düz renkte kalır."
+  },
+  "appearance.gradientcolour": {
+    "message": "Alt renk"
+  },
+  "appearance.group.backing": {
+    "message": "Zemin"
+  },
+  "appearance.group.glow": {
+    "message": "Parıltı"
+  },
+  "appearance.group.palette": {
+    "message": "Renk oyunu"
+  },
+  "appearance.palette": {
+    "message": "Palet"
+  },
+  "appearance.palette.tooltip": {
+    "message": "Yer adını tek renk yerine bir renk dizisiyle yazar. Yukarıdaki metin rengi\nyine konturun kontrastını belirler ve hazır ayara taşınan odur."
+  },
+  "appearance.palettemotion": {
+    "message": "Hareket"
+  },
+  "appearance.palettespeed": {
+    "message": "Hız"
+  },
+  "backing.choice.band": {
+    "message": "Metnin arkasında bir şerit"
+  },
+  "backing.choice.none": {
+    "message": "Yok"
+  },
+  "backing.choice.vignette": {
+    "message": "Ekran boyunca bir bant"
+  },
+  "departure.choice.dissolve": {
+    "message": "Dağılma"
+  },
+  "departure.choice.fade": {
+    "message": "Solma"
+  },
+  "departure.choice.fall": {
+    "message": "Düşme"
+  },
+  "departure.choice.reverse": {
+    "message": "Gelişin tersi"
+  },
+  "motion.choice.assemble": {
+    "message": "Toplanma"
+  },
+  "motion.choice.drop": {
+    "message": "Düşme"
+  },
+  "motion.choice.flicker": {
+    "message": "Titreme"
+  },
+  "motion.choice.slide": {
+    "message": "Kayma"
+  },
+  "motion.choice.zoom": {
+    "message": "Büyüme"
+  },
+  "motion.departure": {
+    "message": "Gidiş"
+  },
+  "motion.departure.tooltip": {
+    "message": "Süresi dolunca satırın nasıl gideceği; solma sırasında oynatılır.\n\nSolma: düz solma.\nGelişin tersi: satırı hangi hareket getirdiyse o götürür.\nDağılma: harfler dağılır.\nDüşme: harfler aşağı kayar."
+  },
+  "motion.particles.fireflies": {
+    "message": "Ateş böcekleri"
+  },
+  "motion.particles.leaves": {
+    "message": "Düşen yapraklar"
+  },
+  "motion.particles.rain": {
+    "message": "Yağmur"
+  },
+  "motion.particles.snow": {
+    "message": "Kar"
+  },
+  "motion.particles.stars": {
+    "message": "Yıldızlar"
+  },
+  "motion.spread": {
+    "message": "Yayılım"
+  },
+  "motion.spread.tooltip": {
+    "message": "Parçacıkların adın çevresinde ne kadar uzağa yayılacağı. 1 metne yapışır;\ndaha yüksek değerler çevresindeki ekranı doldurur."
+  },
+  "palette.choice.aurora": {
+    "message": "Kutup ışığı"
+  },
+  "palette.choice.blossom": {
+    "message": "Çiçek"
+  },
+  "palette.choice.golden": {
+    "message": "Altın"
+  },
+  "palette.choice.none": {
+    "message": "Yok"
+  },
+  "palette.choice.ocean": {
+    "message": "Okyanus"
+  },
+  "palette.choice.rainbow": {
+    "message": "Gökkuşağı"
+  },
+  "palette.choice.sunset": {
+    "message": "Gün batımı"
+  },
+  "palettemotion.choice.pulse": {
+    "message": "Tüm satır birlikte"
+  },
+  "palettemotion.choice.static": {
+    "message": "Satır boyunca serili"
+  },
+  "palettemotion.choice.wave": {
+    "message": "Satır boyunca akan"
+  },
+  "sound.filevolume": {
+    "message": "Ses seviyesi"
+  },
+  "sound.filevolume.tooltip": {
+    "message": "Oyunun ana ses ve Sistem Sesleri seviyelerinin üstüne; dosya onları da\nizler. Oyun sesi için burada kaydırıcı yok, çünkü oyunun kendi ayarları\nzaten onun ses seviyesidir."
+  },
+  "sound.gamesound.banner": {
+    "message": "Afişler"
+  },
+  "sound.gamesound.same": {
+    "message": "Yerlerle aynı"
+  },
+  "sound.gamesound.weather": {
+    "message": "Hava"
   }
 }

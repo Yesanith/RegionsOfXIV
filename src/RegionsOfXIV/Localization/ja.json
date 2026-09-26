@@ -771,5 +771,311 @@
   },
   "changelog.tab": {
     "message": "更新履歴"
+  },
+  "about.community": {
+    "message": "コミュニティ"
+  },
+  "announcements.group.banners": {
+    "message": "バナー"
+  },
+  "announcements.group.native": {
+    "message": "ゲーム自身の表示"
+  },
+  "announcements.group.places": {
+    "message": "場所"
+  },
+  "announcements.group.quiet": {
+    "message": "通知を控えるとき"
+  },
+  "announcements.group.weather": {
+    "message": "天候"
+  },
+  "appearance.group.colours": {
+    "message": "色"
+  },
+  "appearance.group.header": {
+    "message": "見出し"
+  },
+  "appearance.group.lettering": {
+    "message": "文字組み"
+  },
+  "appearance.group.outline": {
+    "message": "縁取り"
+  },
+  "appearance.group.placement": {
+    "message": "配置"
+  },
+  "appearance.group.shadow": {
+    "message": "ドロップシャドウ"
+  },
+  "appearance.intro": {
+    "message": "通知の位置、文字の組み方、そして描画に使う色・縁取り・影。上のプレビューはすべての変更を反映します。"
+  },
+  "changelog.latest": {
+    "message": "最新"
+  },
+  "changelog.new": {
+    "message": "新着"
+  },
+  "fonts.path": {
+    "message": "フォントファイル"
+  },
+  "motion.group.arrival": {
+    "message": "登場"
+  },
+  "motion.group.decode": {
+    "message": "解読"
+  },
+  "motion.group.particles": {
+    "message": "パーティクル"
+  },
+  "motion.group.timing": {
+    "message": "時間"
+  },
+  "sound.file": {
+    "message": "サウンドファイル"
+  },
+  "sound.gamesound": {
+    "message": "効果音"
+  },
+  "sound.group.on": {
+    "message": "鳴らす対象"
+  },
+  "sound.group.source": {
+    "message": "音源"
+  },
+  "about.credit.interface": {
+    "message": "インターフェースの設計と制作: {0}"
+  },
+  "about.credit.plugin": {
+    "message": "プラグイン: {0}"
+  },
+  "about.credits": {
+    "message": "クレジット"
+  },
+  "appearance.position": {
+    "message": "画面上の位置"
+  },
+  "appearance.position.tooltip": {
+    "message": "マーカーをドラッグして通知を動かします。下の2つのスライダーも\nまったく同じ設定です。文字はこの点を中心に置かれるので、横50%が\n画面の中央になり、端の近くに置いた長い地名は端からはみ出します。"
+  },
+  "preview.caption": {
+    "message": "実物大です。縦位置はゲーム画面上で反映されます。"
+  },
+  "preview.onscreen": {
+    "message": "画面に表示"
+  },
+  "preview.onscreen.tooltip": {
+    "message": "ゲーム画面上の、位置スライダーで決めた場所にサンプル通知を出します。"
+  },
+  "preview.pin": {
+    "message": "画面に固定"
+  },
+  "preview.pin.tooltip": {
+    "message": "作業中、サンプル通知をゲーム画面に出したままにします。実際に表示される\n場所で位置と大きさを確かめられます。\n\nこれがオンの間、地域の通知は保留されます。このウィンドウを閉じると\n自動的にオフになります。"
+  },
+  "preview.replay": {
+    "message": "もう一度再生"
+  },
+  "preview.replay.tooltip": {
+    "message": "プレビューを最初から再生し、動きと解読をもう一度見せます。"
+  },
+  "preview.title": {
+    "message": "ライブプレビュー"
+  },
+  "announcements.hidecities": {
+    "message": "都市では表示しない"
+  },
+  "announcements.hidecities.tooltip": {
+    "message": "三大都市などの街。\n数歩ごとに区画や地区が変わる場所です。"
+  },
+  "announcements.hidehousing": {
+    "message": "ハウジングでは表示しない"
+  },
+  "announcements.hidehousing.tooltip": {
+    "message": "居住区と、家やアパルトメントの中です。"
+  },
+  "announcements.minorhold": {
+    "message": "エリアと小エリアの表示時間"
+  },
+  "announcements.minorhold.tooltip": {
+    "message": "エリアや小エリアの通知を表示しておく時間。動きページの表示時間に\n対する割合です。"
+  },
+  "announcements.minorsize": {
+    "message": "エリアと小エリアの大きさ"
+  },
+  "announcements.minorsize.tooltip": {
+    "message": "エリアや小エリアの通知の、地域到着に対する大きさ。最大がこれまでの\n見た目です。小さくすると頻繁な通知はささやきになり、新しい地域は\nそのまま大きく表示されます。"
+  },
+  "announcements.quietzones": {
+    "message": "静かな地域"
+  },
+  "announcements.quietzones.add": {
+    "message": "今いる地域を追加"
+  },
+  "announcements.quietzones.none": {
+    "message": "まだありません。"
+  },
+  "announcements.quietzones.tooltip": {
+    "message": "ほかの設定に関わらず何も通知しない地域。その中に立って追加します。\nここで地域をクリックすると一覧から外れます。"
+  },
+  "appearance.backing": {
+    "message": "文字の背後"
+  },
+  "appearance.backing.tooltip": {
+    "message": "行の後ろに置く暗い背景。明るい空に地名が重なるときのためのものです。\n\n帯は文字の幅で、両端が消えていきます。横断帯は画面の幅いっぱいに\n伸び、原作と同じ見た目になります。"
+  },
+  "appearance.backingcolour": {
+    "message": "背景の色"
+  },
+  "appearance.glow": {
+    "message": "発光"
+  },
+  "appearance.glow.tooltip": {
+    "message": "各行の後ろ、縁取りの下に柔らかな光。縁取りより描画の負荷が高く、\nとても大きなサイズでだけ影響します。"
+  },
+  "appearance.glowcolour": {
+    "message": "発光の色"
+  },
+  "appearance.glowspread": {
+    "message": "発光の広がり"
+  },
+  "appearance.gradient": {
+    "message": "地名を2色目へ変化させる"
+  },
+  "appearance.gradient.tooltip": {
+    "message": "地名は各文字の上端で本文の色、下端でこの色になります。見出しと天候は\n単色のままです。"
+  },
+  "appearance.gradientcolour": {
+    "message": "下側の色"
+  },
+  "appearance.group.backing": {
+    "message": "背景"
+  },
+  "appearance.group.glow": {
+    "message": "発光"
+  },
+  "appearance.group.palette": {
+    "message": "色の演出"
+  },
+  "appearance.palette": {
+    "message": "パレット"
+  },
+  "appearance.palette.tooltip": {
+    "message": "地名を単色ではなく色の連なりで描きます。上の本文の色は引き続き縁取りとの\nコントラストを決め、プリセットに保存されるのもその色です。"
+  },
+  "appearance.palettemotion": {
+    "message": "動き"
+  },
+  "appearance.palettespeed": {
+    "message": "速さ"
+  },
+  "backing.choice.band": {
+    "message": "文字の後ろに帯"
+  },
+  "backing.choice.none": {
+    "message": "なし"
+  },
+  "backing.choice.vignette": {
+    "message": "画面を横切る帯"
+  },
+  "departure.choice.dissolve": {
+    "message": "散る"
+  },
+  "departure.choice.fade": {
+    "message": "フェード"
+  },
+  "departure.choice.fall": {
+    "message": "落ちる"
+  },
+  "departure.choice.reverse": {
+    "message": "登場の逆再生"
+  },
+  "motion.choice.assemble": {
+    "message": "集合"
+  },
+  "motion.choice.drop": {
+    "message": "落下"
+  },
+  "motion.choice.flicker": {
+    "message": "点滅"
+  },
+  "motion.choice.slide": {
+    "message": "スライド"
+  },
+  "motion.choice.zoom": {
+    "message": "ズーム"
+  },
+  "motion.departure": {
+    "message": "退場"
+  },
+  "motion.departure.tooltip": {
+    "message": "時間が来たとき行がどう消えるか。フェードアウトの間に再生されます。\n\nフェード: ただ薄れて消えます。\n登場の逆再生: 現れたときの動きを逆にたどります。\n散る: 文字が散らばります。\n落ちる: 文字が沈んでいきます。"
+  },
+  "motion.particles.fireflies": {
+    "message": "蛍"
+  },
+  "motion.particles.leaves": {
+    "message": "落ち葉"
+  },
+  "motion.particles.rain": {
+    "message": "雨"
+  },
+  "motion.particles.snow": {
+    "message": "雪"
+  },
+  "motion.particles.stars": {
+    "message": "星"
+  },
+  "motion.spread": {
+    "message": "広がり"
+  },
+  "motion.spread.tooltip": {
+    "message": "パーティクルが地名の周りにどこまで広がるか。1で文字に寄り添い、\n大きくすると周囲の画面を埋めます。"
+  },
+  "palette.choice.aurora": {
+    "message": "オーロラ"
+  },
+  "palette.choice.blossom": {
+    "message": "花"
+  },
+  "palette.choice.golden": {
+    "message": "黄金"
+  },
+  "palette.choice.none": {
+    "message": "なし"
+  },
+  "palette.choice.ocean": {
+    "message": "海"
+  },
+  "palette.choice.rainbow": {
+    "message": "虹"
+  },
+  "palette.choice.sunset": {
+    "message": "夕焼け"
+  },
+  "palettemotion.choice.pulse": {
+    "message": "行全体でいっしょに"
+  },
+  "palettemotion.choice.static": {
+    "message": "行に沿って並べる"
+  },
+  "palettemotion.choice.wave": {
+    "message": "行に沿って流れる"
+  },
+  "sound.filevolume": {
+    "message": "音量"
+  },
+  "sound.filevolume.tooltip": {
+    "message": "ゲームのマスター音量とシステム音量の上に掛かります。ファイルも\nそれらに従います。ゲームの音にはここにスライダーがありません。\nゲーム側の設定がそのまま音量だからです。"
+  },
+  "sound.gamesound.banner": {
+    "message": "バナー"
+  },
+  "sound.gamesound.same": {
+    "message": "場所と同じ"
+  },
+  "sound.gamesound.weather": {
+    "message": "天候"
   }
 }
