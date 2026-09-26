@@ -1,8 +1,18 @@
 name: Discord Release Notification
 
+# The release event is kept for a release published by hand through the web
+# form. A release created by the Release workflow does not raise one: GitHub
+# suppresses events from the default token so that a workflow cannot set itself
+# off again, which also suppresses this. That is what workflow_call is for.
 on:
   release:
     types: [published]
+  workflow_call:
+    inputs:
+      tag:
+        description: Tag of the release to announce, e.g. v0.4.2.0
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       tag:
