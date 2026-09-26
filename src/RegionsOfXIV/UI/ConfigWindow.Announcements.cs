@@ -1,6 +1,9 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
+using Dalamud.Interface.Utility;
 using RegionsOfXIV.Services;
 using RegionsOfXIV.UI.Components;
 
@@ -8,6 +11,10 @@ namespace RegionsOfXIV.UI;
 
 internal sealed partial class ConfigWindow
 {
+    private const float MinorScaleFloor = 40f;
+
+    private const float MinorHoldFloor = 25f;
+
     // What gets announced on the left, when to stay quiet and what of the game's own to suppress
     // on the right. The left column adds things to the screen; the right column takes them away
     // under conditions, and is the less often touched of the two.
@@ -27,17 +34,7 @@ internal sealed partial class ConfigWindow
 
         using (SettingsGroup.Begin(Loc.Get("announcements.group.places", "Places")))
         {
-            this.config.ZoneNotificationEnabled = Toggle(
-                "##rox-zone", Loc.Get("announcements.zone", "Zone changes"), null,
-                this.config.ZoneNotificationEnabled, ref changed);
-
-            this.config.AreaNotificationEnabled = Toggle(
-                "##rox-area", Loc.Get("announcements.area", "Area changes"), null,
-                this.config.AreaNotificationEnabled, ref changed);
-
-            this.config.SubAreaNotificationEnabled = Toggle(
-                "##rox-subarea", Loc.Get("announcements.subarea", "Sub-area changes"), null,
-                this.config.SubAreaNotificationEnabled, ref changed);
+            DrawPlaces(ref changed);
         }
 
         using (SettingsGroup.Begin(Loc.Get("announcements.group.weather", "Weather")))
@@ -97,6 +94,49 @@ internal sealed partial class ConfigWindow
         this.actions.LivePreview(Sample);
     }
 
+    // The three tiers, then how the smaller two present. Stored as fractions, shown as percentages
+    // of the full size and the full hold, because that is how the difference is thought about.
+    private void DrawPlaces(ref bool changed)
+    {
+        this.config.ZoneNotificationEnabled = Toggle(
+            "##rox-zone", Loc.Get("announcements.zone", "Zone changes"), null,
+            this.config.ZoneNotificationEnabled, ref changed);
+
+        this.config.AreaNotificationEnabled = Toggle(
+            "##rox-area", Loc.Get("announcements.area", "Area changes"), null,
+            this.config.AreaNotificationEnabled, ref changed);
+
+        this.config.SubAreaNotificationEnabled = Toggle(
+            "##rox-subarea", Loc.Get("announcements.subarea", "Sub-area changes"), null,
+            this.config.SubAreaNotificationEnabled, ref changed);
+
+        using var rows = Reveal(
+            "##rox-minor-rows", this.config.AreaNotificationEnabled || this.config.SubAreaNotificationEnabled);
+        if (rows is null)
+        {
+            return;
+        }
+
+        this.config.MinorPlaceScale = Slider(
+            "##rox-minor-scale",
+            Loc.Get("announcements.minorsize", "Areas and sub-areas at"),
+            Loc.Get(
+                "announcements.minorsize.tooltip",
+                "How large an area or sub-area notice is against a zone arrival. Full size is\n" +
+                "the look the plugin always had; smaller lets the frequent notices whisper\n" +
+                "while a new zone still announces itself."),
+            this.config.MinorPlaceScale * 100f, MinorScaleFloor, 100f, "%.0f%%", ref changed) / 100f;
+
+        this.config.MinorPlaceHoldScale = Slider(
+            "##rox-minor-hold",
+            Loc.Get("announcements.minorhold", "Areas and sub-areas hold for"),
+            Loc.Get(
+                "announcements.minorhold.tooltip",
+                "How long an area or sub-area notice stays up, as a share of the hold on\n" +
+                "the Motion page."),
+            this.config.MinorPlaceHoldScale * 100f, MinorHoldFloor, 100f, "%.0f%%", ref changed) / 100f;
+    }
+
     private void DrawBannerSettings(ref bool changed)
     {
         this.config.BannerNotificationEnabled = Toggle(
@@ -154,15 +194,103 @@ internal sealed partial class ConfigWindow
             "##rox-hide-duty", Loc.Get("announcements.hideduty", "Hide inside duties"), null,
             this.config.HideInDuty, ref changed);
 
+        this.config.HideInCities = Toggle(
+            "##rox-hide-cities",
+            Loc.Get("announcements.hidecities", "Hide in cities"),
+            Loc.Get(
+                "announcements.hidecities.tooltip",
+                "The city states and the other towns, where the wards and districts change\n" +
+                "every few steps."),
+            this.config.HideInCities, ref changed);
+
+        this.config.HideInHousing = Toggle(
+            "##rox-hide-housing",
+            Loc.Get("announcements.hidehousing", "Hide in housing"),
+            Loc.Get(
+                "announcements.hidehousing.tooltip",
+                "The residential districts and the inside of houses and apartments."),
+            this.config.HideInHousing, ref changed);
+
         this.config.HideWhileTravellingFast = Toggle(
             "##rox-skip-fast",
             Loc.Get("announcements.skipfast", "Skip sub-areas while travelling quickly"),
             Loc.Get(
                 "announcements.skipfast.tooltip",
-                "Only affects sub-areas, and only above a speed no ground travel reaches,\n" +
-                "so it comes into play when flying. Zone and area changes are always\n" +
-                "announced however fast you are moving."),
+                "Only affects sub-areas, and only while flying or above a speed no ground\n" +
+                "travel reaches. Zone and area changes are always announced however fast\n" +
+                "you are moving."),
             this.config.HideWhileTravellingFast, ref changed);
+
+        DrawQuietZones(ref changed);
+    }
+
+    // Particular places that never announce, kept by territory and shown by name. The only way in
+    // is to stand somewhere and add it, which is also the only way anyone knows a place is noisy.
+    private void DrawQuietZones(ref bool changed)
+    {
+        SettingsRow.Block(
+            Loc.Get("announcements.quietzones", "Quiet zones"),
+            Loc.Get(
+                "announcements.quietzones.tooltip",
+                "Zones that never announce anything, whatever else is switched on. Stand in\n" +
+                "one and add it; click a zone here to take it off the list again."));
+
+        var scale = ImGuiHelpers.GlobalScale;
+        var quiet = this.config.QuietTerritories;
+        var inner = SettingsGroup.InnerWidth();
+        var spent = 0f;
+        var remove = -1;
+
+        for (var index = 0; index < quiet.Count; index++)
+        {
+            var id = quiet[index];
+            var name = TerritoryKinds.NameOf(id) ?? id.ToString(CultureInfo.InvariantCulture);
+            var width = PillButton.Width(name, FontAwesomeIcon.Times);
+
+            if (spent > 0f && spent + width <= inner)
+            {
+                ImGui.SameLine(0f, ButtonGap * scale);
+                spent += width + (ButtonGap * scale);
+            }
+            else
+            {
+                spent = width;
+            }
+
+            ImGui.PushID(index);
+            if (PillButton.Draw("##rox-quiet-zone", name, Styling.AccentRose, PillButton.Emphasis.Ghost, FontAwesomeIcon.Times))
+            {
+                remove = index;
+            }
+
+            ImGui.PopID();
+        }
+
+        if (remove >= 0)
+        {
+            quiet.RemoveAt(remove);
+            changed = true;
+        }
+
+        if (quiet.Count == 0)
+        {
+            SettingsRow.Note(Loc.Get("announcements.quietzones.none", "None yet."));
+        }
+        else
+        {
+            Styling.VSpace(4f);
+        }
+
+        var here = Plugin.ClientState.TerritoryType;
+        var canAdd = here != 0 && !quiet.Contains(here);
+        var label = Loc.Get("announcements.quietzones.add", "Add the zone I am in");
+        if (PillButton.Draw("##rox-quiet-add", label, Styling.AccentGold, PillButton.Emphasis.Tinted, FontAwesomeIcon.Plus, enabled: canAdd))
+        {
+            quiet.Add(here);
+            changed = true;
+        }
+
+        SettingsRow.EndBlock();
     }
 
     // Both toggles have to tell the plugin to put the game's own back when they are switched off,

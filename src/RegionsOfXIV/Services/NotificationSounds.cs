@@ -73,19 +73,21 @@ internal sealed class NotificationSounds
 
         this.nextAllowed = at + MinimumGap;
 
-        return Emit();
+        return Emit(category);
     }
 
     // Bypasses the gap deliberately: this is the audition button and the point of it is to hear
     // the sound now. It cannot spam anything, because pressing it is the spam.
-    public void PlayNow()
+    public void PlayNow() => PlayNow(SoundCategory.Location);
+
+    public void PlayNow(SoundCategory category)
     {
         if (this.config.SoundSource == SoundSource.Off)
             return;
 
         this.nextAllowed = this.now() + MinimumGap;
 
-        Emit();
+        Emit(category);
     }
 
     // The interval is spent before this is reached, in both callers, so a file that turns out to
@@ -96,14 +98,27 @@ internal sealed class NotificationSounds
     // False from the file path means the sound did not happen, which is what the caller's own
     // return value says. It is not an error here: the game being muted is a perfectly ordinary
     // reason, and the ones that are faults are reported by the player itself.
-    private bool Emit()
+    private bool Emit(SoundCategory category)
     {
         if (this.config.SoundSource == SoundSource.File)
             return this.playFile is { } file && file(this.config.SoundFilePath);
 
-        this.play(SoundEffectFor(this.config.GameSoundId));
+        this.play(SoundEffectFor(GameSoundIdFor(category)));
 
         return true;
+    }
+
+    // A category with no sound of its own follows the one chosen for places.
+    private int GameSoundIdFor(SoundCategory category)
+    {
+        var own = category switch
+        {
+            SoundCategory.Weather => this.config.GameSoundIdWeather,
+            SoundCategory.Banner => this.config.GameSoundIdBanner,
+            _ => 0,
+        };
+
+        return own > 0 ? own : this.config.GameSoundId;
     }
 
     private bool IsEnabledFor(SoundCategory category) => category switch

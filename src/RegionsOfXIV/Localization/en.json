@@ -637,7 +637,7 @@
     "description": ""
   },
   "announcements.skipfast.tooltip": {
-    "message": "Only affects sub-areas, and only above a speed no ground travel reaches,\nso it comes into play when flying. Zone and area changes are always\nannounced however fast you are moving.",
+    "message": "Only affects sub-areas, and only while flying or above a speed no ground\ntravel reaches. Zone and area changes are always announced however fast\nyou are moving.",
     "description": ""
   },
   "announcements.subarea": {
@@ -809,7 +809,7 @@
     "description": ""
   },
   "motion.choice.tooltip": {
-    "message": "None: the letters simply appear where they belong.\nTypewriter: one letter at a time, no fade.\nRise: letters lift into place from below.\nWave: letters ride a wave through the line as it appears.\nBurn: letters catch alight and cool into their colour.\n\nRuns alongside the Eorzean decode rather than instead of it.",
+    "message": "None: the letters simply appear where they belong.\nTypewriter: one letter at a time, no fade.\nRise: letters lift into place from below.\nWave: letters ride a wave through the line as it appears.\nBurn: letters catch alight and cool into their colour.\nDrop: letters fall into place from above.\nSlide: letters slide in from the right.\nAssemble: letters converge from every direction.\nFlicker: letters stutter on like a neon sign.\nZoom: letters grow into place.\n\nRuns alongside the Eorzean decode rather than instead of it.",
     "description": ""
   },
   "motion.choice.typewriter": {
@@ -885,7 +885,7 @@
     "description": ""
   },
   "motion.particlecolour.tooltip": {
-    "message": "The default amber suits embers and sparkles. Hearts and petals\nwant moving towards pink.",
+    "message": "The default amber suits embers and sparkles. Hearts and petals\nwant moving towards pink; snow and rain want something pale.",
     "description": ""
   },
   "motion.particles": {
@@ -1131,5 +1131,265 @@
   "preview.title": {
     "message": "Live preview",
     "description": "Small heading in the corner of the preview stage under the window's header. Drawn in capitals."
+  },
+  "announcements.hidecities": {
+    "message": "Hide in cities",
+    "description": "Switch label under When to stay quiet."
+  },
+  "announcements.hidecities.tooltip": {
+    "message": "The city states and the other towns, where the wards and districts change\nevery few steps.",
+    "description": "Tooltip on that switch. Keep the line break."
+  },
+  "announcements.hidehousing": {
+    "message": "Hide in housing",
+    "description": "Switch label under When to stay quiet. Housing means the residential districts and the inside of houses and apartments."
+  },
+  "announcements.hidehousing.tooltip": {
+    "message": "The residential districts and the inside of houses and apartments.",
+    "description": "Tooltip on that switch."
+  },
+  "announcements.minorhold": {
+    "message": "Areas and sub-areas hold for",
+    "description": "Slider label. How long an area or sub-area notice stays up, as a percentage of the hold on the Motion page."
+  },
+  "announcements.minorhold.tooltip": {
+    "message": "How long an area or sub-area notice stays up, as a share of the hold on\nthe Motion page.",
+    "description": "Tooltip on that slider. Keep the line breaks."
+  },
+  "announcements.minorsize": {
+    "message": "Areas and sub-areas at",
+    "description": "Slider label on the Announcements page. How large an area or sub-area notice is, as a percentage of a zone arrival."
+  },
+  "announcements.minorsize.tooltip": {
+    "message": "How large an area or sub-area notice is against a zone arrival. Full size is\nthe look the plugin always had; smaller lets the frequent notices whisper\nwhile a new zone still announces itself.",
+    "description": "Tooltip on that slider. Keep the line breaks."
+  },
+  "announcements.quietzones": {
+    "message": "Quiet zones",
+    "description": "Label above the list of zones that never announce."
+  },
+  "announcements.quietzones.add": {
+    "message": "Add the zone I am in",
+    "description": "Button. Adds the zone the player is standing in to the quiet list. Short."
+  },
+  "announcements.quietzones.none": {
+    "message": "None yet.",
+    "description": "Shown in place of the list while it is empty."
+  },
+  "announcements.quietzones.tooltip": {
+    "message": "Zones that never announce anything, whatever else is switched on. Stand in\none and add it; click a zone here to take it off the list again.",
+    "description": "Tooltip on that label. Keep the line breaks."
+  },
+  "appearance.backing": {
+    "message": "Behind the text",
+    "description": "Row label beside the dropdown that picks what sits behind the text."
+  },
+  "appearance.backing.tooltip": {
+    "message": "Something dark behind the lines, for a name that lands on a bright sky.\n\nA band is the width of the text and fades at its ends. A strip runs the\nwhole width of the screen, the way the original does it.",
+    "description": "Tooltip on that row. Keep the line breaks."
+  },
+  "appearance.backingcolour": {
+    "message": "Backing colour",
+    "description": "Row label beside the colour of the band or strip behind the text."
+  },
+  "appearance.glow": {
+    "message": "Glow",
+    "description": "Switch label. A soft halo behind every line."
+  },
+  "appearance.glow.tooltip": {
+    "message": "A soft halo behind every line, under the outline. Costs more to draw than\nthe outline does, which matters only at very large sizes.",
+    "description": "Tooltip on that switch. Keep the line break."
+  },
+  "appearance.glowcolour": {
+    "message": "Glow colour",
+    "description": "Row label beside the glow's colour."
+  },
+  "appearance.glowspread": {
+    "message": "Glow spread",
+    "description": "Slider label. How far the glow spreads, in pixels."
+  },
+  "appearance.gradient": {
+    "message": "Fade the name to a second colour",
+    "description": "Switch label. The place name shades from its text colour to a second colour at the foot of each letter."
+  },
+  "appearance.gradient.tooltip": {
+    "message": "The place name shades from its text colour at the top of each letter to\nthis one at the foot. The header and weather keep a flat colour.",
+    "description": "Tooltip on that switch. Keep the line break."
+  },
+  "appearance.gradientcolour": {
+    "message": "Lower colour",
+    "description": "Row label beside the second colour of the gradient."
+  },
+  "appearance.group.backing": {
+    "message": "Backing",
+    "description": "Group title on the Appearance page, above the backing settings."
+  },
+  "appearance.group.glow": {
+    "message": "Glow",
+    "description": "Group title on the Appearance page, above the glow settings."
+  },
+  "appearance.group.palette": {
+    "message": "Colour play",
+    "description": "Group title on the Appearance page, above the palette settings."
+  },
+  "appearance.palette": {
+    "message": "Palette",
+    "description": "Row label beside the dropdown that picks a run of colours for the name."
+  },
+  "appearance.palette.tooltip": {
+    "message": "Letters the place name in a run of colours instead of one. The text colour\nabove still sets the outline's contrast and is what a preset carries.",
+    "description": "Tooltip on that row. Keep the line break."
+  },
+  "appearance.palettemotion": {
+    "message": "Movement",
+    "description": "Row label beside the dropdown that picks how the palette moves."
+  },
+  "appearance.palettespeed": {
+    "message": "Speed",
+    "description": "Slider label. How fast a moving palette moves."
+  },
+  "backing.choice.band": {
+    "message": "A band behind the text",
+    "description": "Dropdown entry: a dark band the width of the text."
+  },
+  "backing.choice.none": {
+    "message": "None",
+    "description": "Dropdown entry: nothing behind the text."
+  },
+  "backing.choice.vignette": {
+    "message": "A strip across the screen",
+    "description": "Dropdown entry: a dark strip across the whole screen."
+  },
+  "departure.choice.dissolve": {
+    "message": "Dissolve",
+    "description": "Dropdown entry: the letters scatter on the way out."
+  },
+  "departure.choice.fade": {
+    "message": "Fade",
+    "description": "Dropdown entry: the plain fade out."
+  },
+  "departure.choice.fall": {
+    "message": "Fall",
+    "description": "Dropdown entry: the letters sink away."
+  },
+  "departure.choice.reverse": {
+    "message": "The arrival, backwards",
+    "description": "Dropdown entry: whatever motion brought the line in plays backwards to take it out."
+  },
+  "motion.choice.assemble": {
+    "message": "Assemble",
+    "description": "Dropdown entry, a motion: letters converge from every direction."
+  },
+  "motion.choice.drop": {
+    "message": "Drop",
+    "description": "Dropdown entry, a motion: letters fall into place from above."
+  },
+  "motion.choice.flicker": {
+    "message": "Flicker",
+    "description": "Dropdown entry, a motion: letters stutter on like a neon sign."
+  },
+  "motion.choice.slide": {
+    "message": "Slide",
+    "description": "Dropdown entry, a motion: letters slide in from the right."
+  },
+  "motion.choice.zoom": {
+    "message": "Zoom",
+    "description": "Dropdown entry, a motion: letters grow into place."
+  },
+  "motion.departure": {
+    "message": "Departure",
+    "description": "Row label beside the dropdown that picks how a line leaves."
+  },
+  "motion.departure.tooltip": {
+    "message": "How the line leaves once its time is up, played over the fade out.\n\nFade: the plain fade.\nThe arrival, backwards: whatever motion brought it in takes it out.\nDissolve: the letters scatter.\nFall: the letters sink away.",
+    "description": "Tooltip on that row. Keep the line breaks; the four names match the dropdown entries."
+  },
+  "motion.particles.fireflies": {
+    "message": "Fireflies",
+    "description": "Dropdown entry. A kind of particle."
+  },
+  "motion.particles.leaves": {
+    "message": "Leaves",
+    "description": "Dropdown entry. A kind of particle."
+  },
+  "motion.particles.rain": {
+    "message": "Rain",
+    "description": "Dropdown entry. A kind of particle."
+  },
+  "motion.particles.snow": {
+    "message": "Snow",
+    "description": "Dropdown entry. A kind of particle."
+  },
+  "motion.particles.stars": {
+    "message": "Stars",
+    "description": "Dropdown entry. A kind of particle."
+  },
+  "motion.spread": {
+    "message": "Spread",
+    "description": "Slider label. How far around the name the particles play."
+  },
+  "motion.spread.tooltip": {
+    "message": "How far around the name the particles play. 1 hugs the text; higher\nvalues fill the screen around it.",
+    "description": "Tooltip on that slider. Keep the line break."
+  },
+  "palette.choice.aurora": {
+    "message": "Aurora",
+    "description": "Dropdown entry. A palette name."
+  },
+  "palette.choice.blossom": {
+    "message": "Blossom",
+    "description": "Dropdown entry. A palette name."
+  },
+  "palette.choice.golden": {
+    "message": "Golden",
+    "description": "Dropdown entry. A palette name."
+  },
+  "palette.choice.none": {
+    "message": "None",
+    "description": "Dropdown entry: no palette, one text colour."
+  },
+  "palette.choice.ocean": {
+    "message": "Ocean",
+    "description": "Dropdown entry. A palette name."
+  },
+  "palette.choice.rainbow": {
+    "message": "Rainbow",
+    "description": "Dropdown entry. A palette name."
+  },
+  "palette.choice.sunset": {
+    "message": "Sunset",
+    "description": "Dropdown entry. A palette name."
+  },
+  "palettemotion.choice.pulse": {
+    "message": "The whole line together",
+    "description": "Dropdown entry: every letter cycles through the palette together."
+  },
+  "palettemotion.choice.static": {
+    "message": "Laid across the line",
+    "description": "Dropdown entry: the palette is laid across the line once and stays put."
+  },
+  "palettemotion.choice.wave": {
+    "message": "Travelling along it",
+    "description": "Dropdown entry: the palette travels along the line."
+  },
+  "sound.filevolume": {
+    "message": "Volume",
+    "description": "Slider label. The plugin's own volume for a sound file, as a percentage."
+  },
+  "sound.filevolume.tooltip": {
+    "message": "On top of the game's own master and System Sounds volumes, which a file\nfollows as well. A game sound has no slider here because the game's own\nsettings already are its volume.",
+    "description": "Tooltip on that slider. Keep the line breaks."
+  },
+  "sound.gamesound.banner": {
+    "message": "Banners",
+    "description": "Row label beside the dropdown that picks the game sound for banners."
+  },
+  "sound.gamesound.same": {
+    "message": "The same as places",
+    "description": "First entry of the weather and banner sound dropdowns: use the sound chosen for places."
+  },
+  "sound.gamesound.weather": {
+    "message": "Weather",
+    "description": "Row label beside the dropdown that picks the game sound for weather."
   }
 }

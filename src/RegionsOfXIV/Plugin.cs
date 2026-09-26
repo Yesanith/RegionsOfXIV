@@ -70,7 +70,7 @@ public sealed class Plugin : IDalamudPlugin
         this.fonts.Rebuild();
 
         this.gameAudio = new GameAudio();
-        this.filePlayer = new FileSoundPlayer(this.gameAudio);
+        this.filePlayer = new FileSoundPlayer(this.gameAudio, () => this.config.SoundFileVolume / 100f);
 
         this.sounds = new NotificationSounds(this.config, playFile: this.filePlayer.Play);
         this.overlay = new NotificationOverlay(this.config, this.fonts, this.sounds);
@@ -226,8 +226,8 @@ public sealed class Plugin : IDalamudPlugin
     // Marshalled, because the settings window draws during the game's present rather than on the
     // framework tick, and PlayChatSoundEffect is a game function. Every other sound in the plugin
     // rides a push, which is already on the framework thread.
-    private void AuditionSound() =>
-        _ = Framework.RunOnFrameworkThread(this.sounds.PlayNow);
+    private void AuditionSound(SoundCategory category) =>
+        _ = Framework.RunOnFrameworkThread(() => this.sounds.PlayNow(category));
 
     private void RebuildFonts() =>
         this.fonts.Rebuild();

@@ -15,10 +15,10 @@ internal sealed partial class ConfigWindow
     // belongs to all three at once: the place name, the weather and the banners each ask for the
     // same noise and configure it here.
     //
-    // There is no volume slider, for either source. A game sound is mixed by the game, so the
-    // sliders the player already has are the volume control and a second one here would fight
-    // them. A file is not mixed by the game, so it is scaled by those same sliders on the way out
-    // instead: see GameMixerRules.
+    // There is no volume slider for a game sound. It is mixed by the game, so the sliders the
+    // player already has are the volume control and a second one here would fight them. A file
+    // is not mixed by the game, so it is scaled by those same sliders on the way out (see
+    // GameMixerRules) and by the one slider here on top.
     private void DrawSoundPage()
     {
         PageHeader.Draw(
@@ -54,7 +54,7 @@ internal sealed partial class ConfigWindow
             }
             else if (this.config.SoundSource == SoundSource.GameSound)
             {
-                DrawGameSoundChoice(ref changed);
+                DrawGameSoundChoices(ref changed);
             }
         }
 
@@ -92,38 +92,71 @@ internal sealed partial class ConfigWindow
     }
 
     // Numbered the way the player already knows them, from typing "<se.1>" in chat, so a sound
-    // can be auditioned in game and then chosen here by the same number.
-    private void DrawGameSoundChoice(ref bool changed)
+    // can be auditioned in game and then chosen here by the same number. Weather and banners can
+    // take one of their own, or follow the one chosen for places.
+    private void DrawGameSoundChoices(ref bool changed)
+    {
+        var places = this.config.GameSoundId;
+        if (GameSoundRow("##rox-game-sound", Loc.Get("sound.gamesound", "Sound effect"), ref places, SoundCategory.Location, withSame: false))
+        {
+            this.config.GameSoundId = places;
+            changed = true;
+        }
+
+        var weather = this.config.GameSoundIdWeather;
+        if (GameSoundRow("##rox-game-sound-weather", Loc.Get("sound.gamesound.weather", "Weather"), ref weather, SoundCategory.Weather, withSame: true))
+        {
+            this.config.GameSoundIdWeather = weather;
+            changed = true;
+        }
+
+        var banner = this.config.GameSoundIdBanner;
+        if (GameSoundRow("##rox-game-sound-banner", Loc.Get("sound.gamesound.banner", "Banners"), ref banner, SoundCategory.Banner, withSame: true))
+        {
+            this.config.GameSoundIdBanner = banner;
+            changed = true;
+        }
+    }
+
+    // The stored id is 1 to 16, or 0 for "the same as places" where that is offered; the dropdown
+    // index is that id shifted down by one, or with the "same" entry in front.
+    private bool GameSoundRow(string id, string label, ref int stored, SoundCategory category, bool withSame)
     {
         var scale = ImGuiHelpers.GlobalScale;
         var play = Loc.Get("sound.play", "Play");
         var playWidth = PillButton.Width(play, FontAwesomeIcon.Play);
         var controlWidth = Layout.RowDropdownWidth + ((playWidth + (ButtonGap * scale)) / scale);
 
-        var row = SettingsRow.Begin(Loc.Get("sound.gamesound", "Sound effect"), null, controlWidth);
+        var row = SettingsRow.Begin(label, null, controlWidth);
 
-        var selected = Math.Clamp(this.config.GameSoundId - 1, 0, GameSoundCount - 1);
-        if (Dropdown.Draw("##rox-game-sound", GameSoundLabels(), ref selected, Layout.RowDropdownWidth))
+        var labels = withSame ? GameSoundLabelsWithSame() : GameSoundLabels();
+        var selected = withSame ? Math.Clamp(stored, 0, GameSoundCount) : Math.Clamp(stored - 1, 0, GameSoundCount - 1);
+        var picked = false;
+        if (Dropdown.Draw(id, labels, ref selected, Layout.RowDropdownWidth))
         {
-            this.config.GameSoundId = selected + 1;
-            changed = true;
+            stored = withSame ? selected : selected + 1;
+            picked = true;
 
             // Auditioned on pick as well as on the button, because choosing from a list of
             // sixteen numbers is otherwise choosing blind.
-            this.actions.AuditionSound();
+            this.actions.AuditionSound(category);
         }
 
         ImGui.SameLine(0f, ButtonGap * scale);
+        ImGui.PushID(id);
         if (PillButton.Draw("##rox-game-sound-play", play, Styling.AccentGold, PillButton.Emphasis.Tinted, FontAwesomeIcon.Play,
                 tooltip: Loc.Get(
                     "sound.audition.tooltip",
                     "Plays the chosen sound now. It ignores the short gap that stops two notifications "
                     + "sounding at once, so pressing it repeatedly always makes a noise.")))
         {
-            this.actions.AuditionSound();
+            this.actions.AuditionSound(category);
         }
 
+        ImGui.PopID();
         row.End();
+
+        return picked;
     }
 
     // The typed path is buffered rather than written straight to the config, matching the custom
@@ -203,11 +236,29 @@ internal sealed partial class ConfigWindow
                     "Plays the chosen file now. It ignores the short gap that stops two notifications "
                     + "sounding at once, so pressing it repeatedly always tries again.")))
         {
-            this.actions.AuditionSound();
+            this.actions.AuditionSound(SoundCategory.Location);
         }
 
         DrawSoundFileStatus(stored);
         SettingsRow.EndBlock();
+
+        var volume = (float)this.config.SoundFileVolume;
+        var edited = false;
+        volume = Slider(
+            "##rox-sound-volume",
+            Loc.Get("sound.filevolume", "Volume"),
+            Loc.Get(
+                "sound.filevolume.tooltip",
+                "On top of the game's own master and System Sounds volumes, which a file\n" +
+                "follows as well. A game sound has no slider here because the game's own\n" +
+                "settings already are its volume."),
+            volume, 0f, 100f, "%.0f%%", ref edited);
+
+        if (edited)
+        {
+            this.config.SoundFileVolume = (int)MathF.Round(volume);
+            changed = true;
+        }
     }
 
     // Three separate things can be wrong and they are found at three different moments: the path
@@ -286,29 +337,44 @@ internal sealed partial class ConfigWindow
 
         // Auditioned on pick, for the same reason the game sounds are: a file chosen from a
         // browser is a filename, and hearing it is the only way to know it was the right one.
-        this.actions.AuditionSound();
+        this.actions.AuditionSound(SoundCategory.Location);
     }
 
     private const int GameSoundCount = 16;
 
     private static readonly string[] GameSoundNames = new string[GameSoundCount];
 
+    private static readonly string[] GameSoundNamesWithSame = new string[GameSoundCount + 1];
+
     private static int GameSoundGeneration = -1;
 
     private static string[] GameSoundLabels()
     {
+        RefreshGameSoundLabels();
+        return GameSoundNames;
+    }
+
+    private static string[] GameSoundLabelsWithSame()
+    {
+        RefreshGameSoundLabels();
+        return GameSoundNamesWithSame;
+    }
+
+    private static void RefreshGameSoundLabels()
+    {
         if (GameSoundGeneration == Loc.Generation)
         {
-            return GameSoundNames;
+            return;
         }
 
+        GameSoundNamesWithSame[0] = Loc.Get("sound.gamesound.same", "The same as places");
         for (var index = 0; index < GameSoundCount; index++)
         {
             GameSoundNames[index] = Loc.Format("sound.effect", "Sound effect {0}", index + 1);
+            GameSoundNamesWithSame[index + 1] = GameSoundNames[index];
         }
 
         GameSoundGeneration = Loc.Generation;
-        return GameSoundNames;
     }
 
     private static readonly ChoiceLabels<SoundSource> SoundSourceLabels = new(SoundSourceName);

@@ -80,6 +80,16 @@ internal sealed class DalamudGameState : IGameState
     public bool IsInCombat => Plugin.Condition[ConditionFlag.InCombat];
 
     public bool IsBoundByDuty => Plugin.Condition[ConditionFlag.BoundByDuty];
+
+    public uint TerritoryTypeId => Plugin.ClientState.TerritoryType;
+
+    public bool IsFlying =>
+        Plugin.Condition[ConditionFlag.InFlight] ||
+        Plugin.Condition[ConditionFlag.Diving];
+
+    public bool IsInCity => TerritoryKinds.Of(TerritoryTypeId) == TerritoryKind.City;
+
+    public bool IsInHousing => TerritoryKinds.Of(TerritoryTypeId) == TerritoryKind.Housing;
 }
 
 // The game's own sound settings, and whether its window is in front, read for the file playback

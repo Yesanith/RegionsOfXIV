@@ -54,7 +54,12 @@ internal sealed partial class ConfigWindow
                     "Typewriter: one letter at a time, no fade.\n" +
                     "Rise: letters lift into place from below.\n" +
                     "Wave: letters ride a wave through the line as it appears.\n" +
-                    "Burn: letters catch alight and cool into their colour.\n\n" +
+                    "Burn: letters catch alight and cool into their colour.\n" +
+                    "Drop: letters fall into place from above.\n" +
+                    "Slide: letters slide in from the right.\n" +
+                    "Assemble: letters converge from every direction.\n" +
+                    "Flicker: letters stutter on like a neon sign.\n" +
+                    "Zoom: letters grow into place.\n\n" +
                     "Runs alongside the Eorzean decode rather than instead of it."),
                 this.config.Motion, MotionLabels, ref restart);
 
@@ -72,6 +77,18 @@ internal sealed partial class ConfigWindow
                         this.config.MotionDuration, 0.1f, 5f, ref timing, ref settled);
                 }
             }
+
+            this.config.Departure = Choice(
+                "##rox-departure",
+                Loc.Get("motion.departure", "Departure"),
+                Loc.Get(
+                    "motion.departure.tooltip",
+                    "How the line leaves once its time is up, played over the fade out.\n\n" +
+                    "Fade: the plain fade.\n" +
+                    "The arrival, backwards: whatever motion brought it in takes it out.\n" +
+                    "Dissolve: the letters scatter.\n" +
+                    "Fall: the letters sink away."),
+                this.config.Departure, DepartureLabels, ref restart);
         }
 
         using (SettingsGroup.Begin(Loc.Get("motion.group.decode", "Decode")))
@@ -195,8 +212,18 @@ internal sealed partial class ConfigWindow
             Loc.Get(
                 "motion.particlecolour.tooltip",
                 "The default amber suits embers and sparkles. Hearts and petals\n" +
-                "want moving towards pink."),
+                "want moving towards pink; snow and rain want something pale."),
             this.config.ParticleColor, ref changed);
+
+        this.config.ParticleSpread = Slider(
+            "##rox-spread",
+            Loc.Get("motion.spread", "Spread"),
+            Loc.Get(
+                "motion.spread.tooltip",
+                "How far around the name the particles play. 1 hugs the text; higher\n" +
+                "values fill the screen around it."),
+            this.config.ParticleSpread, 0.5f, 3f,
+            "%.1f" + Loc.Unit("units.times", "x"), ref changed);
 
         if (this.config.Particles == ParticleEffect.Embers && this.config.Motion != MotionEffect.Burn)
         {

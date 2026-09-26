@@ -1,4 +1,4 @@
-﻿namespace RegionsOfXIV;
+namespace RegionsOfXIV;
 
 public enum FontChoice
 {
@@ -45,6 +45,8 @@ public enum SoundSource
     File,
 }
 
+// The same rule as SoundSource for every enum below: a value's number is what the config file
+// and every share code store, so new members are only ever appended.
 public enum MotionEffect
 {
     None,
@@ -52,6 +54,21 @@ public enum MotionEffect
     Rise,
     Wave,
     Burn,
+    Drop,
+    Slide,
+    Assemble,
+    Flicker,
+    Zoom,
+}
+
+// How a line leaves. Fade is the plain fade the plugin always had; the rest play a motion
+// backwards over the fade, so a line goes out the way it came in, scatters, or sinks.
+public enum DepartureEffect
+{
+    Fade,
+    Reverse,
+    Dissolve,
+    Fall,
 }
 
 public enum ParticleEffect
@@ -61,4 +78,39 @@ public enum ParticleEffect
     Embers,
     Sparkles,
     Petals,
+    Snow,
+    Fireflies,
+    Leaves,
+    Rain,
+    Stars,
+}
+
+// What sits behind the lines: nothing, a band the width of the text, or a strip across the
+// whole screen.
+public enum BackingStyle
+{
+    None,
+    Band,
+    Vignette,
+}
+
+// A run of colours across the letters of the place name, in place of one text colour.
+public enum TextPalette
+{
+    None,
+    Rainbow,
+    Sunset,
+    Ocean,
+    Aurora,
+    Blossom,
+    Golden,
+}
+
+// How a palette moves: laid once across the line, travelling along it, or the whole line
+// cycling through it together.
+public enum PaletteMotion
+{
+    Static,
+    Wave,
+    Pulse,
 }

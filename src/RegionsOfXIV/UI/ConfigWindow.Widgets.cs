@@ -39,6 +39,20 @@ internal sealed partial class ConfigWindow
         MotionEffect.Rise => Loc.Get("motion.choice.rise", "Rise"),
         MotionEffect.Wave => Loc.Get("motion.choice.wave", "Wave"),
         MotionEffect.Burn => Loc.Get("motion.choice.burn", "Burn"),
+        MotionEffect.Drop => Loc.Get("motion.choice.drop", "Drop"),
+        MotionEffect.Slide => Loc.Get("motion.choice.slide", "Slide"),
+        MotionEffect.Assemble => Loc.Get("motion.choice.assemble", "Assemble"),
+        MotionEffect.Flicker => Loc.Get("motion.choice.flicker", "Flicker"),
+        MotionEffect.Zoom => Loc.Get("motion.choice.zoom", "Zoom"),
+        _ => effect.ToString(),
+    };
+
+    private static string Label(DepartureEffect effect) => effect switch
+    {
+        DepartureEffect.Fade => Loc.Get("departure.choice.fade", "Fade"),
+        DepartureEffect.Reverse => Loc.Get("departure.choice.reverse", "The arrival, backwards"),
+        DepartureEffect.Dissolve => Loc.Get("departure.choice.dissolve", "Dissolve"),
+        DepartureEffect.Fall => Loc.Get("departure.choice.fall", "Fall"),
         _ => effect.ToString(),
     };
 
@@ -49,12 +63,51 @@ internal sealed partial class ConfigWindow
         ParticleEffect.Embers => Loc.Get("motion.particles.embers", "Embers"),
         ParticleEffect.Sparkles => Loc.Get("motion.particles.sparkles", "Sparkles"),
         ParticleEffect.Petals => Loc.Get("motion.particles.petals", "Petals"),
+        ParticleEffect.Snow => Loc.Get("motion.particles.snow", "Snow"),
+        ParticleEffect.Fireflies => Loc.Get("motion.particles.fireflies", "Fireflies"),
+        ParticleEffect.Leaves => Loc.Get("motion.particles.leaves", "Leaves"),
+        ParticleEffect.Rain => Loc.Get("motion.particles.rain", "Rain"),
+        ParticleEffect.Stars => Loc.Get("motion.particles.stars", "Stars"),
         _ => effect.ToString(),
+    };
+
+    private static string Label(BackingStyle style) => style switch
+    {
+        BackingStyle.None => Loc.Get("backing.choice.none", "None"),
+        BackingStyle.Band => Loc.Get("backing.choice.band", "A band behind the text"),
+        BackingStyle.Vignette => Loc.Get("backing.choice.vignette", "A strip across the screen"),
+        _ => style.ToString(),
+    };
+
+    // Palette names are the plugin's own words rather than anything the game has, so they are
+    // translated like everything else here.
+    private static string Label(TextPalette palette) => palette switch
+    {
+        TextPalette.None => Loc.Get("palette.choice.none", "None"),
+        TextPalette.Rainbow => Loc.Get("palette.choice.rainbow", "Rainbow"),
+        TextPalette.Sunset => Loc.Get("palette.choice.sunset", "Sunset"),
+        TextPalette.Ocean => Loc.Get("palette.choice.ocean", "Ocean"),
+        TextPalette.Aurora => Loc.Get("palette.choice.aurora", "Aurora"),
+        TextPalette.Blossom => Loc.Get("palette.choice.blossom", "Blossom"),
+        TextPalette.Golden => Loc.Get("palette.choice.golden", "Golden"),
+        _ => palette.ToString(),
+    };
+
+    private static string Label(PaletteMotion motion) => motion switch
+    {
+        PaletteMotion.Static => Loc.Get("palettemotion.choice.static", "Laid across the line"),
+        PaletteMotion.Wave => Loc.Get("palettemotion.choice.wave", "Travelling along it"),
+        PaletteMotion.Pulse => Loc.Get("palettemotion.choice.pulse", "The whole line together"),
+        _ => motion.ToString(),
     };
 
     private static readonly ChoiceLabels<FontChoice> FontChoiceLabels = new(Label);
     private static readonly ChoiceLabels<MotionEffect> MotionLabels = new(Label);
+    private static readonly ChoiceLabels<DepartureEffect> DepartureLabels = new(Label);
     private static readonly ChoiceLabels<ParticleEffect> ParticleLabels = new(Label);
+    private static readonly ChoiceLabels<BackingStyle> BackingLabels = new(Label);
+    private static readonly ChoiceLabels<TextPalette> PaletteLabels = new(Label);
+    private static readonly ChoiceLabels<PaletteMotion> PaletteMotionLabels = new(Label);
 
     private readonly ColumnLayout columns = new();
 

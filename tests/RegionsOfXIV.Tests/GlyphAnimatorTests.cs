@@ -13,6 +13,11 @@ public class GlyphAnimatorTests
         MotionEffect.Rise,
         MotionEffect.Wave,
         MotionEffect.Burn,
+        MotionEffect.Drop,
+        MotionEffect.Slide,
+        MotionEffect.Assemble,
+        MotionEffect.Flicker,
+        MotionEffect.Zoom,
     ];
 
     public static TheoryData<MotionEffect> AnimatedEffects()
@@ -34,9 +39,11 @@ public class GlyphAnimatorTests
             {
                 var state = GlyphAnimator.For(effect, i, count, 1f, FontSize);
 
+                Assert.Equal(0f, state.OffsetX, 5);
                 Assert.Equal(0f, state.OffsetY, 5);
                 Assert.Equal(1f, state.Alpha, 5);
                 Assert.Equal(0f, state.Heat, 5);
+                Assert.Equal(1f, state.Scale, 5);
             }
         }
     }
@@ -151,8 +158,10 @@ public class GlyphAnimatorTests
             var end = GlyphAnimator.For(effect, i, count, 1f, FontSize);
 
             if (MathF.Abs(now.Alpha - end.Alpha) > 0.001f
+                || MathF.Abs(now.OffsetX - end.OffsetX) > 0.01f
                 || MathF.Abs(now.OffsetY - end.OffsetY) > 0.01f
-                || MathF.Abs(now.Heat - end.Heat) > 0.001f)
+                || MathF.Abs(now.Heat - end.Heat) > 0.001f
+                || MathF.Abs(now.Scale - end.Scale) > 0.001f)
                 return false;
         }
 
@@ -215,5 +224,97 @@ public class GlyphAnimatorTests
         Assert.True(
             MathF.Abs(riseLowest - riseHighest) > MathF.Abs(waveLowest - waveHighest) * 2f,
             "Rise should travel visibly further than Wave");
+    }
+
+    [Fact]
+    public void DropComesDownFromAbove()
+    {
+        Assert.True(GlyphAnimator.For(MotionEffect.Drop, 0, 12, 0f, FontSize).OffsetY < 0f);
+    }
+
+    [Fact]
+    public void SlideComesInFromTheRightAndOnlyMovesSideways()
+    {
+        var start = GlyphAnimator.For(MotionEffect.Slide, 0, 1, 0f, FontSize);
+
+        Assert.True(start.OffsetX > 0f);
+        Assert.Equal(0f, start.OffsetY, 5);
+    }
+
+    // The scatter is fixed by the glyph's index, so a replay looks like the first showing.
+    [Fact]
+    public void AssembleScattersEachGlyphTheSameWayEveryTime()
+    {
+        var first = GlyphAnimator.For(MotionEffect.Assemble, 4, 12, 0.1f, FontSize);
+        var again = GlyphAnimator.For(MotionEffect.Assemble, 4, 12, 0.1f, FontSize);
+
+        Assert.Equal(first, again);
+        Assert.True(first.OffsetX != 0f || first.OffsetY != 0f, "the glyph started in place");
+    }
+
+    [Fact]
+    public void AssembleOnlyEverConverges()
+    {
+        var previous = float.MaxValue;
+
+        for (var step = 0; step <= 100; step++)
+        {
+            var state = GlyphAnimator.For(MotionEffect.Assemble, 2, 1, step / 100f, FontSize);
+            var distance = MathF.Sqrt((state.OffsetX * state.OffsetX) + (state.OffsetY * state.OffsetY));
+
+            Assert.True(distance <= previous + 0.0001f, $"glyph moved away again at {step}%");
+            previous = distance;
+        }
+    }
+
+    // Never quite solid until its window ends, so a line visibly settles rather than happening
+    // to be lit when the stage runs out.
+    [Fact]
+    public void FlickerIsNeverSolidBeforeItsWindowEnds()
+    {
+        for (var step = 1; step < 100; step++)
+        {
+            var alpha = GlyphAnimator.For(MotionEffect.Flicker, 0, 1, step / 100f, FontSize).Alpha;
+
+            Assert.True(alpha < 1f, $"flicker was solid at {step}%");
+        }
+    }
+
+    [Fact]
+    public void ZoomGrowsIntoPlaceAndOvershootsOnTheWay()
+    {
+        Assert.True(GlyphAnimator.For(MotionEffect.Zoom, 0, 1, 0.05f, FontSize).Scale < 0.5f);
+
+        var largest = 0f;
+        for (var step = 0; step <= 100; step++)
+            largest = MathF.Max(largest, GlyphAnimator.For(MotionEffect.Zoom, 0, 1, step / 100f, FontSize).Scale);
+
+        Assert.True(largest > 1f, "Zoom never overshot its resting size");
+    }
+
+    [Fact]
+    public void APlainFadeHasNoDepartureMotion()
+    {
+        Assert.Null(GlyphAnimator.DepartureMotion(DepartureEffect.Fade, MotionEffect.Rise));
+    }
+
+    [Fact]
+    public void ReversingAnArrivalPlaysThatArrival()
+    {
+        Assert.Equal(MotionEffect.Wave, GlyphAnimator.DepartureMotion(DepartureEffect.Reverse, MotionEffect.Wave));
+    }
+
+    // There is nothing to run backwards, so the line fades as it would have anyway.
+    [Fact]
+    public void ReversingNoArrivalIsAPlainFade()
+    {
+        Assert.Null(GlyphAnimator.DepartureMotion(DepartureEffect.Reverse, MotionEffect.None));
+    }
+
+    [Fact]
+    public void FallingAndDissolvingDoNotDependOnTheArrival()
+    {
+        Assert.Equal(MotionEffect.Rise, GlyphAnimator.DepartureMotion(DepartureEffect.Fall, MotionEffect.Burn));
+        Assert.Equal(MotionEffect.Assemble, GlyphAnimator.DepartureMotion(DepartureEffect.Dissolve, MotionEffect.None));
     }
 }

@@ -8,8 +8,8 @@ namespace RegionsOfXIV.UI;
 
 internal sealed partial class ConfigWindow
 {
-    // Where and how the lines are set on the left; what they are coloured with on the right. The
-    // rows that belong to a switch appear under it only while it is on.
+    // Where and how the lines are set on the left; what they are coloured and lit with on the
+    // right. The rows that belong to a switch appear under it only while it is on.
     private void DrawAppearancePage()
     {
         PageHeader.Draw(
@@ -39,6 +39,11 @@ internal sealed partial class ConfigWindow
             DrawHeaderShape(ref changed);
         }
 
+        using (SettingsGroup.Begin(Loc.Get("appearance.group.backing", "Backing")))
+        {
+            DrawBacking(ref changed);
+        }
+
         this.columns.Next();
 
         using (SettingsGroup.Begin(Loc.Get("appearance.group.colours", "Colours")))
@@ -46,9 +51,19 @@ internal sealed partial class ConfigWindow
             DrawFillColors(ref changed);
         }
 
+        using (SettingsGroup.Begin(Loc.Get("appearance.group.palette", "Colour play")))
+        {
+            DrawPalette(ref changed);
+        }
+
         using (SettingsGroup.Begin(Loc.Get("appearance.group.outline", "Outline")))
         {
             DrawOutline(ref changed);
+        }
+
+        using (SettingsGroup.Begin(Loc.Get("appearance.group.glow", "Glow")))
+        {
+            DrawGlow(ref changed);
         }
 
         using (SettingsGroup.Begin(Loc.Get("appearance.group.shadow", "Drop shadow")))
@@ -155,6 +170,29 @@ internal sealed partial class ConfigWindow
             "%.2f " + Loc.Unit("units.lines", "lines"), ref changed);
     }
 
+    private void DrawBacking(ref bool changed)
+    {
+        this.config.Backing = Choice(
+            "##rox-backing",
+            Loc.Get("appearance.backing", "Behind the text"),
+            Loc.Get(
+                "appearance.backing.tooltip",
+                "Something dark behind the lines, for a name that lands on a bright sky.\n\n" +
+                "A band is the width of the text and fades at its ends. A strip runs the\n" +
+                "whole width of the screen, the way the original does it."),
+            this.config.Backing, BackingLabels, ref changed);
+
+        using var rows = Reveal("##rox-backing-rows", this.config.Backing != BackingStyle.None);
+        if (rows is null)
+        {
+            return;
+        }
+
+        this.config.BackingColor = Colour(
+            "##rox-backingcolour", Loc.Get("appearance.backingcolour", "Backing colour"), null,
+            this.config.BackingColor, ref changed);
+    }
+
     // SeparateLineColors gates one picker here and two in DrawOutline below: the switch belongs
     // with the pickers it enables, and those sit either side of the split between fill and outline.
     private void DrawFillColors(ref bool changed)
@@ -162,6 +200,25 @@ internal sealed partial class ConfigWindow
         this.config.TextColor = Colour(
             "##rox-textcolour", Loc.Get("appearance.textcolour", "Text colour"), null,
             this.config.TextColor, ref changed);
+
+        this.config.TextGradientEnabled = Toggle(
+            "##rox-gradient",
+            Loc.Get("appearance.gradient", "Fade the name to a second colour"),
+            Loc.Get(
+                "appearance.gradient.tooltip",
+                "The place name shades from its text colour at the top of each letter to\n" +
+                "this one at the foot. The header and weather keep a flat colour."),
+            this.config.TextGradientEnabled, ref changed);
+
+        using (var rows = Reveal("##rox-gradient-rows", this.config.TextGradientEnabled))
+        {
+            if (rows is not null)
+            {
+                this.config.TextGradientColor = Colour(
+                    "##rox-gradientcolour", Loc.Get("appearance.gradientcolour", "Lower colour"), null,
+                    this.config.TextGradientColor, ref changed);
+            }
+        }
 
         this.config.HeaderColor = Colour(
             "##rox-headercolour", Loc.Get("appearance.headercolour", "Header colour"), null,
@@ -178,8 +235,8 @@ internal sealed partial class ConfigWindow
                 "line can be pushed towards the background without touching the others."),
             this.config.SeparateLineColors, ref changed);
 
-        using var rows = Reveal("##rox-weather-colour-rows", this.config.SeparateLineColors);
-        if (rows is null)
+        using var weatherRows = Reveal("##rox-weather-colour-rows", this.config.SeparateLineColors);
+        if (weatherRows is null)
         {
             return;
         }
@@ -187,6 +244,37 @@ internal sealed partial class ConfigWindow
         this.config.WeatherColor = Colour(
             "##rox-weathercolour", Loc.Get("appearance.weathercolour", "Weather colour"), null,
             this.config.WeatherColor, ref changed);
+    }
+
+    // A run of colours over the letters of the name, in place of one text colour. The name only,
+    // so the header stays readable above whatever the name is doing.
+    private void DrawPalette(ref bool changed)
+    {
+        this.config.Palette = Choice(
+            "##rox-palette",
+            Loc.Get("appearance.palette", "Palette"),
+            Loc.Get(
+                "appearance.palette.tooltip",
+                "Letters the place name in a run of colours instead of one. The text colour\n" +
+                "above still sets the outline's contrast and is what a preset carries."),
+            this.config.Palette, PaletteLabels, ref changed);
+
+        using var rows = Reveal("##rox-palette-rows", this.config.Palette != TextPalette.None);
+        if (rows is null)
+        {
+            return;
+        }
+
+        this.config.PaletteMotion = Choice(
+            "##rox-palette-motion",
+            Loc.Get("appearance.palettemotion", "Movement"), null,
+            this.config.PaletteMotion, PaletteMotionLabels, ref changed);
+
+        this.config.PaletteSpeed = Slider(
+            "##rox-palette-speed",
+            Loc.Get("appearance.palettespeed", "Speed"), null,
+            this.config.PaletteSpeed, 0.2f, 3f,
+            "%.1f" + Loc.Unit("units.times", "x"), ref changed, enabled: this.config.PaletteMotion != PaletteMotion.Static);
     }
 
     private void DrawOutline(ref bool changed)
@@ -215,6 +303,34 @@ internal sealed partial class ConfigWindow
             Loc.Get("appearance.outlinethickness.tooltip", "Zero turns the outline off."),
             this.config.StrokeThickness, 0f, 4f,
             "%.1f " + Loc.Unit("units.px", "px"), ref changed);
+    }
+
+    private void DrawGlow(ref bool changed)
+    {
+        this.config.GlowEnabled = Toggle(
+            "##rox-glow",
+            Loc.Get("appearance.glow", "Glow"),
+            Loc.Get(
+                "appearance.glow.tooltip",
+                "A soft halo behind every line, under the outline. Costs more to draw than\n" +
+                "the outline does, which matters only at very large sizes."),
+            this.config.GlowEnabled, ref changed);
+
+        using var rows = Reveal("##rox-glow-rows", this.config.GlowEnabled);
+        if (rows is null)
+        {
+            return;
+        }
+
+        this.config.GlowColor = Colour(
+            "##rox-glowcolour", Loc.Get("appearance.glowcolour", "Glow colour"), null,
+            this.config.GlowColor, ref changed);
+
+        this.config.GlowSpread = Slider(
+            "##rox-glowspread",
+            Loc.Get("appearance.glowspread", "Glow spread"), null,
+            this.config.GlowSpread, 1f, 14f,
+            "%.0f " + Loc.Unit("units.px", "px"), ref changed);
     }
 
     private void DrawShadow(ref bool changed)

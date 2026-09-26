@@ -19,6 +19,14 @@ internal sealed partial class ConfigWindow
 
     private string newPresetName = string.Empty;
 
+    // The stage paints whichever card is hovered, through a scratch configuration the preset is
+    // applied to. Keyed by the card so a hover that stays on one card applies it once.
+    private readonly Configuration presetScratch = new();
+
+    private string? hoveredPreset;
+
+    private string? hoveredThisFrame;
+
     // The colour a preset card wears: what it paints on screen, taken from the preset itself so
     // the card previews the look rather than guessing at it. Built on first use rather than at
     // type load: applying a preset repairs faint colours, and that can log.
@@ -64,6 +72,7 @@ internal sealed partial class ConfigWindow
         Styling.VSpace(14f);
 
         var applied = false;
+        this.hoveredThisFrame = null;
 
         SectionHeading(
             Loc.Get("presets.builtin", "Built-in looks"),
@@ -106,6 +115,8 @@ internal sealed partial class ConfigWindow
                 Loc.Get("presets.discord.tooltip", "Trade preset codes, report a bug, or suggest a feature."),
                 DiscordInvite));
         }
+
+        SettleHoverPreview();
 
         if (!applied)
         {
@@ -197,6 +208,7 @@ internal sealed partial class ConfigWindow
             if (hit.Hovered)
             {
                 Tooltip.Show(Loc.Format("presets.builtin.tooltip", "{0}\nEverything else returns to its default.", DescriptionOf(preset)));
+                HoverPreview(preset.Name, preset);
             }
 
             if (hit.Clicked)
@@ -237,6 +249,7 @@ internal sealed partial class ConfigWindow
             if (hit.Hovered)
             {
                 Tooltip.Show(Loc.Get("presets.saved.tooltip", "Apply this preset.\nRight-click to share, overwrite or delete it."));
+                HoverPreview(id, preset);
             }
 
             if (hit.Clicked)
@@ -302,6 +315,48 @@ internal sealed partial class ConfigWindow
         }
 
         return applied;
+    }
+
+    private void HoverPreview(string key, in Preset preset)
+    {
+        this.hoveredThisFrame = key;
+        if (this.hoveredPreset == key)
+        {
+            return;
+        }
+
+        this.hoveredPreset = key;
+        preset.ApplyTo(this.presetScratch);
+        this.stage.Override(this.presetScratch);
+        this.stage.Replay();
+    }
+
+    private void HoverPreview(string key, UserPreset preset)
+    {
+        this.hoveredThisFrame = key;
+        if (this.hoveredPreset == key)
+        {
+            return;
+        }
+
+        this.hoveredPreset = key;
+        preset.ApplyTo(this.presetScratch);
+        this.stage.Override(this.presetScratch);
+        this.stage.Replay();
+    }
+
+    // Back to the live look on the first frame nothing is hovered, and replayed so the change of
+    // look is not a jump between two half-finished animations.
+    private void SettleHoverPreview()
+    {
+        if (this.hoveredThisFrame is not null || this.hoveredPreset is null)
+        {
+            return;
+        }
+
+        this.hoveredPreset = null;
+        this.stage.Override(null);
+        this.stage.Replay();
     }
 
     private static Hit.Result DrawPresetCard(string id, string name, string description, Vector4 accent, Vector2 slot, Vector2 size)

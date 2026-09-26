@@ -25,7 +25,7 @@ internal readonly record struct ConfigActions(
     Action RestoreNativeAreaText,
     Action RestoreNativeLoadingTitle,
     Action ReloadLanguage,
-    Action AuditionSound,
+    Action<SoundCategory> AuditionSound,
     Func<string, string?> SoundFileProblem,
     Func<string?> SoundSilenceReason);
 

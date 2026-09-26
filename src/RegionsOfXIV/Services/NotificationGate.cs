@@ -69,7 +69,10 @@ internal sealed class NotificationGate
     // Deliberately does not consult IsBlockedByGameState. A zone entry is decided during the
     // loading screen, when BetweenAreas and friends are all set, so those checks would refuse
     // every arrival there is.
-    public bool ShouldAnnounceZoneEntry(bool destinationIsPvp, bool destinationIsDuty)
+    public bool ShouldAnnounceZoneEntry(bool destinationIsPvp, bool destinationIsDuty) =>
+        ShouldAnnounceZoneEntry(destinationIsPvp, destinationIsDuty, this.game.TerritoryTypeId);
+
+    public bool ShouldAnnounceZoneEntry(bool destinationIsPvp, bool destinationIsDuty, uint territoryTypeId)
     {
         if (!this.config.HideNativeLoadingTitle)
             return false;
@@ -78,6 +81,9 @@ internal sealed class NotificationGate
             return false;
 
         if (this.config.HideInDuty && destinationIsDuty)
+            return false;
+
+        if (IsQuietPlace(territoryTypeId))
             return false;
 
         return true;
@@ -100,7 +106,9 @@ internal sealed class NotificationGate
         CanAnnounceAnyArea() && this.now() >= this.nextAllowed;
 
     public bool ShouldAnnounceWeather() =>
-        this.config.WeatherNotificationEnabled && !IsBlockedByGameState();
+        this.config.WeatherNotificationEnabled
+        && !IsBlockedByGameState()
+        && !IsQuietPlace(this.game.TerritoryTypeId);
 
     // Banners answer to a narrower set of rules than anything else here, and each omission is
     // deliberate.
@@ -146,7 +154,22 @@ internal sealed class NotificationGate
 
     private bool CanAnnounceAnyArea() =>
         (this.config.AreaNotificationEnabled || this.config.SubAreaNotificationEnabled)
-        && !IsBlockedByGameState();
+        && !IsBlockedByGameState()
+        && !IsQuietPlace(this.game.TerritoryTypeId);
+
+    // The places that never announce: a territory on the quiet list, or a city or a housing
+    // district when those are switched off. Asked of the destination for a zone entry and of the
+    // place the player is standing in for everything else.
+    private bool IsQuietPlace(uint territoryTypeId)
+    {
+        if (this.config.IsQuiet(territoryTypeId))
+            return true;
+
+        if (this.config.HideInCities && this.game.IsInCity)
+            return true;
+
+        return this.config.HideInHousing && this.game.IsInHousing;
+    }
 
     public void MarkZoneAnnounced(NotificationTiming timing)
     {
@@ -184,9 +207,14 @@ internal sealed class NotificationGate
         if (AnnouncedRecently(current, now))
             return false;
 
+        if (IsQuietPlace(current.TerritoryTypeId))
+            return false;
+
+        // The flight flag is the exact answer where the speed estimate is only a good one; both
+        // are kept because the flag is not raised for every kind of fast travel.
         if (tier == LocationTier.SubArea &&
             this.config.HideWhileTravellingFast &&
-            speed >= TravellingSpeed)
+            (speed >= TravellingSpeed || this.game.IsFlying))
             return false;
 
         return true;

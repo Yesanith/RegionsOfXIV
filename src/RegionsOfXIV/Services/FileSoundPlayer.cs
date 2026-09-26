@@ -51,7 +51,15 @@ internal sealed class FileSoundPlayer : IDisposable
 
     private string? lastLogged;
 
-    public FileSoundPlayer(IGameAudio audio) => this.audio = audio;
+    // The plugin's own volume for a file, as a fraction, read when a sound is asked for rather than
+    // captured, so the slider is honoured the moment it moves.
+    private readonly Func<float>? volumeScale;
+
+    public FileSoundPlayer(IGameAudio audio, Func<float>? volumeScale = null)
+    {
+        this.audio = audio;
+        this.volumeScale = volumeScale;
+    }
 
     // What the Sound tab shows under the file row, for the file it is currently showing. Null when
     // the last attempt at that file was fine, when there has not been one, or when the last
@@ -65,6 +73,11 @@ internal sealed class FileSoundPlayer : IDisposable
     public bool Play(string path)
     {
         if (GameMixerRules.Decide(this.audio).Volume is not { } volume)
+            return false;
+
+        volume *= Math.Clamp(this.volumeScale?.Invoke() ?? 1f, 0f, 1f);
+
+        if (volume <= 0f)
             return false;
 
         if (SoundLimits.CustomSoundProblem(path) is { } fault)

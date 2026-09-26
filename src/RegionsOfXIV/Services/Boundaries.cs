@@ -109,6 +109,13 @@ internal interface IGateSettings
     bool WeatherNotificationEnabled { get; }
 
     bool BannerNotificationEnabled { get; }
+
+    // Defaults, so a fake written before these existed keeps compiling and keeps answering no.
+    bool HideInCities => false;
+
+    bool HideInHousing => false;
+
+    bool IsQuiet(uint territoryTypeId) => false;
 }
 
 // The slice of the config NotificationSounds can see, narrow for the same reason IGateSettings is:
@@ -126,6 +133,12 @@ internal interface ISoundSettings
     bool SoundOnWeather { get; }
 
     bool SoundOnBanner { get; }
+
+    // Zero means the same sound as GameSoundId, which is what every configuration was before a
+    // category could differ.
+    int GameSoundIdWeather => 0;
+
+    int GameSoundIdBanner => 0;
 }
 
 // The game's own sound settings, as far as playing a file has to care about them.
@@ -172,6 +185,10 @@ internal interface INotificationSink
 {
     void Push(string? header, string text);
 
+    // A minor place is an area or a sub-area: the overlay draws those at the smaller presence
+    // the settings choose. The default forwards, so a sink that does not care keeps working.
+    void Push(string? header, string text, bool minor) => Push(header, text);
+
     void PushWeather(string text, uint iconId);
 
     // Separate from Push because a banner and a place name can be on screen at the same moment.
@@ -199,4 +216,13 @@ internal interface IGameState
     bool IsInCombat { get; }
 
     bool IsBoundByDuty { get; }
+
+    // Defaults, so a fake written before these existed keeps compiling.
+    uint TerritoryTypeId => 0;
+
+    bool IsFlying => false;
+
+    bool IsInCity => false;
+
+    bool IsInHousing => false;
 }
