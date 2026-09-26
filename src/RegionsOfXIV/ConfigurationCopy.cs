@@ -31,8 +31,9 @@ internal static class ConfigurationCopy
     [
         "Version", "UserPresets", "LastSeenVersion", "OverlapHeader",
         "Language", "TranslationNoticeDismissedFor", "BannerNameLanguage",
-        "SoundSource", "GameSoundId", "SoundFilePath",
-        "SoundOnLocation", "SoundOnWeather", "SoundOnBanner",
+        "SoundSource", "GameSoundId", "GameSoundIdWeather", "GameSoundIdBanner", "SoundFilePath",
+        "SoundFileVolume", "SoundOnLocation", "SoundOnWeather", "SoundOnBanner",
+        "QuietTerritories",
     ];
 
     // Settings that no longer travel, but that an older preset can still name. Migrate() works

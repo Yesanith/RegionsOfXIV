@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 
@@ -12,11 +12,23 @@ internal readonly record struct Shadow(uint Color, Vector2 Offset, float Spread)
         (this.Color >> 24) != 0u && (this.Offset != Vector2.Zero || this.Spread > 0f);
 }
 
-internal readonly record struct Ink(uint Fill, uint Stroke, float StrokeDistance, Shadow Shadow)
+// A soft halo behind the letters, under the outline, spread this many pixels out.
+internal readonly record struct Glow(uint Color, float Spread)
+{
+    public static readonly Glow None = default;
+
+    public bool IsVisible => (this.Color >> 24) != 0u && this.Spread > 0f;
+}
+
+// FillBottom is a second fill colour for the foot of each glyph, or zero for a flat fill.
+internal readonly record struct Ink(
+    uint Fill, uint Stroke, float StrokeDistance, Shadow Shadow, Glow Glow = default, uint FillBottom = 0u)
 {
     public bool HasStroke => this.StrokeDistance > 0f && (this.Stroke >> 24) != 0u;
 
     public bool HasFill => (this.Fill >> 24) != 0u;
+
+    public bool HasGradient => (this.FillBottom >> 24) != 0u;
 }
 
 // Text is drawn a glyph at a time rather than handed to ImGui as a string, because the motion
@@ -30,9 +42,11 @@ internal static class GlyphPainter
         new(-1, 1), new(0, 1), new(1, 1),
     ];
 
-    // Shadow first, then the outline ring, then the fill on top. Each layer is skipped when it
-    // would be invisible: a line costs up to nineteen draw calls per glyph with everything on, so
-    // the cheap checks are worth making.
+    private const int GlowLayers = 3;
+
+    // Shadow first, then the glow, then the outline ring, then the fill on top. Each layer is
+    // skipped when it would be invisible: a line costs up to forty-three draw calls per glyph
+    // with everything on, so the cheap checks are worth making.
     public static void DrawStroked(
         ImDrawListPtr drawList,
         Vector2 position,
@@ -40,7 +54,7 @@ internal static class GlyphPainter
         in Ink ink,
         float scale = 1f)
     {
-        if (text.IsEmpty || (!ink.HasFill && !ink.HasStroke && !ink.Shadow.IsVisible))
+        if (text.IsEmpty || (!ink.HasFill && !ink.HasStroke && !ink.Shadow.IsVisible && !ink.Glow.IsVisible))
             return;
 
         var font = ImGui.GetFont();
@@ -49,14 +63,30 @@ internal static class GlyphPainter
         if (ink.Shadow.IsVisible)
             DrawShadow(drawList, font, size, position, text, ink.Shadow);
 
+        if (ink.Glow.IsVisible)
+            DrawGlow(drawList, font, size, position, text, ink.Glow);
+
         if (ink.HasStroke)
         {
             foreach (var offset in StrokeOffsets)
                 drawList.AddText(font, size, position + (offset * ink.StrokeDistance), ink.Stroke, text);
         }
 
-        if (ink.HasFill)
-            drawList.AddText(font, size, position, ink.Fill, text);
+        if (!ink.HasFill)
+            return;
+
+        var start = drawList.VtxBuffer.Size;
+        drawList.AddText(font, size, position, ink.Fill, text);
+
+        // Shaded top to bottom over the line's own height, so every glyph in a run takes the same
+        // gradient whatever its own shape.
+        if (ink.HasGradient)
+        {
+            ImGuiP.ShadeVertsLinearColorGradientKeepAlpha(
+                drawList, start, drawList.VtxBuffer.Size,
+                position, position + new Vector2(0f, size),
+                ink.Fill, ink.FillBottom);
+        }
     }
 
     private static void DrawShadow(
@@ -76,6 +106,30 @@ internal static class GlyphPainter
         }
 
         drawList.AddText(font, size, at, shadow.Color, text);
+    }
+
+    // Rings of the glow colour at growing distances and falling alpha. Three rings of eight is
+    // enough to read as soft at notification sizes without a blur pass, which the draw list
+    // cannot do.
+    private static void DrawGlow(
+        ImDrawListPtr drawList,
+        ImFontPtr font,
+        float size,
+        Vector2 position,
+        ReadOnlySpan<char> text,
+        in Glow glow)
+    {
+        var alpha = (glow.Color >> 24) / 255f;
+
+        for (var layer = GlowLayers; layer >= 1; layer--)
+        {
+            var distance = glow.Spread * layer / GlowLayers;
+            var layerAlpha = alpha * (1f - ((layer - 1f) / GlowLayers)) / 4f;
+            var color = (glow.Color & 0x00FFFFFFu) | ((uint)(layerAlpha * 255f) << 24);
+
+            foreach (var offset in StrokeOffsets)
+                drawList.AddText(font, size, position + (offset * distance), color, text);
+        }
     }
 
     public static float RunWidth(string text, float tracking)

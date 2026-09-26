@@ -100,6 +100,10 @@ internal sealed class AreaNotification
 
     public uint IconId { get; init; }
 
+    // How large against a full notification: 1 for a zone arrival, the configured fraction for
+    // the smaller places. The renderer scales the lines and their gaps by it.
+    public float Presence { get; init; } = 1f;
+
     private NotificationPhase Phase { get; set; } = NotificationPhase.FadeIn;
 
     public float Opacity { get; private set; }
@@ -107,6 +111,9 @@ internal sealed class AreaNotification
     public float MotionProgress { get; private set; }
 
     public float RevealProgress { get; private set; }
+
+    // How far through the fade out, for a departure that plays a motion over it. Zero until then.
+    public float DepartureProgress { get; private set; }
 
     // Half the configured fade, floored so it does not simply snap, and never longer than the
     // fade it stands in for -- FadeOutDuration goes down to 0.05s, well under the floor.
@@ -239,10 +246,12 @@ internal sealed class AreaNotification
 
             case NotificationPhase.FadeOut:
                 this.activeFadeOut.Update();
-                Opacity = this.fadeOutFrom * (1f - (float)this.activeFadeOut.ValueClamped);
+                DepartureProgress = (float)this.activeFadeOut.ValueClamped;
+                Opacity = this.fadeOutFrom * (1f - DepartureProgress);
                 if (this.activeFadeOut.IsDone)
                 {
                     Opacity = 0f;
+                    DepartureProgress = 1f;
                     Advance(NotificationPhase.Done);
                 }
 

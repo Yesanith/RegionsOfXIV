@@ -104,6 +104,28 @@ is not used for a modified version. The file is named for what it is rather
 than carrying a Reserved Font Name.
 
 
+Noto Sans Medium, Latin subset - assets/fonts/NotoSans-Medium-Latin.ttf
+-----------------------------------------------------------------------
+Included in this repository and in the released plugin, under the SIL Open Font
+License 1.1, the same licence and the same copyright as the subset above. The
+full licence text travels with it as assets/fonts/NotoSans-OFL.txt.
+
+    Copyright 2022 The Noto Project Authors
+    https://github.com/notofonts/latin-greek-cyrillic
+
+It is a subset of Noto Sans Medium cut down to the Latin blocks: Basic Latin,
+Latin-1, Latin Extended-A, Latin Extended-B, the combining marks, Latin Extended
+Additional, general punctuation and currency. About 1,200 glyphs and 114 KB.
+Nothing else from the font is included.
+
+It is the face the plugin's own settings window draws with. The notification
+fonts are unaffected. Everything the window needs outside Latin is merged in at
+build time from the Noto Sans CJK that Dalamud ships.
+
+Named for what it is rather than carrying a Reserved Font Name, as the OFL
+requires of a modified version.
+
+
 Dalamud and FFXIVClientStructs
 ------------------------------
 This plugin builds against Dalamud (AGPL-3.0) and FFXIVClientStructs (MIT).

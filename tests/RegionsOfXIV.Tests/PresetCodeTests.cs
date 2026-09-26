@@ -71,9 +71,10 @@ public class PresetCodeTests
             Assert.Equal(property.GetValue(defaults), property.GetValue(preset!.Settings));
     }
 
+    // The three enums this names have ten members each, so 10 is the first value none of them has.
     [Theory]
     [InlineData(99)]
-    [InlineData(5)]
+    [InlineData(10)]
     [InlineData(-1)]
     public void IgnoresAnEffectThisBuildDoesNotHave(int unknown)
     {

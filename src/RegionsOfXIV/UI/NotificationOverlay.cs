@@ -108,12 +108,14 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
         }
     }
 
-    public void Push(string? header, string text)
+    public void Push(string? header, string text) => Push(header, text, minor: false);
+
+    public void Push(string? header, string text, bool minor)
     {
         if (this.previewHeld)
             return;
 
-        Spawn(this.locations, new Line(header, text));
+        Spawn(this.locations, new Line(header, text, Minor: minor));
         this.sounds.Play(SoundCategory.Location);
     }
 
@@ -261,16 +263,19 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
             existing.Dismiss();
         }
 
+        // A minor place holds for a fraction of the configured time and draws at a fraction of
+        // the size, both chosen on the Announcements page.
         var notification = new AreaNotification(
             line.Header,
             line.Text,
             this.config.FadeInDuration,
             this.config.Motion != MotionEffect.None ? this.config.MotionDuration : TimeSpan.Zero,
             this.renderer.IsDecoding ? this.config.RevealDuration : TimeSpan.Zero,
-            this.config.ShowDuration,
+            line.Minor ? this.config.ShowDuration * this.config.MinorPlaceHoldScale : this.config.ShowDuration,
             this.config.FadeOutDuration)
         {
             IconId = line.Icon,
+            Presence = line.Minor ? this.config.MinorPlaceScale : 1f,
         };
 
         lane.Items.Add(notification);
@@ -400,7 +405,7 @@ internal sealed class NotificationOverlay : Window, IDisposable, INotificationSi
 
     private static TimeSpan Longer(TimeSpan a, TimeSpan b) => a > b ? a : b;
 
-    private readonly record struct Line(string? Header, string Text, uint Icon = 0);
+    private readonly record struct Line(string? Header, string Text, uint Icon = 0, bool Minor = false);
 
     // A named delegate rather than Func, so the sample keeps the `in` the three line builders
     // take it by. A method group with an `in` parameter will not bind to Func<PreviewSample, _>.

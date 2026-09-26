@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game;
+using Dalamud.Interface;
 using Dalamud.Interface.Utility;
-using Dalamud.Interface.Utility.Raii;
 using RegionsOfXIV.Services;
+using RegionsOfXIV.UI.Components;
 
 namespace RegionsOfXIV.UI;
 
@@ -16,7 +17,7 @@ internal sealed partial class ConfigWindow
     // font atlas per character; it lands when the field loses focus.
     //
     // ProblemWith caches its answer for the same reason -- validating a path touches the disk,
-    // and this is drawn every frame the tab is open.
+    // and this is drawn every frame the page is open.
     private sealed class FontPathEditor
     {
         public string? Buffer;
@@ -25,19 +26,44 @@ internal sealed partial class ConfigWindow
 
         public string? Problem;
 
+        private string? label;
+
+        private int labelGeneration = -1;
+
         public string? ProblemWith(string path)
         {
             if (this.Checked == path)
+            {
                 return this.Problem;
+            }
 
             this.Checked = path;
             this.Problem = FontLimits.CustomFontProblem(path);
+            this.label = null;
 
             return this.Problem;
+        }
+
+        // Rebuilt when the path or the language changes, not on every frame the page is drawn.
+        public string LabelFor(string path)
+        {
+            if (this.label is not null && this.labelGeneration == Loc.Generation)
+            {
+                return this.label;
+            }
+
+            this.labelGeneration = Loc.Generation;
+            return this.label = Loc.Format("fonts.drawingwith", "Drawing with {0}.", Path.GetFileName(path));
         }
     }
 
     private readonly FontPathEditor[] pathEditors = [new(), new(), new()];
+
+    private readonly Segmented.Item[] fontRoleItems = new Segmented.Item[3];
+
+    private int fontRole;
+
+    private int fontRoleGeneration = -1;
 
     // Pixels at 100% Dalamud scale. The atlas multiplies by the global scale when it builds, so a
     // player at 200% sees twice these and pays four times the texture for them.
@@ -48,103 +74,124 @@ internal sealed partial class ConfigWindow
 
     private const float MinHeaderPx = 10f;
 
-    private void DrawFontsTab()
+    private const float ButtonGap = 8f;
+
+    private void DrawFontsPage()
     {
-        using var tab = ImRaii.TabItem(Loc.Label("fonts.tab", "Fonts"));
-        if (!tab) return;
-
-        UiText.Wrapped(Loc.Get(
-            "fonts.intro",
-            "Every line of a notification has its own face and size. Pick one of the built-in "
-            + "faces, or point the plugin at a font file on this PC."));
-
-        ImGui.Spacing();
-
-        using var roles = ImRaii.TabBar("##RegionsOfXIVFontRoles");
-        if (!roles) return;
-
-        DrawFontRole(
-            FontRole.Text,
-            Loc.Get("fonts.role.text", "Text"),
-            Loc.Get("fonts.role.text.hint", "The place name itself, the largest line."),
-            MinTextPx,
-            FontLimits.MaxAffordablePx(FontRole.Text));
-
-        DrawFontRole(
-            FontRole.Header,
-            Loc.Get("fonts.role.header", "Header"),
+        PageHeader.Draw(
+            Loc.Get("fonts.tab", "Fonts"),
             Loc.Get(
-                "fonts.role.header.hint",
-                "The smaller line above the name, giving the region or area it sits in."),
-            MinHeaderPx,
-            FontLimits.MaxAffordablePx(FontRole.Header));
+                "fonts.intro",
+                "Every line of a notification has its own face and size. Pick one of the built-in "
+                + "faces, or point the plugin at a font file on this PC."));
 
-        DrawFontRole(
-            FontRole.Weather,
-            Loc.Get("fonts.role.weather", "Weather"),
-            Loc.Get(
-                "fonts.role.weather.hint",
-                "The forecast line above the header, shown when weather announcements are on."),
-            MinHeaderPx,
-            FontLimits.MaxAffordablePx(FontRole.Weather));
+        Segmented.Draw("##rox-font-roles", FontRoleItems(), ref this.fontRole);
+        Styling.VSpace(14f);
+
+        switch ((FontRole)this.fontRole)
+        {
+            case FontRole.Header:
+                DrawFontRole(
+                    FontRole.Header,
+                    Loc.Get("fonts.role.header", "Header"),
+                    Loc.Get("fonts.role.header.hint", "The smaller line above the name, giving the region or area it sits in."),
+                    MinHeaderPx,
+                    FontLimits.MaxAffordablePx(FontRole.Header));
+                break;
+            case FontRole.Weather:
+                DrawFontRole(
+                    FontRole.Weather,
+                    Loc.Get("fonts.role.weather", "Weather"),
+                    Loc.Get("fonts.role.weather.hint", "The forecast line above the header, shown when weather announcements are on."),
+                    MinHeaderPx,
+                    FontLimits.MaxAffordablePx(FontRole.Weather));
+                break;
+            default:
+                DrawFontRole(
+                    FontRole.Text,
+                    Loc.Get("fonts.role.text", "Text"),
+                    Loc.Get("fonts.role.text.hint", "The place name itself, the largest line."),
+                    MinTextPx,
+                    FontLimits.MaxAffordablePx(FontRole.Text));
+                break;
+        }
+    }
+
+    private Segmented.Item[] FontRoleItems()
+    {
+        if (this.fontRoleGeneration == Loc.Generation)
+        {
+            return this.fontRoleItems;
+        }
+
+        this.fontRoleItems[(int)FontRole.Text] = new Segmented.Item(FontAwesomeIcon.Heading, Loc.Get("fonts.role.text", "Text"));
+        this.fontRoleItems[(int)FontRole.Header] = new Segmented.Item(FontAwesomeIcon.MapSigns, Loc.Get("fonts.role.header", "Header"));
+        this.fontRoleItems[(int)FontRole.Weather] = new Segmented.Item(FontAwesomeIcon.CloudSun, Loc.Get("fonts.role.weather", "Weather"));
+        this.fontRoleGeneration = Loc.Generation;
+        return this.fontRoleItems;
     }
 
     // Every identity here is built from the role rather than from the label. The label is
     // translated, and an identity that moves with the language is a different widget in each one.
     private void DrawFontRole(FontRole role, string label, string describes, float minSize, float maxSize)
     {
-        using var tab = ImRaii.TabItem($"{label}###font-role-{role}");
-        if (!tab) return;
-
-        UiText.Disabled(describes);
-        ImGui.Spacing();
-
         var changed = false;
         var font = this.config.FontFor(role);
 
-        font = font with
+        using (Motion.PushSwitch("##rox-font-role-page", (int)role))
+        using (SettingsGroup.Begin(label, describes))
         {
             // Logarithmic, because the useful range sits near the bottom: a linear slider from
             // 24 to 280 puts every size anyone actually picks into the first fifth of the track.
-            SizePx = Slider(
-                Loc.Get("fonts.size", "Size") + $"###font-size-{role}",
-                font.SizePx, minSize, maxSize,
-                "%.0f " + Loc.Unit("units.px", "px"), ref changed,
-                ImGuiSliderFlags.Logarithmic),
-        };
+            font = font with
+            {
+                SizePx = Slider(
+                    $"##rox-font-size-{(int)role}",
+                    Loc.Get("fonts.size", "Size"), null,
+                    font.SizePx, minSize, maxSize,
+                    "%.0f " + Loc.Unit("units.px", "px"), ref changed,
+                    ImGuiSliderFlags.Logarithmic),
+            };
 
-        font = font with
-        {
-            Choice = Choice(
-                Loc.Get("fonts.face", "Font") + $"###font-choice-{role}",
-                font.Choice, Label, ref changed),
-        };
+            font = font with
+            {
+                Choice = Choice(
+                    $"##rox-font-choice-{(int)role}",
+                    Loc.Get("fonts.face", "Font"),
+                    Loc.Get(
+                        "fonts.face.tooltip",
+                        "Noto Sans CJK is vector: sharp at any size, and it covers every language.\n\n"
+                        + "The game's own faces suit FFXIV better, but each is a bitmap with a ceiling:\n"
+                        + "Trump Gothic: Latin only, to 91 px.\n"
+                        + "Jupiter: Latin only, to 61 px.\n"
+                        + "Axis: to 48 px, the only one with Japanese glyphs.\n\n"
+                        + "Custom file loads a font of your own from this PC."),
+                    font.Choice, FontChoiceLabels, ref changed),
+            };
 
-        this.config.SetFontFor(role, font);
+            this.config.SetFontFor(role, font);
 
-        UiText.Tooltip(Loc.Get(
-            "fonts.face.tooltip",
-            "Noto Sans CJK is vector: sharp at any size, and it covers every language.\n\n"
-            + "The game's own faces suit FFXIV better, but each is a bitmap with a ceiling:\n"
-            + "Trump Gothic: Latin only, to 91 px.\n"
-            + "Jupiter: Latin only, to 61 px.\n"
-            + "Axis: to 48 px, the only one with Japanese glyphs.\n\n"
-            + "Custom file loads a font of your own from this PC."));
+            if (font.IsCustom)
+            {
+                changed |= DrawCustomFont(role, font);
+            }
+        }
 
         DrawSizeCeilingNote(role, font);
 
         if (font.IsCustom)
-            changed |= DrawCustomFont(role, font);
+        {
+            DrawCustomFontNotice();
+        }
         else
+        {
             DrawStockFontWarnings(font);
-
-        ImGui.Spacing();
-
-        if (ImGui.Button(Loc.Get("fonts.preview", "Preview") + $"###font-preview-{role}"))
-            this.actions.Preview(Sample);
+        }
 
         if (!changed)
+        {
             return;
+        }
 
         this.actions.RebuildFonts();
         MarkUnsaved();
@@ -159,18 +206,18 @@ internal sealed partial class ConfigWindow
         var ceiling = FontLimits.MaxAffordablePx(role);
 
         if (font.SizePx <= ceiling)
+        {
             return;
+        }
 
-        Warn(
-            CautionColor,
-            Loc.Format(
-                "fonts.reduced",
-                "Drawing at {0:F0} px rather than {1:F0}. This client shows Japanese place names, "
-                + "so every notification font has to carry kanji, and at that size it would be too "
-                + "large to build. Your setting is kept as it is and comes back if the game's "
-                + "language changes.",
-                ceiling,
-                font.SizePx));
+        Warn(Loc.Format(
+            "fonts.reduced",
+            "Drawing at {0:F0} px rather than {1:F0}. This client shows Japanese place names, "
+            + "so every notification font has to carry kanji, and at that size it would be too "
+            + "large to build. Your setting is kept as it is and comes back if the game's "
+            + "language changes.",
+            ceiling,
+            font.SizePx));
     }
 
     private bool DrawCustomFont(FontRole role, FontSetting font)
@@ -179,60 +226,56 @@ internal sealed partial class ConfigWindow
         var stored = font.Path;
         var buffer = editor.Buffer ??= stored;
         var changed = false;
+        var scale = ImGuiHelpers.GlobalScale;
+
+        SettingsRow.Block(Loc.Get("fonts.path", "Font file"), null);
 
         // Browse and Clear sit to the right of this field, so the field gets what is left after
-        // measuring them. The floor scales with the interface, which the fixed one it replaced
-        // did not.
-        var browse = Loc.Get("fonts.browse", "Browse") + $"###font-browse-{role}";
-        var clear = Loc.Get("fonts.clear", "Clear") + $"###font-clear-{role}";
+        // measuring them.
+        var browse = Loc.Get("fonts.browse", "Browse");
+        var clear = Loc.Get("fonts.clear", "Clear");
+        var buttons = PillButton.Width(browse, FontAwesomeIcon.FolderOpen) + PillButton.Width(clear, FontAwesomeIcon.Times) + (ButtonGap * 2f * scale);
+        var fieldWidth = Math.Max(SettingsGroup.InnerWidth() - buttons, 120f * scale);
 
-        ImGui.SetNextItemWidth(Math.Max(
-            ImGui.GetContentRegionAvail().X - ButtonRowWidth(browse, clear),
-            120f * ImGuiHelpers.GlobalScale));
-
-        ImGui.InputTextWithHint(
-            $"##font-path-{role}",
+        var field = TextField.Draw(
+            $"##rox-font-path-{(int)role}",
             Loc.Get("fonts.path.hint", "Path to a .ttf, .otf or .ttc file"),
             ref buffer,
-            512);
+            fieldWidth);
 
         editor.Buffer = buffer;
 
-        if (ImGui.IsItemDeactivatedAfterEdit())
+        if (field.Committed)
         {
             stored = buffer.Trim().Trim('"');
             this.config.SetFontFor(role, font with { Path = stored });
             editor.Buffer = stored;
             changed = true;
         }
-        else if (!ImGui.IsItemActive() && buffer != stored)
+        else if (!field.Active && buffer != stored)
         {
             editor.Buffer = stored;
         }
 
-        ImGui.SameLine();
-
-        if (ImGui.Button(browse))
-            BrowseForFont(role);
-
-        UiText.Tooltip(Loc.Get(
-            "fonts.browse.tooltip",
-            "Opens your Windows font folder. Any .ttf, .otf or .ttc file will do."));
-
-        ImGui.SameLine();
-
-        using (ImRaii.Disabled(stored.Length == 0))
+        ImGui.SameLine(0f, ButtonGap * scale);
+        if (PillButton.Draw($"##rox-font-browse-{(int)role}", browse, Styling.AccentGold, PillButton.Emphasis.Tinted, FontAwesomeIcon.FolderOpen,
+                height: Layout.FieldHeight,
+                tooltip: Loc.Get("fonts.browse.tooltip", "Opens your Windows font folder. Any .ttf, .otf or .ttc file will do.")))
         {
-            if (ImGui.Button(clear))
-            {
-                this.config.SetFontFor(role, font with { Path = string.Empty });
-                editor.Buffer = string.Empty;
-                changed = true;
-            }
+            BrowseForFont(role);
+        }
+
+        ImGui.SameLine(0f, ButtonGap * scale);
+        if (PillButton.Draw($"##rox-font-clear-{(int)role}", clear, Styling.AccentRose, PillButton.Emphasis.Ghost, FontAwesomeIcon.Times,
+                enabled: stored.Length > 0, height: Layout.FieldHeight))
+        {
+            this.config.SetFontFor(role, font with { Path = string.Empty });
+            editor.Buffer = string.Empty;
+            changed = true;
         }
 
         DrawCustomFontStatus(role, editor, stored);
-        DrawCustomFontNotice();
+        SettingsRow.EndBlock();
 
         return changed;
     }
@@ -246,27 +289,22 @@ internal sealed partial class ConfigWindow
 
         if (problem == null)
         {
-            UiText.Disabled(Loc.Format(
-                "fonts.drawingwith", "Drawing with {0}.", Path.GetFileName(path)));
+            SettingsRow.Note(editor.LabelFor(path), Styling.AccentMintSoft);
             return;
         }
 
-        Warn(FaultColor, problem);
+        SettingsRow.Note(problem, Styling.AccentRoseSoft);
     }
 
     private static void DrawCustomFontNotice()
     {
-        ImGui.Spacing();
-
-        Warn(
-            CautionColor,
-            Loc.Get(
-                "fonts.custom.notice",
-                "A font you supply is loaded exactly as it is, and it stays yours to look after. "
-                + "Missing glyphs, odd spacing, soft edges, a file the game cannot read, or a licence "
-                + "you do not hold are on you rather than on Regions of XIV, and no support is offered "
-                + "for anything that comes of one. If a line stops looking right, put it back on one of "
-                + "the built-in faces."));
+        Warn(Loc.Get(
+            "fonts.custom.notice",
+            "A font you supply is loaded exactly as it is, and it stays yours to look after. "
+            + "Missing glyphs, odd spacing, soft edges, a file the game cannot read, or a licence "
+            + "you do not hold are on you rather than on Regions of XIV, and no support is offered "
+            + "for anything that comes of one. If a line stops looking right, put it back on one of "
+            + "the built-in faces."));
     }
 
     private static void DrawStockFontWarnings(FontSetting font)
@@ -274,30 +312,28 @@ internal sealed partial class ConfigWindow
         if (FontLimits.IsLatinOnly(font.Choice) &&
             Plugin.ClientState.ClientLanguage == ClientLanguage.Japanese)
         {
-            Warn(
-                FaultColor,
-                Loc.Format(
-                    "fonts.nojapanese",
-                    "{0} has no Japanese glyphs. On this client that means place names "
-                    + "will render as blank boxes, not just look soft. Choose Axis or Noto Sans CJK instead.",
-                    Label(font.Choice)));
+            Fault(Loc.Format(
+                "fonts.nojapanese",
+                "{0} has no Japanese glyphs. On this client that means place names "
+                + "will render as blank boxes, not just look soft. Choose Axis or Noto Sans CJK instead.",
+                Label(font.Choice)));
         }
 
         var ceiling = FontLimits.NativeCeilingPx(font.Choice);
         var size = font.SizePx;
 
         if (size <= ceiling)
+        {
             return;
+        }
 
-        Warn(
-            CautionColor,
-            Loc.Format(
-                "fonts.upscaled",
-                "This font has no bitmap above {0:F0} px, so at {1:F0} px it is being "
-                + "upscaled and will look soft. Lower the size, or switch to Noto Sans CJK or a "
-                + "font file of your own, either of which stays sharp at any size.",
-                ceiling,
-                size));
+        Warn(Loc.Format(
+            "fonts.upscaled",
+            "This font has no bitmap above {0:F0} px, so at {1:F0} px it is being "
+            + "upscaled and will look soft. Lower the size, or switch to Noto Sans CJK or a "
+            + "font file of your own, either of which stays sharp at any size.",
+            ceiling,
+            size));
     }
 
     private void BrowseForFont(FontRole role)
@@ -316,7 +352,9 @@ internal sealed partial class ConfigWindow
     private void AdoptFont(FontRole role, bool picked, List<string> chosen)
     {
         if (!picked || chosen.Count == 0 || string.IsNullOrWhiteSpace(chosen[0]))
+        {
             return;
+        }
 
         this.config.SetFontFor(
             role,

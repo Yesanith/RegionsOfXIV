@@ -53,6 +53,18 @@ public class Configuration : IPluginConfiguration, IGateSettings, ISoundSettings
 
     public bool HideNativeBanner { get; set; } = true;
 
+    public bool HideInCities { get; set; }
+
+    public bool HideInHousing { get; set; }
+
+    // Territory ids that never announce, kept on this machine: a preset is a look, and a list of
+    // places somebody does not want to hear about is not. Excluded from ConfigurationCopy for
+    // that reason and a second one: the copy is by reference, and a shared list would make the
+    // preset and the live settings edit each other.
+    public List<uint> QuietTerritories { get; set; } = [];
+
+    public bool IsQuiet(uint territoryTypeId) => QuietTerritories.Contains(territoryTypeId);
+
     // Off by default. This is an atmosphere plugin and a sound is the one thing it can do that
     // reaches a player who is not looking at the screen, so it is asked for rather than assumed.
     public SoundSource SoundSource { get; set; } = SoundSource.Off;
@@ -61,6 +73,15 @@ public class Configuration : IPluginConfiguration, IGateSettings, ISoundSettings
     // game's own settings and in "<se.1>". NotificationSounds is the only thing that turns this
     // into whatever the client's own function wants.
     public int GameSoundId { get; set; } = 1;
+
+    // Per category, or 0 to follow GameSoundId, so a config from before these existed reads back
+    // as one sound for everything, which is what it was.
+    public int GameSoundIdWeather { get; set; }
+
+    public int GameSoundIdBanner { get; set; }
+
+    // Percent, applied on top of the game's own volumes for a file, which the game does not mix.
+    public int SoundFileVolume { get; set; } = 100;
 
     // A .wav or .mp3 on this PC, used when SoundSource is File. Empty until one is chosen. Absent
     // from a config written before this existed, which JSON leaves as the default, so it needs no
@@ -135,6 +156,37 @@ public class Configuration : IPluginConfiguration, IGateSettings, ISoundSettings
     public float ParticleDensity { get; set; } = 1f;
 
     public Vector4 ParticleColor { get; set; } = new(1f, 0.72f, 0.35f, 1f);
+
+    public float ParticleSpread { get; set; } = 1f;
+
+    public DepartureEffect Departure { get; set; } = DepartureEffect.Fade;
+
+    // How an area or sub-area notice differs from a zone arrival: a fraction of the size and of
+    // the hold, so the frequent tiers can whisper while a new zone still announces itself. 1 is
+    // the look the plugin always had.
+    public float MinorPlaceScale { get; set; } = 1f;
+
+    public float MinorPlaceHoldScale { get; set; } = 1f;
+
+    public BackingStyle Backing { get; set; } = BackingStyle.None;
+
+    public Vector4 BackingColor { get; set; } = new(0f, 0f, 0f, 0.45f);
+
+    public bool TextGradientEnabled { get; set; }
+
+    public Vector4 TextGradientColor { get; set; } = new(0.62f, 0.45f, 0.22f, 1f);
+
+    public bool GlowEnabled { get; set; }
+
+    public Vector4 GlowColor { get; set; } = new(1f, 0.80f, 0.45f, 0.55f);
+
+    public float GlowSpread { get; set; } = 6f;
+
+    public TextPalette Palette { get; set; } = TextPalette.None;
+
+    public PaletteMotion PaletteMotion { get; set; } = PaletteMotion.Wave;
+
+    public float PaletteSpeed { get; set; } = 1f;
 
     public Vector4 TextColor { get; set; } = new(0.875f, 0.761f, 0.584f, 1f);
 

@@ -358,4 +358,27 @@ public class AnnouncementCoordinatorTests
         Assert.Equal("Summerford Farms", announced.Text);
         Assert.Equal("Summerford", announced.Header);
     }
+
+    // Areas and sub-areas are the frequent tiers, and the ones the presence settings quieten; a
+    // zone arrival is always announced at full size.
+    [Fact]
+    public void ASubAreaIsPushedAsAMinorPlace()
+    {
+        using var coordinator = Build();
+        this.locations.Current = new LocationSnapshot(100, Region, Zone, Place, Area, 0);
+
+        this.locations.Move(new LocationSnapshot(100, Region, Zone, Place, Area, SubArea));
+
+        Assert.True(this.sink.Last!.Minor);
+    }
+
+    [Fact]
+    public void AZoneArrivalIsPushedAtFullPresence()
+    {
+        using var coordinator = Build();
+
+        this.zones.Arrive(new ZoneArrival(200, Place, Zone, Region, false, false));
+
+        Assert.False(this.sink.Last!.Minor);
+    }
 }

@@ -276,6 +276,10 @@ internal sealed class FakeSoundSettings : ISoundSettings
 
     public int GameSoundId { get; set; } = 1;
 
+    public int GameSoundIdWeather { get; set; }
+
+    public int GameSoundIdBanner { get; set; }
+
     public string SoundFilePath { get; set; } = string.Empty;
 
     public bool SoundOnLocation { get; set; } = true;

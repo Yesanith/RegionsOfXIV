@@ -21,6 +21,14 @@ internal sealed class FakeSettings : IGateSettings
     public bool WeatherNotificationEnabled { get; set; }
 
     public bool BannerNotificationEnabled { get; set; } = true;
+
+    public bool HideInCities { get; set; }
+
+    public bool HideInHousing { get; set; }
+
+    public HashSet<uint> Quiet { get; } = [];
+
+    public bool IsQuiet(uint territoryTypeId) => this.Quiet.Contains(territoryTypeId);
 }
 
 internal sealed class FakeGameState : IGameState
@@ -38,6 +46,14 @@ internal sealed class FakeGameState : IGameState
     public bool IsInCombat { get; set; }
 
     public bool IsBoundByDuty { get; set; }
+
+    public uint TerritoryTypeId { get; set; } = 100;
+
+    public bool IsFlying { get; set; }
+
+    public bool IsInCity { get; set; }
+
+    public bool IsInHousing { get; set; }
 }
 
 internal sealed class TestClock

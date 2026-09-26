@@ -36,12 +36,18 @@ for Guild Wars 2.
   names are transcribed by hand and only English is substantially covered. A
   banner the plugin has no name for keeps the game's own.
 - **Decodes from the Eorzean alphabet** as it reveals, glyph by glyph, and the
-  letters can rise, wave, type or catch alight while they resolve.
-- **Hearts, embers, sparkles or petals** drifting around the text, if that is
-  your sort of thing. Drawn from primitives, so they cost no download and work
-  under every font.
-- **A sound, if you want one.** One of the game's own chat effects, or a `.wav`
-  or `.mp3` of yours, off until you ask for it. It follows the game's own volume
+  letters can rise, drop, slide, assemble, flicker, zoom, wave, type or catch
+  alight while they resolve. A line can leave the way it came, dissolve or sink,
+  rather than only fading.
+- **Hearts, embers, sparkles, petals, snow, fireflies, leaves, rain or stars**
+  drifting around the text, if that is your sort of thing, as close to the name or
+  as far around it as you like. Drawn from primitives, so they cost no download
+  and work under every font.
+- **Smaller places can whisper.** An area or sub-area notice can be a fraction of
+  the size and the hold of a zone arrival, so the frequent tiers stop shouting.
+- **A sound, if you want one.** One of the game's own chat effects, with weather
+  and banners able to take one of their own, or a `.wav` or `.mp3` of yours at a
+  volume you choose, off until you ask for it. It follows the game's own volume
   and mute settings, so it goes quiet when the game does.
 - **Presets to start from.** Inferno, Sweetheart, Starlight, Sakura, Dispatch,
   Tyria: each one a motion, a particle and a palette that suit each other.
@@ -58,14 +64,20 @@ for Guild Wars 2.
   but it cannot add a glyph a font does not have, so a Latin-only display face on
   the Japanese client will draw blanks for Japanese place names.
 - **Styled to taste.** Place it anywhere on screen, with your own colours, letter
-  spacing, casing, outline weight and a drop shadow you can throw in any
+  spacing, casing, outline weight, a glow, and a drop shadow you can throw in any
   direction. Name, header and weather can each take their own colour and outline,
-  or share one.
-- **Live preview.** Drag the position, size and colour sliders and a sample
-  notification follows them as you go.
+  or share one; the name can fade to a second colour, or be lettered in a run of
+  colours that lies across the line, travels along it or cycles through it. A
+  dark band behind the text, or a strip across the screen, for names that land on
+  a bright sky.
+- **Live preview.** The settings window paints the notification at actual size,
+  motion and all, and follows every change as you make it. Hover a preset and
+  the preview shows that instead. The game screen is still where the position
+  sliders and the pin button put it.
 - **Knows when to stay quiet.** Silent through cutscenes, PvP and gpose; through
-  combat and duties if you ask; and it skips sub-areas while you are flying, so
-  crossing a zone at speed does not announce a string of places you passed over.
+  combat, duties, cities and housing if you ask; in any zone you put on its quiet
+  list; and it skips sub-areas while you are flying, so crossing a zone at speed
+  does not announce a string of places you passed over.
 
 ## Installing
 
@@ -165,9 +177,9 @@ assembly entirely, not merely unreachable.
 Interface strings live in `src/RegionsOfXIV/Localization/`, one JSON file per
 language code, such as `de.json`, or `pt-BR.json` for a regional one. They are
 embedded by a glob and discovered from the resource names, so **a new language is
-a file, not a code change**. German, French, Japanese and Turkish ship, all four
-complete, and all four still marked machine drafts until a speaker has been
-through them.
+a file, not a code change**. German, French, Japanese, Turkish, Spanish,
+Portuguese, Russian and Chinese ship, all eight complete, and all eight still
+marked machine drafts until a speaker has been through them.
 
 **[TRANSLATING.md](TRANSLATING.md) is the guide.** It is written for a translator
 rather than for a developer: what a line looks like, why `en.json` is generated
@@ -175,10 +187,12 @@ from the call sites rather than edited, what the `description` on every entry is
 for, and which scripts the settings window can actually draw.
 
 Two things in there are the code's problem rather than a translator's.
-`UI/WindowFont.cs` merges the Windows interface font in behind the game's AXIS
-face so Latin Extended draws at all, which is what lets Turkish, Polish, Czech,
-Romanian and Vietnamese render. And `NoBundledLanguageNeedsGlyphsTheWindowLacks`
-fails the build before a language the window cannot draw can ship.
+`UI/Fonts.cs` draws the window with a bundled Latin subset of Noto Sans, which
+carries Latin Extended in full, and merges Dalamud's Noto Sans CJK in behind it
+for Greek, Cyrillic, kana and kanji, which is what lets Turkish, Polish, Czech,
+Romanian, Vietnamese and Japanese render. And
+`NoBundledLanguageNeedsGlyphsTheWindowLacks` fails the build before a language
+the window cannot draw can ship.
 
 ### How it fits together
 
@@ -195,7 +209,7 @@ launching the game.
 | Layer | What lives there |
 | --- | --- |
 | `Services/` | detection, decisions, game data. Never draws, never references `UI` |
-| `UI/` | windows, the overlay, and the glyph painting |
+| `UI/` | the settings window and its pages, the overlay, and the glyph painting. `UI/Components/` is the widget set the window is built from, `UI/Shell/` its header and backdrop |
 | `Models/` | the few plain records both sides pass around |
 
 The plugin draws its own text glyph by glyph rather than handing ImGui a string,
@@ -206,6 +220,20 @@ decides where a line goes; `UI/NotificationRenderer.Runs.cs` paints it.
 and rebuilds only the roles whose face, size or file actually changed. A role
 set to a custom file also holds a Noto fallback, so a font that will not load
 degrades to something readable rather than to nothing.
+
+The settings window has fonts of its own, in `UI/Fonts.cs`: caption, body,
+headline and title tiers, plus three sizes of icon, every one a ratio of the
+font size chosen in Dalamud's settings rather than a pixel count. The window is
+drawn through the draw list rather than through stock ImGui widgets, so every
+control in `UI/Components/` takes an explicit id and its wording through
+`Loc.Get`; nothing in it depends on a label to keep its identity.
+
+The preview stage under the window's header is `UI/PreviewStage.cs`: the same
+`NotificationRenderer` the overlay uses, handed a `Canvas` that is the stage
+rather than the screen, painting pinned notifications that never fade. It is
+why every colour, font and motion setting can be seen without leaving the
+window; the position sliders and the pin button are what the game screen is
+still for.
 
 ## Feedback
 

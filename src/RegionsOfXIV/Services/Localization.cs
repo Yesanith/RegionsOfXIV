@@ -78,6 +78,13 @@ internal static class Loc
     // been through stops apologising for itself the moment the marker comes out of the file.
     public static bool IsMachineDraft { get; private set; }
 
+    // Casing in the window follows the language of the text rather than the operating system,
+    // for the same reason numbers do.
+    internal static CultureInfo Culture => culture;
+
+    // Bumped on every table swap, so a window can rebuild whatever it derived from the strings.
+    internal static int Generation => Volatile.Read(ref generation);
+
     public static string Get(string key, string english) =>
         active.TryGetValue(key, out var translated) && !string.IsNullOrWhiteSpace(translated)
             ? translated
@@ -356,14 +363,13 @@ internal static class Loc
         return false;
     }
 
-    // The window no longer draws with the game's AXIS face alone: UI/WindowFont merges the Windows
-    // interface font in behind it for Latin Extended-A, Latin Extended-B and Latin Extended
-    // Additional. Turkish, Polish, Czech, Romanian and Vietnamese are drawable because of that
-    // merge, and were not before it.
+    // The window draws with the faces UI/Fonts.cs builds: a bundled Latin subset of Noto Sans that
+    // carries Latin Extended in full, with Dalamud's Noto Sans CJK merged in behind it for Greek,
+    // Cyrillic, kana and kanji. Turkish, Polish, Czech, Romanian, Vietnamese and Japanese are
+    // drawable because of that.
     //
-    // What is still missing is what neither face supplies: Cyrillic beyond the Russian alphabet
-    // AXIS carries, and the scripts the merge deliberately leaves out because they are large and
-    // nothing asks for them.
+    // What is still missing is what the merge deliberately leaves out because it is large and
+    // nothing asks for it: Hebrew, Arabic, Thai and Hangul.
     //
     // Glyph ranges are fixed when the atlas is built, so nothing recovers them at draw time, and
     // widening the merge is a real change rather than a file drop. Hence saying so at load rather
@@ -381,18 +387,19 @@ internal static class Loc
             return;
 
         Log.Warning(
-            $"The {code} strings use characters the game's AXIS font has no glyph for, so they "
+            $"The {code} strings use characters the window font has no glyph for, so they "
             + $"will draw as blanks: {string.Join(" ", missing.Select(c => $"{c} (U+{(int)c:X4})"))}. "
-            + "Showing them would mean giving the config window its own font.");
+            + "Showing them would mean widening the merge in UI/Fonts.cs.");
     }
 
-    // What the window still cannot draw once the merge in UI/WindowFont is counted. Deliberately a
-    // list of what is absent rather than of what is present: a rare kanji outside AXIS's ~6300
+    // What the window still cannot draw once the merge in UI/Fonts.cs is counted. Deliberately a
+    // list of what is absent rather than of what is present: a rare kanji outside the merged set
     // slips through, but nothing legitimate gets flagged, and a warning that cries wolf is one
     // nobody reads.
     //
-    // The extended Latin blocks are gone from this list because the merge supplies them. Cyrillic
-    // stays: the merge covers Latin only, so AXIS's Russian alphabet is still the whole of it.
+    // The extended Latin blocks are not listed because the Latin face supplies them. Cyrillic
+    // beyond the Russian alphabet stays listed for now: the merge asks for the whole block, but
+    // that has not been checked in game, so the guard errs toward warning until it has been.
     internal static bool WindowFontLacks(char c) =>
         (c is >= 'Ѐ' and <= 'ԯ' // Cyrillic, except the Russian alphabet below
          && c is not ('Ё' or 'ё') // Yo, yo

@@ -56,7 +56,7 @@ internal sealed class ParticleField
 
             particle.Position += particle.Velocity * dt;
 
-            if (effect is ParticleEffect.Hearts or ParticleEffect.Petals)
+            if (Sways(effect))
                 particle.Position.X += MathF.Sin((particle.Age * 2.2f) + particle.Phase) * 14f * dt;
 
             this.particles[i] = particle;
@@ -113,9 +113,32 @@ internal sealed class ParticleField
                 case ParticleEffect.Petals:
                     DrawPetal(drawList, particle.Position, particle.Size, particle.Age + particle.Phase, packed);
                     break;
+
+                case ParticleEffect.Snow:
+                    drawList.AddCircleFilled(particle.Position, particle.Size * 0.5f, packed);
+                    break;
+
+                case ParticleEffect.Fireflies:
+                    DrawFirefly(drawList, particle.Position, particle.Size, tint, alpha);
+                    break;
+
+                case ParticleEffect.Leaves:
+                    DrawLeaf(drawList, particle.Position, particle.Size, (particle.Age * 1.6f) + particle.Phase, packed);
+                    break;
+
+                case ParticleEffect.Rain:
+                    DrawDrop(drawList, particle.Position, particle.Velocity, particle.Size, packed);
+                    break;
+
+                case ParticleEffect.Stars:
+                    DrawSparkle(drawList, particle.Position, particle.Size * 0.8f, packed);
+                    break;
             }
         }
     }
+
+    private static bool Sways(ParticleEffect effect) =>
+        effect is ParticleEffect.Hearts or ParticleEffect.Petals or ParticleEffect.Snow or ParticleEffect.Leaves;
 
     private static float RatePerSecond(ParticleEffect effect) => effect switch
     {
@@ -123,13 +146,20 @@ internal sealed class ParticleField
         ParticleEffect.Embers => 18f,
         ParticleEffect.Sparkles => 14f,
         ParticleEffect.Petals => 7f,
+        ParticleEffect.Snow => 16f,
+        ParticleEffect.Fireflies => 5f,
+        ParticleEffect.Leaves => 6f,
+        ParticleEffect.Rain => 40f,
+        ParticleEffect.Stars => 10f,
         _ => 0f,
     };
 
     private static float Fade(ParticleEffect effect, float life, float age, float phase) => effect switch
     {
-        ParticleEffect.Sparkles => (1f - life) * (0.45f + (0.55f * MathF.Sin((age * 9f) + phase))),
+        ParticleEffect.Sparkles or ParticleEffect.Stars => (1f - life) * (0.45f + (0.55f * MathF.Sin((age * 9f) + phase))),
         ParticleEffect.Embers => (1f - life) * (1f - life),
+        ParticleEffect.Fireflies => MathF.Min((1f - life) * 2f, 1f) * (0.35f + (0.65f * MathF.Max(0f, MathF.Sin((age * 4f) + phase)))),
+        ParticleEffect.Rain => (1f - life) * 0.8f,
         _ => MathF.Min((1f - life) * 2f, 1f),
     };
 
@@ -165,6 +195,61 @@ internal sealed class ParticleField
                 Velocity = new Vector2(Range(-6f, 6f), Range(-14f, -2f)),
                 Life = Range(0.6f, 1.3f),
                 Size = Range(5f, 11f),
+                Phase = phase,
+            },
+
+            ParticleEffect.Snow => new Particle
+            {
+                Position = new Vector2(
+                    center.X + Range(-extent.X * 1.3f, extent.X * 1.3f),
+                    center.Y - extent.Y - Range(0f, 40f)),
+                Velocity = new Vector2(Range(-12f, 12f), Range(20f, 45f)),
+                Life = Range(2.0f, 3.5f),
+                Size = Range(3f, 6f),
+                Phase = phase,
+            },
+
+            ParticleEffect.Fireflies => new Particle
+            {
+                Position = new Vector2(
+                    center.X + Range(-extent.X * 1.4f, extent.X * 1.4f),
+                    center.Y + Range(-extent.Y * 1.6f, extent.Y * 1.6f)),
+                Velocity = new Vector2(Range(-10f, 10f), Range(-10f, 10f)),
+                Life = Range(1.5f, 3f),
+                Size = Range(3f, 5f),
+                Phase = phase,
+            },
+
+            ParticleEffect.Leaves => new Particle
+            {
+                Position = new Vector2(
+                    center.X + Range(-extent.X * 1.2f, extent.X * 1.2f),
+                    center.Y - extent.Y - Range(0f, 30f)),
+                Velocity = new Vector2(Range(-25f, 25f), Range(30f, 60f)),
+                Life = Range(1.6f, 2.8f),
+                Size = Range(8f, 13f),
+                Phase = phase,
+            },
+
+            ParticleEffect.Rain => new Particle
+            {
+                Position = new Vector2(
+                    center.X + Range(-extent.X * 1.4f, extent.X * 1.4f),
+                    center.Y - (extent.Y * 1.5f) - Range(0f, 60f)),
+                Velocity = new Vector2(Range(-5f, 5f), Range(260f, 380f)),
+                Life = Range(0.35f, 0.6f),
+                Size = Range(8f, 14f),
+                Phase = phase,
+            },
+
+            ParticleEffect.Stars => new Particle
+            {
+                Position = new Vector2(
+                    center.X + Range(-extent.X * 1.4f, extent.X * 1.4f),
+                    center.Y + Range(-extent.Y * 1.6f, extent.Y * 1.6f)),
+                Velocity = new Vector2(0f, Range(-6f, -2f)),
+                Life = Range(1.2f, 2.4f),
+                Size = Range(4f, 9f),
                 Phase = phase,
             },
 
@@ -232,5 +317,45 @@ internal sealed class ParticleField
             Rotated(0f, r),
             Rotated(-r * 0.55f, 0f),
             color);
+    }
+
+    // A leaf is a petal drawn longer and thinner, with a darker midrib so it reads as a leaf
+    // rather than a second petal in a different colour.
+    private static void DrawLeaf(ImDrawListPtr drawList, Vector2 at, float size, float angle, uint color)
+    {
+        var r = size * 0.5f;
+        var cos = MathF.Cos(angle);
+        var sin = MathF.Sin(angle);
+
+        Vector2 Rotated(float x, float y) =>
+            new(at.X + ((x * cos) - (y * sin)), at.Y + ((x * sin) + (y * cos)));
+
+        drawList.AddQuadFilled(
+            Rotated(0f, -r * 1.2f),
+            Rotated(r * 0.38f, 0f),
+            Rotated(0f, r * 1.2f),
+            Rotated(-r * 0.38f, 0f),
+            color);
+
+        var rib = (color & 0x00FFFFFFu) | (((color >> 24) / 2) << 24);
+        drawList.AddLine(Rotated(0f, -r * 1.1f), Rotated(0f, r * 1.1f), rib, 1f);
+    }
+
+    // A dot with a halo, so it reads as light rather than as a speck.
+    private static void DrawFirefly(ImDrawListPtr drawList, Vector2 at, float size, Vector4 tint, float alpha)
+    {
+        var halo = ImGui.ColorConvertFloat4ToU32(tint with { W = tint.W * alpha * 0.25f });
+        var core = ImGui.ColorConvertFloat4ToU32(tint with { W = tint.W * alpha });
+
+        drawList.AddCircleFilled(at, size * 1.8f, halo);
+        drawList.AddCircleFilled(at, size * 0.5f, core);
+    }
+
+    // A streak along the direction of travel, sized by the drop's length.
+    private static void DrawDrop(ImDrawListPtr drawList, Vector2 at, Vector2 velocity, float length, uint color)
+    {
+        var direction = velocity.LengthSquared() > 0f ? Vector2.Normalize(velocity) : Vector2.UnitY;
+
+        drawList.AddLine(at, at + (direction * length), color, 1.2f);
     }
 }

@@ -53,10 +53,6 @@
     "message": "About",
     "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
   },
-  "about.title": {
-    "message": "Regions of XIV {0}",
-    "description": "Heading at the top of the About tab. \"Regions of XIV\" is the plugin's name and stays as-is; {0} is the version number."
-  },
   "about.author": {
     "message": "by {0}",
     "description": "Sits under the title. {0} is the author's name and is never translated - it is passed in separately so it cannot be."
@@ -313,11 +309,6 @@
     "description": "Dropdown entry for using a font file from the player's own PC. The other entries in this dropdown are typeface names and are not translated."
   },
 
-  "fonts.preview": {
-    "message": "Preview",
-    "description": "Button that fires a sample notification, one per role tab. The Motion and Appearance tabs have their own with the same wording and their own keys."
-  },
-
   "fonts.path.hint": {
     "message": "Path to a .ttf, .otf or .ttc file",
     "description": "Placeholder text inside the empty font-path box. The three extensions are file types and stay as they are."
@@ -360,11 +351,6 @@
     "message": "Open the Regions of XIV settings. \"{0}\" fires a sample notification, \"{1}\" shows what has changed.",
     "description": "Shown in Dalamud's own list of chat commands. {0} and {1} are the commands themselves, \"/regions test\" and \"/regions changelog\" - they are what the player types, so never translate them, and keep the quotation marks around them. \"Regions of XIV\" is the plugin's name."
   },
-
-  "changelog.title": {
-    "message": "Regions of XIV: What's New",
-    "description": "Title bar of the What's New window. \"Regions of XIV\" is the plugin's name and stays as-is; only the second half is translated. Match about.whatsnew, which is the button that opens this window."
-  },
   "changelog.all": {
     "message": "Every release, newest first:",
     "description": "Line at the top of the window when the player opened it themselves, above the full list."
@@ -376,35 +362,6 @@
   "changelog.updated.away": {
     "message": "Regions of XIV has updated. Here is what changed while you were away:",
     "description": "The same line when more than one release is being shown at once, because the player skipped some updates. \"Regions of XIV\" is the plugin's name."
-  },
-  "changelog.close": {
-    "message": "Close",
-    "description": "Button that shuts the window."
-  },
-  "changelog.discord": {
-    "message": "Join the Discord",
-    "description": "Button opening the project's Discord invite. \"Discord\" is a product name and stays as-is. The same words appear on the Presets and About tabs; they are separate entries because each button needs its own identity, but they should read the same."
-  },
-  "changelog.discord.tooltip": {
-    "message": "Ideas, bug reports and preset codes.\n{0}",
-    "description": "Tooltip for the Join the Discord button. {0} is the invite address - keep it on its own line."
-  },
-  "changelog.onceonly": {
-    "message": "You will not see this again until the next update.",
-    "description": "Footer shown when the window opened itself after an update."
-  },
-  "changelog.onrequest": {
-    "message": "Shown because you asked: \"{0}\".",
-    "description": "Footer shown when the player opened the window themselves. {0} is the command they typed; it is never translated, and the quotes around it stay."
-  },
-
-  "window.editing": {
-    "message": "Editing mode",
-    "description": "Checkbox above the row of tabs, which holds a sample notification on screen while the player changes settings."
-  },
-  "window.editing.tooltip": {
-    "message": "Keeps one sample notification on screen while you work, instead of\nstarting a new one every time you change something.\n\nZone announcements are held back while this is on. It switches itself\noff when you close this window.",
-    "description": "Tooltip for the Editing mode checkbox. Keep the line breaks, including the blank line between the two paragraphs."
   },
   "window.discord": {
     "message": "Join the Discord\n{0}",
@@ -599,10 +556,6 @@
     "message": "That file stops part way through and could not be read to the end.",
     "description": "The file ends part way through, so it was cut off in a download or a copy."
   },
-  "about.language": {
-    "message": "Language",
-    "description": ""
-  },
   "about.language.follow": {
     "message": "Follow Dalamud",
     "description": ""
@@ -684,7 +637,7 @@
     "description": ""
   },
   "announcements.skipfast.tooltip": {
-    "message": "Only affects sub-areas, and only above a speed no ground travel reaches,\nso it comes into play when flying. Zone and area changes are always\nannounced however fast you are moving.",
+    "message": "Only affects sub-areas, and only while flying or above a speed no ground\ntravel reaches. Zone and area changes are always announced however fast\nyou are moving.",
     "description": ""
   },
   "announcements.subarea": {
@@ -735,10 +688,6 @@
     "message": "Horizontal position",
     "description": ""
   },
-  "appearance.horizontal.tooltip": {
-    "message": "The text is centred on this point, so 50% is the middle of the screen.\nA long place name set near either end will reach past it.",
-    "description": ""
-  },
   "appearance.letterspacing": {
     "message": "Letter spacing",
     "description": ""
@@ -757,10 +706,6 @@
   },
   "appearance.outlinethickness.tooltip": {
     "message": "Zero turns the outline off.",
-    "description": ""
-  },
-  "appearance.preview": {
-    "message": "Preview",
     "description": ""
   },
   "appearance.separatecolours": {
@@ -864,7 +809,7 @@
     "description": ""
   },
   "motion.choice.tooltip": {
-    "message": "None: the letters simply appear where they belong.\nTypewriter: one letter at a time, no fade.\nRise: letters lift into place from below.\nWave: letters ride a wave through the line as it appears.\nBurn: letters catch alight and cool into their colour.\n\nRuns alongside the Eorzean decode rather than instead of it.",
+    "message": "None: the letters simply appear where they belong.\nTypewriter: one letter at a time, no fade.\nRise: letters lift into place from below.\nWave: letters ride a wave through the line as it appears.\nBurn: letters catch alight and cool into their colour.\nDrop: letters fall into place from above.\nSlide: letters slide in from the right.\nAssemble: letters converge from every direction.\nFlicker: letters stutter on like a neon sign.\nZoom: letters grow into place.\n\nRuns alongside the Eorzean decode rather than instead of it.",
     "description": ""
   },
   "motion.choice.typewriter": {
@@ -940,7 +885,7 @@
     "description": ""
   },
   "motion.particlecolour.tooltip": {
-    "message": "The default amber suits embers and sparkles. Hearts and petals\nwant moving towards pink.",
+    "message": "The default amber suits embers and sparkles. Hearts and petals\nwant moving towards pink; snow and rain want something pale.",
     "description": ""
   },
   "motion.particles": {
@@ -969,10 +914,6 @@
   },
   "motion.particles.sparkles": {
     "message": "Sparkles",
-    "description": ""
-  },
-  "motion.preview": {
-    "message": "Preview",
     "description": ""
   },
   "motion.tab": {
@@ -1034,5 +975,421 @@
   "sound.tab": {
     "message": "Sound",
     "description": "Tab label. The noise a notification makes. Keep it short."
+  },
+  "about.community": {
+    "message": "Community",
+    "description": "Section heading on the About page above the Discord, GitHub and issue tiles. Shown in capitals."
+  },
+  "announcements.group.banners": {
+    "message": "Banners",
+    "description": "Group title on the Announcements page, above the banner settings."
+  },
+  "announcements.group.native": {
+    "message": "The game's own text",
+    "description": "Group title on the Announcements page, above the two switches that hide the game's own location text."
+  },
+  "announcements.group.places": {
+    "message": "Places",
+    "description": "Group title on the Announcements page, above the zone, area and sub-area switches."
+  },
+  "announcements.group.quiet": {
+    "message": "When to stay quiet",
+    "description": "Group title on the Announcements page, above the combat, duty and fast-travel rules."
+  },
+  "announcements.group.weather": {
+    "message": "Weather",
+    "description": "Group title on the Announcements page, above the weather switches."
+  },
+  "appearance.group.colours": {
+    "message": "Colours",
+    "description": "Group title on the Appearance page, above the text, header and weather colours."
+  },
+  "appearance.group.header": {
+    "message": "Header",
+    "description": "Group title on the Appearance page, above the header switches and the header gap."
+  },
+  "appearance.group.lettering": {
+    "message": "Lettering",
+    "description": "Group title on the Appearance page, above letter spacing and uppercase."
+  },
+  "appearance.group.outline": {
+    "message": "Outline",
+    "description": "Group title on the Appearance page, above the outline colours and thickness."
+  },
+  "appearance.group.placement": {
+    "message": "Placement",
+    "description": "Group title on the Appearance page, above the vertical and horizontal position sliders."
+  },
+  "appearance.group.shadow": {
+    "message": "Drop shadow",
+    "description": "Group title on the Appearance page, above the drop shadow settings."
+  },
+  "appearance.intro": {
+    "message": "Where the notification sits, how it is lettered, and the colours, outline and shadow it is drawn with. The preview above follows every change.",
+    "description": "Sentence under the Appearance page title, saying what the page covers."
+  },
+  "changelog.latest": {
+    "message": "Latest",
+    "description": "Small pill beside the newest version on the What's new page. One word; it is drawn in capitals."
+  },
+  "changelog.new": {
+    "message": "New",
+    "description": "Small pill beside a version the player has not seen yet. One word; it is drawn in capitals."
+  },
+  "changelog.tab": {
+    "message": "What's new",
+    "description": "Label of the What's new page in the navigation rail, and the title at the top of it. Short."
+  },
+  "fonts.path": {
+    "message": "Font file",
+    "description": "Label above the path field for a custom font file, on the Fonts page."
+  },
+  "motion.group.arrival": {
+    "message": "Arrival",
+    "description": "Group title on the Motion page, above the motion choice and its duration."
+  },
+  "motion.group.decode": {
+    "message": "Decode",
+    "description": "Group title on the Motion page, above the Eorzean decode switch and its duration."
+  },
+  "motion.group.particles": {
+    "message": "Particles",
+    "description": "Group title on the Motion page, above the particle settings."
+  },
+  "motion.group.timing": {
+    "message": "Timing",
+    "description": "Group title on the Motion page, above fade in, hold and fade out."
+  },
+  "sound.file": {
+    "message": "Sound file",
+    "description": "Label above the path field for a sound file, on the Sound page."
+  },
+  "sound.gamesound": {
+    "message": "Sound effect",
+    "description": "Row label beside the dropdown that picks one of the game's chat sound effects."
+  },
+  "sound.group.on": {
+    "message": "Plays on",
+    "description": "Group title on the Sound page, above the three switches for which notifications make a sound."
+  },
+  "sound.group.source": {
+    "message": "Source",
+    "description": "Group title on the Sound page, above the source dropdown."
+  },
+  "window.close": {
+    "message": "Close",
+    "description": "Tooltip on the close button in the window's header."
+  },
+  "about.credit.interface": {
+    "message": "User Interface designed and developed by {0}",
+    "description": "Credit line on the About page. {0} is the name of whoever designed and developed the settings window."
+  },
+  "about.credit.plugin": {
+    "message": "Plugin developed by {0}",
+    "description": "Credit line on the About page. {0} is the plugin author's name."
+  },
+  "about.credits": {
+    "message": "Credits",
+    "description": "Section heading on the About page above the two credit lines. Shown in capitals."
+  },
+  "appearance.position": {
+    "message": "Position on screen",
+    "description": "Label above the small screen map on the Appearance page, which is dragged to place the notification."
+  },
+  "appearance.position.tooltip": {
+    "message": "Drag the marker to move the notification. The two sliders below set the\nsame thing exactly. The text is centred on this point, so 50% across is\nthe middle of the screen, and a long place name set near either end\nwill reach past it.",
+    "description": "Tooltip on that label. Keep the line breaks."
+  },
+  "preview.caption": {
+    "message": "Actual size. The vertical position applies on the game screen.",
+    "description": "One line under that heading, explaining that the stage shows the notification at its real size and that only the horizontal position is mirrored there."
+  },
+  "preview.onscreen": {
+    "message": "Show on screen",
+    "description": "Button on the preview stage. Fires a sample notification on the game screen. Short."
+  },
+  "preview.onscreen.tooltip": {
+    "message": "Fires a sample notification on the game screen, where the position sliders place it.",
+    "description": "Tooltip on the show-on-screen button."
+  },
+  "preview.pin": {
+    "message": "Pin on screen",
+    "description": "Button on the preview stage. Keeps a sample notification on the game screen while the window is open. Short."
+  },
+  "preview.pin.tooltip": {
+    "message": "Keeps one sample notification on the game screen while you work, so you can\ncheck the position and size where it will really appear.\n\nZone announcements are held back while this is on. It switches itself\noff when you close this window.",
+    "description": "Tooltip on the pin button. Keep the line breaks."
+  },
+  "preview.replay": {
+    "message": "Replay",
+    "description": "Button on the preview stage. Plays the preview animation from the top. Short."
+  },
+  "preview.replay.tooltip": {
+    "message": "Plays the preview from the top, so the motion and the decode run again.",
+    "description": "Tooltip on the replay button."
+  },
+  "preview.title": {
+    "message": "Live preview",
+    "description": "Small heading in the corner of the preview stage under the window's header. Drawn in capitals."
+  },
+  "announcements.hidecities": {
+    "message": "Hide in cities",
+    "description": "Switch label under When to stay quiet."
+  },
+  "announcements.hidecities.tooltip": {
+    "message": "The city states and the other towns, where the wards and districts change\nevery few steps.",
+    "description": "Tooltip on that switch. Keep the line break."
+  },
+  "announcements.hidehousing": {
+    "message": "Hide in housing",
+    "description": "Switch label under When to stay quiet. Housing means the residential districts and the inside of houses and apartments."
+  },
+  "announcements.hidehousing.tooltip": {
+    "message": "The residential districts and the inside of houses and apartments.",
+    "description": "Tooltip on that switch."
+  },
+  "announcements.minorhold": {
+    "message": "Areas and sub-areas hold for",
+    "description": "Slider label. How long an area or sub-area notice stays up, as a percentage of the hold on the Motion page."
+  },
+  "announcements.minorhold.tooltip": {
+    "message": "How long an area or sub-area notice stays up, as a share of the hold on\nthe Motion page.",
+    "description": "Tooltip on that slider. Keep the line breaks."
+  },
+  "announcements.minorsize": {
+    "message": "Areas and sub-areas at",
+    "description": "Slider label on the Announcements page. How large an area or sub-area notice is, as a percentage of a zone arrival."
+  },
+  "announcements.minorsize.tooltip": {
+    "message": "How large an area or sub-area notice is against a zone arrival. Full size is\nthe look the plugin always had; smaller lets the frequent notices whisper\nwhile a new zone still announces itself.",
+    "description": "Tooltip on that slider. Keep the line breaks."
+  },
+  "announcements.quietzones": {
+    "message": "Quiet zones",
+    "description": "Label above the list of zones that never announce."
+  },
+  "announcements.quietzones.add": {
+    "message": "Add the zone I am in",
+    "description": "Button. Adds the zone the player is standing in to the quiet list. Short."
+  },
+  "announcements.quietzones.none": {
+    "message": "None yet.",
+    "description": "Shown in place of the list while it is empty."
+  },
+  "announcements.quietzones.tooltip": {
+    "message": "Zones that never announce anything, whatever else is switched on. Stand in\none and add it; click a zone here to take it off the list again.",
+    "description": "Tooltip on that label. Keep the line breaks."
+  },
+  "appearance.backing": {
+    "message": "Behind the text",
+    "description": "Row label beside the dropdown that picks what sits behind the text."
+  },
+  "appearance.backing.tooltip": {
+    "message": "Something dark behind the lines, for a name that lands on a bright sky.\n\nA band is the width of the text and fades at its ends. A strip runs the\nwhole width of the screen, the way the original does it.",
+    "description": "Tooltip on that row. Keep the line breaks."
+  },
+  "appearance.backingcolour": {
+    "message": "Backing colour",
+    "description": "Row label beside the colour of the band or strip behind the text."
+  },
+  "appearance.glow": {
+    "message": "Glow",
+    "description": "Switch label. A soft halo behind every line."
+  },
+  "appearance.glow.tooltip": {
+    "message": "A soft halo behind every line, under the outline. Costs more to draw than\nthe outline does, which matters only at very large sizes.",
+    "description": "Tooltip on that switch. Keep the line break."
+  },
+  "appearance.glowcolour": {
+    "message": "Glow colour",
+    "description": "Row label beside the glow's colour."
+  },
+  "appearance.glowspread": {
+    "message": "Glow spread",
+    "description": "Slider label. How far the glow spreads, in pixels."
+  },
+  "appearance.gradient": {
+    "message": "Fade the name to a second colour",
+    "description": "Switch label. The place name shades from its text colour to a second colour at the foot of each letter."
+  },
+  "appearance.gradient.tooltip": {
+    "message": "The place name shades from its text colour at the top of each letter to\nthis one at the foot. The header and weather keep a flat colour.",
+    "description": "Tooltip on that switch. Keep the line break."
+  },
+  "appearance.gradientcolour": {
+    "message": "Lower colour",
+    "description": "Row label beside the second colour of the gradient."
+  },
+  "appearance.group.backing": {
+    "message": "Backing",
+    "description": "Group title on the Appearance page, above the backing settings."
+  },
+  "appearance.group.glow": {
+    "message": "Glow",
+    "description": "Group title on the Appearance page, above the glow settings."
+  },
+  "appearance.group.palette": {
+    "message": "Colour play",
+    "description": "Group title on the Appearance page, above the palette settings."
+  },
+  "appearance.palette": {
+    "message": "Palette",
+    "description": "Row label beside the dropdown that picks a run of colours for the name."
+  },
+  "appearance.palette.tooltip": {
+    "message": "Letters the place name in a run of colours instead of one. The text colour\nabove still sets the outline's contrast and is what a preset carries.",
+    "description": "Tooltip on that row. Keep the line break."
+  },
+  "appearance.palettemotion": {
+    "message": "Movement",
+    "description": "Row label beside the dropdown that picks how the palette moves."
+  },
+  "appearance.palettespeed": {
+    "message": "Speed",
+    "description": "Slider label. How fast a moving palette moves."
+  },
+  "backing.choice.band": {
+    "message": "A band behind the text",
+    "description": "Dropdown entry: a dark band the width of the text."
+  },
+  "backing.choice.none": {
+    "message": "None",
+    "description": "Dropdown entry: nothing behind the text."
+  },
+  "backing.choice.vignette": {
+    "message": "A strip across the screen",
+    "description": "Dropdown entry: a dark strip across the whole screen."
+  },
+  "departure.choice.dissolve": {
+    "message": "Dissolve",
+    "description": "Dropdown entry: the letters scatter on the way out."
+  },
+  "departure.choice.fade": {
+    "message": "Fade",
+    "description": "Dropdown entry: the plain fade out."
+  },
+  "departure.choice.fall": {
+    "message": "Fall",
+    "description": "Dropdown entry: the letters sink away."
+  },
+  "departure.choice.reverse": {
+    "message": "The arrival, backwards",
+    "description": "Dropdown entry: whatever motion brought the line in plays backwards to take it out."
+  },
+  "motion.choice.assemble": {
+    "message": "Assemble",
+    "description": "Dropdown entry, a motion: letters converge from every direction."
+  },
+  "motion.choice.drop": {
+    "message": "Drop",
+    "description": "Dropdown entry, a motion: letters fall into place from above."
+  },
+  "motion.choice.flicker": {
+    "message": "Flicker",
+    "description": "Dropdown entry, a motion: letters stutter on like a neon sign."
+  },
+  "motion.choice.slide": {
+    "message": "Slide",
+    "description": "Dropdown entry, a motion: letters slide in from the right."
+  },
+  "motion.choice.zoom": {
+    "message": "Zoom",
+    "description": "Dropdown entry, a motion: letters grow into place."
+  },
+  "motion.departure": {
+    "message": "Departure",
+    "description": "Row label beside the dropdown that picks how a line leaves."
+  },
+  "motion.departure.tooltip": {
+    "message": "How the line leaves once its time is up, played over the fade out.\n\nFade: the plain fade.\nThe arrival, backwards: whatever motion brought it in takes it out.\nDissolve: the letters scatter.\nFall: the letters sink away.",
+    "description": "Tooltip on that row. Keep the line breaks; the four names match the dropdown entries."
+  },
+  "motion.particles.fireflies": {
+    "message": "Fireflies",
+    "description": "Dropdown entry. A kind of particle."
+  },
+  "motion.particles.leaves": {
+    "message": "Leaves",
+    "description": "Dropdown entry. A kind of particle."
+  },
+  "motion.particles.rain": {
+    "message": "Rain",
+    "description": "Dropdown entry. A kind of particle."
+  },
+  "motion.particles.snow": {
+    "message": "Snow",
+    "description": "Dropdown entry. A kind of particle."
+  },
+  "motion.particles.stars": {
+    "message": "Stars",
+    "description": "Dropdown entry. A kind of particle."
+  },
+  "motion.spread": {
+    "message": "Spread",
+    "description": "Slider label. How far around the name the particles play."
+  },
+  "motion.spread.tooltip": {
+    "message": "How far around the name the particles play. 1 hugs the text; higher\nvalues fill the screen around it.",
+    "description": "Tooltip on that slider. Keep the line break."
+  },
+  "palette.choice.aurora": {
+    "message": "Aurora",
+    "description": "Dropdown entry. A palette name."
+  },
+  "palette.choice.blossom": {
+    "message": "Blossom",
+    "description": "Dropdown entry. A palette name."
+  },
+  "palette.choice.golden": {
+    "message": "Golden",
+    "description": "Dropdown entry. A palette name."
+  },
+  "palette.choice.none": {
+    "message": "None",
+    "description": "Dropdown entry: no palette, one text colour."
+  },
+  "palette.choice.ocean": {
+    "message": "Ocean",
+    "description": "Dropdown entry. A palette name."
+  },
+  "palette.choice.rainbow": {
+    "message": "Rainbow",
+    "description": "Dropdown entry. A palette name."
+  },
+  "palette.choice.sunset": {
+    "message": "Sunset",
+    "description": "Dropdown entry. A palette name."
+  },
+  "palettemotion.choice.pulse": {
+    "message": "The whole line together",
+    "description": "Dropdown entry: every letter cycles through the palette together."
+  },
+  "palettemotion.choice.static": {
+    "message": "Laid across the line",
+    "description": "Dropdown entry: the palette is laid across the line once and stays put."
+  },
+  "palettemotion.choice.wave": {
+    "message": "Travelling along it",
+    "description": "Dropdown entry: the palette travels along the line."
+  },
+  "sound.filevolume": {
+    "message": "Volume",
+    "description": "Slider label. The plugin's own volume for a sound file, as a percentage."
+  },
+  "sound.filevolume.tooltip": {
+    "message": "On top of the game's own master and System Sounds volumes, which a file\nfollows as well. A game sound has no slider here because the game's own\nsettings already are its volume.",
+    "description": "Tooltip on that slider. Keep the line breaks."
+  },
+  "sound.gamesound.banner": {
+    "message": "Banners",
+    "description": "Row label beside the dropdown that picks the game sound for banners."
+  },
+  "sound.gamesound.same": {
+    "message": "The same as places",
+    "description": "First entry of the weather and banner sound dropdowns: use the sound chosen for places."
+  },
+  "sound.gamesound.weather": {
+    "message": "Weather",
+    "description": "Row label beside the dropdown that picks the game sound for weather."
   }
 }

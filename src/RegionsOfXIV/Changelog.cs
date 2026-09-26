@@ -13,6 +13,26 @@ internal static class Changelog
 {
     public static readonly ChangelogEntry[] All =
     [
+        new(new Version("1.0.0.0"),
+        [
+            "The settings window is built around a live preview. The notification you are shaping is drawn at the top of the window at its real size, by the same code that draws it in game, and follows every change as you make it. Replay it, send it to the game screen, or pin it there while you work.",
+            "Eight tabs across the top: Announcements, Appearance, Fonts, Motion, Sound, Presets, What's new and About. Each page is two columns, and a setting that only matters while another is switched on appears when that one is switched on.",
+            "Drag a marker to place the notification on the screen. The two position sliders are still there and set exactly the same thing.",
+            "The language this window is in sits in the header, where it is found without a trip to About.",
+            "Areas and sub-areas can arrive smaller and leave sooner than a zone, so the frequent notices whisper while a new zone still announces itself. Full size is the old look.",
+            "Something dark behind the text, for a name landing on a bright sky: a band the width of the text, or a strip across the whole screen as the original does.",
+            "The place name can fade to a second colour from top to bottom, glow behind its outline, or be written in a run of colours: Rainbow, Sunset, Ocean, Aurora, Blossom and Golden, laid along the line, breathing all at once or running along it, at a speed of your choosing.",
+            "Five more ways to arrive: Drop, Slide, Assemble, Flicker and Zoom. And a choice of how a line leaves: the plain fade, the arrival run backwards, dissolving, or falling.",
+            "Five more kinds of particle: snow, fireflies, leaves, rain and stars, with a slider for how far around the name they play.",
+            "Quiet rules. Notices can be hidden in cities, in housing districts and inside houses, and in any zone you put on a quiet list by standing in it. Skipping sub-areas while travelling fast now also counts flying and diving.",
+            "Weather and banners can each have a game sound of their own rather than sharing the one for places, and a sound file of your own has a volume slider.",
+            "Hovering a preset shows it in the preview before you apply it.",
+            "The window is drawn in Noto Sans, with Dalamud's Noto Sans CJK merged in for everything Latin does not cover, so every shipped language reads in the same face at the same weight.",
+            "Spanish, Portuguese, Russian and Chinese join German, French, Japanese and Turkish, all machine-drafted and marked so at the top until a speaker has been through them. Every string in the window is translated in all eight, and the language pickers write each language's name with a capital letter.",
+            "Nothing you have saved is affected. Presets, share codes and your current settings carry over as they were, every new setting starts at the old look, and a preset from an older version still applies.",
+            "The About tab credits the plugin's author and the interface's author.",
+        ]),
+
         new(new Version("0.6.1.0"),
         [
             "Turkish banner wording draws properly. The dotted I, the S with a cedilla and the G with a breve were coming out as question marks, so \"ETKINLIK BASLADI\" was missing three of its letters.",

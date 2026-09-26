@@ -122,7 +122,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
 
     private void OnArrived(ZoneArrival arrival)
     {
-        if (!this.gate.ShouldAnnounceZoneEntry(arrival.IsPvp, arrival.IsDuty))
+        if (!this.gate.ShouldAnnounceZoneEntry(arrival.IsPvp, arrival.IsDuty, arrival.TerritoryTypeId))
             return;
 
         var text = this.sources.PlaceNames.Resolve(arrival.PlaceNameId)
@@ -163,7 +163,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
             if (this.pendingNativeAreaText is not null && this.gate.ShouldAnnounceNativeAreaText())
             {
                 Log.Debug($"Native area text only (TerritoryInfo unchanged): {nativeText}");
-                this.sink.Push(null, nativeText);
+                this.sink.Push(null, nativeText, minor: true);
                 this.gate.MarkAnnounced(
                     this.sources.Locations.Current, LocationTier.SubArea, this.sink.Timing);
             }
@@ -193,7 +193,7 @@ internal sealed class AnnouncementCoordinator : IDisposable
 
         Log.Debug($"Sanctuary {(inSanctuary ? "entered" : "left")}: {header} / {text}");
 
-        this.sink.Push(header, text);
+        this.sink.Push(header, text, minor: true);
         this.gate.MarkAnnounced(this.sources.Locations.Current, LocationTier.SubArea, this.sink.Timing);
     }
 
@@ -217,7 +217,8 @@ internal sealed class AnnouncementCoordinator : IDisposable
         if (string.IsNullOrWhiteSpace(text))
             return;
 
-        this.sink.Push(header, text);
+        // Areas and sub-areas are the frequent tiers, and the ones the presence settings quieten.
+        this.sink.Push(header, text, minor: tier > LocationTier.Place);
         this.gate.MarkAnnounced(current, tier, this.sink.Timing);
     }
 

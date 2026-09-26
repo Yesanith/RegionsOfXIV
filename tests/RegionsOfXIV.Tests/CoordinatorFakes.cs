@@ -13,7 +13,7 @@ internal enum PushedTo
     Banner,
 }
 
-internal sealed record Announcement(string? Header, string Text, PushedTo Lane, uint IconId);
+internal sealed record Announcement(string? Header, string Text, PushedTo Lane, uint IconId, bool Minor = false);
 
 internal sealed class FakeSink : INotificationSink
 {
@@ -35,6 +35,9 @@ internal sealed class FakeSink : INotificationSink
 
     public void Push(string? header, string text) =>
         this.Pushed.Add(new Announcement(header, text, PushedTo.Place, 0));
+
+    public void Push(string? header, string text, bool minor) =>
+        this.Pushed.Add(new Announcement(header, text, PushedTo.Place, 0, minor));
 
     public void PushWeather(string text, uint iconId) =>
         this.Pushed.Add(new Announcement(null, text, PushedTo.Weather, iconId));
