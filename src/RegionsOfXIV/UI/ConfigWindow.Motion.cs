@@ -1,22 +1,23 @@
-using Dalamud.Bindings.ImGui;
-using Dalamud.Interface.Utility.Raii;
 using RegionsOfXIV.Services;
+using RegionsOfXIV.UI.Components;
 
 namespace RegionsOfXIV.UI;
 
 internal sealed partial class ConfigWindow
 {
-    // How a notification arrives, resolves and leaves, which was three tabs' worth of controls
-    // with two features split across them: the motion type and its duration, and the decode
-    // toggle and its duration. Each pair is now adjacent, which is why three tooltips on this tab
-    // no longer have to name another tab to explain themselves.
+    // How a notification arrives, resolves and leaves. Each pair of a feature and its duration is
+    // adjacent, which is why no help text on this page has to name another page to explain itself.
     //
-    // Four flags rather than the two either half used, because the two halves preview differently
-    // and both behaviours have to survive. See the tail of this method for what each one does.
-    private void DrawMotionTab()
+    // Four flags rather than one, because the groups preview differently and both behaviours have
+    // to survive. See the tail of this method for what each one does.
+    private void DrawMotionPage()
     {
-        using var tab = ImRaii.TabItem(Loc.Label("motion.tab", "Motion"));
-        if (!tab) return;
+        PageHeader.Draw(
+            Loc.Get("motion.tab", "Motion"),
+            Loc.Get(
+                "motion.intro",
+                "The line arrives, lands, then decodes. Motion and decode are separate " +
+                "stages and each takes its own time."));
 
         // A live redraw is enough: the notification on screen can take the new value as it is.
         var changed = false;
@@ -36,145 +37,145 @@ internal sealed partial class ConfigWindow
         // rebuilt before the replay rather than after it.
         var refont = false;
 
-        UiText.Wrapped(Loc.Get(
-            "motion.intro",
-            "The line arrives, lands, then decodes. Motion and decode are separate " +
-            "stages and each takes its own time."));
-        ImGui.Separator();
-
-        UiText.Wrapped(Loc.Get("motion.choice.intro", "How the letters move as they arrive."));
-
-        this.config.Motion = Choice(
-            Loc.Label("motion.choice", "Motion"), this.config.Motion, Label, ref restart);
-        UiText.Tooltip(Loc.Get(
-            "motion.choice.tooltip",
-            "None: the letters simply appear where they belong.\n" +
-            "Typewriter: one letter at a time, no fade.\n" +
-            "Rise: letters lift into place from below.\n" +
-            "Wave: letters ride a wave through the line as it appears.\n" +
-            "Burn: letters catch alight and cool into their colour.\n\n" +
-            "Runs alongside the Eorzean decode rather than instead of it."));
-
-        using (ImRaii.Disabled(this.config.Motion == MotionEffect.None))
+        using (SettingsGroup.Begin(
+                   Loc.Get("motion.group.arrival", "Arrival"),
+                   Loc.Get("motion.choice.intro", "How the letters move as they arrive.")))
         {
-            this.config.MotionDuration = DrawSeconds(
-                Loc.Label("motion.duration", "Motion time"),
-                this.config.MotionDuration, 0.1f, 5f, ref timing, ref settled);
+            this.config.Motion = Choice(
+                "##rox-motion",
+                Loc.Get("motion.choice", "Motion"),
+                Loc.Get(
+                    "motion.choice.tooltip",
+                    "None: the letters simply appear where they belong.\n" +
+                    "Typewriter: one letter at a time, no fade.\n" +
+                    "Rise: letters lift into place from below.\n" +
+                    "Wave: letters ride a wave through the line as it appears.\n" +
+                    "Burn: letters catch alight and cool into their colour.\n\n" +
+                    "Runs alongside the Eorzean decode rather than instead of it."),
+                this.config.Motion, MotionLabels, ref restart);
+
+            this.config.MotionDuration = Seconds(
+                "##rox-motion-duration",
+                Loc.Get("motion.duration", "Motion time"),
+                Loc.Get(
+                    "motion.duration.tooltip",
+                    "How long the letters take to arrive. Runs alongside the fade in, and\n" +
+                    "does nothing when the motion above is None."),
+                this.config.MotionDuration, 0.1f, 5f, ref timing, ref settled, this.config.Motion != MotionEffect.None);
         }
 
-        UiText.Tooltip(Loc.Get(
-            "motion.duration.tooltip",
-            "How long the letters take to arrive. Runs alongside the fade in, and\n" +
-            "does nothing when the motion above is None."));
-
-        ImGui.Separator();
-
-        var wasDecoding = this.config.DecodeEffectEnabled;
-
-        this.config.DecodeEffectEnabled = Checkbox(
-            Loc.Label("motion.decode", "Decode from Eorzean script"),
-            this.config.DecodeEffectEnabled, ref restart);
-
-        // Asked explicitly rather than reading restart, which happens to mean the same thing today
-        // only because this is the one control on the tab that sets it without also being a
-        // Choice.
-        if (this.config.DecodeEffectEnabled != wasDecoding)
-            refont = true;
-
-        UiText.Tooltip(Loc.Get(
-            "motion.decode.tooltip",
-            "Requires a bundled Eorzean font. Latin text only.\n\n" +
-            "Runs after the motion above rather than alongside it: the line\n" +
-            "arrives in Eorzean, lands, then resolves. Turned off, it arrives\n" +
-            "already readable. Presets leave this alone, so switching it off\n" +
-            "here switches it off for all of them."));
-
-        using (ImRaii.Disabled(!this.config.DecodeEffectEnabled))
+        using (SettingsGroup.Begin(Loc.Get("motion.group.decode", "Decode")))
         {
-            this.config.RevealDuration = DrawSeconds(
-                Loc.Label("motion.decode.duration", "Decode time"),
-                this.config.RevealDuration, 0.05f, 5f, ref timing, ref settled);
+            var wasDecoding = this.config.DecodeEffectEnabled;
+
+            this.config.DecodeEffectEnabled = Toggle(
+                "##rox-decode",
+                Loc.Get("motion.decode", "Decode from Eorzean script"),
+                Loc.Get(
+                    "motion.decode.tooltip",
+                    "Requires a bundled Eorzean font. Latin text only.\n\n" +
+                    "Runs after the motion above rather than alongside it: the line\n" +
+                    "arrives in Eorzean, lands, then resolves. Turned off, it arrives\n" +
+                    "already readable. Presets leave this alone, so switching it off\n" +
+                    "here switches it off for all of them."),
+                this.config.DecodeEffectEnabled, ref restart);
+
+            if (this.config.DecodeEffectEnabled != wasDecoding)
+            {
+                refont = true;
+            }
+
+            this.config.RevealDuration = Seconds(
+                "##rox-decode-duration",
+                Loc.Get("motion.decode.duration", "Decode time"),
+                Loc.Get(
+                    "motion.decode.duration.tooltip",
+                    "How long the Eorzean takes to resolve, once the letters have landed.\n" +
+                    "Needs the decode effect above."),
+                this.config.RevealDuration, 0.05f, 5f, ref timing, ref settled, this.config.DecodeEffectEnabled);
         }
 
-        UiText.Tooltip(Loc.Get(
-            "motion.decode.duration.tooltip",
-            "How long the Eorzean takes to resolve, once the letters have landed.\n" +
-            "Needs the decode effect above."));
-
-        ImGui.Separator();
-        UiText.Wrapped(Loc.Get(
-            "motion.particles.intro", "What plays around it, for as long as it is on screen."));
-
-        this.config.Particles = Choice(
-            Loc.Label("motion.particles", "Particles"), this.config.Particles, Label, ref restart);
-
-        if (this.config.Particles != ParticleEffect.None)
+        using (SettingsGroup.Begin(
+                   Loc.Get("motion.group.particles", "Particles"),
+                   Loc.Get("motion.particles.intro", "What plays around it, for as long as it is on screen.")))
         {
-            this.config.ParticleDensity = Slider(
-                Loc.Label("motion.density", "Density"),
-                this.config.ParticleDensity, 0.2f, 3f,
-                "%.1f" + Loc.Unit("units.times", "x"), ref changed);
-
-            this.config.ParticleColor = ColorPicker(
-                Loc.Label("motion.particlecolour", "Particle colour"),
-                this.config.ParticleColor, ref changed);
-            UiText.Tooltip(Loc.Get(
-                "motion.particlecolour.tooltip",
-                "The default amber suits embers and sparkles. Hearts and petals\n" +
-                "want moving towards pink."));
-
-            if (this.config.Particles == ParticleEffect.Embers && this.config.Motion != MotionEffect.Burn)
-                UiText.Wrapped(Loc.Get(
-                    "motion.embers.note",
-                    "Embers go with the Burn motion, but they do not need it."));
+            DrawParticles(ref changed, ref restart);
         }
 
-        ImGui.Separator();
-        UiText.Wrapped(Loc.Get(
-            "motion.timing.intro",
-            "How long the whole notification lasts, whichever of the above it is using."));
+        using (SettingsGroup.Begin(
+                   Loc.Get("motion.group.timing", "Timing"),
+                   Loc.Get("motion.timing.intro", "How long the whole notification lasts, whichever of the above it is using.")))
+        {
+            this.config.FadeInDuration = Seconds(
+                "##rox-fadein",
+                Loc.Get("motion.fadein", "Fade in"),
+                Loc.Get("motion.fadein.tooltip", "How long the line takes to come up to full strength as it appears."),
+                this.config.FadeInDuration, 0.05f, 3f, ref timing, ref settled);
 
-        this.config.FadeInDuration = DrawSeconds(
-            Loc.Label("motion.fadein", "Fade in"),
-            this.config.FadeInDuration, 0.05f, 3f, ref timing, ref settled);
-        UiText.Tooltip(Loc.Get(
-            "motion.fadein.tooltip",
-            "How long the line takes to come up to full strength as it appears."));
+            this.config.ShowDuration = Seconds(
+                "##rox-hold",
+                Loc.Get("motion.hold", "Hold"),
+                Loc.Get("motion.hold.tooltip", "How long the finished line stays up before it starts to fade."),
+                this.config.ShowDuration, 0.5f, 15f, ref timing, ref settled);
 
-        this.config.ShowDuration = DrawSeconds(
-            Loc.Label("motion.hold", "Hold"),
-            this.config.ShowDuration, 0.5f, 15f, ref timing, ref settled);
-        UiText.Tooltip(Loc.Get(
-            "motion.hold.tooltip",
-            "How long the finished line stays up before it starts to fade."));
-
-        this.config.FadeOutDuration = DrawSeconds(
-            Loc.Label("motion.fadeout", "Fade out"),
-            this.config.FadeOutDuration, 0.05f, 5f, ref timing, ref settled);
-        UiText.Tooltip(Loc.Get(
-            "motion.fadeout.tooltip",
-            "How long the line takes to disappear once its time is up."));
-
-        ImGui.Separator();
-
-        if (ImGui.Button(Loc.Label("motion.preview", "Preview")))
-            this.actions.Preview(Sample);
+            this.config.FadeOutDuration = Seconds(
+                "##rox-fadeout",
+                Loc.Get("motion.fadeout", "Fade out"),
+                Loc.Get("motion.fadeout.tooltip", "How long the line takes to disappear once its time is up."),
+                this.config.FadeOutDuration, 0.05f, 5f, ref timing, ref settled);
+        }
 
         if (!changed && !restart && !timing && !settled)
+        {
             return;
+        }
 
         MarkUnsaved();
 
         if (refont)
+        {
             this.actions.RebuildFonts();
+        }
 
         // restart and settled both mean "play it from the top", for different reasons: a changed
         // effect cannot be seen in a notification that has already arrived, and a duration is only
         // worth showing once the slider has been let go. A drag on its own sets neither, which is
         // what keeps it from replaying sixty times a second.
         if (restart || settled)
+        {
             this.actions.Preview(Sample);
+        }
         else if (changed)
+        {
             this.actions.LivePreview(Sample);
+        }
+    }
+
+    private void DrawParticles(ref bool changed, ref bool restart)
+    {
+        this.config.Particles = Choice(
+            "##rox-particles", Loc.Get("motion.particles", "Particles"), null,
+            this.config.Particles, ParticleLabels, ref restart);
+
+        var enabled = this.config.Particles != ParticleEffect.None;
+
+        this.config.ParticleDensity = Slider(
+            "##rox-density", Loc.Get("motion.density", "Density"), null,
+            this.config.ParticleDensity, 0.2f, 3f,
+            "%.1f" + Loc.Unit("units.times", "x"), ref changed, enabled: enabled);
+
+        this.config.ParticleColor = Colour(
+            "##rox-particlecolour",
+            Loc.Get("motion.particlecolour", "Particle colour"),
+            Loc.Get(
+                "motion.particlecolour.tooltip",
+                "The default amber suits embers and sparkles. Hearts and petals\n" +
+                "want moving towards pink."),
+            this.config.ParticleColor, ref changed, enabled);
+
+        if (this.config.Particles == ParticleEffect.Embers && this.config.Motion != MotionEffect.Burn)
+        {
+            SettingsRow.Note(Loc.Get("motion.embers.note", "Embers go with the Burn motion, but they do not need it."));
+        }
     }
 }

@@ -363,8 +363,8 @@ public class LocalizationTests : IDisposable
     }
 
     // Polish, Czech, Turkish, Romanian and Vietnamese, none of which the game font carries. They
-    // are drawable because UI/WindowFont merges the Windows interface font in for the extended
-    // Latin blocks, and they were blanks before it.
+    // are drawable because the Latin face UI/Fonts.cs bundles carries the extended Latin blocks,
+    // and they were blanks before the window had a face of its own.
     [Theory]
     [InlineData('ł')]
     [InlineData('ń')]

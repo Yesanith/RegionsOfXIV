@@ -117,7 +117,7 @@ edge. Aim for the English length where you can.
 **9. Speak to the player directly**, in plain second person, the way the English does.
 
 **10. Be consistent.** The same term should get the same translation everywhere. The place tiers (region, zone, area, sub-area)
-appear in several tabs and must match across all of them.
+appear on several pages and must match across all of them.
 
 **11. Keep the file valid JSON.** UTF-8, two-space indent, a comma after every entry except the
 last, quotes intact. If a value contains `\"` or `\\`, keep the backslash. A file that will not
@@ -242,22 +242,22 @@ So a banner table is worth looking at in game, under more than one font, before 
 This section is about the settings window. Banner wording is drawn with different fonts and has
 its own caveat, above.
 
-The settings window draws with the game's own AXIS font, which carries Latin-1, kana, about 6,300
-kanji and the complete Russian Cyrillic alphabet, but only eight characters of Latin Extended-A.
-On its own that ruled out most of Europe.
+The settings window draws Latin with a bundled subset of Noto Sans that carries Basic Latin,
+Latin-1, Latin Extended-A, Latin Extended-B and Latin Extended Additional in full, so **Turkish,
+Polish, Czech, Romanian, Vietnamese and their neighbours all draw properly**, in one typeface.
 
-The window no longer draws with AXIS alone. It merges the Windows interface font in behind it for
-Latin Extended-A, Latin Extended-B and Latin Extended Additional, so **Turkish, Polish, Czech,
-Romanian, Vietnamese and their neighbours all draw properly**. Basic Latin still comes from AXIS,
-which means a word can mix two typefaces: `Şık` takes its `Ş` and `ı` from the merged font and its
-`k` from AXIS. Slightly uneven, and a great deal better than blank boxes.
+Everything outside Latin is merged in behind it from the Noto Sans CJK that Dalamud ships: Greek,
+Cyrillic, kana, the few thousand kanji ImGui's Japanese set names, and on top of that every
+character the bundled locale files actually use, so a kanji outside that set still draws as long as
+a shipped file contains it.
 
 What still cannot ship:
 
-- **Ukrainian, Serbian, Bulgarian and other non-Russian Cyrillic.** The merge covers Latin only,
-  so AXIS's Russian alphabet is still the whole of the Cyrillic coverage.
-- **Hebrew, Arabic, Thai, Korean, and Chinese beyond the kanji AXIS happens to share.** No coverage
-  at all, and each would need its own merge.
+- **Hebrew, Arabic, Thai and Korean.** Not merged, so no coverage at all, and each would need its
+  own merge.
+- **Cyrillic beyond the Russian alphabet** is drawable by the merge, but the build check that
+  guards the bundled files has not been widened past Russian yet. Open an issue if you want to
+  ship one of those languages; it is a small change.
 
 The loader logs a warning naming the offending characters when a file uses them, so this fails
 visibly rather than silently. If you want one of the languages above, open an issue and say so; it
@@ -340,8 +340,8 @@ as the rest of the project.
 - **A malformed file leaves the whole language in English.** The plugin keeps working; your file
   just never loads.
 - **Removing `machine-drafted` from `_status` is what hides the notice.** Nothing else does.
-- **Characters AXIS lacks draw as blanks, not as boxes.** They vanish. The log warns; the window
-  does not.
+- **Characters the window font lacks draw as blanks, not as boxes.** They vanish. The log warns;
+  the window does not.
 - **Preset names are identifiers, not words.** They travel in share codes and must match across
   machines.
 - **Banner wording is not in the JSON at all.** Searching a locale file for "Duty Commenced" finds
@@ -365,9 +365,14 @@ The generator preserves existing `description` fields, so notes written for tran
 regeneration. Translations are not touched, and a new key simply falls back to English in every
 language until someone adds it.
 
-Widget labels go through `Loc.Label`, which appends `###key` so a control's ImGui identity comes
-from the key rather than the translated text. Slider units go through `Loc.Unit`, which escapes
-`%`. Neither is visible to translators.
+The settings window draws its own controls and gives each one an explicit id, so a label wants
+plain `Loc.Get`. `Loc.Label`, which appends `###key` so a stock ImGui widget's identity comes from
+the key rather than the translated text, is there for any stock widget that still needs it. Slider
+units go through `Loc.Unit`, which escapes `%`. None of this is visible to translators.
+
+The export only recognises a call whose key and English are both literals, so a label that comes
+out of a table or a variable has to be resolved through a small switch of literal calls. The
+navigation rail and the About page's tiles do exactly that.
 
 Banner wording is not part of that system. A new language there is a dictionary in
 `BannerNames.cs` plus one line in `ByLanguage`, which is what the Announcements dropdown is built

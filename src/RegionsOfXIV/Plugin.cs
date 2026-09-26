@@ -36,11 +36,9 @@ public sealed class Plugin : IDalamudPlugin
     private readonly GameAudio gameAudio;
     private readonly FileSoundPlayer filePlayer;
     private readonly NotificationSounds sounds;
-    private readonly WindowFont windowFont;
     private readonly NativeUiSuppressor nativeUiSuppressor;
     private readonly NotificationOverlay overlay;
     private readonly ConfigWindow configWindow;
-    private readonly ChangelogWindow changelogWindow;
 #if DEBUG
     private readonly IconBrowserWindow iconBrowserWindow;
     private readonly BannerPreviewWindow bannerPreviewWindow;
@@ -65,7 +63,7 @@ public sealed class Plugin : IDalamudPlugin
         BannerNameResolver.Language = this.config.BannerNameLanguage;
 
         this.fonts = new FontService(this.config);
-        this.windowFont = new WindowFont();
+        Fonts.Initialize(PluginInterface.UiBuilder, PluginInterface.AssemblyLocation.DirectoryName ?? string.Empty);
         this.nativeUiSuppressor = new NativeUiSuppressor(this.config);
         this.uiVisibilityGuard = new UiVisibilityGuard();
 
@@ -104,8 +102,6 @@ public sealed class Plugin : IDalamudPlugin
                 new GamePlaceNames(),
                 new GameWeatherNames()));
 
-        this.changelogWindow = new ChangelogWindow(this.windowFont);
-
         this.configWindow = new ConfigWindow(
             this.config,
             new ConfigActions(
@@ -114,18 +110,15 @@ public sealed class Plugin : IDalamudPlugin
                 this.overlay.HoldPreview,
                 RebuildFonts,
                 this.fonts.ProblemWith,
-                this.changelogWindow.ShowAll,
                 this.nativeUiSuppressor.RestoreAreaText,
                 this.nativeUiSuppressor.RestoreLoadingTitle,
                 ApplyLanguage,
                 AuditionSound,
                 this.filePlayer.ProblemFor,
-                () => GameMixerRules.Decide(this.gameAudio).Reason),
-            this.windowFont);
+                () => GameMixerRules.Decide(this.gameAudio).Reason));
 
         this.windowSystem.AddWindow(this.overlay);
         this.windowSystem.AddWindow(this.configWindow);
-        this.windowSystem.AddWindow(this.changelogWindow);
 
 #if DEBUG
 
@@ -144,7 +137,7 @@ public sealed class Plugin : IDalamudPlugin
         var subcommands = new Dictionary<string, Action>(StringComparer.OrdinalIgnoreCase)
         {
             ["test"] = this.coordinator.PushPreview,
-            ["changelog"] = this.changelogWindow.ShowAll,
+            ["changelog"] = this.configWindow.ShowChangelog,
         };
 #if DEBUG
         subcommands["icons"] = this.iconBrowserWindow.Toggle;
@@ -172,9 +165,9 @@ public sealed class Plugin : IDalamudPlugin
 
         if (!isFirstRun)
         {
-            this.changelogWindow.ShowSince(Changelog.Parse(this.config.LastSeenVersion));
+            this.configWindow.ShowChangelogSince(Changelog.Parse(this.config.LastSeenVersion));
 
-            if (this.changelogWindow.IsOpen)
+            if (this.configWindow.IsOpen)
                 Log.Information($"Updated from {this.config.LastSeenVersion ?? "an earlier build"} to {current}.");
         }
 
@@ -214,7 +207,6 @@ public sealed class Plugin : IDalamudPlugin
         this.bannerPreviewWindow.Dispose();
         this.iconBrowserWindow.Dispose();
 #endif
-        this.changelogWindow.Dispose();
         this.configWindow.Dispose();
         this.overlay.Dispose();
 
@@ -224,7 +216,7 @@ public sealed class Plugin : IDalamudPlugin
 
         this.uiVisibilityGuard.Dispose();
         this.nativeUiSuppressor.Dispose();
-        this.windowFont.Dispose();
+        Fonts.Dispose();
         this.fonts.Dispose();
     }
 

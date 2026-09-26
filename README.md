@@ -175,10 +175,12 @@ from the call sites rather than edited, what the `description` on every entry is
 for, and which scripts the settings window can actually draw.
 
 Two things in there are the code's problem rather than a translator's.
-`UI/WindowFont.cs` merges the Windows interface font in behind the game's AXIS
-face so Latin Extended draws at all, which is what lets Turkish, Polish, Czech,
-Romanian and Vietnamese render. And `NoBundledLanguageNeedsGlyphsTheWindowLacks`
-fails the build before a language the window cannot draw can ship.
+`UI/Fonts.cs` draws the window with a bundled Latin subset of Noto Sans, which
+carries Latin Extended in full, and merges Dalamud's Noto Sans CJK in behind it
+for Greek, Cyrillic, kana and kanji, which is what lets Turkish, Polish, Czech,
+Romanian, Vietnamese and Japanese render. And
+`NoBundledLanguageNeedsGlyphsTheWindowLacks` fails the build before a language
+the window cannot draw can ship.
 
 ### How it fits together
 
@@ -195,7 +197,7 @@ launching the game.
 | Layer | What lives there |
 | --- | --- |
 | `Services/` | detection, decisions, game data. Never draws, never references `UI` |
-| `UI/` | windows, the overlay, and the glyph painting |
+| `UI/` | the settings window and its pages, the overlay, and the glyph painting. `UI/Components/` is the widget set the window is built from, `UI/Shell/` its header and navigation rail |
 | `Models/` | the few plain records both sides pass around |
 
 The plugin draws its own text glyph by glyph rather than handing ImGui a string,
@@ -206,6 +208,13 @@ decides where a line goes; `UI/NotificationRenderer.Runs.cs` paints it.
 and rebuilds only the roles whose face, size or file actually changed. A role
 set to a custom file also holds a Noto fallback, so a font that will not load
 degrades to something readable rather than to nothing.
+
+The settings window has fonts of its own, in `UI/Fonts.cs`: caption, body,
+headline and title tiers, plus three sizes of icon, every one a ratio of the
+font size chosen in Dalamud's settings rather than a pixel count. The window is
+drawn through the draw list rather than through stock ImGui widgets, so every
+control in `UI/Components/` takes an explicit id and its wording through
+`Loc.Get`; nothing in it depends on a label to keep its identity.
 
 ## Feedback
 

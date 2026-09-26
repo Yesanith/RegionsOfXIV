@@ -53,10 +53,6 @@
     "message": "About",
     "description": "Tab label. Short - it sits in a row of tabs and a long word pushes the others off."
   },
-  "about.title": {
-    "message": "Regions of XIV {0}",
-    "description": "Heading at the top of the About tab. \"Regions of XIV\" is the plugin's name and stays as-is; {0} is the version number."
-  },
   "about.author": {
     "message": "by {0}",
     "description": "Sits under the title. {0} is the author's name and is never translated - it is passed in separately so it cannot be."
@@ -313,11 +309,6 @@
     "description": "Dropdown entry for using a font file from the player's own PC. The other entries in this dropdown are typeface names and are not translated."
   },
 
-  "fonts.preview": {
-    "message": "Preview",
-    "description": "Button that fires a sample notification, one per role tab. The Motion and Appearance tabs have their own with the same wording and their own keys."
-  },
-
   "fonts.path.hint": {
     "message": "Path to a .ttf, .otf or .ttc file",
     "description": "Placeholder text inside the empty font-path box. The three extensions are file types and stay as they are."
@@ -360,11 +351,6 @@
     "message": "Open the Regions of XIV settings. \"{0}\" fires a sample notification, \"{1}\" shows what has changed.",
     "description": "Shown in Dalamud's own list of chat commands. {0} and {1} are the commands themselves, \"/regions test\" and \"/regions changelog\" - they are what the player types, so never translate them, and keep the quotation marks around them. \"Regions of XIV\" is the plugin's name."
   },
-
-  "changelog.title": {
-    "message": "Regions of XIV: What's New",
-    "description": "Title bar of the What's New window. \"Regions of XIV\" is the plugin's name and stays as-is; only the second half is translated. Match about.whatsnew, which is the button that opens this window."
-  },
   "changelog.all": {
     "message": "Every release, newest first:",
     "description": "Line at the top of the window when the player opened it themselves, above the full list."
@@ -376,26 +362,6 @@
   "changelog.updated.away": {
     "message": "Regions of XIV has updated. Here is what changed while you were away:",
     "description": "The same line when more than one release is being shown at once, because the player skipped some updates. \"Regions of XIV\" is the plugin's name."
-  },
-  "changelog.close": {
-    "message": "Close",
-    "description": "Button that shuts the window."
-  },
-  "changelog.discord": {
-    "message": "Join the Discord",
-    "description": "Button opening the project's Discord invite. \"Discord\" is a product name and stays as-is. The same words appear on the Presets and About tabs; they are separate entries because each button needs its own identity, but they should read the same."
-  },
-  "changelog.discord.tooltip": {
-    "message": "Ideas, bug reports and preset codes.\n{0}",
-    "description": "Tooltip for the Join the Discord button. {0} is the invite address - keep it on its own line."
-  },
-  "changelog.onceonly": {
-    "message": "You will not see this again until the next update.",
-    "description": "Footer shown when the window opened itself after an update."
-  },
-  "changelog.onrequest": {
-    "message": "Shown because you asked: \"{0}\".",
-    "description": "Footer shown when the player opened the window themselves. {0} is the command they typed; it is never translated, and the quotes around it stay."
   },
 
   "window.editing": {
@@ -759,10 +725,6 @@
     "message": "Zero turns the outline off.",
     "description": ""
   },
-  "appearance.preview": {
-    "message": "Preview",
-    "description": ""
-  },
   "appearance.separatecolours": {
     "message": "Colour each line separately",
     "description": ""
@@ -971,10 +933,6 @@
     "message": "Sparkles",
     "description": ""
   },
-  "motion.preview": {
-    "message": "Preview",
-    "description": ""
-  },
   "motion.tab": {
     "message": "Motion",
     "description": "Tab label. How a notification moves: the arrival effect, the Eorzean decode, particles and the timings. Keep it short."
@@ -1034,5 +992,117 @@
   "sound.tab": {
     "message": "Sound",
     "description": "Tab label. The noise a notification makes. Keep it short."
+  },
+  "about.community": {
+    "message": "Community",
+    "description": "Section heading on the About page above the Discord, GitHub and issue tiles. Shown in capitals."
+  },
+  "announcements.group.banners": {
+    "message": "Banners",
+    "description": "Group title on the Announcements page, above the banner settings."
+  },
+  "announcements.group.native": {
+    "message": "The game's own text",
+    "description": "Group title on the Announcements page, above the two switches that hide the game's own location text."
+  },
+  "announcements.group.places": {
+    "message": "Places",
+    "description": "Group title on the Announcements page, above the zone, area and sub-area switches."
+  },
+  "announcements.group.quiet": {
+    "message": "When to stay quiet",
+    "description": "Group title on the Announcements page, above the combat, duty and fast-travel rules."
+  },
+  "announcements.group.weather": {
+    "message": "Weather",
+    "description": "Group title on the Announcements page, above the weather switches."
+  },
+  "appearance.group.colours": {
+    "message": "Colours",
+    "description": "Group title on the Appearance page, above the text, header and weather colours."
+  },
+  "appearance.group.header": {
+    "message": "Header",
+    "description": "Group title on the Appearance page, above the header switches and the header gap."
+  },
+  "appearance.group.lettering": {
+    "message": "Lettering",
+    "description": "Group title on the Appearance page, above letter spacing and uppercase."
+  },
+  "appearance.group.outline": {
+    "message": "Outline",
+    "description": "Group title on the Appearance page, above the outline colours and thickness."
+  },
+  "appearance.group.placement": {
+    "message": "Placement",
+    "description": "Group title on the Appearance page, above the vertical and horizontal position sliders."
+  },
+  "appearance.group.shadow": {
+    "message": "Drop shadow",
+    "description": "Group title on the Appearance page, above the drop shadow settings."
+  },
+  "appearance.intro": {
+    "message": "Where the notification sits, how it is lettered, and the colours, outline and shadow it is drawn with. The sample follows every slider as you move it.",
+    "description": "Sentence under the Appearance page title, saying what the page covers."
+  },
+  "changelog.latest": {
+    "message": "Latest",
+    "description": "Small pill beside the newest version on the What's new page. One word; it is drawn in capitals."
+  },
+  "changelog.new": {
+    "message": "New",
+    "description": "Small pill beside a version the player has not seen yet. One word; it is drawn in capitals."
+  },
+  "changelog.tab": {
+    "message": "What's new",
+    "description": "Label of the What's new page in the navigation rail, and the title at the top of it. Short."
+  },
+  "fonts.path": {
+    "message": "Font file",
+    "description": "Label above the path field for a custom font file, on the Fonts page."
+  },
+  "motion.group.arrival": {
+    "message": "Arrival",
+    "description": "Group title on the Motion page, above the motion choice and its duration."
+  },
+  "motion.group.decode": {
+    "message": "Decode",
+    "description": "Group title on the Motion page, above the Eorzean decode switch and its duration."
+  },
+  "motion.group.particles": {
+    "message": "Particles",
+    "description": "Group title on the Motion page, above the particle settings."
+  },
+  "motion.group.timing": {
+    "message": "Timing",
+    "description": "Group title on the Motion page, above fade in, hold and fade out."
+  },
+  "sound.file": {
+    "message": "Sound file",
+    "description": "Label above the path field for a sound file, on the Sound page."
+  },
+  "sound.gamesound": {
+    "message": "Sound effect",
+    "description": "Row label beside the dropdown that picks one of the game's chat sound effects."
+  },
+  "sound.group.on": {
+    "message": "Plays on",
+    "description": "Group title on the Sound page, above the three switches for which notifications make a sound."
+  },
+  "sound.group.source": {
+    "message": "Source",
+    "description": "Group title on the Sound page, above the source dropdown."
+  },
+  "window.close": {
+    "message": "Close",
+    "description": "Tooltip on the close button in the window's header."
+  },
+  "window.preview": {
+    "message": "Preview",
+    "description": "Button in the window's header. Fires a sample notification. Short."
+  },
+  "window.preview.tooltip": {
+    "message": "Fires a sample notification so you can see the current settings.",
+    "description": "Tooltip on the preview button in the window's header."
   }
 }

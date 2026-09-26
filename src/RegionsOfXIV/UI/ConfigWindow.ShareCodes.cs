@@ -1,8 +1,10 @@
-﻿using System;
+using System;
 using System.Linq;
 using Dalamud.Bindings.ImGui;
-using Dalamud.Interface.Utility.Raii;
+using Dalamud.Interface;
+using Dalamud.Interface.Utility;
 using RegionsOfXIV.Services;
+using RegionsOfXIV.UI.Components;
 
 namespace RegionsOfXIV.UI;
 
@@ -15,71 +17,96 @@ internal sealed partial class ConfigWindow
 
     private bool DrawShareCodeRow()
     {
-        UiText.Wrapped(Loc.Get("sharecodes.heading", "Share codes"));
-        UiText.Disabled(Loc.Get(
-            "sharecodes.intro",
-            "A code is the whole preset as one line of text. Paste one into chat to hand it to someone."));
+        SectionHeading(
+            Loc.Get("sharecodes.heading", "Share codes"),
+            Loc.Get(
+                "sharecodes.intro",
+                "A code is the whole preset as one line of text. Paste one into chat to hand it to someone."));
 
+        var scale = ImGuiHelpers.GlobalScale;
         var named = this.newPresetName.Trim().Length > 0;
 
-        // Two long labels on one row. Placed rather than SameLine'd so that a language which sets
-        // them wider than the window drops the second onto its own line instead of off the edge.
-        var copy = Loc.Label("sharecodes.copy", "Copy current settings");
-        var paste = Loc.Label("sharecodes.paste", "Paste a code");
-        var row = new WrappingRow();
+        var copy = Loc.Get("sharecodes.copy", "Copy current settings");
+        var paste = Loc.Get("sharecodes.paste", "Paste a code");
 
-        row.Place(copy);
+        // Both tooltips are formatted, so they are built only while hovered.
+        var fits = PillButton.Width(copy, FontAwesomeIcon.Copy) + PillButton.Width(paste, FontAwesomeIcon.Paste) + (ButtonGap * scale)
+                   <= ImGui.GetContentRegionAvail().X;
 
-        using (ImRaii.Disabled(!named))
+        if (PillButton.Draw("##rox-share-copy", copy, Styling.AccentGold, PillButton.Emphasis.Tinted, FontAwesomeIcon.Copy, enabled: named))
         {
-            if (ImGui.Button(copy))
-            {
-                ImGui.SetClipboardText(PresetCode.Encode(this.newPresetName.Trim(), this.config));
-                Report(Loc.Get("sharecodes.copied", "Copied. Paste it wherever you like."), failed: false);
-            }
+            ImGui.SetClipboardText(PresetCode.Encode(this.newPresetName.Trim(), this.config));
+            Report(Loc.Get("sharecodes.copied", "Copied. Paste it wherever you like."), failed: false);
         }
 
-        UiText.Tooltip(named
-            ? Loc.Format(
-                  "sharecodes.copy.tooltip.named",
-                  "Puts a code for everything as it stands right now on the clipboard,\n" +
-                  "under the name \"{0}\".",
-                  this.newPresetName.Trim()) + CustomFontCodeNote()
-            : Loc.Get(
-                  "sharecodes.copy.tooltip.unnamed",
-                  "Type a name in the box above first: it travels with the code, and it\n" +
-                  "is all the person you send it to will have to go on.\n\n" +
-                  "To share a preset you have already saved, right-click it instead."));
+        if (ImGui.IsItemHovered())
+        {
+            Tooltip.Show(CopyTooltip(named));
+        }
 
-        row.Place(paste);
+        // Placed rather than SameLine'd so that a language which sets them wider than the window
+        // drops the second onto its own line instead of off the edge.
+        if (fits)
+        {
+            ImGui.SameLine(0f, ButtonGap * scale);
+        }
 
         var imported = false;
-        if (ImGui.Button(paste))
+        if (PillButton.Draw("##rox-share-paste", paste, Styling.AccentBlue, PillButton.Emphasis.Tinted, FontAwesomeIcon.Paste))
+        {
             imported = ImportFromClipboard();
+        }
 
-        UiText.Tooltip(named
-            ? Loc.Format(
-                  "sharecodes.paste.tooltip.named",
-                  "Reads a code from the clipboard, saves it as one of your presets, and\n" +
-                  "applies it. It will be filed under \"{0}\" rather than\n" +
-                  "the name the code arrived with.",
-                  this.newPresetName.Trim())
-            : Loc.Get(
-                  "sharecodes.paste.tooltip.unnamed",
-                  "Reads a code from the clipboard, saves it as one of your presets, and\n" +
-                  "applies it under the name it arrived with.\n\n" +
-                  "Type a name above first to file it under that instead."));
+        if (ImGui.IsItemHovered())
+        {
+            Tooltip.Show(PasteTooltip(named));
+        }
 
         DrawShareStatus();
         return imported;
     }
 
+    private string CopyTooltip(bool named) => named
+        ? Loc.Format(
+              "sharecodes.copy.tooltip.named",
+              "Puts a code for everything as it stands right now on the clipboard,\n" +
+              "under the name \"{0}\".",
+              this.newPresetName.Trim()) + CustomFontCodeNote()
+        : Loc.Get(
+              "sharecodes.copy.tooltip.unnamed",
+              "Type a name in the box above first: it travels with the code, and it\n" +
+              "is all the person you send it to will have to go on.\n\n" +
+              "To share a preset you have already saved, right-click it instead.");
+
+    private string PasteTooltip(bool named) => named
+        ? Loc.Format(
+              "sharecodes.paste.tooltip.named",
+              "Reads a code from the clipboard, saves it as one of your presets, and\n" +
+              "applies it. It will be filed under \"{0}\" rather than\n" +
+              "the name the code arrived with.",
+              this.newPresetName.Trim())
+        : Loc.Get(
+              "sharecodes.paste.tooltip.unnamed",
+              "Reads a code from the clipboard, saves it as one of your presets, and\n" +
+              "applies it under the name it arrived with.\n\n" +
+              "Type a name above first to file it under that instead.");
+
     private void DrawShareStatus()
     {
         if (this.shareStatus.Length == 0 || DateTime.UtcNow - this.shareStatusAt > ShareStatusLinger)
+        {
             return;
+        }
 
-        Warn(this.shareFailed ? FaultColor : GoodColor, this.shareStatus);
+        Styling.VSpace(10f);
+        if (this.shareFailed)
+        {
+            Fault(this.shareStatus);
+        }
+        else
+        {
+            Good(this.shareStatus);
+        }
     }
 
     private void Report(string message, bool failed)
@@ -131,9 +158,13 @@ internal sealed partial class ConfigWindow
             "sharecodes.imported", "Imported \"{0}\" and applied it.", preset.Name);
 
         if (MissingCustomFontNote() is { } note)
+        {
             Report($"{message} {note}", failed: true);
+        }
         else
+        {
             Report(message, failed: false);
+        }
 
         return true;
     }
@@ -143,13 +174,17 @@ internal sealed partial class ConfigWindow
     private string UniqueName(string wanted)
     {
         if (!NameTaken(wanted))
+        {
             return wanted;
+        }
 
         for (var n = 2; ; n++)
         {
             var candidate = $"{wanted} ({n})";
             if (!NameTaken(candidate))
+            {
                 return candidate;
+            }
         }
     }
 
