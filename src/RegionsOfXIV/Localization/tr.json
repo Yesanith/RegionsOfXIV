@@ -1081,5 +1081,243 @@
   },
   "sound.gamesound.weather": {
     "message": "Hava"
+  },
+
+  "changelog.0.1.0.0.01": {
+    "message": "İlk sürüm. Girdiğin diyarı, bölgeyi, alanı ve alt alanı, oyunun kendi konum yazısının yanına çizmek yerine onun yerine geçerek duyurur."
+  },
+  "changelog.0.1.1.0.01": {
+    "message": "Bildirim artık ara sahne sırasında donup sonrasında bayat halde devam etmiyor."
+  },
+  "changelog.0.1.1.0.02": {
+    "message": "Ara sahne sırasında bir yere varmak artık tamamen kaybolmuyor."
+  },
+  "changelog.0.2.0.0.01": {
+    "message": "Hareket efektleri: satırı daktiloyla yaz, yerine yükselt, bir dalgayla içeri taşı ya da tutuştur."
+  },
+  "changelog.0.2.0.0.02": {
+    "message": "Ortam parçacıkları: kalpler, kor, ışıltı ve yapraklar; metin ekrandayken etrafına çiziliyor."
+  },
+  "changelog.0.2.0.0.03": {
+    "message": "Bir hareketi parçacıklar ve bir paletle eşleştiren hazır görünümler."
+  },
+  "changelog.0.2.0.0.04": {
+    "message": "Harf aralığı, büyük harf, yatay yerleşim ve kontur kalınlığı."
+  },
+  "changelog.0.2.0.0.05": {
+    "message": "Hareket ve çözme üst üste değil art arda çalışıyor; böylece ikisini de görebiliyorsun."
+  },
+  "changelog.0.2.1.0.01": {
+    "message": "Eklenti kendi simgesiyle geliyor; böylece yükleyicide kendine benziyor."
+  },
+  "changelog.0.2.2.0.01": {
+    "message": "Kendi hazır ayarlarını kaydet. Bir hazır ayar artık yalnızca görünümü değil, Genel, Efektler, Bildirimler ve Süreler'deki her ayarı kapsıyor."
+  },
+  "changelog.0.2.2.0.02": {
+    "message": "Hazır ayarları kod olarak paylaş. Birini panoya kopyala, sohbete yapıştır; herkes onu buraya geri yapıştırabilir."
+  },
+  "changelog.0.2.2.0.03": {
+    "message": "Düzenleme modu, her değişiklikte yeni bir bildirim başlatmak yerine sen çalışırken ekranda tek bir örnek bildirim tutuyor."
+  },
+  "changelog.0.2.2.0.04": {
+    "message": "Hazır görünümler artık eksiksiz yapılandırmalar: birini uygulamak, adlandırmadığı her şeyi varsayılanına döndürüyor."
+  },
+  "changelog.0.2.2.0.05": {
+    "message": "Başlık çubuğunda ve Hazır Ayarlar sayfasında bir Discord bağlantısı."
+  },
+  "changelog.0.2.3.0.01": {
+    "message": "Hava duyuruları. Hava değiştiğinde yer adının üstünde kendi satırında, yanında oyunun kendi simgesiyle duyuruluyor. Varsayılan olarak kapalı; ayarlardan aç."
+  },
+  "changelog.0.2.3.0.02": {
+    "message": "Hava satırı diğer her şey gibi biçimleniyor; alt çizgiyi, hareket ve çözme efektlerini, renklerini ve zamanlamalarını paylaşıyor."
+  },
+  "changelog.0.2.3.0.03": {
+    "message": "Yeni bir yere varmak havasını yer adının yanında duyuruyor; sen oradayken havanın değişmesi ise kendi başına duyuruluyor."
+  },
+  "changelog.0.2.3.0.04": {
+    "message": "Önizleme açık olan her şeyi gösteriyor, hava dahil; böylece ayarladığın şey gördüğün şey oluyor."
+  },
+  "changelog.0.3.0.0.01": {
+    "message": "Oyunun kendi afişleri artık senin. Quest Accepted, Duty Commenced, Level Up! ve diğerleri bu eklentinin yazı düzeniyle, bir yer adıyla aynı efektlerle yeniden çiziliyor. Varsayılan olarak kapalı; ayarlardan aç."
+  },
+  "changelog.0.3.0.0.02": {
+    "message": "Yalnızca eklentinin kelimelerini bildiği afişler devralınıyor. Yazı metin olarak saklanmak yerine oyunun görseline boyanmış; bu yüzden adlandıramadığı her şey kaybolmak yerine oyunun kendi afişini koruyor."
+  },
+  "changelog.0.3.0.0.03": {
+    "message": "Harfler Q'dan sonra düzgün oturuyor. Oyunun yazı tipleri çift başına aralık taşıyor ve eklenti her harfte bir çifti düşürüyordu; bu da her satırı biraz gevşek ve biraz merkezden kaymış bırakıyordu. Jupiter'de belirgin, diğer her yerde ince."
+  },
+  "changelog.0.3.0.0.04": {
+    "message": "Her satırı ayrı renklendir. Hava satırı, başlığın konturu ve havanın konturu her biri kendi rengini alabiliyor; böylece bir satır diğerlerine dokunmadan geri soldurulabiliyor."
+  },
+  "changelog.0.3.0.0.05": {
+    "message": "Başlık anahtarı Genel'e, diğer başlık ayarlarının yanına taşındı; gerçekten bulunabileceği yere."
+  },
+  "changelog.0.3.0.0.06": {
+    "message": "Ayarlar kaydırıcıyı sürüklediğin her karede değil, bıraktığında yazılıyor; böylece renk seçicileri artık takılmış gibi hissettirmiyor."
+  },
+  "changelog.0.3.0.0.07": {
+    "message": "Saydam yapılan bir renk artık bunu söylüyor; çalışmayı bırakmış bir ayar gibi görünmek yerine."
+  },
+  "changelog.0.3.0.0.08": {
+    "message": "Hazır ayar kodları oradan oraya yapıştırılmaya dayanıyor. Satır kaydırmaları, sohbet biçimlendirmesi ve bir web sayfasının geride bıraktığı görünmez karakterler kod okunmadan önce ayıklanıyor."
+  },
+  "changelog.0.4.0.0.01": {
+    "message": "Kendi yazı tiplerini kullan. Ad, başlık ve hava satırı artık her biri kendi yazı tipini ve boyutunu seçiyor ve her biri PC'ndeki bir .ttf, .otf ya da .ttc dosyasını gösterebiliyor."
+  },
+  "changelog.0.4.0.0.02": {
+    "message": "Sağladığın bir yazı tipinin sorumluluğu sende kalır. Eklenti onu olduğu gibi yükler, yükleyemediğinde açıkça söyler ve hiçliğe değil Noto Sans CJK'ya düşer."
+  },
+  "changelog.0.4.0.0.03": {
+    "message": "Hazır ayarlar yazı tipinin kendisini değil, özel yazı tipi dosyasının nerede olduğunu taşır. Birini paylaşmak seni önce uyarır; sende olmayan bir yazı tipini adlandıran birini içe aktarmak hangi satırların geri düştüğünü söyler."
+  },
+  "changelog.0.4.0.0.04": {
+    "message": "Bir gölge; herhangi bir yöne düşürülebilir ve istediğin kadar yayılabilir. Konturun altında durur, böylece ikisi birlikte kullanılabilir; alt çizgi ve hava simgesi de gölge düşürür."
+  },
+  "changelog.0.4.0.0.05": {
+    "message": "Hava satırının başlığınkini ödünç almak yerine kendi yazı tipi ve boyutu var. Zaten sahip olduğun ayarlar gösterdikleri boyutu koruyor."
+  },
+  "changelog.0.4.0.0.06": {
+    "message": "Başlığın boyutu nihayet ayarlanabiliyor. Bir ayarı vardı ama hiç kaydırıcısı yoktu."
+  },
+  "changelog.0.4.0.0.07": {
+    "message": "Yazı tipi ve boyut Genel'den kendi Yazı Tipleri sekmesine taşındı; üç satırın her biri için bir sayfa."
+  },
+  "changelog.0.4.0.0.08": {
+    "message": "Her karede daha az iş: özellik kapalıyken afişler artık izlenmiyor, bir satır ekranda kaldığı her karede değil bir kez ölçülüyor ve göremediğin bir kontur artık sekiz kez üst üste çizilmiyor."
+  },
+  "changelog.0.4.1.0.01": {
+    "message": "Son bildirim hâlâ ekrandayken yeni bir yere varmak artık ikisini üst üste yazılı bırakmıyor. Giden bildirim artık hızla çekiliyor ve gelenin önünden kalkıyor; altında okuma hızında solmak yerine."
+  },
+  "changelog.0.4.1.0.02": {
+    "message": "Yeni yer yine ulaştığın anda görünüyor. Hiçbir şey sırasını beklemiyor."
+  },
+  "changelog.0.4.1.0.03": {
+    "message": "Renklerin alfası geri geldi; eskiden olduğu yerde, seçicide. Sıfıra kadar inmek yerine %15'te duruyor; böylece bir satır diğerlerinin arkasına soldurulabiliyor ama eklenti çalışmayı bırakmış gibi görünecek kadar soldurulamıyor."
+  },
+  "changelog.0.4.1.0.04": {
+    "message": "Zaten bundan daha soluk kaydedilmiş bir renk, eklenti yüklendiğinde bu değere geri çekiliyor; bu, hiç alfası olmayan sürümün görünmez bıraktığı her şeyi kapsıyor."
+  },
+  "changelog.0.4.1.0.05": {
+    "message": "Başlık ile yer adı arasındaki boşluk bir kaydırıcı; eskiden iki konumlu bir anahtardı."
+  },
+  "changelog.0.4.1.0.06": {
+    "message": "Ayarlar penceresindeki örnek yeniden başlık anahtarını izliyor. \"Başlığı göster\"i kapatmak onu bir başlık gösterir halde bırakıyordu."
+  },
+  "changelog.0.4.2.0.01": {
+    "message": "Eski sürümlerle yapılmış hazır ayarlar ve paylaşım kodları kaydedildikleri gibi uygulanıyor. Başlık aralığı kaydırıcı olmadan önceki bir tanesi kaydedildiği aralık yerine varsayılan aralığa düşüyordu; hava satırı kendi boyutunu almadan önceki bir tanesi de o boyutu geride bırakıyordu."
+  },
+  "changelog.0.4.2.0.02": {
+    "message": "Bu hem kendi kaydettiğin hazır ayarları hem de birinin sana gönderdiği kodları kapsıyor. Kaydedilmiş olanlar eklenti bir sonraki yüklenişinde güncelleniyor; yeniden yapılacak bir şey yok."
+  },
+  "changelog.0.5.0.0.01": {
+    "message": "Ayarlar penceresi senin dilinde okunuyor. Almanca, Fransızca, Japonca ve Türkçe eklentiyle birlikte geliyor ve ayarlardan kendin bir dil seçmedikçe Dalamud'un ayarlı olduğu dili izliyor."
+  },
+  "changelog.0.5.0.0.02": {
+    "message": "Bu dördü bir makine tarafından taslak olarak yazıldı. O dili konuşan biri gözden geçirene kadar pencere üstte bunu söylüyor ve birini düzeltmek için bir metin düzenleyici ile bir GitHub hesabından başka bir şey gerekmiyor. Nasıl yapılacağı TRANSLATING.md'de."
+  },
+  "changelog.0.5.0.0.03": {
+    "message": "Afişler istemcinin dilinde değil, seçtiğin dilde çizilebiliyor. Türkçe yazılar dahil geliyor. Eklentinin kelimelerini bilmediği her afiş, hangi dili seçersen seç oyunun kendi görselini koruyor."
+  },
+  "changelog.0.5.0.0.04": {
+    "message": "Hafif Grup ve Tam Grup da diğer her afiş gibi duyuruluyor ve gizleniyor. Arayüzün eklentinin izlemediği bir kısmında beliriyorlardı; bu ikisinin hep kaçırılmasının nedeni buydu."
+  },
+  "changelog.0.5.0.0.05": {
+    "message": "Bir yer adının hemen ardından gelen afiş artık düşürülmüyor. Onu tutmak hiçbir zaman sessizlik getirmedi, yalnızca yerine oyunun kendi sürümünü ekranda bıraktı; bu yüzden afiş artık yer adının altında kendi satırını alıyor. Ne kadar altta olacağı bir kaydırıcı."
+  },
+  "changelog.0.5.0.0.06": {
+    "message": "Yazı tipi kaydırıcıları çok daha yukarı çıkıyor; yüksek çözünürlükte oynayıp eski üst sınırı hâlâ küçük bulanlar için. Japonca istemcide oyunun harfleri hâlâ oluşturabildiği yerde duruyorlar ve ayarın bıraktığın gibi korunuyor."
+  },
+  "changelog.0.5.0.0.07": {
+    "message": "Aksanlı harfler bir satır çözülürken artık kaybolmuyor. Eorzea alfabesinde onlar için glif yok; bu yüzden aksanlı her şey ad netleşene kadar boşluk olarak çiziliyordu. Artık altındaki harfin yerine geçiyorlar: é yerine e, ğ yerine g."
+  },
+  "changelog.0.5.0.0.08": {
+    "message": "Ayarlar penceresi Türkçe, Lehçe, Çekçe, Romence ve komşularını çizebiliyor; eskiden Latin Genişletilmiş-A'dan sekiz harfi vardı, gerisi boştu."
+  },
+  "changelog.0.6.0.0.01": {
+    "message": "Bildirimler ses çıkarabiliyor. Sen açana kadar kapalı, kendine ait bir Ses sekmesinin altında: oyunun on altı sohbet ses efektinden biri ya da kendi .wav veya .mp3 dosyan."
+  },
+  "changelog.0.6.0.0.02": {
+    "message": "Oyunun kendi ses ayarlarını izliyor; ana ses ve Sistem Sesleri düzeyleri ile sessize alma kutuları dahil. Daha kısık istiyorsan Ses Efektleri değil Sistem Sesleri'ne uzanmalısın, çünkü oyun sohbet ses efektini o kanala koyuyor."
+  },
+  "changelog.0.6.0.0.03": {
+    "message": "Kendi dosyanı oyun değil eklenti çalar; bu yüzden eklenti aynı ayarları okuyup elle uygular. Oyun sessize alınmışken ve pencere önde değilken, oyuna o durumda çalmaya devam etmesini söylemediysen sessiz kalır. Beş saniyeyi geçen kısım kesilir."
+  },
+  "changelog.0.6.0.0.04": {
+    "message": "Hangi tür bildirimlerin ses çıkaracağı senin seçimin: yer adları, hava ve afişlerin her birinin kendi anahtarı var ve birlikte gelen iki bildirim yine tek ses çıkarıyor."
+  },
+  "changelog.0.6.0.0.05": {
+    "message": "Ses ayarları senin makinende kalıyor. Bir hazır ayarda ya da paylaşım kodunda taşınmıyorlar, çünkü bir yabancıdan gelen bir gürültü kazara öğrenilecek bir şey değil."
+  },
+  "changelog.0.6.0.0.06": {
+    "message": "Ayarlar penceresi, bir şeylerin ne zaman eklendiğine göre değil, ne yaptığına göre gruplandı. Yedi sekme: Duyurular, Görünüm, Hareket, Yazı Tipleri, Ses, Hazır Ayarlar ve Hakkında."
+  },
+  "changelog.0.6.0.0.07": {
+    "message": "Birbirine ait ayarlar bir arada. Hareket ve süresi tek sayfada, Eorzea yazısından çözme ve süresi de öyle; eskiden her çift iki sekmeye bölünmüştü. Renkler neyi renklendirdiklerine göre gruplandı."
+  },
+  "changelog.0.6.0.0.08": {
+    "message": "Kaydettiğin hiçbir şey etkilenmiyor. Hazır ayarlar, paylaşım kodları ve mevcut ayarların tamamen olduğu gibi taşınıyor; yalnızca bir denetimin çizildiği yer değişti."
+  },
+  "changelog.0.6.0.0.09": {
+    "message": "Bu pencerenin dili Hakkında sekmesine taşındı."
+  },
+  "changelog.0.6.0.0.10": {
+    "message": "Almanca, Fransızca, Japonca ve Türkçe tamamlandı. Penceredeki her metin dördüne de çevrildi; eskiden her birinde birkaç eksik vardı. Hâlâ makine taslağı ve o dili konuşan biri gözden geçirene kadar üstte hâlâ öyle yazıyor."
+  },
+  "changelog.0.6.1.0.01": {
+    "message": "Türkçe afiş yazıları düzgün çiziliyor. Noktalı İ, çengelli Ş ve şapkalı Ğ soru işareti olarak çıkıyordu; bu yüzden \"ETKINLIK BASLADI\" üç harfini kaybediyordu."
+  },
+  "changelog.0.6.1.0.02": {
+    "message": "Eklentinin çizim için kullandığı yazı tipinde hiç Türkçe harf yoktu. Artık bu harfleri içeren küçük bir ekle geliyor ve tamamlanan harfler çevrelerindekilerle aynı aileden; böylece bir kelime yarı yolda yazı tipi değiştirmiyor. Lehçe, Çekçe, Romence ve Macarca da aynı kazanımı elde ediyor."
+  },
+  "changelog.0.6.1.0.03": {
+    "message": "Ayarlar penceresindeki örnek bildirim, sen bakarken afiş dilini izliyor. Eskiden bir dil seçmek, önizlemeyi eklentinin başladığı dilde bırakıyordu."
+  },
+  "changelog.1.0.0.0.01": {
+    "message": "Ayarlar penceresi canlı bir önizlemenin etrafına kuruldu. Üzerinde çalıştığın bildirim, oyunda çizen kodun aynısıyla pencerenin üstünde gerçek boyutunda çizilir ve yaptığın her değişikliği anında izler. Yeniden oynatabilir, oyun ekranına gönderebilir ya da çalışırken ekrana sabitleyebilirsin."
+  },
+  "changelog.1.0.0.0.02": {
+    "message": "Üstte sekiz sekme: Duyurular, Görünüm, Yazı Tipleri, Hareket, Ses, Hazır Ayarlar, Yenilikler ve Hakkında. Her sayfa iki sütun, ve yalnızca başka bir ayar açıkken anlam taşıyan bir ayar, o ayar açıldığında görünür."
+  },
+  "changelog.1.0.0.0.03": {
+    "message": "Bildirimi ekrana yerleştirmek için işaretçiyi sürükle. İki konum kaydırıcısı hâlâ yerinde ve tam olarak aynı şeyi ayarlıyor."
+  },
+  "changelog.1.0.0.0.04": {
+    "message": "Bu pencerenin dili artık üst çubukta; Hakkında'ya gitmeden bulunuyor."
+  },
+  "changelog.1.0.0.0.05": {
+    "message": "Alanlar ve alt alanlar bir bölgeden daha küçük gelip daha erken gidebilir; böylece sık bildirimler fısıldarken yeni bir bölge kendini yine gür sesle duyurur. Tam boyut eski görünümdür."
+  },
+  "changelog.1.0.0.0.06": {
+    "message": "Açık bir gökyüzüne düşen ad için metnin arkasına koyu bir şey: metin genişliğinde bir şerit ya da aslındaki gibi ekran boyunca bir bant."
+  },
+  "changelog.1.0.0.0.07": {
+    "message": "Yer adı yukarıdan aşağıya ikinci bir renge geçebilir, konturunun arkasında parıldayabilir ya da bir dizi renkle yazılabilir: Gökkuşağı, Gün batımı, Okyanus, Kutup ışığı, Çiçek ve Altın; satır boyunca serili, tüm satır birlikte nefes alır gibi ya da satır boyunca akan, seçtiğin hızda."
+  },
+  "changelog.1.0.0.0.08": {
+    "message": "Beş yeni geliş biçimi: Düşme, Kayma, Toplanma, Titreme ve Büyüme. Satırın gidişi de seçilebilir: sade solma, gelişin tersi, dağılma ya da düşme."
+  },
+  "changelog.1.0.0.0.09": {
+    "message": "Beş yeni parçacık türü: kar, ateş böcekleri, düşen yapraklar, yağmur ve yıldızlar; adın ne kadar etrafında oynayacakları için bir kaydırıcıyla."
+  },
+  "changelog.1.0.0.0.10": {
+    "message": "Sessizlik kuralları. Bildirimler şehirlerde, konut bölgelerinde ve evlerin içinde, ayrıca içinde durup sessiz listesine eklediğin her bölgede gizlenebilir. Hızlı giderken alt alanları atlamak artık uçmayı ve dalmayı da sayıyor."
+  },
+  "changelog.1.0.0.0.11": {
+    "message": "Hava ve afişler yerlerle aynı sesi paylaşmak yerine kendi oyun seslerine sahip olabilir; kendi ses dosyanın ise bir ses seviyesi kaydırıcısı var."
+  },
+  "changelog.1.0.0.0.12": {
+    "message": "Bir hazır ayarın üzerine gelmek, uygulamadan önce onu önizlemede gösterir."
+  },
+  "changelog.1.0.0.0.13": {
+    "message": "Pencere Noto Sans ile çiziliyor; Latin harflerinin kapsamadığı her şey için Dalamud'un Noto Sans CJK'sı birleştirildi. Böylece gönderilen her dil aynı yazı tipinde, aynı kalınlıkta okunuyor."
+  },
+  "changelog.1.0.0.0.14": {
+    "message": "İspanyolca, Portekizce, Rusça ve Çince; Almanca, Fransızca, Japonca ve Türkçe'ye katıldı. Hepsi makine taslağı ve o dili konuşan biri gözden geçirene kadar üstte öyle işaretli. Penceredeki her metin sekiz dile de çevrildi, dil seçicileri de her dilin adını büyük harfle başlatıyor."
+  },
+  "changelog.1.0.0.0.15": {
+    "message": "Kaydettiğin hiçbir şey etkilenmiyor. Hazır ayarlar, paylaşım kodları ve mevcut ayarların olduğu gibi taşınıyor, her yeni ayar eski görünümden başlıyor ve eski bir sürümden gelen hazır ayar hâlâ uygulanıyor."
+  },
+  "changelog.1.0.0.0.16": {
+    "message": "Hakkında sekmesi eklentinin yazarını ve arayüzün yazarını belirtiyor."
   }
 }
