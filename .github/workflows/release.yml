@@ -160,3 +160,13 @@ jobs:
         gh release create "v$asked" "$env:PACKAGE" --title "v$asked" --notes-file 'release-notes.md'
         if ($LASTEXITCODE -ne 0) { throw 'gh release create failed.' }
         Write-Host "Published v$asked."
+
+  # Called rather than left to the release event, which never arrives: the
+  # release above is created with the default token, and GitHub does not raise
+  # events for those.
+  announce:
+    needs: release
+    uses: ./.github/workflows/discord-release.yml
+    secrets: inherit
+    with:
+      tag: v${{ inputs.version }}
