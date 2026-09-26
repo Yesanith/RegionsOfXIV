@@ -177,9 +177,9 @@ assembly entirely, not merely unreachable.
 Interface strings live in `src/RegionsOfXIV/Localization/`, one JSON file per
 language code, such as `de.json`, or `pt-BR.json` for a regional one. They are
 embedded by a glob and discovered from the resource names, so **a new language is
-a file, not a code change**. German, French, Japanese and Turkish ship, all four
-complete, and all four still marked machine drafts until a speaker has been
-through them.
+a file, not a code change**. German, French, Japanese, Turkish, Spanish,
+Portuguese, Russian and Chinese ship, all eight complete, and all eight still
+marked machine drafts until a speaker has been through them.
 
 **[TRANSLATING.md](TRANSLATING.md) is the guide.** It is written for a translator
 rather than for a developer: what a line looks like, why `en.json` is generated

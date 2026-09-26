@@ -17,7 +17,8 @@ are already in your language.
 | --- | --- |
 | `src/RegionsOfXIV/Localization/en.json` | The English source with notes for translators. **Generated, so never edit it** |
 | `src/RegionsOfXIV/Localization/de.json` | German. Edit this to improve German |
-| `src/RegionsOfXIV/Localization/fr.json`, `ja.json` | French and Japanese |
+| `src/RegionsOfXIV/Localization/fr.json`, `ja.json`, `tr.json` | French, Japanese and Turkish |
+| `src/RegionsOfXIV/Localization/es.json`, `pt.json`, `ru.json`, `zh.json` | Spanish, Portuguese, Russian and Chinese |
 | `src/RegionsOfXIV/Services/BannerNames.cs` | Banner wording. A different job with different rules |
 | `src/RegionsOfXIV/Services/Localization.cs` | The loader. Developers only |
 | `tools/export-en-json.py` | Regenerates `en.json`. Developers only |

@@ -405,15 +405,19 @@ internal sealed partial class ConfigWindow : Window, IDisposable
     }
 
     private static string LanguageName(string? code)
-    {
-        if (code is null)
-        {
-            return Loc.Get("about.language.follow", "Follow Dalamud");
-        }
+        => code is null ? Loc.Get("about.language.follow", "Follow Dalamud") : NativeLanguageName(code);
 
+    // The runtime writes some languages' own names in lower case (français, español, português),
+    // which reads as a slip in a list of names, so the first letter is raised by that language's
+    // own casing rules.
+    internal static string NativeLanguageName(string code)
+    {
         try
         {
-            return CultureInfo.GetCultureInfo(code).NativeName;
+            var culture = CultureInfo.GetCultureInfo(code);
+            var name = culture.NativeName;
+
+            return name.Length == 0 ? code : string.Concat(char.ToUpper(name[0], culture).ToString(), name.AsSpan(1));
         }
         catch (CultureNotFoundException)
         {

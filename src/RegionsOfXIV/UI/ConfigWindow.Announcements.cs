@@ -394,19 +394,5 @@ internal sealed partial class ConfigWindow
     }
 
     private static string BannerLanguageName(string? code)
-    {
-        if (code is null)
-        {
-            return Loc.Get("announcements.bannerlanguage.follow", "Follow the client");
-        }
-
-        try
-        {
-            return CultureInfo.GetCultureInfo(code).NativeName;
-        }
-        catch (CultureNotFoundException)
-        {
-            return code;
-        }
-    }
+        => code is null ? Loc.Get("announcements.bannerlanguage.follow", "Follow the client") : NativeLanguageName(code);
 }
