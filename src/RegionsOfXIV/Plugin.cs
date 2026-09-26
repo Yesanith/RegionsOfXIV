@@ -104,6 +104,7 @@ public sealed class Plugin : IDalamudPlugin
 
         this.configWindow = new ConfigWindow(
             this.config,
+            new PreviewStage(this.config, this.fonts),
             new ConfigActions(
                 this.overlay.PreviewOnce,
                 this.overlay.TouchPreview,

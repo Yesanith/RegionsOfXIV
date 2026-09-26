@@ -8,10 +8,9 @@ namespace RegionsOfXIV.UI;
 
 internal sealed partial class ConfigWindow
 {
-    // What gets announced, when to stay quiet, and what of the game's own to suppress, in that
-    // order. The page reads outward: the first three groups each add something to the screen, the
-    // quiet rules take it away again under conditions, and the suppression is about the game's UI
-    // rather than about this plugin's, so it ends the page as the least often touched of the four.
+    // What gets announced on the left, when to stay quiet and what of the game's own to suppress
+    // on the right. The left column adds things to the screen; the right column takes them away
+    // under conditions, and is the less often touched of the two.
     private void DrawAnnouncementsPage()
     {
         PageHeader.Draw(
@@ -22,6 +21,9 @@ internal sealed partial class ConfigWindow
                 "it. If you turn the suppression below off, the game's version comes back."));
 
         var changed = false;
+
+        this.columns.Begin(2);
+        this.columns.Next();
 
         using (SettingsGroup.Begin(Loc.Get("announcements.group.places", "Places")))
         {
@@ -52,19 +54,27 @@ internal sealed partial class ConfigWindow
                     + "as you walk in."),
                 this.config.WeatherNotificationEnabled, ref changed);
 
-            this.config.ShowWeatherIcon = Toggle(
-                "##rox-weather-icon",
-                Loc.Get("announcements.weathericon", "Show the weather icon"),
-                Loc.Get(
-                    "announcements.weathericon.tooltip",
-                    "Draws the game's own icon for the weather to the left of its name."),
-                this.config.ShowWeatherIcon, ref changed, this.config.WeatherNotificationEnabled);
+            using (var rows = Reveal("##rox-weather-rows", this.config.WeatherNotificationEnabled))
+            {
+                if (rows is not null)
+                {
+                    this.config.ShowWeatherIcon = Toggle(
+                        "##rox-weather-icon",
+                        Loc.Get("announcements.weathericon", "Show the weather icon"),
+                        Loc.Get(
+                            "announcements.weathericon.tooltip",
+                            "Draws the game's own icon for the weather to the left of its name."),
+                        this.config.ShowWeatherIcon, ref changed);
+                }
+            }
         }
 
         using (SettingsGroup.Begin(Loc.Get("announcements.group.banners", "Banners")))
         {
             DrawBannerSettings(ref changed);
         }
+
+        this.columns.Next();
 
         using (SettingsGroup.Begin(Loc.Get("announcements.group.quiet", "When to stay quiet")))
         {
@@ -75,6 +85,8 @@ internal sealed partial class ConfigWindow
         {
             DrawNativeSuppression(ref changed);
         }
+
+        this.columns.End();
 
         if (!changed)
         {
@@ -99,7 +111,11 @@ internal sealed partial class ConfigWindow
                 + "it does not recognise keep the game's own."),
             this.config.BannerNotificationEnabled, ref changed);
 
-        var enabled = this.config.BannerNotificationEnabled;
+        using var rows = Reveal("##rox-banner-rows", this.config.BannerNotificationEnabled);
+        if (rows is null)
+        {
+            return;
+        }
 
         this.config.HideNativeBanner = Toggle(
             "##rox-hide-banner",
@@ -109,7 +125,7 @@ internal sealed partial class ConfigWindow
                 "Fades out the game's artwork so only this plugin's version shows.\n\n"
                 + "Turn this off to see both, which is a quick way to check the "
                 + "wording matches."),
-            this.config.HideNativeBanner, ref changed, enabled);
+            this.config.HideNativeBanner, ref changed);
 
         this.config.BannerGap = Slider(
             "##rox-banner-gap",
@@ -123,9 +139,9 @@ internal sealed partial class ConfigWindow
                 "them. The drop is the same whether or not a name is up, so a banner on\n" +
                 "its own also lands here."),
             this.config.BannerGap, 0.5f, 5f,
-            "%.2f " + Loc.Unit("units.lines", "lines"), ref changed, enabled: enabled);
+            "%.2f " + Loc.Unit("units.lines", "lines"), ref changed);
 
-        DrawBannerLanguage(ref changed, enabled);
+        DrawBannerLanguage(ref changed);
     }
 
     private void DrawQuietRules(ref bool changed)
@@ -199,7 +215,7 @@ internal sealed partial class ConfigWindow
     // cannot be picked that has no wording behind it. One that did would name nothing, and a
     // banner with no name keeps the game's own, so the setting would read as having switched
     // banners off.
-    private void DrawBannerLanguage(ref bool changed, bool enabled)
+    private void DrawBannerLanguage(ref bool changed)
     {
         var row = SettingsRow.Begin(
             Loc.Get("announcements.bannerlanguage", "Banner language"),
@@ -212,11 +228,11 @@ internal sealed partial class ConfigWindow
                 + "English words are drawn in its place.\n\n"
                 + "Only languages this plugin has wording for are listed. Banners it has no "
                 + "wording for keep the game's own, whichever language is chosen."),
-            Layout.RowDropdownWidth, 0f, enabled);
+            Layout.RowDropdownWidth);
 
         var labels = BannerLanguageLabels();
         var selected = Array.IndexOf(BannerLanguages, this.config.BannerNameLanguage);
-        if (Dropdown.Draw("##rox-banner-language", labels, ref selected, Layout.RowDropdownWidth, enabled))
+        if (Dropdown.Draw("##rox-banner-language", labels, ref selected, Layout.RowDropdownWidth))
         {
             this.config.BannerNameLanguage = BannerLanguages[selected];
             BannerNameResolver.Language = this.config.BannerNameLanguage;

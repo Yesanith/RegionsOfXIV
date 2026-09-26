@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
@@ -30,18 +31,19 @@ internal readonly record struct ConfigActions(
 
 // Split across ConfigWindow.*.cs, one file per page, over the widget vocabulary they all share in
 // ConfigWindow.Widgets.cs. This file is the window itself: its lifetime, the chrome and fonts it
-// pushes, the header, the navigation rail, the page it is on, and the saving.
+// pushes, the header, the preview stage, the tab strip, the page it is on, and the saving.
 //
 // The window never touches the plugin directly: everything it needs to make happen goes through
-// the delegates in ConfigActions, which Plugin.cs supplies.
+// the delegates in ConfigActions, which Plugin.cs supplies. The stage is the one exception, and
+// only because it draws with the same renderer the overlay does.
 internal sealed partial class ConfigWindow : Window, IDisposable
 {
     public enum Page
     {
         Announcements,
         Appearance,
-        Motion,
         Fonts,
+        Motion,
         Sound,
         Presets,
         Changelog,
@@ -50,16 +52,19 @@ internal sealed partial class ConfigWindow : Window, IDisposable
 
     private const float PageRevealMs = 260f;
     private const float PageSlide = 12f;
-    private const float MinimumBodyHeight = 320f;
+    private const float MinimumBodyHeight = 300f;
 
     private const ImGuiWindowFlags ShellFlags =
         ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse;
 
-    private static readonly Vector2 DefaultSize = new(980, 740);
+    private static readonly Vector2 DefaultSize = new(1020, 820);
 
     private readonly Configuration config;
     private readonly ConfigActions actions;
+    private readonly PreviewStage stage;
     private readonly FileDialogManager fileDialogs = new();
+    private readonly TabStrip.Item[] tabItems = new TabStrip.Item[Enum.GetValues<Page>().Length];
+    private readonly Action dismissTranslationNotice;
 
     private IDisposable? pushedFont;
     private IDisposable? pushedChrome;
@@ -67,11 +72,10 @@ internal sealed partial class ConfigWindow : Window, IDisposable
     private Page page = Page.Announcements;
     private long pageShownTick = Environment.TickCount64;
     private bool resetScroll;
+    private int tabsGeneration = -1;
 
-    private bool editing;
+    private bool pinned;
     private bool unsaved;
-
-    private readonly Action dismissTranslationNotice;
 
     private string? translationNotice;
     private int translationNoticeGeneration = -1;
@@ -79,26 +83,25 @@ internal sealed partial class ConfigWindow : Window, IDisposable
     // The title is not translated: "Regions of XIV" is the plugin's name and the rest is a
     // version number. The ### part is the identity Dalamud saves this window's position and size
     // against, and it is kept from before the redesign so nobody's window moves.
-    public ConfigWindow(Configuration config, ConfigActions actions)
+    public ConfigWindow(Configuration config, PreviewStage stage, ConfigActions actions)
         : base($"Regions of XIV v{Changelog.Current}###RegionsOfXIVConfig", ShellFlags)
     {
         this.config = config;
         this.actions = actions;
+        this.stage = stage;
         this.dismissTranslationNotice = DrawTranslationNoticeDismiss;
 
         Size = DefaultSize;
         SizeCondition = ImGuiCond.FirstUseEver;
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(HeaderBar.MinimumWidth, Layout.HeaderHeight + MinimumBodyHeight),
+            MinimumSize = new Vector2(HeaderBar.MinimumWidth, Layout.HeaderHeight + Layout.StageMinHeight + Layout.TabStripHeight + MinimumBodyHeight),
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue),
         };
 
         AllowPinning = false;
         AllowClickthrough = false;
     }
-
-    public bool Editing => this.editing;
 
     public void Dispose() => this.fileDialogs.Reset();
 
@@ -113,8 +116,6 @@ internal sealed partial class ConfigWindow : Window, IDisposable
 
         IsOpen = true;
     }
-
-    public void FirePreview() => this.actions.Preview(Sample);
 
     // Either side of the ImGui window rather than around Draw, so popups and tooltips opened from
     // the body carry the same font and chrome.
@@ -132,11 +133,15 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         this.pushedFont = null;
     }
 
-    public override void OnOpen() => this.pageShownTick = Environment.TickCount64;
+    public override void OnOpen()
+    {
+        this.pageShownTick = Environment.TickCount64;
+        this.stage.Replay();
+    }
 
     public override void OnClose()
     {
-        SetEditing(false);
+        SetPinned(false);
         this.fileDialogs.Reset();
 
         if (this.unsaved)
@@ -155,13 +160,23 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         var windowPos = ImGui.GetWindowPos();
         var windowSize = ImGui.GetWindowSize();
         var headerHeight = Layout.HeaderHeight * scale;
+        var tabsHeight = Layout.TabStripHeight * scale;
+        var stageHeight = StageHeight(windowSize.Y, scale);
         var windowRounding = Styling.WindowRounding * scale;
         var drawList = ImGui.GetWindowDrawList();
 
         HeaderBar.HandleDrag(windowPos, windowSize.X, headerHeight);
         Ambient.Draw(drawList, windowPos, windowPos + windowSize);
         HeaderBar.Draw(this, windowPos, windowSize.X, headerHeight, windowRounding);
-        DrawBody(windowPos, windowSize, headerHeight);
+
+        var stageTop = windowPos.Y + headerHeight;
+        DrawStage(new Vector2(windowPos.X, stageTop), windowSize.X, stageHeight);
+
+        var tabsTop = stageTop + stageHeight;
+        DrawTabs(new Vector2(windowPos.X, tabsTop), windowSize.X, tabsHeight);
+
+        var bodyTop = tabsTop + tabsHeight;
+        DrawBody(new Vector2(windowPos.X, bodyTop), new Vector2(windowSize.X, windowSize.Y - (bodyTop - windowPos.Y)));
         DrawResizeGrip(drawList, windowPos + windowSize);
     }
 
@@ -176,38 +191,70 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         this.fileDialogs.Draw();
     }
 
-    private void DrawBody(Vector2 windowPos, Vector2 windowSize, float headerHeight)
+    // As tall as the lines need, within a floor and a share of the window, so a huge display
+    // font does not push the settings off the bottom.
+    private float StageHeight(float windowHeight, float scale)
+    {
+        var wanted = ((Layout.StagePad * 2f) + Layout.StageToolbarHeight + 8f) * scale
+                     + ((this.stage.AboveAnchor() + this.stage.BelowAnchor()) * scale);
+
+        return Math.Clamp(wanted, Layout.StageMinHeight * scale, windowHeight * Layout.StageMaxShare);
+    }
+
+    private void DrawTabs(Vector2 origin, float width, float height)
     {
         var scale = ImGuiHelpers.GlobalScale;
         var drawList = ImGui.GetWindowDrawList();
-        var railWidth = Layout.RailWidth * scale;
-        var bodyTop = windowPos.Y + headerHeight;
-        var bodyHeight = windowSize.Y - headerHeight;
-        if (bodyHeight < 1f)
+        Paint.Fill(drawList, origin, origin + new Vector2(width, height), Styling.WithAlpha(Styling.Surface1, 0.35f), 0f);
+        Paint.Hairline(drawList, new Vector2(origin.X, origin.Y + height - 0.5f), new Vector2(origin.X + width, origin.Y + height - 0.5f));
+
+        var padX = Layout.ContentPadding * scale;
+        ImGui.SetCursorScreenPos(new Vector2(origin.X + padX, origin.Y));
+        var selected = (int)this.page;
+        if (TabStrip.Draw("##rox-tabs", TabItems(), ref selected, width - (padX * 2f), height))
+        {
+            Show((Page)selected);
+        }
+    }
+
+    private TabStrip.Item[] TabItems()
+    {
+        var unseen = this.unseenChanges > 0 && this.page != Page.Changelog;
+        if (this.tabsGeneration == Loc.Generation && this.tabItems[(int)Page.Changelog].Badge == unseen)
+        {
+            return this.tabItems;
+        }
+
+        this.tabsGeneration = Loc.Generation;
+        this.tabItems[(int)Page.Announcements] = new TabStrip.Item(FontAwesomeIcon.Bullhorn, Loc.Get("announcements.tab", "Announcements"));
+        this.tabItems[(int)Page.Appearance] = new TabStrip.Item(FontAwesomeIcon.Palette, Loc.Get("appearance.tab", "Appearance"));
+        this.tabItems[(int)Page.Fonts] = new TabStrip.Item(FontAwesomeIcon.Font, Loc.Get("fonts.tab", "Fonts"));
+        this.tabItems[(int)Page.Motion] = new TabStrip.Item(FontAwesomeIcon.Wind, Loc.Get("motion.tab", "Motion"));
+        this.tabItems[(int)Page.Sound] = new TabStrip.Item(FontAwesomeIcon.VolumeUp, Loc.Get("sound.tab", "Sound"));
+        this.tabItems[(int)Page.Presets] = new TabStrip.Item(FontAwesomeIcon.Swatchbook, Loc.Get("presets.tab", "Presets"));
+        this.tabItems[(int)Page.Changelog] = new TabStrip.Item(FontAwesomeIcon.Newspaper, Loc.Get("changelog.tab", "What's new"), unseen);
+        this.tabItems[(int)Page.About] = new TabStrip.Item(FontAwesomeIcon.InfoCircle, Loc.Get("about.tab", "About"));
+        return this.tabItems;
+    }
+
+    private void DrawBody(Vector2 origin, Vector2 size)
+    {
+        if (size.Y < 1f)
         {
             return;
         }
 
-        ImGui.SetCursorScreenPos(new Vector2(windowPos.X, bodyTop));
-        using (var rail = ImRaii.Child("##rox-rail", new Vector2(railWidth, bodyHeight), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
-        {
-            if (rail.Success && NavRail.Draw(this.page, this.unseenChanges > 0) is { } target)
-            {
-                Show(target);
-            }
-        }
-
-        Paint.Hairline(drawList, new Vector2(windowPos.X + railWidth, bodyTop + (10f * scale)), new Vector2(windowPos.X + railWidth, bodyTop + bodyHeight - (10f * scale)));
+        var scale = ImGuiHelpers.GlobalScale;
 
         // The page column is capped and centred by padding the child, so it scrolls as one and a
         // very wide window does not stretch every row across it.
-        var bodyWidth = windowSize.X - railWidth - (Layout.ContentRightInset * scale);
+        var bodyWidth = size.X - (Layout.ContentRightInset * scale);
         var padding = Layout.ContentPadding * scale;
         var padX = MathF.Max(padding, (bodyWidth - (Layout.ContentMaxWidth * scale)) * 0.5f);
 
-        ImGui.SetCursorScreenPos(new Vector2(windowPos.X + railWidth, bodyTop));
+        ImGui.SetCursorScreenPos(origin);
         using (ImRaii.PushStyle(ImGuiStyleVar.WindowPadding, new Vector2(padX, padding * 0.8f)))
-        using (var content = ImRaii.Child("##rox-page", new Vector2(bodyWidth, bodyHeight), false, ImGuiWindowFlags.AlwaysUseWindowPadding))
+        using (var content = ImRaii.Child("##rox-page", new Vector2(bodyWidth, size.Y), false, ImGuiWindowFlags.AlwaysUseWindowPadding))
         {
             if (content)
             {
@@ -236,11 +283,11 @@ internal sealed partial class ConfigWindow : Window, IDisposable
             case Page.Appearance:
                 DrawAppearancePage();
                 break;
-            case Page.Motion:
-                DrawMotionPage();
-                break;
             case Page.Fonts:
                 DrawFontsPage();
+                break;
+            case Page.Motion:
+                DrawMotionPage();
                 break;
             case Page.Sound:
                 DrawSoundPage();
@@ -312,6 +359,68 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         this.config.Save();
     }
 
+    // Loc.Shipped never contains "en" -- English is the compiled-in fallback rather than a
+    // bundled file -- so listing it here cannot double it up.
+    private static readonly string?[] LanguageOptions = [null, "en", .. Loc.Shipped];
+
+    private static readonly string[] LanguageNames = new string[LanguageOptions.Length];
+
+    private static int LanguageGeneration = -1;
+
+    internal void DrawLanguagePicker(float width)
+    {
+        var selected = Array.IndexOf(LanguageOptions, this.config.Language);
+        if (Dropdown.Draw("##rox-language", LanguageLabels(), ref selected, width))
+        {
+            this.config.Language = LanguageOptions[selected];
+            this.actions.ReloadLanguage();
+            MarkUnsaved();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            Tooltip.Show(Loc.Get(
+                "about.language.tooltip",
+                "Follow Dalamud takes whichever language Dalamud itself is set to, and\n" +
+                "changes with it.\n\n" +
+                "Only this window is affected. Place and weather names come from the game\n" +
+                "and stay in whatever language your client is running in."));
+        }
+    }
+
+    private static string[] LanguageLabels()
+    {
+        if (LanguageGeneration == Loc.Generation)
+        {
+            return LanguageNames;
+        }
+
+        for (var index = 0; index < LanguageOptions.Length; index++)
+        {
+            LanguageNames[index] = LanguageName(LanguageOptions[index]);
+        }
+
+        LanguageGeneration = Loc.Generation;
+        return LanguageNames;
+    }
+
+    private static string LanguageName(string? code)
+    {
+        if (code is null)
+        {
+            return Loc.Get("about.language.follow", "Follow Dalamud");
+        }
+
+        try
+        {
+            return CultureInfo.GetCultureInfo(code).NativeName;
+        }
+        catch (CultureNotFoundException)
+        {
+            return code;
+        }
+    }
+
     private void MarkUnsaved() => this.unsaved = true;
 
     // Writing the config on every changed frame meant a full JSON serialise and disk write per
@@ -328,15 +437,16 @@ internal sealed partial class ConfigWindow : Window, IDisposable
         this.config.Save();
     }
 
-    public void SetEditing(bool on)
+    private void SetPinned(bool on)
     {
-        this.editing = on;
+        this.pinned = on;
         this.actions.HoldPreview(on, Sample);
     }
 
     // Built on each use rather than once, because the banner language can change while the window
     // is open and the sample has to change with it. Both resolvers cache, and this is reached from
-    // button presses and change handlers rather than from the draw loop.
+    // button presses and change handlers rather than from the draw loop; the stage has a cached
+    // copy of its own for that.
     private static PreviewSample Sample => BuildSample();
 
     // The sample's place names are content rather than the plugin's own words, so they stay as

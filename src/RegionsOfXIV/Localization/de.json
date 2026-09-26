@@ -765,9 +765,6 @@
   "motion.decode.tooltip": {
     "message": "Benötigt eine mitgelieferte eorzeanische Schrift. Nur lateinischer Text.\n\nLäuft nach der Bewegung oben statt gleichzeitig damit: die Zeile kommt\neorzeanisch an, landet und löst sich dann auf. Ausgeschaltet kommt sie\nbereits lesbar an. Voreinstellungen lassen dies unberührt, also schaltet\nes sich hier für alle aus."
   },
-  "window.preview": {
-    "message": "Vorschau"
-  },
   "window.close": {
     "message": "Schließen"
   },

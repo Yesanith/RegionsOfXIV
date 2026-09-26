@@ -5,8 +5,9 @@ namespace RegionsOfXIV.UI;
 
 internal sealed partial class ConfigWindow
 {
-    // How a notification arrives, resolves and leaves. Each pair of a feature and its duration is
-    // adjacent, which is why no help text on this page has to name another page to explain itself.
+    // How a notification arrives and resolves on the left, what plays around it and how long it
+    // all lasts on the right. Each pair of a feature and its duration is adjacent, and the
+    // duration appears only while the feature is on.
     //
     // Four flags rather than one, because the groups preview differently and both behaviours have
     // to survive. See the tail of this method for what each one does.
@@ -37,6 +38,9 @@ internal sealed partial class ConfigWindow
         // rebuilt before the replay rather than after it.
         var refont = false;
 
+        this.columns.Begin(2);
+        this.columns.Next();
+
         using (SettingsGroup.Begin(
                    Loc.Get("motion.group.arrival", "Arrival"),
                    Loc.Get("motion.choice.intro", "How the letters move as they arrive.")))
@@ -54,14 +58,20 @@ internal sealed partial class ConfigWindow
                     "Runs alongside the Eorzean decode rather than instead of it."),
                 this.config.Motion, MotionLabels, ref restart);
 
-            this.config.MotionDuration = Seconds(
-                "##rox-motion-duration",
-                Loc.Get("motion.duration", "Motion time"),
-                Loc.Get(
-                    "motion.duration.tooltip",
-                    "How long the letters take to arrive. Runs alongside the fade in, and\n" +
-                    "does nothing when the motion above is None."),
-                this.config.MotionDuration, 0.1f, 5f, ref timing, ref settled, this.config.Motion != MotionEffect.None);
+            using (var rows = Reveal("##rox-motion-rows", this.config.Motion != MotionEffect.None))
+            {
+                if (rows is not null)
+                {
+                    this.config.MotionDuration = Seconds(
+                        "##rox-motion-duration",
+                        Loc.Get("motion.duration", "Motion time"),
+                        Loc.Get(
+                            "motion.duration.tooltip",
+                            "How long the letters take to arrive. Runs alongside the fade in, and\n" +
+                            "does nothing when the motion above is None."),
+                        this.config.MotionDuration, 0.1f, 5f, ref timing, ref settled);
+                }
+            }
         }
 
         using (SettingsGroup.Begin(Loc.Get("motion.group.decode", "Decode")))
@@ -85,15 +95,23 @@ internal sealed partial class ConfigWindow
                 refont = true;
             }
 
-            this.config.RevealDuration = Seconds(
-                "##rox-decode-duration",
-                Loc.Get("motion.decode.duration", "Decode time"),
-                Loc.Get(
-                    "motion.decode.duration.tooltip",
-                    "How long the Eorzean takes to resolve, once the letters have landed.\n" +
-                    "Needs the decode effect above."),
-                this.config.RevealDuration, 0.05f, 5f, ref timing, ref settled, this.config.DecodeEffectEnabled);
+            using (var rows = Reveal("##rox-decode-rows", this.config.DecodeEffectEnabled))
+            {
+                if (rows is not null)
+                {
+                    this.config.RevealDuration = Seconds(
+                        "##rox-decode-duration",
+                        Loc.Get("motion.decode.duration", "Decode time"),
+                        Loc.Get(
+                            "motion.decode.duration.tooltip",
+                            "How long the Eorzean takes to resolve, once the letters have landed.\n" +
+                            "Needs the decode effect above."),
+                        this.config.RevealDuration, 0.05f, 5f, ref timing, ref settled);
+                }
+            }
         }
+
+        this.columns.Next();
 
         using (SettingsGroup.Begin(
                    Loc.Get("motion.group.particles", "Particles"),
@@ -125,6 +143,8 @@ internal sealed partial class ConfigWindow
                 this.config.FadeOutDuration, 0.05f, 5f, ref timing, ref settled);
         }
 
+        this.columns.End();
+
         if (!changed && !restart && !timing && !settled)
         {
             return;
@@ -143,6 +163,7 @@ internal sealed partial class ConfigWindow
         // what keeps it from replaying sixty times a second.
         if (restart || settled)
         {
+            this.stage.Replay();
             this.actions.Preview(Sample);
         }
         else if (changed)
@@ -157,12 +178,16 @@ internal sealed partial class ConfigWindow
             "##rox-particles", Loc.Get("motion.particles", "Particles"), null,
             this.config.Particles, ParticleLabels, ref restart);
 
-        var enabled = this.config.Particles != ParticleEffect.None;
+        using var rows = Reveal("##rox-particle-rows", this.config.Particles != ParticleEffect.None);
+        if (rows is null)
+        {
+            return;
+        }
 
         this.config.ParticleDensity = Slider(
             "##rox-density", Loc.Get("motion.density", "Density"), null,
             this.config.ParticleDensity, 0.2f, 3f,
-            "%.1f" + Loc.Unit("units.times", "x"), ref changed, enabled: enabled);
+            "%.1f" + Loc.Unit("units.times", "x"), ref changed);
 
         this.config.ParticleColor = Colour(
             "##rox-particlecolour",
@@ -171,7 +196,7 @@ internal sealed partial class ConfigWindow
                 "motion.particlecolour.tooltip",
                 "The default amber suits embers and sparkles. Hearts and petals\n" +
                 "want moving towards pink."),
-            this.config.ParticleColor, ref changed, enabled);
+            this.config.ParticleColor, ref changed);
 
         if (this.config.Particles == ParticleEffect.Embers && this.config.Motion != MotionEffect.Burn)
         {

@@ -125,6 +125,7 @@ internal sealed partial class ConfigWindow
         }
 
         this.config.Save();
+        this.stage.Replay();
         this.actions.Preview(Sample);
     }
 

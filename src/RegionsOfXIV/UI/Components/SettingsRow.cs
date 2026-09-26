@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
@@ -9,10 +10,14 @@ namespace RegionsOfXIV.UI.Components;
 // One setting: a label on the left, its control on the right, and the help text on hover. Begin
 // draws the label and leaves the cursor where the control goes; End reserves the row. Shaped this
 // way rather than around a delegate so a caller can pass ref locals to the control it draws.
+//
+// A row with help shows a small mark beside its label at all times, dim until hovered, so it is
+// plain which settings have more to say.
 internal readonly struct SettingsRow
 {
     private const float RowHeight = 40f;
     private const float HelpIconGap = 7f;
+    private const float LabelControlGap = 14f;
     private const float BlockBottomGap = 6f;
     private const float NoteTopGap = 6f;
     private const float NoteBottomGap = 8f;
@@ -36,18 +41,23 @@ internal readonly struct SettingsRow
         var rowHeight = RowHeight * scale;
         var hovered = ImGui.IsMouseHoveringRect(origin, origin + new Vector2(rightEdge - origin.X, rowHeight));
         var middleY = origin.Y + (rowHeight * 0.5f);
+        var controlLeft = rightEdge - (controlWidth * scale);
+        var hasHelp = !string.IsNullOrEmpty(help);
 
         DrawTopDivider(origin, rightEdge);
-        var labelHovered = DrawLabel(origin, middleY, label, hovered, enabled);
-        var iconHovered = DrawHelpIcon(origin, middleY, label, help, hovered);
 
-        if (!string.IsNullOrEmpty(help) && (labelHovered || iconHovered))
+        var iconWidth = hasHelp ? TextDraw.IconSize(FontAwesomeIcon.InfoCircle).X + (HelpIconGap * scale) : 0f;
+        var labelRoom = MathF.Max(1f, controlLeft - (LabelControlGap * scale) - iconWidth - origin.X);
+        var labelHovered = DrawLabel(origin, middleY, TextDraw.Truncate(label, labelRoom), hovered, enabled);
+        var iconHovered = hasHelp && DrawHelpIcon(middleY, hovered);
+
+        if (hasHelp && (labelHovered || iconHovered))
         {
-            Tooltip.Show(help);
+            Tooltip.Show(help!);
         }
 
         var resolvedHeight = controlHeight > 0f ? controlHeight * scale : ImGui.GetFrameHeight();
-        ImGui.SetCursorScreenPos(new Vector2(rightEdge - (controlWidth * scale), middleY - (resolvedHeight * 0.5f)));
+        ImGui.SetCursorScreenPos(new Vector2(controlLeft, middleY - (resolvedHeight * 0.5f)));
         return new SettingsRow(origin, rightEdge - origin.X);
     }
 
@@ -92,20 +102,16 @@ internal readonly struct SettingsRow
         return ImGui.IsItemHovered();
     }
 
-    private static bool DrawHelpIcon(Vector2 origin, float middleY, string label, string? help, bool rowHovered)
+    // Placed straight after the label the caller just drew, so it follows a truncated label too.
+    private static bool DrawHelpIcon(float middleY, bool rowHovered)
     {
-        if (string.IsNullOrEmpty(help) || !rowHovered)
-        {
-            return false;
-        }
-
-        var labelWidth = ImGui.CalcTextSize(label).X;
+        var scale = ImGuiHelpers.GlobalScale;
         var iconString = FontAwesomeIcon.InfoCircle.ToIconString();
         using (Fonts.PushIcon())
         {
             var iconSize = ImGui.CalcTextSize(iconString);
-            ImGui.SetCursorScreenPos(new Vector2(origin.X + labelWidth + (HelpIconGap * ImGuiHelpers.GlobalScale), middleY - (iconSize.Y * 0.5f)));
-            using (ImRaii.PushColor(ImGuiCol.Text, Styling.WithAlpha(Styling.TextMuted, 0.9f)))
+            ImGui.SetCursorScreenPos(new Vector2(ImGui.GetItemRectMax().X + (HelpIconGap * scale), middleY - (iconSize.Y * 0.5f)));
+            using (ImRaii.PushColor(ImGuiCol.Text, Styling.WithAlpha(rowHovered ? Styling.AccentGoldSoft : Styling.TextMuted, rowHovered ? 0.95f : 0.55f)))
             {
                 ImGui.TextUnformatted(iconString);
             }

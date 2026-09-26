@@ -56,6 +56,8 @@ internal sealed partial class ConfigWindow
     private static readonly ChoiceLabels<MotionEffect> MotionLabels = new(Label);
     private static readonly ChoiceLabels<ParticleEffect> ParticleLabels = new(Label);
 
+    private readonly ColumnLayout columns = new();
+
     private static bool Toggle(string id, string label, string? help, bool value, ref bool changed, bool enabled = true)
     {
         var row = SettingsRow.Begin(label, help, Layout.ToggleWidth, SettingsRow.ToggleHeight, enabled);
@@ -162,6 +164,10 @@ internal sealed partial class ConfigWindow
         return value;
     }
 
+    // Rows that only mean something while a switch is on are shown only then. A page reads as
+    // the choices that apply, and a switch that unfolds its own settings explains itself.
+    private static ImRaii.StyleDisposable? Reveal(string id, bool shown) => Motion.PushSection(id, shown);
+
     // The wording of an enum's options, rebuilt only when the language table is swapped, so a
     // dropdown drawn every frame does not translate its list every frame.
     private sealed class ChoiceLabels<T>(Func<T, string> name)
@@ -201,6 +207,54 @@ internal sealed partial class ConfigWindow
 
             return 0;
         }
+    }
+
+    // Two columns of groups when the page is wide enough for them, one when it is not. Next moves
+    // to the top of the next column; End drops the cursor below the taller one.
+    private sealed class ColumnLayout
+    {
+        private Vector2 origin;
+        private float width;
+        private float gap;
+        private float bottom;
+        private int count;
+        private int current;
+
+        public void Begin(int wanted)
+        {
+            var scale = ImGuiHelpers.GlobalScale;
+            this.origin = ImGui.GetCursorScreenPos();
+            this.gap = Layout.ColumnGap * scale;
+            var available = ImGui.GetContentRegionAvail().X;
+            var fit = (int)MathF.Floor((available + this.gap) / ((Layout.ColumnMinWidth * scale) + this.gap));
+            this.count = Math.Clamp(Math.Min(wanted, fit), 1, wanted);
+            this.width = (available - (this.gap * (this.count - 1))) / this.count;
+            this.bottom = this.origin.Y;
+            this.current = -1;
+            SettingsGroup.ColumnWidth = this.width;
+        }
+
+        public void Next()
+        {
+            Track();
+            this.current++;
+            if (this.count == 1 || this.current >= this.count)
+            {
+                return;
+            }
+
+            ImGui.SetCursorScreenPos(new Vector2(this.origin.X + (this.current * (this.width + this.gap)), this.origin.Y));
+        }
+
+        public void End()
+        {
+            Track();
+            SettingsGroup.ColumnWidth = 0f;
+            ImGui.SetCursorScreenPos(new Vector2(this.origin.X, this.bottom));
+            ImGui.Dummy(new Vector2((this.width * this.count) + (this.gap * (this.count - 1)), 0f));
+        }
+
+        private void Track() => this.bottom = MathF.Max(this.bottom, ImGui.GetCursorScreenPos().Y);
     }
 
     private static void Warn(string text) => NoticeCard.Draw(Styling.AccentAmber, FontAwesomeIcon.ExclamationTriangle, text);

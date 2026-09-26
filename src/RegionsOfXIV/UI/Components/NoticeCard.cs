@@ -19,7 +19,7 @@ internal static class NoticeCard
     {
         var scale = ImGuiHelpers.GlobalScale;
         var origin = ImGui.GetCursorScreenPos();
-        var cardWidth = width > 0f ? width : ImGui.GetContentRegionAvail().X;
+        var cardWidth = width > 0f ? width : SettingsGroup.AvailableWidth();
         var padX = PadX * scale;
         var padY = PadY * scale;
         var iconSize = TextDraw.IconSize(icon);

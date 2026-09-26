@@ -184,10 +184,10 @@ internal sealed partial class NotificationRenderer
             return FitScale(cache, text, Tracking(), room);
     }
 
-    private static float RoomFor(ImGuiViewportPtr viewport, float centerX)
+    private static float RoomFor(in Canvas canvas, float centerX)
     {
-        var toLeft = centerX - viewport.Pos.X;
-        var toRight = viewport.Pos.X + viewport.Size.X - centerX;
+        var toLeft = centerX - canvas.Pos.X;
+        var toRight = canvas.Pos.X + canvas.Size.X - centerX;
 
         return MathF.Max(MathF.Min(toLeft, toRight), 1f) * 2f * WidthBudget;
     }

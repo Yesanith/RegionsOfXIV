@@ -363,15 +363,6 @@
     "message": "Regions of XIV has updated. Here is what changed while you were away:",
     "description": "The same line when more than one release is being shown at once, because the player skipped some updates. \"Regions of XIV\" is the plugin's name."
   },
-
-  "window.editing": {
-    "message": "Editing mode",
-    "description": "Checkbox above the row of tabs, which holds a sample notification on screen while the player changes settings."
-  },
-  "window.editing.tooltip": {
-    "message": "Keeps one sample notification on screen while you work, instead of\nstarting a new one every time you change something.\n\nZone announcements are held back while this is on. It switches itself\noff when you close this window.",
-    "description": "Tooltip for the Editing mode checkbox. Keep the line breaks, including the blank line between the two paragraphs."
-  },
   "window.discord": {
     "message": "Join the Discord\n{0}",
     "description": "Tooltip on the speech-bubble button in this window's title bar. {0} is the invite address - keep it on its own line. \"Discord\" is a product name and stays as-is."
@@ -565,10 +556,6 @@
     "message": "That file stops part way through and could not be read to the end.",
     "description": "The file ends part way through, so it was cut off in a download or a copy."
   },
-  "about.language": {
-    "message": "Language",
-    "description": ""
-  },
   "about.language.follow": {
     "message": "Follow Dalamud",
     "description": ""
@@ -699,10 +686,6 @@
   },
   "appearance.horizontal": {
     "message": "Horizontal position",
-    "description": ""
-  },
-  "appearance.horizontal.tooltip": {
-    "message": "The text is centred on this point, so 50% is the middle of the screen.\nA long place name set near either end will reach past it.",
     "description": ""
   },
   "appearance.letterspacing": {
@@ -1042,7 +1025,7 @@
     "description": "Group title on the Appearance page, above the drop shadow settings."
   },
   "appearance.intro": {
-    "message": "Where the notification sits, how it is lettered, and the colours, outline and shadow it is drawn with. The sample follows every slider as you move it.",
+    "message": "Where the notification sits, how it is lettered, and the colours, outline and shadow it is drawn with. The preview above follows every change.",
     "description": "Sentence under the Appearance page title, saying what the page covers."
   },
   "changelog.latest": {
@@ -1097,12 +1080,56 @@
     "message": "Close",
     "description": "Tooltip on the close button in the window's header."
   },
-  "window.preview": {
-    "message": "Preview",
-    "description": "Button in the window's header. Fires a sample notification. Short."
+  "about.credit.interface": {
+    "message": "Interface made and designed by {0}",
+    "description": "Credit line on the About page. {0} is the name of whoever made and designed the settings window."
   },
-  "window.preview.tooltip": {
-    "message": "Fires a sample notification so you can see the current settings.",
-    "description": "Tooltip on the preview button in the window's header."
+  "about.credit.plugin": {
+    "message": "Plugin by {0}",
+    "description": "Credit line on the About page. {0} is the plugin author's name."
+  },
+  "about.credits": {
+    "message": "Credits",
+    "description": "Section heading on the About page above the two credit lines. Shown in capitals."
+  },
+  "appearance.position": {
+    "message": "Position on screen",
+    "description": "Label above the small screen map on the Appearance page, which is dragged to place the notification."
+  },
+  "appearance.position.tooltip": {
+    "message": "Drag the marker to move the notification. The two sliders below set the\nsame thing exactly. The text is centred on this point, so 50% across is\nthe middle of the screen, and a long place name set near either end\nwill reach past it.",
+    "description": "Tooltip on that label. Keep the line breaks."
+  },
+  "preview.caption": {
+    "message": "Actual size. The vertical position applies on the game screen.",
+    "description": "One line under that heading, explaining that the stage shows the notification at its real size and that only the horizontal position is mirrored there."
+  },
+  "preview.onscreen": {
+    "message": "Show on screen",
+    "description": "Button on the preview stage. Fires a sample notification on the game screen. Short."
+  },
+  "preview.onscreen.tooltip": {
+    "message": "Fires a sample notification on the game screen, where the position sliders place it.",
+    "description": "Tooltip on the show-on-screen button."
+  },
+  "preview.pin": {
+    "message": "Pin on screen",
+    "description": "Button on the preview stage. Keeps a sample notification on the game screen while the window is open. Short."
+  },
+  "preview.pin.tooltip": {
+    "message": "Keeps one sample notification on the game screen while you work, so you can\ncheck the position and size where it will really appear.\n\nZone announcements are held back while this is on. It switches itself\noff when you close this window.",
+    "description": "Tooltip on the pin button. Keep the line breaks."
+  },
+  "preview.replay": {
+    "message": "Replay",
+    "description": "Button on the preview stage. Plays the preview animation from the top. Short."
+  },
+  "preview.replay.tooltip": {
+    "message": "Plays the preview from the top, so the motion and the decode run again.",
+    "description": "Tooltip on the replay button."
+  },
+  "preview.title": {
+    "message": "Live preview",
+    "description": "Small heading in the corner of the preview stage under the window's header. Drawn in capitals."
   }
 }

@@ -90,6 +90,13 @@ internal static class Motion
     public static ImRaii.StyleDisposable PushSwitch(string id, int state, float durationMs = SwitchMs, float slide = SwitchSlide)
         => PushReveal(Transition(Key(id), state, durationMs), slide);
 
+    // Rows that only apply while a switch is on: null when hidden, a fading reveal while showing.
+    public static ImRaii.StyleDisposable? PushSection(string id, bool shown, float durationMs = SwitchMs, float slide = SwitchSlide)
+    {
+        var progress = Transition(Key(id), shown ? 1 : 0, durationMs);
+        return shown ? PushReveal(progress, slide) : null;
+    }
+
     public static float EaseOutCubic(float t)
     {
         var u = 1f - t;

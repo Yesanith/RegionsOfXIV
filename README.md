@@ -197,7 +197,7 @@ launching the game.
 | Layer | What lives there |
 | --- | --- |
 | `Services/` | detection, decisions, game data. Never draws, never references `UI` |
-| `UI/` | the settings window and its pages, the overlay, and the glyph painting. `UI/Components/` is the widget set the window is built from, `UI/Shell/` its header and navigation rail |
+| `UI/` | the settings window and its pages, the overlay, and the glyph painting. `UI/Components/` is the widget set the window is built from, `UI/Shell/` its header and backdrop |
 | `Models/` | the few plain records both sides pass around |
 
 The plugin draws its own text glyph by glyph rather than handing ImGui a string,
@@ -215,6 +215,13 @@ font size chosen in Dalamud's settings rather than a pixel count. The window is
 drawn through the draw list rather than through stock ImGui widgets, so every
 control in `UI/Components/` takes an explicit id and its wording through
 `Loc.Get`; nothing in it depends on a label to keep its identity.
+
+The preview stage under the window's header is `UI/PreviewStage.cs`: the same
+`NotificationRenderer` the overlay uses, handed a `Canvas` that is the stage
+rather than the screen, painting pinned notifications that never fade. It is
+why every colour, font and motion setting can be seen without leaving the
+window; the position sliders and the pin button are what the game screen is
+still for.
 
 ## Feedback
 

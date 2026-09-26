@@ -6,6 +6,11 @@ using RegionsOfXIV.Services;
 
 namespace RegionsOfXIV.UI;
 
+// Where a notification is painted: the rectangle that bounds it and the point it grows out from.
+// The overlay hands the renderer the whole screen with the anchor the position sliders choose;
+// the settings window hands it the preview stage with an anchor of its own.
+internal readonly record struct Canvas(Vector2 Pos, Vector2 Size, Vector2 Anchor);
+
 // Decides where each line goes and hands the glyph painting to the Runs half of the class.
 //
 // The weather line is drawn above the anchor and the header and name below it, so a notification
@@ -24,24 +29,37 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
 
     public bool IsDecoding => config.DecodeEffectEnabled && fonts.EorzeanDisplay != null;
 
-    public void Draw(AreaNotification notification) => Draw(notification, 0f);
+    public void Draw(AreaNotification notification) => Draw(notification, ScreenCanvas(), 0f);
 
     // The same paint, dropped clear of the place name. A banner and an arrival can be on screen
     // together, so they need somewhere separate to be rather than one dismissing the other.
-    public void DrawBanner(AreaNotification notification) => Draw(notification, BannerGap());
+    public void DrawBanner(AreaNotification notification) => Draw(notification, ScreenCanvas(), BannerGap());
 
-    private void Draw(AreaNotification notification, float drop)
+    public void DrawWeather(AreaNotification notification) => DrawWeather(notification, ScreenCanvas());
+
+    // The settings window's preview stage: the same paint on a canvas of the caller's choosing,
+    // drawn into whatever window is current.
+    public void Draw(AreaNotification notification, in Canvas canvas) => Draw(notification, canvas, 0f);
+
+    public void DrawBanner(AreaNotification notification, in Canvas canvas) => Draw(notification, canvas, BannerGap());
+
+    private Canvas ScreenCanvas()
     {
-        var drawList = ImGui.GetWindowDrawList();
         var viewport = ImGui.GetMainViewport();
 
-        var anchor = Anchor(viewport);
-        var centerX = anchor.X;
-        var top = anchor.Y + drop + (notification.StackOffset * ImGuiHelpers.GlobalScale);
+        return new Canvas(viewport.Pos, viewport.Size, Anchor(viewport));
+    }
+
+    private void Draw(AreaNotification notification, in Canvas canvas, float drop)
+    {
+        var drawList = ImGui.GetWindowDrawList();
+
+        var centerX = canvas.Anchor.X;
+        var top = canvas.Anchor.Y + drop + (notification.StackOffset * ImGuiHelpers.GlobalScale);
 
         notification.ApplyCasing(config.UppercaseText);
 
-        var room = RoomFor(viewport, centerX);
+        var room = RoomFor(canvas, centerX);
 
         top = DrawHeader(notification, drawList, centerX, top, room);
 
@@ -57,12 +75,11 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
             scale);
     }
 
-    public void DrawWeather(AreaNotification notification)
+    public void DrawWeather(AreaNotification notification, in Canvas canvas)
     {
         var drawList = ImGui.GetWindowDrawList();
-        var viewport = ImGui.GetMainViewport();
 
-        var anchor = Anchor(viewport);
+        var anchor = canvas.Anchor;
         var centerX = anchor.X;
 
         notification.ApplyCasing(config.UppercaseText);
@@ -90,7 +107,7 @@ internal sealed partial class NotificationRenderer(Configuration config, FontSer
 
             var tracking = Tracking();
             scale = FitScale(
-                notification.DisplayLayout, text, tracking, RoomFor(viewport, centerX) - iconWidth);
+                notification.DisplayLayout, text, tracking, RoomFor(canvas, centerX) - iconWidth);
 
             var width = Layout(notification.DisplayLayout, text, tracking, textCenterX, scale).Width;
 

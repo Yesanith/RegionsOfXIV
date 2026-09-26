@@ -1,5 +1,4 @@
 using System;
-using System.Globalization;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
@@ -16,9 +15,13 @@ internal sealed partial class ConfigWindow
 
     private const string Author = "Yesanith";
 
+    private const string InterfaceAuthor = "XeldarAlz";
+
     private const string RepositoryUrl = "https://github.com/Yesanith/RegionsOfXIV";
 
     private const string IssuesUrl = RepositoryUrl + "/issues";
+
+    private const string InterfaceAuthorUrl = "https://github.com/XeldarAlz";
 
     private const string InspirationUrl = "https://blishhud.com/modules/?module=Nekres.Regions_Of_Tyria";
 
@@ -27,9 +30,9 @@ internal sealed partial class ConfigWindow
     private const float RevealStaggerMs = 110f;
     private const float RevealSlide = 14f;
 
-    private const float HeroMinHeight = 184f;
+    private const float HeroMinHeight = 172f;
     private const float HeroPad = 26f;
-    private const float HeroIconSize = 108f;
+    private const float HeroIconSize = 100f;
     private const float HeroTextGap = 26f;
     private const float HeroLineGap = 6f;
     private const float ChipPadX = 10f;
@@ -87,34 +90,34 @@ internal sealed partial class ConfigWindow
     private Action[]? aboutSections;
 
     private string? authorChip;
-    private int authorChipGeneration = -1;
+    private string? pluginCredit;
+    private string? interfaceCredit;
+    private int creditsGeneration = -1;
 
-    private string AuthorChip()
+    private void RefreshCredits()
     {
-        if (this.authorChip is null || this.authorChipGeneration != Loc.Generation)
+        if (this.authorChip is not null && this.creditsGeneration == Loc.Generation)
         {
-            this.authorChipGeneration = Loc.Generation;
-            this.authorChip = Loc.Format("about.author", "by {0}", Author);
+            return;
         }
 
-        return this.authorChip;
+        this.creditsGeneration = Loc.Generation;
+        this.authorChip = Loc.Format("about.author", "by {0}", Author);
+        this.pluginCredit = Loc.Format("about.credit.plugin", "Plugin by {0}", Author);
+        this.interfaceCredit = Loc.Format("about.credit.interface", "Interface made and designed by {0}", InterfaceAuthor);
     }
 
     private void DrawAboutPage()
     {
         this.aboutColumnWidth = ImGui.GetContentRegionAvail().X;
         this.aboutColumnX = ImGui.GetCursorScreenPos().X;
+        RefreshCredits();
 
-        // The language picker is first on the page, above the hero, and not because a setting
-        // belongs at the top of an otherwise informational page. Each language is named in its own
-        // language so somebody who has landed in one they cannot read can find their way out, and
-        // that only works if the control is findable by position rather than by reading the prose
-        // below it first.
-        this.aboutSections ??= [DrawLanguage, DrawHero, DrawCommunity, DrawCommands, DrawAboutFooter];
+        this.aboutSections ??= [DrawHero, DrawCommunity, DrawCommands, DrawCredits, DrawAboutFooter];
 
         for (var index = 0; index < this.aboutSections.Length; index++)
         {
-            if (index > 1)
+            if (index > 0)
             {
                 Styling.VSpace(SectionGap);
             }
@@ -135,72 +138,6 @@ internal sealed partial class ConfigWindow
         }
     }
 
-    private void DrawLanguage()
-    {
-        using var group = SettingsGroup.Begin(string.Empty);
-
-        var row = SettingsRow.Begin(
-            Loc.Get("about.language", "Language"),
-            Loc.Get(
-                "about.language.tooltip",
-                "Follow Dalamud takes whichever language Dalamud itself is set to, and\n" +
-                "changes with it.\n\n" +
-                "Only this window is affected. Place and weather names come from the game\n" +
-                "and stay in whatever language your client is running in."),
-            Layout.RowDropdownWidth);
-
-        var selected = Array.IndexOf(LanguageOptions, this.config.Language);
-        if (Dropdown.Draw("##rox-language", LanguageLabels(), ref selected, Layout.RowDropdownWidth))
-        {
-            this.config.Language = LanguageOptions[selected];
-            this.actions.ReloadLanguage();
-            MarkUnsaved();
-        }
-
-        row.End();
-    }
-
-    // Loc.Shipped never contains "en" -- English is the compiled-in fallback rather than a
-    // bundled file -- so listing it here cannot double it up.
-    private static readonly string?[] LanguageOptions = [null, "en", .. Loc.Shipped];
-
-    private static readonly string[] LanguageNames = new string[LanguageOptions.Length];
-
-    private static int LanguageGeneration = -1;
-
-    private static string[] LanguageLabels()
-    {
-        if (LanguageGeneration == Loc.Generation)
-        {
-            return LanguageNames;
-        }
-
-        for (var index = 0; index < LanguageOptions.Length; index++)
-        {
-            LanguageNames[index] = LanguageName(LanguageOptions[index]);
-        }
-
-        LanguageGeneration = Loc.Generation;
-        return LanguageNames;
-    }
-
-    private static string LanguageName(string? code)
-    {
-        if (code is null)
-        {
-            return Loc.Get("about.language.follow", "Follow Dalamud");
-        }
-
-        try
-        {
-            return CultureInfo.GetCultureInfo(code).NativeName;
-        }
-        catch (CultureNotFoundException)
-        {
-            return code;
-        }
-    }
-
     private void DrawHero()
     {
         var scale = ImGuiHelpers.GlobalScale;
@@ -217,7 +154,7 @@ internal sealed partial class ConfigWindow
         var rounding = Styling.CardRounding * 1.6f * scale;
 
         Paint.Shadow(drawList, origin, max, rounding, 16f * scale, 0.5f);
-        Paint.Gradient(drawList, origin, max, Styling.Tint(Styling.Surface2, Styling.AccentGold, 0.20f), Styling.Tint(Styling.Surface0, Styling.AccentGold, 0.05f), rounding);
+        Paint.Gradient(drawList, origin, max, Styling.Tint(Styling.Surface2, Styling.AccentGold, 0.18f), Styling.Tint(Styling.Surface0, Styling.AccentGold, 0.05f), rounding);
         DrawAurora(drawList, origin, max);
         Paint.TopLight(drawList, origin, max, rounding, 0.14f);
         Paint.Stroke(drawList, origin, max, Styling.WithAlpha(Styling.AccentGold, 0.35f), rounding, 1.2f * scale);
@@ -261,27 +198,13 @@ internal sealed partial class ConfigWindow
     {
         var scale = ImGuiHelpers.GlobalScale;
         var half = size * 0.5f;
-        ProgressRing.Glow(center, half * 1.05f, Styling.AccentGold, 0.5f + (0.45f * Styling.Pulse(Styling.PulseBreath)));
-        ProgressRing.Sweep(center, half * 1.28f, 2f * scale, Styling.AccentGoldSoft, Styling.PulseOrbit, MathF.PI * 0.5f, 0.9f);
-        OrbitParticles(drawList, center, half * 1.28f, 3, 4600, Styling.AccentGoldSoft, 2.2f * scale);
+        ProgressRing.Glow(center, half * 1.05f, Styling.AccentGold, 0.4f + (0.35f * Styling.Pulse(Styling.PulseBreath)));
 
         var iconMin = center - new Vector2(half, half);
         var iconMax = center + new Vector2(half, half);
         var rounding = size * 0.22f;
         AppIcon.Draw(drawList, iconMin, iconMax, rounding);
         Paint.Stroke(drawList, iconMin, iconMax, Styling.WithAlpha(Styling.AccentGoldSoft, 0.55f), rounding, 1.5f * scale);
-    }
-
-    private static void OrbitParticles(ImDrawListPtr drawList, Vector2 center, float radius, int count, double periodMs, Vector4 color, float dotRadius)
-    {
-        var baseAngle = (-MathF.PI / 2f) + (Styling.Phase(periodMs) * MathF.PI * 2f);
-        for (var index = 0; index < count; index++)
-        {
-            var angle = baseAngle + (index * (MathF.PI * 2f / count));
-            var position = center + (new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * radius);
-            drawList.AddCircleFilled(position, dotRadius * 2.4f, Paint.Col(Styling.WithAlpha(color, 0.16f)));
-            drawList.AddCircleFilled(position, dotRadius, Paint.Col(color));
-        }
     }
 
     // The wider of the title and the row of chips; the summary wraps to whatever this comes to.
@@ -298,12 +221,12 @@ internal sealed partial class ConfigWindow
             var scale = ImGuiHelpers.GlobalScale;
             return MathF.Max(width,
                 ChipWidth(FontAwesomeIcon.Tag, VersionText)
-                + (ChipGap * scale) + ChipWidth(FontAwesomeIcon.Code, AuthorChip())
+                + (ChipGap * scale) + ChipWidth(FontAwesomeIcon.Code, this.authorChip!)
                 + (ChipGap * scale) + ChipWidth(FontAwesomeIcon.Newspaper, Loc.Get("about.whatsnew", "What's new")));
         }
     }
 
-    private float HeroTextHeight(float width)
+    private static float HeroTextHeight(float width)
     {
         var scale = ImGuiHelpers.GlobalScale;
         float titleHeight;
@@ -343,7 +266,7 @@ internal sealed partial class ConfigWindow
             var chipHeight = TextDraw.LineHeight() + (ChipPadY * 2f * scale);
             var chipX = x;
             chipX += StaticChip(FontAwesomeIcon.Tag, VersionText, Styling.AccentGold, new Vector2(chipX, y), chipHeight) + (ChipGap * scale);
-            chipX += StaticChip(FontAwesomeIcon.Code, AuthorChip(), Styling.AccentBlue, new Vector2(chipX, y), chipHeight) + (ChipGap * scale);
+            chipX += StaticChip(FontAwesomeIcon.Code, this.authorChip!, Styling.AccentBlue, new Vector2(chipX, y), chipHeight) + (ChipGap * scale);
             if (LinkChip("##rox-about-whatsnew", FontAwesomeIcon.Newspaper, Loc.Get("about.whatsnew", "What's new"), Styling.AccentGoldSoft, new Vector2(chipX, y), chipHeight,
                     Loc.Get("about.whatsnew.tooltip", "Every release, newest first. Also at \"/regions changelog\".")))
             {
@@ -388,7 +311,9 @@ internal sealed partial class ConfigWindow
         return width;
     }
 
-    private static bool LinkChip(string id, FontAwesomeIcon icon, string label, Vector4 accent, Vector2 origin, float height, string tooltip)
+    // A null tooltip leaves the hover to the caller, for one that is formatted and so only worth
+    // building while hovered.
+    private static bool LinkChip(string id, FontAwesomeIcon icon, string label, Vector4 accent, Vector2 origin, float height, string? tooltip)
     {
         var width = ChipWidth(icon, label);
         var size = new Vector2(width, height);
@@ -398,7 +323,7 @@ internal sealed partial class ConfigWindow
         var max = origin + size;
         Paint.Pill(ImGui.GetWindowDrawList(), origin, max, Styling.WithAlpha(accent, 0.14f + (0.14f * hover)), Styling.WithAlpha(accent, 0.45f + (0.35f * hover)));
         DrawChipContent(icon, label, accent, Vector4.Lerp(Styling.TextSecondary, Styling.TextStrong, hover), origin, height);
-        if (hit.Hovered)
+        if (hit.Hovered && tooltip is not null)
         {
             Tooltip.Show(tooltip);
         }
@@ -523,6 +448,45 @@ internal sealed partial class ConfigWindow
         var width = TextDraw.Measure(text).X / scale;
         var row = SettingsRow.Begin(command, null, width, TextDraw.LineHeight() / scale);
         TextDraw.At(text, ImGui.GetCursorScreenPos(), Styling.TextDim);
+        row.End();
+    }
+
+    // Who made what. The plugin is Yesanith's; the window it is set up in was made and designed
+    // by XeldarAlz, and each name links to where the rest of their work lives.
+    private void DrawCredits()
+    {
+        SectionHeader(FontAwesomeIcon.PenNib, Loc.Get("about.credits", "Credits"), Styling.AccentEmber, this.aboutColumnWidth);
+
+        using var group = SettingsGroup.Begin(string.Empty);
+        CreditRow("##rox-credit-plugin", this.pluginCredit!, Author, RepositoryUrl, Styling.AccentGold);
+        CreditRow("##rox-credit-interface", this.interfaceCredit!, InterfaceAuthor, InterfaceAuthorUrl, Styling.AccentEmber);
+    }
+
+    private static void CreditRow(string id, string label, string name, string url, Vector4 accent)
+    {
+        var scale = ImGuiHelpers.GlobalScale;
+        float chipHeight;
+        float chipWidth;
+        using (Fonts.PushCaption())
+        {
+            chipHeight = TextDraw.LineHeight() + (ChipPadY * 2f * scale);
+            chipWidth = ChipWidth(FontAwesomeIcon.CodeBranch, name);
+        }
+
+        var row = SettingsRow.Begin(label, null, chipWidth / scale, chipHeight / scale);
+        using (Fonts.PushCaption())
+        {
+            if (LinkChip(id, FontAwesomeIcon.CodeBranch, name, accent, ImGui.GetCursorScreenPos(), chipHeight, null))
+            {
+                Util.OpenLink(url);
+            }
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            Tooltip.Show(Loc.Format("common.opens", "{0}\n\nOpens {1} in your browser.", name, url));
+        }
+
         row.End();
     }
 

@@ -8,9 +8,12 @@ using RegionsOfXIV.UI.Components;
 
 namespace RegionsOfXIV.UI.Shell;
 
-// The strip along the top of the window: icon, name and version on the left; the editing switch,
-// the preview button, Discord and close on the right. It also moves the window, since the ImGui
-// title bar is not drawn.
+// The strip along the top of the window: icon, name and version on the left; the language
+// picker, Discord and close on the right. It also moves the window, since the ImGui title bar is
+// not drawn.
+//
+// The language picker lives here, findable by position, so somebody who has landed in a language
+// they cannot read can still find their way out without reading anything.
 internal static class HeaderBar
 {
     private const string Title = "Regions of XIV";
@@ -22,9 +25,10 @@ internal static class HeaderBar
     private const float ControlGap = 14f;
     private const float ChipPadX = 8f;
     private const float ChipPadY = 3f;
-    private const float ToggleLabelGap = 8f;
+    private const float LanguageWidth = 150f;
+    private const float GlobeGap = 8f;
 
-    public const float MinimumWidth = 620f;
+    public const float MinimumWidth = 700f;
 
     private static readonly string VersionLabel = "v" + Changelog.Current;
 
@@ -37,8 +41,8 @@ internal static class HeaderBar
         ImGui.SetCursorScreenPos(windowPos);
         ImGui.InvisibleButton("##rox-drag", new Vector2(MathF.Max(1f, dragWidth), height));
 
-        // The switch and the preview button sit on top of this strip, so they must be allowed to
-        // take the hover and the click from it.
+        // The language picker sits on top of this strip, so it must be allowed to take the hover
+        // and the click from it.
         ImGui.SetItemAllowOverlap();
         if (!ImGui.IsItemActive())
         {
@@ -100,8 +104,8 @@ internal static class HeaderBar
         }
     }
 
-    // Right to left: close, Discord, the preview button, then the editing switch with its label.
-    // Returns the x where the controls begin, so the title knows how much room it has.
+    // Right to left: close, Discord, then the language picker with a globe beside it. Returns the
+    // x where the controls begin, so the title knows how much room it has.
     private static float DrawControls(ConfigWindow window, Vector2 end, float midY)
     {
         var scale = ImGuiHelpers.GlobalScale;
@@ -128,54 +132,15 @@ internal static class HeaderBar
             Tooltip.Show(Loc.Format("window.discord", "Join the Discord\n{0}", DiscordLink.Invite));
         }
 
-        var x = end.X - padX - buttonSize - stride - (ControlGap * scale);
+        var pickerWidth = LanguageWidth * scale;
+        var pickerX = end.X - padX - buttonSize - stride - (ControlGap * scale) - pickerWidth;
+        ImGui.SetCursorScreenPos(new Vector2(pickerX, midY - (ImGui.GetFrameHeight() * 0.5f)));
+        window.DrawLanguagePicker(LanguageWidth);
 
-        var preview = Loc.Get("window.preview", "Preview");
-        var previewWidth = PillButton.Width(preview, FontAwesomeIcon.Play);
-        x -= previewWidth;
-        ImGui.SetCursorScreenPos(new Vector2(x, midY - (Layout.PillHeight * scale * 0.5f)));
-        if (PillButton.Draw("##rox-preview", preview, Styling.AccentGold, PillButton.Emphasis.Tinted, FontAwesomeIcon.Play,
-                tooltip: Loc.Get("window.preview.tooltip", "Fires a sample notification so you can see the current settings.")))
-        {
-            window.FirePreview();
-        }
+        var globeSize = TextDraw.IconSize(FontAwesomeIcon.Globe);
+        var globeX = pickerX - (GlobeGap * scale) - globeSize.X;
+        TextDraw.Icon(FontAwesomeIcon.Globe, new Vector2(globeX, midY - (globeSize.Y * 0.5f)), Styling.TextDim);
 
-        x -= ControlGap * scale;
-        return DrawEditingSwitch(window, x, midY);
-    }
-
-    private static float DrawEditingSwitch(ConfigWindow window, float rightX, float midY)
-    {
-        var scale = ImGuiHelpers.GlobalScale;
-        var toggleWidth = ToggleSwitch.TrackWidth * scale;
-        var toggleHeight = ToggleSwitch.TrackHeight * scale;
-        var toggleX = rightX - toggleWidth;
-
-        ImGui.SetCursorScreenPos(new Vector2(toggleX, midY - (toggleHeight * 0.5f)));
-        var editing = window.Editing;
-        if (ToggleSwitch.Draw("##rox-editing", ref editing))
-        {
-            window.SetEditing(editing);
-        }
-
-        var toggleHovered = ImGui.IsItemHovered();
-
-        var label = Loc.Get("window.editing", "Editing mode");
-        var labelSize = TextDraw.Measure(label);
-        var labelX = toggleX - (ToggleLabelGap * scale) - labelSize.X;
-        TextDraw.At(label, new Vector2(labelX, midY - (labelSize.Y * 0.5f)), editing ? Styling.AccentGoldSoft : Styling.TextDim);
-
-        var labelHovered = ImGui.IsMouseHoveringRect(new Vector2(labelX, midY - (labelSize.Y * 0.5f)), new Vector2(toggleX, midY + (labelSize.Y * 0.5f)));
-        if (toggleHovered || labelHovered)
-        {
-            Tooltip.Show(Loc.Get(
-                "window.editing.tooltip",
-                "Keeps one sample notification on screen while you work, instead of\n" +
-                "starting a new one every time you change something.\n\n" +
-                "Zone announcements are held back while this is on. It switches itself\n" +
-                "off when you close this window."));
-        }
-
-        return labelX - (ControlGap * scale);
+        return globeX - (ControlGap * scale);
     }
 }

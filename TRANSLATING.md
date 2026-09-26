@@ -372,7 +372,7 @@ units go through `Loc.Unit`, which escapes `%`. None of this is visible to trans
 
 The export only recognises a call whose key and English are both literals, so a label that comes
 out of a table or a variable has to be resolved through a small switch of literal calls. The
-navigation rail and the About page's tiles do exactly that.
+About page's community tiles do exactly that.
 
 Banner wording is not part of that system. A new language there is a dictionary in
 `BannerNames.cs` plus one line in `ByLanguage`, which is what the Announcements dropdown is built

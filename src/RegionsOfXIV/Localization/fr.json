@@ -765,9 +765,6 @@
   "motion.decode.tooltip": {
     "message": "Nécessite une police eorzéenne fournie. Texte latin uniquement.\n\nSe déroule après le mouvement au-dessus plutôt qu'en même temps : la ligne\narrive en eorzéen, se pose, puis se résout. Désactivé, elle arrive déjà\nlisible. Les préréglages n'y touchent pas, donc le désactiver ici le\ndésactive pour tous."
   },
-  "window.preview": {
-    "message": "Aperçu"
-  },
   "window.close": {
     "message": "Fermer"
   },

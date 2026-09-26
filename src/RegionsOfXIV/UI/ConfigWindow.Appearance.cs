@@ -1,3 +1,6 @@
+using System;
+using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Utility;
 using RegionsOfXIV.Services;
 using RegionsOfXIV.UI.Components;
 
@@ -5,8 +8,8 @@ namespace RegionsOfXIV.UI;
 
 internal sealed partial class ConfigWindow
 {
-    // Grouped by what is being coloured rather than by kind of widget, so every governing control
-    // sits beside the thing it governs.
+    // Where and how the lines are set on the left; what they are coloured with on the right. The
+    // rows that belong to a switch appear under it only while it is on.
     private void DrawAppearancePage()
     {
         PageHeader.Draw(
@@ -14,9 +17,12 @@ internal sealed partial class ConfigWindow
             Loc.Get(
                 "appearance.intro",
                 "Where the notification sits, how it is lettered, and the colours, outline and "
-                + "shadow it is drawn with. The sample follows every slider as you move it."));
+                + "shadow it is drawn with. The preview above follows every change."));
 
         var changed = false;
+
+        this.columns.Begin(2);
+        this.columns.Next();
 
         using (SettingsGroup.Begin(Loc.Get("appearance.group.placement", "Placement")))
         {
@@ -33,6 +39,8 @@ internal sealed partial class ConfigWindow
             DrawHeaderShape(ref changed);
         }
 
+        this.columns.Next();
+
         using (SettingsGroup.Begin(Loc.Get("appearance.group.colours", "Colours")))
         {
             DrawFillColors(ref changed);
@@ -48,6 +56,8 @@ internal sealed partial class ConfigWindow
             DrawShadow(ref changed);
         }
 
+        this.columns.End();
+
         if (!changed)
         {
             return;
@@ -59,20 +69,41 @@ internal sealed partial class ConfigWindow
 
     private void DrawPlacement(ref bool changed)
     {
+        var scale = ImGuiHelpers.GlobalScale;
+
+        SettingsRow.Block(
+            Loc.Get("appearance.position", "Position on screen"),
+            Loc.Get(
+                "appearance.position.tooltip",
+                "Drag the marker to move the notification. The two sliders below set the\n" +
+                "same thing exactly. The text is centred on this point, so 50% across is\n" +
+                "the middle of the screen, and a long place name set near either end\n" +
+                "will reach past it."));
+
+        var inner = SettingsGroup.InnerWidth();
+        var padWidth = MathF.Min(Layout.PositionPadWidth * scale, inner);
+        ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ((inner - padWidth) * 0.5f));
+
+        var horizontal = this.config.HorizontalPosition;
+        var vertical = this.config.VerticalPosition;
+        if (PositionPad.Draw("##rox-position-pad", ref horizontal, ref vertical, padWidth))
+        {
+            this.config.HorizontalPosition = horizontal;
+            this.config.VerticalPosition = vertical;
+            changed = true;
+        }
+
+        SettingsRow.EndBlock();
+
         // "%%" is an escaped per-cent sign rather than a word, so there is nothing in this format
         // for a translator to change and it stays whole.
+        this.config.HorizontalPosition = Slider(
+            "##rox-horizontal", Loc.Get("appearance.horizontal", "Horizontal position"), null,
+            this.config.HorizontalPosition, 0f, 100f, "%.0f%%", ref changed);
+
         this.config.VerticalPosition = Slider(
             "##rox-vertical", Loc.Get("appearance.vertical", "Vertical position"), null,
             this.config.VerticalPosition, 0f, 100f, "%.0f%%", ref changed);
-
-        this.config.HorizontalPosition = Slider(
-            "##rox-horizontal",
-            Loc.Get("appearance.horizontal", "Horizontal position"),
-            Loc.Get(
-                "appearance.horizontal.tooltip",
-                "The text is centred on this point, so 50% is the middle of the screen.\n" +
-                "A long place name set near either end will reach past it."),
-            this.config.HorizontalPosition, 0f, 100f, "%.0f%%", ref changed);
     }
 
     private void DrawLettering(ref bool changed)
@@ -106,6 +137,7 @@ internal sealed partial class ConfigWindow
                 "to it."),
             this.config.IncludeParentTierAsHeader, ref changed);
 
+        // Shown whether or not the header is, because both also govern the weather line.
         this.config.UnderlineHeader = Toggle(
             "##rox-underlineheader", Loc.Get("appearance.underlineheader", "Underline header"), null,
             this.config.UnderlineHeader, ref changed);
@@ -146,9 +178,15 @@ internal sealed partial class ConfigWindow
                 "line can be pushed towards the background without touching the others."),
             this.config.SeparateLineColors, ref changed);
 
+        using var rows = Reveal("##rox-weather-colour-rows", this.config.SeparateLineColors);
+        if (rows is null)
+        {
+            return;
+        }
+
         this.config.WeatherColor = Colour(
             "##rox-weathercolour", Loc.Get("appearance.weathercolour", "Weather colour"), null,
-            this.config.WeatherColor, ref changed, this.config.SeparateLineColors);
+            this.config.WeatherColor, ref changed);
     }
 
     private void DrawOutline(ref bool changed)
@@ -157,13 +195,19 @@ internal sealed partial class ConfigWindow
             "##rox-outlinecolour", Loc.Get("appearance.outlinecolour", "Outline colour"), null,
             this.config.StrokeColor, ref changed);
 
-        this.config.HeaderStrokeColor = Colour(
-            "##rox-headeroutlinecolour", Loc.Get("appearance.headeroutlinecolour", "Header outline colour"), null,
-            this.config.HeaderStrokeColor, ref changed, this.config.SeparateLineColors);
+        using (var rows = Reveal("##rox-outline-colour-rows", this.config.SeparateLineColors))
+        {
+            if (rows is not null)
+            {
+                this.config.HeaderStrokeColor = Colour(
+                    "##rox-headeroutlinecolour", Loc.Get("appearance.headeroutlinecolour", "Header outline colour"), null,
+                    this.config.HeaderStrokeColor, ref changed);
 
-        this.config.WeatherStrokeColor = Colour(
-            "##rox-weatheroutlinecolour", Loc.Get("appearance.weatheroutlinecolour", "Weather outline colour"), null,
-            this.config.WeatherStrokeColor, ref changed, this.config.SeparateLineColors);
+                this.config.WeatherStrokeColor = Colour(
+                    "##rox-weatheroutlinecolour", Loc.Get("appearance.weatheroutlinecolour", "Weather outline colour"), null,
+                    this.config.WeatherStrokeColor, ref changed);
+            }
+        }
 
         this.config.StrokeThickness = Slider(
             "##rox-outlinethickness",
@@ -186,25 +230,29 @@ internal sealed partial class ConfigWindow
                 "One shadow covers all three lines; it does not follow the separate colours."),
             this.config.ShadowEnabled, ref changed);
 
-        var enabled = this.config.ShadowEnabled;
+        using var rows = Reveal("##rox-shadow-rows", this.config.ShadowEnabled);
+        if (rows is null)
+        {
+            return;
+        }
 
         this.config.ShadowColor = Colour(
             "##rox-shadowcolour", Loc.Get("appearance.shadowcolour", "Shadow colour"), null,
-            this.config.ShadowColor, ref changed, enabled);
+            this.config.ShadowColor, ref changed);
 
         this.config.ShadowOffsetX = Slider(
             "##rox-shadowacross",
             Loc.Get("appearance.shadowacross", "Shadow across"),
             Loc.Get("appearance.shadowacross.tooltip", "Negative moves the shadow to the left."),
             this.config.ShadowOffsetX, -20f, 20f,
-            "%.0f " + Loc.Unit("units.px", "px"), ref changed, enabled: enabled);
+            "%.0f " + Loc.Unit("units.px", "px"), ref changed);
 
         this.config.ShadowOffsetY = Slider(
             "##rox-shadowdown",
             Loc.Get("appearance.shadowdown", "Shadow down"),
             Loc.Get("appearance.shadowdown.tooltip", "Negative lifts the shadow above the text."),
             this.config.ShadowOffsetY, -20f, 20f,
-            "%.0f " + Loc.Unit("units.px", "px"), ref changed, enabled: enabled);
+            "%.0f " + Loc.Unit("units.px", "px"), ref changed);
 
         this.config.ShadowSoftness = Slider(
             "##rox-shadowspread",
@@ -214,6 +262,6 @@ internal sealed partial class ConfigWindow
                 "Fattens the shadow outwards. Zero keeps it the same shape as the\n" +
                 "letters; higher values thicken it into a halo behind them."),
             this.config.ShadowSoftness, 0f, 6f,
-            "%.1f " + Loc.Unit("units.px", "px"), ref changed, enabled: enabled);
+            "%.1f " + Loc.Unit("units.px", "px"), ref changed);
     }
 }
