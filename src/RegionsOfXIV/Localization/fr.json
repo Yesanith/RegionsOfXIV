@@ -1076,5 +1076,243 @@
   },
   "sound.gamesound.weather": {
     "message": "Météo"
+  },
+
+  "changelog.0.1.0.0.01": {
+    "message": "Première version. Annonce la région, la zone, le secteur et le sous-secteur où tu entres, en remplaçant l'affichage de lieu du jeu plutôt qu'en dessinant à côté."
+  },
+  "changelog.0.1.1.0.01": {
+    "message": "Une notification ne se fige plus pendant une cinématique pour reprendre périmée ensuite."
+  },
+  "changelog.0.1.1.0.02": {
+    "message": "Arriver quelque part pendant une cinématique n'est plus entièrement perdu."
+  },
+  "changelog.0.2.0.0.01": {
+    "message": "Effets de mouvement : taper la ligne, la faire monter en place, la faire entrer sur une vague, ou l'enflammer."
+  },
+  "changelog.0.2.0.0.02": {
+    "message": "Particules d'ambiance : cœurs, braises, étincelles et pétales, dessinés autour du texte tant qu'il est affiché."
+  },
+  "changelog.0.2.0.0.03": {
+    "message": "Des styles fournis qui associent un mouvement à des particules et une palette."
+  },
+  "changelog.0.2.0.0.04": {
+    "message": "Espacement des lettres, majuscules, placement horizontal et épaisseur du contour."
+  },
+  "changelog.0.2.0.0.05": {
+    "message": "Le mouvement et le décodage s'enchaînent au lieu de se superposer, pour que tu puisses voir les deux."
+  },
+  "changelog.0.2.1.0.01": {
+    "message": "Le plugin livre sa propre icône, pour se ressembler dans l'installateur."
+  },
+  "changelog.0.2.2.0.01": {
+    "message": "Enregistre tes propres préréglages. Un préréglage couvre maintenant chaque réglage de Général, Effets, Notifications et Durées, pas seulement le rendu."
+  },
+  "changelog.0.2.2.0.02": {
+    "message": "Partage des préréglages sous forme de codes. Copies-en un dans le presse-papiers, colle-le dans le chat, et n'importe qui peut le recoller ici."
+  },
+  "changelog.0.2.2.0.03": {
+    "message": "Le mode édition garde une seule notification d'exemple à l'écran pendant que tu travailles, au lieu d'en lancer une nouvelle à chaque changement."
+  },
+  "changelog.0.2.2.0.04": {
+    "message": "Les styles fournis sont maintenant des configurations complètes : en appliquer un remet à sa valeur par défaut tout ce qu'il ne nomme pas."
+  },
+  "changelog.0.2.2.0.05": {
+    "message": "Un lien Discord, dans la barre de titre et sur la page Préréglages."
+  },
+  "changelog.0.2.3.0.01": {
+    "message": "Annonces météo. Quand la météo change, elle est annoncée sur sa propre ligne au-dessus du nom du lieu, avec l'icône du jeu à côté. Désactivé par défaut ; active-le dans les réglages."
+  },
+  "changelog.0.2.3.0.02": {
+    "message": "La ligne météo est stylée comme tout le reste, partageant le soulignement, les effets de mouvement et de décodage, et tes couleurs et durées."
+  },
+  "changelog.0.2.3.0.03": {
+    "message": "Arriver quelque part de nouveau annonce sa météo à côté du nom du lieu, et la météo qui change pendant que tu es là s'annonce d'elle-même."
+  },
+  "changelog.0.2.3.0.04": {
+    "message": "L'aperçu montre tout ce qui est activé, météo comprise, pour que ce que tu règles soit ce que tu vois."
+  },
+  "changelog.0.3.0.0.01": {
+    "message": "Les bannières du jeu sont à toi maintenant. Quest Accepted, Duty Commenced, Level Up! et les autres sont redessinées dans le lettrage de ce plugin, avec les mêmes effets qu'un nom de lieu. Désactivé par défaut ; active-le dans les réglages."
+  },
+  "changelog.0.3.0.0.02": {
+    "message": "Seules les bannières pour lesquelles le plugin a des mots sont reprises. Le texte est peint dans l'illustration du jeu plutôt que stocké comme texte, alors tout ce qu'il ne peut pas nommer garde la bannière du jeu au lieu de la perdre."
+  },
+  "changelog.0.3.0.0.03": {
+    "message": "Les lettres se placent correctement après un Q. Les polices du jeu portent un espacement par paire et le plugin en laissait tomber une par lettre, ce qui laissait chaque ligne un peu lâche et un peu décentrée. Net en Jupiter, subtil partout ailleurs."
+  },
+  "changelog.0.3.0.0.04": {
+    "message": "Colore chaque ligne séparément. La ligne météo, le contour de l'en-tête et le contour de la météo peuvent chacun prendre leur couleur, pour qu'une ligne puisse s'effacer sans toucher aux autres."
+  },
+  "changelog.0.3.0.0.05": {
+    "message": "L'interrupteur de l'en-tête est passé dans Général, à côté du reste des réglages d'en-tête, là où on peut vraiment le trouver."
+  },
+  "changelog.0.3.0.0.06": {
+    "message": "Les réglages sont écrits quand tu relâches un curseur plutôt qu'à chaque image où tu le fais glisser, si bien que les sélecteurs de couleur ne donnent plus l'impression de se bloquer."
+  },
+  "changelog.0.3.0.0.07": {
+    "message": "Une couleur rendue transparente le dit maintenant, au lieu de ressembler à un réglage qui a cessé de fonctionner."
+  },
+  "changelog.0.3.0.0.08": {
+    "message": "Les codes de préréglage survivent aux collages. Les retours à la ligne, la mise en forme du chat et les caractères invisibles qu'une page web laisse derrière elle sont retirés avant la lecture du code."
+  },
+  "changelog.0.4.0.0.01": {
+    "message": "Utilise tes propres polices. Le nom, l'en-tête et la ligne météo choisissent maintenant chacun leur police et leur taille, et n'importe lequel peut pointer vers un .ttf, .otf ou .ttc sur ton PC."
+  },
+  "changelog.0.4.0.0.02": {
+    "message": "Une police que tu fournis reste à ta charge. Le plugin la charge exactement telle quelle, dit clairement quand il ne peut pas, et se rabat sur Noto Sans CJK plutôt que sur rien."
+  },
+  "changelog.0.4.0.0.03": {
+    "message": "Les préréglages transportent l'emplacement d'un fichier de police personnalisé plutôt que la police elle-même. En partager un t'avertit d'abord, et en importer un qui nomme une police que tu n'as pas te dit quelles lignes se sont rabattues."
+  },
+  "changelog.0.4.0.0.04": {
+    "message": "Une ombre portée, projetée dans n'importe quelle direction et étendue autant que tu veux. Elle se place sous le contour pour que les deux puissent servir ensemble, et le soulignement et l'icône météo la projettent aussi."
+  },
+  "changelog.0.4.0.0.05": {
+    "message": "La ligne météo a sa propre police et sa propre taille au lieu d'emprunter celles de l'en-tête. Les réglages que tu avais déjà gardent la taille qu'ils affichaient."
+  },
+  "changelog.0.4.0.0.06": {
+    "message": "La taille de l'en-tête se règle enfin. Elle avait un réglage mais jamais de curseur."
+  },
+  "changelog.0.4.0.0.07": {
+    "message": "La police et la taille ont quitté Général pour leur propre onglet Polices, une page pour chacune des trois lignes."
+  },
+  "changelog.0.4.0.0.08": {
+    "message": "Moins de travail à chaque image : les bannières ne sont plus surveillées tant que la fonction est désactivée, une ligne est mesurée une fois au lieu de l'être à chaque image où elle est affichée, et un contour que tu ne peux pas voir n'est plus dessiné huit fois."
+  },
+  "changelog.0.4.1.0.01": {
+    "message": "Arriver quelque part de nouveau pendant que le dernier avis est encore affiché ne laisse plus les deux écrits l'un sur l'autre. Celui qui s'en va part maintenant vite et s'écarte de celui qui arrive, au lieu de s'estomper au rythme de lecture en dessous."
+  },
+  "changelog.0.4.1.0.02": {
+    "message": "Le nouveau lieu apparaît toujours à l'instant où tu l'atteins. Rien n'attend son tour."
+  },
+  "changelog.0.4.1.0.03": {
+    "message": "Les couleurs ont retrouvé leur alpha, dans le sélecteur où il se trouvait. Il s'arrête à 15 % plutôt que de descendre jusqu'à rien, pour qu'une ligne puisse s'effacer derrière les autres sans s'effacer au point de faire croire que le plugin a cessé de fonctionner."
+  },
+  "changelog.0.4.1.0.04": {
+    "message": "Une couleur déjà enregistrée plus pâle que cela est remontée à ce niveau au chargement du plugin, ce qui couvre tout ce que la version sans alpha avait laissé invisible."
+  },
+  "changelog.0.4.1.0.05": {
+    "message": "L'écart entre l'en-tête et le nom du lieu est un curseur, là où c'était un interrupteur à deux positions."
+  },
+  "changelog.0.4.1.0.06": {
+    "message": "L'exemple dans la fenêtre des réglages suit de nouveau l'interrupteur de l'en-tête. Désactiver \"Afficher l'en-tête\" lui en laissait un."
+  },
+  "changelog.0.4.2.0.01": {
+    "message": "Les préréglages et codes de partage faits par des versions plus anciennes s'appliquent comme ils ont été enregistrés. Un d'avant que l'écart de l'en-tête devienne un curseur retombait sur l'espacement par défaut plutôt que sur celui enregistré, et un d'avant que la ligne météo ait sa propre taille laissait cette taille de côté aussi."
+  },
+  "changelog.0.4.2.0.02": {
+    "message": "Cela couvre aussi bien les préréglages que tu as enregistrés toi-même que les codes que quelqu'un t'envoie. Les enregistrés sont mis à jour au prochain chargement du plugin, il n'y a donc rien à refaire."
+  },
+  "changelog.0.5.0.0.01": {
+    "message": "La fenêtre des réglages se lit dans ta langue. L'allemand, le français, le japonais et le turc sont livrés avec le plugin, et il suit la langue sur laquelle Dalamud est réglé sauf si tu en choisis une toi-même dans les réglages."
+  },
+  "changelog.0.5.0.0.02": {
+    "message": "Ces quatre-là ont été rédigés par une machine. La fenêtre le dit en haut jusqu'à ce que quelqu'un qui parle la langue les ait relus, et en corriger un ne demande rien d'autre qu'un éditeur de texte et un compte GitHub. TRANSLATING.md explique comment."
+  },
+  "changelog.0.5.0.0.03": {
+    "message": "Les bannières peuvent être dessinées dans une langue de ton choix plutôt que celle de ton client. Le texte turc est fourni. Toute bannière pour laquelle le plugin n'a pas de mots garde l'illustration du jeu, quelle que soit la langue choisie."
+  },
+  "changelog.0.5.0.0.04": {
+    "message": "Light Party et Full Party sont annoncées et masquées comme toute autre bannière. Elles arrivent sur une partie de l'interface que le plugin ne surveillait pas, ce qui explique pourquoi ces deux-là étaient toujours manquées."
+  },
+  "changelog.0.5.0.0.05": {
+    "message": "Une bannière qui arrive juste derrière un nom de lieu n'est plus abandonnée. En retenir une n'a jamais apporté de calme, cela laissait seulement la version du jeu à l'écran à la place, alors une bannière prend maintenant sa propre ligne sous le nom du lieu. À quelle distance en dessous, c'est un curseur."
+  },
+  "changelog.0.5.0.0.06": {
+    "message": "Les curseurs de police vont beaucoup plus haut, pour qui joue en haute résolution et trouvait l'ancien maximum encore petit. Sur un client japonais ils s'arrêtent là où le jeu peut encore construire les lettres, et ton réglage est gardé tel que tu l'as laissé."
+  },
+  "changelog.0.5.0.0.07": {
+    "message": "Les lettres accentuées ne disparaissent plus pendant qu'une ligne se décode. L'alphabet eorzéen n'a pas de glyphe pour elles, alors tout ce qui portait un accent était dessiné en blanc jusqu'à ce que le nom se résolve. Elles tiennent maintenant la place de la lettre en dessous : é comme e, ğ comme g."
+  },
+  "changelog.0.5.0.0.08": {
+    "message": "La fenêtre des réglages peut dessiner le turc, le polonais, le tchèque, le roumain et leurs voisins, là où elle n'avait que huit lettres du latin étendu A et des blancs pour le reste."
+  },
+  "changelog.0.6.0.0.01": {
+    "message": "Les notifications peuvent faire un son. Désactivé jusqu'à ce que tu l'actives, sous un onglet Son à lui : l'un des seize effets sonores de chat du jeu, ou un .wav ou .mp3 à toi."
+  },
+  "changelog.0.6.0.0.02": {
+    "message": "Il suit les réglages audio du jeu, y compris les volumes principal et Sons système et les cases de sourdine. C'est Sons système plutôt qu'Effets sonores qu'il faut baisser si tu le veux plus discret, parce que c'est le bus sur lequel le jeu place un effet sonore de chat."
+  },
+  "changelog.0.6.0.0.03": {
+    "message": "Un fichier à toi est joué par le plugin plutôt que par le jeu, alors le plugin lit ces mêmes réglages et les suit à la main. Il reste silencieux tant que le jeu est en sourdine, et tant que la fenêtre n'est pas au premier plan sauf si tu as dit au jeu de continuer à jouer alors. Tout ce qui dépasse cinq secondes est coupé."
+  },
+  "changelog.0.6.0.0.04": {
+    "message": "Quelles sortes de notification font un son, c'est à toi de choisir : les noms de lieux, la météo et les bannières ont chacun leur interrupteur, et deux qui arrivent ensemble ne font toujours qu'un son."
+  },
+  "changelog.0.6.0.0.05": {
+    "message": "Les réglages de son restent sur ta machine. Ils ne voyagent pas dans un préréglage ni dans un code de partage, parce qu'un bruit venu d'un inconnu n'est pas une chose à découvrir par accident."
+  },
+  "changelog.0.6.0.0.06": {
+    "message": "La fenêtre des réglages est groupée par ce que tu fais plutôt que par le moment où les choses ont été ajoutées. Sept onglets : Annonces, Apparence, Mouvement, Polices, Son, Préréglages et À propos."
+  },
+  "changelog.0.6.0.0.07": {
+    "message": "Les réglages qui allaient ensemble sont ensemble. Le mouvement et sa durée sont sur une même page, comme le décodage eorzéen et sa durée, là où chaque paire était répartie sur deux onglets. Les couleurs sont groupées par ce qu'elles colorent."
+  },
+  "changelog.0.6.0.0.08": {
+    "message": "Rien de ce que tu as enregistré n'est touché. Les préréglages, les codes de partage et tes réglages actuels passent exactement tels quels ; seul l'endroit où un contrôle est dessiné a changé."
+  },
+  "changelog.0.6.0.0.09": {
+    "message": "La langue de cette fenêtre est passée dans l'onglet À propos."
+  },
+  "changelog.0.6.0.0.10": {
+    "message": "L'allemand, le français, le japonais et le turc sont complets. Chaque texte de la fenêtre est traduit dans les quatre, là où il en manquait une poignée à chacun. Ils sont toujours rédigés par une machine et le disent toujours en haut jusqu'à ce qu'un locuteur les ait relus."
+  },
+  "changelog.0.6.1.0.01": {
+    "message": "Le texte des bannières turques se dessine correctement. Le I pointé, le S cédille et le G bref sortaient en points d'interrogation, si bien qu'il manquait trois lettres à \"ETKINLIK BASLADI\"."
+  },
+  "changelog.0.6.1.0.02": {
+    "message": "La police avec laquelle le plugin dessine n'avait aucune lettre turque. Elle est livrée avec un petit complément qui en a, et les lettres qu'il fournit viennent de la même famille que celles qui les entourent, pour qu'un mot ne change pas de police à mi-chemin. Le polonais, le tchèque, le roumain et le hongrois y gagnent autant."
+  },
+  "changelog.0.6.1.0.03": {
+    "message": "La notification d'exemple dans la fenêtre des réglages suit la langue des bannières pendant que tu la regardes. Choisir une langue laissait l'aperçu montrer celle avec laquelle le plugin avait démarré."
+  },
+  "changelog.1.0.0.0.01": {
+    "message": "La fenêtre des réglages est construite autour d'un aperçu en direct. La notification que tu façonnes est dessinée en haut de la fenêtre à sa taille réelle, par le même code qui la dessine en jeu, et suit chaque changement à mesure que tu le fais. Rejoue-la, envoie-la sur l'écran du jeu ou épingle-la là pendant que tu travailles."
+  },
+  "changelog.1.0.0.0.02": {
+    "message": "Huit onglets en haut : Annonces, Apparence, Polices, Mouvement, Son, Préréglages, Nouveautés et À propos. Chaque page est en deux colonnes, et un réglage qui ne compte que lorsqu'un autre est activé apparaît quand celui-ci est activé."
+  },
+  "changelog.1.0.0.0.03": {
+    "message": "Fais glisser un repère pour placer la notification à l'écran. Les deux curseurs de position sont toujours là et règlent exactement la même chose."
+  },
+  "changelog.1.0.0.0.04": {
+    "message": "La langue de cette fenêtre se trouve dans l'en-tête, où on la trouve sans passer par À propos."
+  },
+  "changelog.1.0.0.0.05": {
+    "message": "Les secteurs et sous-secteurs peuvent arriver plus petits et partir plus tôt qu'une zone, pour que les avis fréquents murmurent pendant qu'une nouvelle zone continue de s'annoncer. La taille pleine est l'ancien rendu."
+  },
+  "changelog.1.0.0.0.06": {
+    "message": "Quelque chose de sombre derrière le texte, pour un nom qui tombe sur un ciel clair : une bande de la largeur du texte, ou un bandeau en travers de tout l'écran comme le fait l'original."
+  },
+  "changelog.1.0.0.0.07": {
+    "message": "Le nom du lieu peut se fondre vers une seconde couleur de haut en bas, luire derrière son contour, ou s'écrire dans une suite de couleurs : Arc-en-ciel, Coucher de soleil, Océan, Aurore, Fleurs et Doré, posée le long de la ligne, respirant toute ensemble ou défilant le long d'elle, à la vitesse de ton choix."
+  },
+  "changelog.1.0.0.0.08": {
+    "message": "Cinq façons de plus d'arriver : Chute, Glissement, Assemblage, Scintillement et Zoom. Et un choix pour la façon dont une ligne s'en va : le simple fondu, l'arrivée à l'envers, la dissolution ou la chute."
+  },
+  "changelog.1.0.0.0.09": {
+    "message": "Cinq sortes de particules de plus : neige, lucioles, feuilles, pluie et étoiles, avec un curseur pour la distance autour du nom où elles jouent."
+  },
+  "changelog.1.0.0.0.10": {
+    "message": "Règles de silence. Les avis peuvent être masqués dans les villes, dans les quartiers résidentiels et à l'intérieur des maisons, et dans toute zone que tu mets sur une liste silencieuse en t'y tenant. Ignorer les sous-secteurs en déplacement rapide compte maintenant aussi le vol et la plongée."
+  },
+  "changelog.1.0.0.0.11": {
+    "message": "La météo et les bannières peuvent avoir chacune un son du jeu à elles plutôt que de partager celui des lieux, et un fichier son à toi a un curseur de volume."
+  },
+  "changelog.1.0.0.0.12": {
+    "message": "Survoler un préréglage le montre dans l'aperçu avant que tu l'appliques."
+  },
+  "changelog.1.0.0.0.13": {
+    "message": "La fenêtre est dessinée en Noto Sans, avec le Noto Sans CJK de Dalamud fusionné pour tout ce que le latin ne couvre pas, pour que chaque langue fournie se lise dans la même police à la même graisse."
+  },
+  "changelog.1.0.0.0.14": {
+    "message": "L'espagnol, le portugais, le russe et le chinois rejoignent l'allemand, le français, le japonais et le turc, tous rédigés par une machine et signalés comme tels en haut jusqu'à ce qu'un locuteur les ait relus. Chaque texte de la fenêtre est traduit dans les huit, et les sélecteurs de langue écrivent le nom de chaque langue avec une majuscule."
+  },
+  "changelog.1.0.0.0.15": {
+    "message": "Rien de ce que tu as enregistré n'est touché. Les préréglages, les codes de partage et tes réglages actuels passent tels quels, chaque nouveau réglage démarre sur l'ancien rendu, et un préréglage d'une version plus ancienne s'applique toujours."
+  },
+  "changelog.1.0.0.0.16": {
+    "message": "L'onglet À propos crédite l'auteur du plugin et l'auteur de l'interface."
   }
 }

@@ -1076,5 +1076,243 @@
   },
   "sound.gamesound.weather": {
     "message": "Wetter"
+  },
+
+  "changelog.0.1.0.0.01": {
+    "message": "Erste Veröffentlichung. Meldet Region, Zone, Gebiet und Untergebiet, die du betrittst, und ersetzt dabei die Ortsanzeige des Spiels, statt daneben zu zeichnen."
+  },
+  "changelog.0.1.1.0.01": {
+    "message": "Eine Meldung friert während einer Zwischensequenz nicht mehr ein, um danach veraltet weiterzulaufen."
+  },
+  "changelog.0.1.1.0.02": {
+    "message": "Irgendwo während einer Zwischensequenz anzukommen geht nicht mehr ganz verloren."
+  },
+  "changelog.0.2.0.0.01": {
+    "message": "Bewegungseffekte: die Zeile tippen, sie aufsteigen lassen, sie auf einer Welle hereinreiten lassen oder sie entzünden."
+  },
+  "changelog.0.2.0.0.02": {
+    "message": "Umgebungspartikel: Herzen, Glut, Funkeln und Blütenblätter, um den Text herum gezeichnet, solange er steht."
+  },
+  "changelog.0.2.0.0.03": {
+    "message": "Mitgelieferte Looks, die eine Bewegung mit Partikeln und einer Palette verbinden."
+  },
+  "changelog.0.2.0.0.04": {
+    "message": "Buchstabenabstand, Großbuchstaben, waagerechte Platzierung und Umrissstärke."
+  },
+  "changelog.0.2.0.0.05": {
+    "message": "Bewegung und Entschlüsselung laufen nacheinander statt übereinander, sodass du beide sehen kannst."
+  },
+  "changelog.0.2.1.0.01": {
+    "message": "Das Plugin bringt ein eigenes Symbol mit, sodass es im Installer wie es selbst aussieht."
+  },
+  "changelog.0.2.2.0.01": {
+    "message": "Speichere eigene Voreinstellungen. Eine Voreinstellung umfasst jetzt jede Einstellung unter Allgemein, Effekte, Meldungen und Dauern, nicht nur den Look."
+  },
+  "changelog.0.2.2.0.02": {
+    "message": "Teile Voreinstellungen als Codes. Kopiere einen in die Zwischenablage, füge ihn im Chat ein, und jeder kann ihn hier wieder einfügen."
+  },
+  "changelog.0.2.2.0.03": {
+    "message": "Der Bearbeitungsmodus hält eine einzelne Beispielmeldung auf dem Bildschirm, während du arbeitest, statt bei jeder Änderung eine neue zu starten."
+  },
+  "changelog.0.2.2.0.04": {
+    "message": "Die mitgelieferten Looks sind jetzt vollständige Konfigurationen: einen anzuwenden setzt alles, was er nicht benennt, auf den Standard zurück."
+  },
+  "changelog.0.2.2.0.05": {
+    "message": "Ein Discord-Link, in der Titelleiste und auf der Seite Voreinstellungen."
+  },
+  "changelog.0.2.3.0.01": {
+    "message": "Wettermeldungen. Wenn das Wetter umschlägt, wird es auf einer eigenen Zeile über dem Ortsnamen gemeldet, mit dem Symbol des Spiels daneben. Standardmäßig aus; schalte es in den Einstellungen ein."
+  },
+  "changelog.0.2.3.0.02": {
+    "message": "Die Wetterzeile ist gestaltet wie alles andere, mit derselben Unterstreichung, denselben Bewegungs- und Entschlüsselungseffekten und deinen Farben und Zeiten."
+  },
+  "changelog.0.2.3.0.03": {
+    "message": "Irgendwo Neues anzukommen meldet das dortige Wetter neben dem Ortsnamen, und ein Wetterumschwung, während du dort stehst, meldet sich von allein."
+  },
+  "changelog.0.2.3.0.04": {
+    "message": "Die Vorschau zeigt alles, was eingeschaltet ist, Wetter eingeschlossen, sodass das, was du einstellst, das ist, was du siehst."
+  },
+  "changelog.0.3.0.0.01": {
+    "message": "Die Banner des Spiels gehören jetzt dir. Quest Accepted, Duty Commenced, Level Up! und die übrigen werden im Schriftbild dieses Plugins neu gezeichnet, mit denselben Effekten wie ein Ortsname. Standardmäßig aus; schalte es in den Einstellungen ein."
+  },
+  "changelog.0.3.0.0.02": {
+    "message": "Nur Banner, für die das Plugin Worte hat, werden übernommen. Der Text ist in die Grafik des Spiels gemalt, nicht als Text gespeichert, also behält alles, was es nicht benennen kann, das Banner des Spiels, statt es zu verlieren."
+  },
+  "changelog.0.3.0.0.03": {
+    "message": "Buchstaben sitzen nach einem Q richtig. Die Schriften des Spiels tragen Abstände je Buchstabenpaar, und das Plugin ließ ein Paar pro Buchstabe fallen, was jede Zeile leicht locker und leicht außermittig ließ. Deutlich in Jupiter, dezent überall sonst."
+  },
+  "changelog.0.3.0.0.04": {
+    "message": "Färbe jede Zeile einzeln. Die Wetterzeile, der Umriss der Kopfzeile und der Umriss des Wetters können je eine eigene Farbe nehmen, sodass eine Zeile zurücktreten kann, ohne die anderen anzurühren."
+  },
+  "changelog.0.3.0.0.05": {
+    "message": "Der Kopfzeilenschalter ist nach Allgemein gewandert, neben die übrigen Kopfzeileneinstellungen, wo man ihn tatsächlich findet."
+  },
+  "changelog.0.3.0.0.06": {
+    "message": "Einstellungen werden geschrieben, wenn du einen Regler loslässt, nicht in jedem Frame, in dem du ihn ziehst, sodass sich die Farbwähler nicht mehr anfühlen, als würden sie hängen."
+  },
+  "changelog.0.3.0.0.07": {
+    "message": "Eine transparent gestellte Farbe sagt das jetzt, statt wie eine Einstellung auszusehen, die aufgehört hat zu funktionieren."
+  },
+  "changelog.0.3.0.0.08": {
+    "message": "Voreinstellungscodes überstehen das Herumkopieren. Zeilenumbrüche, Chat-Formatierung und die unsichtbaren Zeichen, die eine Webseite hinterlässt, werden entfernt, bevor der Code gelesen wird."
+  },
+  "changelog.0.4.0.0.01": {
+    "message": "Nutze deine eigenen Schriften. Name, Kopfzeile und Wetterzeile wählen jetzt je eine eigene Schrift und Größe, und jede davon kann auf eine .ttf, .otf oder .ttc auf deinem PC zeigen."
+  },
+  "changelog.0.4.0.0.02": {
+    "message": "Eine Schrift, die du lieferst, bleibt in deiner Obhut. Das Plugin lädt sie genau, wie sie ist, sagt klar, wenn es das nicht kann, und fällt auf Noto Sans CJK zurück statt auf nichts."
+  },
+  "changelog.0.4.0.0.03": {
+    "message": "Voreinstellungen tragen mit, wo eine eigene Schriftdatei liegt, nicht die Schrift selbst. Eine zu teilen warnt dich vorher, und eine zu importieren, die eine Schrift nennt, die du nicht hast, sagt dir, welche Zeilen zurückgefallen sind."
+  },
+  "changelog.0.4.0.0.04": {
+    "message": "Ein Schlagschatten, in jede Richtung geworfen und so weit gestreut, wie du magst. Er liegt unter dem Umriss, sodass beide zusammen genutzt werden können, und Unterstreichung und Wettersymbol werfen ihn ebenfalls."
+  },
+  "changelog.0.4.0.0.05": {
+    "message": "Die Wetterzeile hat eine eigene Schrift und Größe, statt sich die der Kopfzeile zu leihen. Einstellungen, die du schon hattest, behalten die Größe, die sie gezeigt haben."
+  },
+  "changelog.0.4.0.0.06": {
+    "message": "Die Größe der Kopfzeile lässt sich endlich anpassen. Sie hatte eine Einstellung, aber nie einen Regler."
+  },
+  "changelog.0.4.0.0.07": {
+    "message": "Schrift und Größe sind von Allgemein auf einen eigenen Reiter Schriften gezogen, eine Seite für jede der drei Zeilen."
+  },
+  "changelog.0.4.0.0.08": {
+    "message": "Weniger Arbeit pro Frame: Banner werden nicht mehr beobachtet, solange die Funktion aus ist, eine Zeile wird einmal gemessen statt in jedem Frame, in dem sie steht, und ein Umriss, den du nicht sehen kannst, wird nicht mehr achtfach gezeichnet."
+  },
+  "changelog.0.4.1.0.01": {
+    "message": "Irgendwo Neues anzukommen, während die letzte Meldung noch steht, lässt die beiden nicht mehr übereinander geschrieben zurück. Die, die gerade geht, geht jetzt schnell und macht der ankommenden Platz, statt darunter in Lesetempo auszublenden."
+  },
+  "changelog.0.4.1.0.02": {
+    "message": "Der neue Ort erscheint weiterhin in dem Moment, in dem du ihn erreichst. Nichts wartet, bis es dran ist."
+  },
+  "changelog.0.4.1.0.03": {
+    "message": "Farben haben ihr Alpha zurück, im Farbwähler, wo es früher war. Es hält bei 15 % an, statt bis auf nichts zu laufen, sodass eine Zeile hinter die anderen zurücktreten kann, ohne so weit ausgeblendet zu werden, dass es aussieht, als hätte das Plugin aufgehört zu funktionieren."
+  },
+  "changelog.0.4.1.0.04": {
+    "message": "Eine Farbe, die bereits blasser gespeichert war, wird beim Laden des Plugins wieder darauf angehoben, was alles abdeckt, was die Version ganz ohne Alpha unsichtbar zurückgelassen hat."
+  },
+  "changelog.0.4.1.0.05": {
+    "message": "Der Abstand zwischen Kopfzeile und Ortsname ist ein Regler, wo er ein Schalter mit zwei Stellungen war."
+  },
+  "changelog.0.4.1.0.06": {
+    "message": "Das Beispiel im Einstellungsfenster folgt wieder dem Kopfzeilenschalter. \"Kopfzeile anzeigen\" auszuschalten ließ es eine zeigen."
+  },
+  "changelog.0.4.2.0.01": {
+    "message": "Voreinstellungen und Freigabecodes aus älteren Versionen werden so angewendet, wie sie gespeichert wurden. Eine von vor der Zeit, als der Kopfzeilenabstand ein Regler wurde, landete auf dem Standardabstand statt auf dem gespeicherten, und eine von vor der Zeit, als die Wetterzeile eine eigene Größe bekam, ließ auch diese Größe zurück."
+  },
+  "changelog.0.4.2.0.02": {
+    "message": "Das gilt für die Voreinstellungen, die du selbst gespeichert hast, wie für Codes, die dir jemand schickt. Gespeicherte werden beim nächsten Laden des Plugins auf den neuesten Stand gebracht, es gibt also nichts nachzuholen."
+  },
+  "changelog.0.5.0.0.01": {
+    "message": "Das Einstellungsfenster liest sich in deiner Sprache. Deutsch, Französisch, Japanisch und Türkisch werden mit dem Plugin ausgeliefert, und es folgt der Sprache, auf die Dalamud eingestellt ist, sofern du nicht selbst eine in den Einstellungen wählst."
+  },
+  "changelog.0.5.0.0.02": {
+    "message": "Diese vier hat eine Maschine entworfen. Das Fenster sagt das oben, bis jemand, der die Sprache spricht, sie durchgesehen hat, und eine zu korrigieren braucht nichts als einen Texteditor und ein GitHub-Konto. TRANSLATING.md erklärt, wie."
+  },
+  "changelog.0.5.0.0.03": {
+    "message": "Banner können in einer Sprache deiner Wahl gezeichnet werden statt in der, in der dein Client läuft. Türkische Texte werden mitgeliefert. Jedes Banner, für das das Plugin keine Worte hat, behält die Grafik des Spiels, welche Sprache du auch wählst."
+  },
+  "changelog.0.5.0.0.04": {
+    "message": "Leichte Gruppe und Volle Gruppe werden wie jedes andere Banner gemeldet und ausgeblendet. Sie kommen auf einem Teil der Oberfläche an, den das Plugin nicht beobachtet hat, weshalb diese beiden immer übersehen wurden."
+  },
+  "changelog.0.5.0.0.05": {
+    "message": "Ein Banner, das direkt hinter einem Ortsnamen ankommt, wird nicht mehr verworfen. Eines zurückzuhalten brachte nie Ruhe, es ließ nur die Version des Spiels stattdessen auf dem Bildschirm, also nimmt ein Banner jetzt eine eigene Zeile unter dem Ortsnamen. Wie weit darunter, ist ein Regler."
+  },
+  "changelog.0.5.0.0.06": {
+    "message": "Die Schriftregler reichen viel weiter nach oben, für alle mit hoher Auflösung, denen das alte Ende der Skala noch klein vorkam. Auf einem japanischen Client halten sie dort an, wo das Spiel die Buchstaben noch bauen kann, und deine Einstellung bleibt, wie du sie gelassen hast."
+  },
+  "changelog.0.5.0.0.07": {
+    "message": "Buchstaben mit Akzent verschwinden nicht mehr, während eine Zeile sich entschlüsselt. Das eorzeanische Alphabet hat keine Glyphe für sie, also wurde alles mit Akzent als Leerraum gezeichnet, bis der Name sich auflöste. Sie stehen jetzt als der Buchstabe darunter: é als e, ğ als g."
+  },
+  "changelog.0.5.0.0.08": {
+    "message": "Das Einstellungsfenster kann Türkisch, Polnisch, Tschechisch, Rumänisch und ihre Nachbarn zeichnen, wo es vorher acht Buchstaben aus Latein Erweitert-A hatte und Lücken für den Rest."
+  },
+  "changelog.0.6.0.0.01": {
+    "message": "Meldungen können einen Ton machen. Aus, bis du ihn einschaltest, unter einem eigenen Reiter Ton: einer der sechzehn Chat-Soundeffekte des Spiels oder eine eigene .wav oder .mp3."
+  },
+  "changelog.0.6.0.0.02": {
+    "message": "Er folgt den Audioeinstellungen des Spiels, einschließlich der Lautstärken für Master und Systemtöne und der Stummschalt-Häkchen. Systemtöne statt Soundeffekte ist der Regler, wenn du es leiser willst, denn auf diesen Bus legt das Spiel einen Chat-Soundeffekt."
+  },
+  "changelog.0.6.0.0.03": {
+    "message": "Eine eigene Datei spielt das Plugin ab, nicht das Spiel, also liest das Plugin dieselben Einstellungen und befolgt sie von Hand. Es bleibt still, solange das Spiel stummgeschaltet ist, und solange das Fenster nicht vorne ist, es sei denn, du hast dem Spiel gesagt, dann weiterzuspielen. Alles über fünf Sekunden wird abgeschnitten."
+  },
+  "changelog.0.6.0.0.04": {
+    "message": "Welche Arten von Meldung einen Ton machen, wählst du selbst: Ortsnamen, Wetter und Banner haben je einen eigenen Schalter, und zwei, die zusammen ankommen, machen weiterhin nur einen Ton."
+  },
+  "changelog.0.6.0.0.05": {
+    "message": "Toneinstellungen bleiben auf deinem Rechner. Sie reisen nicht in einer Voreinstellung oder einem Freigabecode mit, denn ein Geräusch von einem Fremden ist nichts, was man aus Versehen entdecken sollte."
+  },
+  "changelog.0.6.0.0.06": {
+    "message": "Das Einstellungsfenster ist danach gruppiert, was du gerade tust, nicht danach, wann etwas hinzukam. Sieben Reiter: Meldungen, Darstellung, Bewegung, Schriften, Ton, Voreinstellungen und Über."
+  },
+  "changelog.0.6.0.0.07": {
+    "message": "Einstellungen, die zusammengehören, sind zusammen. Bewegung und ihre Dauer liegen auf einer Seite, ebenso das eorzeanische Entschlüsseln und seine Dauer, wo jedes Paar früher auf zwei Reiter verteilt war. Farben sind danach gruppiert, was sie färben."
+  },
+  "changelog.0.6.0.0.08": {
+    "message": "Nichts, was du gespeichert hast, ist betroffen. Voreinstellungen, Freigabecodes und deine aktuellen Einstellungen bleiben genau, wie sie waren; nur wo ein Bedienelement gezeichnet wird, hat sich geändert."
+  },
+  "changelog.0.6.0.0.09": {
+    "message": "Die Sprache dieses Fensters ist auf den Reiter Über gewandert."
+  },
+  "changelog.0.6.0.0.10": {
+    "message": "Deutsch, Französisch, Japanisch und Türkisch sind vollständig. Jeder Text im Fenster ist in allen vieren übersetzt, wo vorher jeder eine Handvoll vermisste. Sie sind weiterhin maschinell entworfen und sagen das oben weiterhin, bis jemand, der die Sprache spricht, sie durchgesehen hat."
+  },
+  "changelog.0.6.1.0.01": {
+    "message": "Türkische Bannertexte werden richtig gezeichnet. Das I mit Punkt, das S mit Cedille und das G mit Breve kamen als Fragezeichen heraus, sodass \"ETKINLIK BASLADI\" drei seiner Buchstaben fehlten."
+  },
+  "changelog.0.6.1.0.02": {
+    "message": "Die Schrift, mit der das Plugin zeichnet, hatte überhaupt keine türkischen Buchstaben. Sie kommt jetzt mit einer kleinen Ergänzung, die sie hat, und die Buchstaben, die sie einsetzt, stammen aus derselben Familie wie die um sie herum, sodass ein Wort nicht mittendrin die Schrift wechselt. Polnisch, Tschechisch, Rumänisch und Ungarisch gewinnen dasselbe."
+  },
+  "changelog.0.6.1.0.03": {
+    "message": "Die Beispielmeldung im Einstellungsfenster folgt der Bannersprache, während du hinsiehst. Eine Sprache zu wählen ließ die Vorschau früher die zeigen, mit der das Plugin gestartet war."
+  },
+  "changelog.1.0.0.0.01": {
+    "message": "Das Einstellungsfenster ist um eine Live-Vorschau herum gebaut. Die Meldung, an der du gerade arbeitest, wird oben im Fenster in echter Größe gezeichnet, von demselben Code, der sie auch im Spiel zeichnet, und folgt jeder Änderung, während du sie machst. Spiel sie erneut ab, schick sie auf den Spielbildschirm oder halte sie dort, während du arbeitest."
+  },
+  "changelog.1.0.0.0.02": {
+    "message": "Acht Reiter oben: Meldungen, Darstellung, Schriften, Bewegung, Ton, Voreinstellungen, Neuerungen und Über. Jede Seite hat zwei Spalten, und eine Einstellung, die nur zählt, solange eine andere eingeschaltet ist, erscheint, wenn diese eingeschaltet wird."
+  },
+  "changelog.1.0.0.0.03": {
+    "message": "Zieh eine Markierung, um die Meldung auf dem Bildschirm zu platzieren. Die beiden Positionsregler sind noch da und stellen genau dasselbe ein."
+  },
+  "changelog.1.0.0.0.04": {
+    "message": "Die Sprache dieses Fensters sitzt in der Kopfleiste, wo sie ohne Umweg über Über zu finden ist."
+  },
+  "changelog.1.0.0.0.05": {
+    "message": "Gebiete und Untergebiete können kleiner ankommen und früher gehen als eine Zone, sodass die häufigen Meldungen flüstern, während eine neue Zone sich weiterhin ankündigt. Volle Größe ist der alte Look."
+  },
+  "changelog.1.0.0.0.06": {
+    "message": "Etwas Dunkles hinter dem Text, für einen Namen, der auf hellem Himmel landet: ein Band so breit wie der Text oder ein Streifen über den ganzen Bildschirm, wie es das Original macht."
+  },
+  "changelog.1.0.0.0.07": {
+    "message": "Der Ortsname kann von oben nach unten in eine zweite Farbe übergehen, hinter seinem Umriss leuchten oder in einer Folge von Farben geschrieben werden: Regenbogen, Sonnenuntergang, Ozean, Polarlicht, Blüte und Golden, über die Zeile gelegt, alle zusammen atmend oder an ihr entlang wandernd, in einem Tempo deiner Wahl."
+  },
+  "changelog.1.0.0.0.08": {
+    "message": "Fünf weitere Arten anzukommen: Herabfallen, Hereingleiten, Zusammenfinden, Flackern und Aufwachsen. Und eine Wahl, wie eine Zeile geht: das schlichte Ausblenden, die Ankunft rückwärts, Zerfallen oder Fallen."
+  },
+  "changelog.1.0.0.0.09": {
+    "message": "Fünf weitere Arten von Partikeln: Schnee, Glühwürmchen, Blätter, Regen und Sterne, mit einem Regler dafür, wie weit um den Namen herum sie spielen."
+  },
+  "changelog.1.0.0.0.10": {
+    "message": "Stille Regeln. Meldungen lassen sich in Städten, in Wohngebieten und in Häusern ausblenden, und in jeder Zone, die du auf eine stille Liste setzt, indem du darin stehst. Untergebiete beim schnellen Reisen zu überspringen zählt jetzt auch Fliegen und Tauchen."
+  },
+  "changelog.1.0.0.0.11": {
+    "message": "Wetter und Banner können je einen eigenen Spielton haben, statt sich den für Orte zu teilen, und eine eigene Tondatei hat einen Lautstärkeregler."
+  },
+  "changelog.1.0.0.0.12": {
+    "message": "Fährst du mit der Maus über eine Voreinstellung, zeigt die Vorschau sie, bevor du sie anwendest."
+  },
+  "changelog.1.0.0.0.13": {
+    "message": "Das Fenster wird in Noto Sans gezeichnet, mit Dalamuds Noto Sans CJK für alles, was Latein nicht abdeckt, sodass jede mitgelieferte Sprache in derselben Schrift mit derselben Strichstärke zu lesen ist."
+  },
+  "changelog.1.0.0.0.14": {
+    "message": "Spanisch, Portugiesisch, Russisch und Chinesisch kommen zu Deutsch, Französisch, Japanisch und Türkisch hinzu, alle maschinell entworfen und oben so gekennzeichnet, bis jemand, der die Sprache spricht, sie durchgesehen hat. Jeder Text im Fenster ist in allen acht übersetzt, und die Sprachauswahl schreibt den Namen jeder Sprache mit großem Anfangsbuchstaben."
+  },
+  "changelog.1.0.0.0.15": {
+    "message": "Nichts, was du gespeichert hast, ist betroffen. Voreinstellungen, Freigabecodes und deine aktuellen Einstellungen bleiben, wie sie waren, jede neue Einstellung beginnt beim alten Look, und eine Voreinstellung aus einer älteren Version lässt sich weiterhin anwenden."
+  },
+  "changelog.1.0.0.0.16": {
+    "message": "Der Reiter Über nennt den Autor des Plugins und den Autor der Oberfläche."
   }
 }
