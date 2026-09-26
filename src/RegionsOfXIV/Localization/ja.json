@@ -845,10 +845,10 @@
     "message": "音源"
   },
   "about.credit.interface": {
-    "message": "インターフェースの設計と制作: {0}"
+    "message": "ユーザーインターフェースの設計と開発: {0}"
   },
   "about.credit.plugin": {
-    "message": "プラグイン: {0}"
+    "message": "プラグイン開発: {0}"
   },
   "about.credits": {
     "message": "クレジット"

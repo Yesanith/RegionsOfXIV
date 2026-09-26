@@ -103,8 +103,8 @@ internal sealed partial class ConfigWindow
 
         this.creditsGeneration = Loc.Generation;
         this.authorChip = Loc.Format("about.author", "by {0}", Author);
-        this.pluginCredit = Loc.Format("about.credit.plugin", "Plugin by {0}", Author);
-        this.interfaceCredit = Loc.Format("about.credit.interface", "Interface made and designed by {0}", InterfaceAuthor);
+        this.pluginCredit = Loc.Format("about.credit.plugin", "Plugin developed by {0}", Author);
+        this.interfaceCredit = Loc.Format("about.credit.interface", "User Interface designed and developed by {0}", InterfaceAuthor);
     }
 
     private void DrawAboutPage()

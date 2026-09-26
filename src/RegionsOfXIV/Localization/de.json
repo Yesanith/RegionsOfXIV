@@ -844,10 +844,10 @@
     "message": "Quelle"
   },
   "about.credit.interface": {
-    "message": "Oberfläche gestaltet und gebaut von {0}"
+    "message": "Benutzeroberfläche entworfen und entwickelt von {0}"
   },
   "about.credit.plugin": {
-    "message": "Plugin von {0}"
+    "message": "Plugin entwickelt von {0}"
   },
   "about.credits": {
     "message": "Mitwirkende"

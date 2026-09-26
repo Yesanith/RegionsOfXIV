@@ -1081,11 +1081,11 @@
     "description": "Tooltip on the close button in the window's header."
   },
   "about.credit.interface": {
-    "message": "Interface made and designed by {0}",
-    "description": "Credit line on the About page. {0} is the name of whoever made and designed the settings window."
+    "message": "User Interface designed and developed by {0}",
+    "description": "Credit line on the About page. {0} is the name of whoever designed and developed the settings window."
   },
   "about.credit.plugin": {
-    "message": "Plugin by {0}",
+    "message": "Plugin developed by {0}",
     "description": "Credit line on the About page. {0} is the plugin author's name."
   },
   "about.credits": {

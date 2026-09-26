@@ -849,10 +849,10 @@
     "message": "Kaynak"
   },
   "about.credit.interface": {
-    "message": "Arayüz tasarımı ve yapımı: {0}"
+    "message": "Kullanıcı arayüzünü tasarlayan ve geliştiren: {0}"
   },
   "about.credit.plugin": {
-    "message": "Eklenti: {0}"
+    "message": "Eklentiyi geliştiren: {0}"
   },
   "about.credits": {
     "message": "Emeği geçenler"
