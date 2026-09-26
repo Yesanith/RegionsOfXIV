@@ -23,10 +23,21 @@ internal static class Changelog
     {
         get
         {
-            if (Entries is null || EntriesGeneration != Loc.Generation)
+            // Read before the build rather than after it. Loc.Get resolves at call time, so a
+            // language change part way through Build leaves an array holding some lines in each
+            // language, and stamping that with the generation read afterwards would mark the
+            // mixture as current and leave it on screen until the next language change.
+            //
+            // Apply runs on the framework thread as well as the draw thread, so that interleaving
+            // is reachable even though everything that reads this is on the draw thread. Stamping
+            // with the generation the build started from means a swap during it simply loses, and
+            // the next read rebuilds.
+            var generation = Loc.Generation;
+
+            if (Entries is null || EntriesGeneration != generation)
             {
                 Entries = Build();
-                EntriesGeneration = Loc.Generation;
+                EntriesGeneration = generation;
             }
 
             return Entries;
@@ -161,7 +172,7 @@ internal static class Changelog
 
         new(new Version("0.1.1.0"),
         [
-            Loc.Get("changelog.0.1.1.0.01", "A notification no longer freezes during a cutscene and resume stale afterwards."),
+            Loc.Get("changelog.0.1.1.0.01", "A notification no longer freezes during a cutscene and resumes stale afterwards."),
             Loc.Get("changelog.0.1.1.0.02", "Arriving somewhere during a cutscene is no longer lost entirely."),
         ]),
 

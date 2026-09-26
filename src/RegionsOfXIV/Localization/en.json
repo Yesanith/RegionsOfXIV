@@ -1397,7 +1397,7 @@
     "description": ""
   },
   "changelog.0.1.1.0.01": {
-    "message": "A notification no longer freezes during a cutscene and resume stale afterwards.",
+    "message": "A notification no longer freezes during a cutscene and resumes stale afterwards.",
     "description": ""
   },
   "changelog.0.1.1.0.02": {
