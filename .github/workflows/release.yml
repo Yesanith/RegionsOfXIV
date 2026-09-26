@@ -80,6 +80,12 @@ jobs:
 
     # The notes are the changelog entry, so the release and the in game What's
     # new window cannot say different things about the same version.
+    #
+    # Each line is a Loc.Get(key, english) call, so the English fallback is
+    # taken and the key ignored. Matching every quoted string instead, which is
+    # what this did while the lines were plain strings, now yields the key and
+    # the text alternating: a sixteen line entry came out as thirty two, half of
+    # them reading changelog.1.0.0.0.01.
     - name: Build the release notes
       shell: pwsh
       run: |
@@ -95,11 +101,13 @@ jobs:
           throw "Changelog.cs has no entry for $asked. A release with nothing to say about it is a release nobody can read."
         }
 
-        $lines = [regex]::Matches($entry.Groups['body'].Value, '"((?:[^"\\]|\\.)*)"') |
-          ForEach-Object { '- ' + $_.Groups[1].Value.Replace('\"', '"').Replace('\\', '\') }
+        $lines = [regex]::Matches(
+            $entry.Groups['body'].Value,
+            'Loc\.Get\(\s*"(?:[^"\\]|\\.)*"\s*,\s*"(?<text>(?:[^"\\]|\\.)*)"\s*\)') |
+          ForEach-Object { '- ' + $_.Groups['text'].Value.Replace('\"', '"').Replace('\\', '\') }
 
         if ($lines.Count -eq 0) {
-          throw "The $asked entry in Changelog.cs is empty."
+          throw "The $asked entry in Changelog.cs is empty, or its lines are not Loc.Get calls."
         }
 
         Set-Content -Path 'release-notes.md' -Value $lines -Encoding utf8
