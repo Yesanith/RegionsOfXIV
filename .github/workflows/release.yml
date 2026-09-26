@@ -1,0 +1,162 @@
+name: Release
+
+# Cutting a release by hand meant a local Release build, a zip, and an upload,
+# with nothing checking that the version in the csproj, the changelog entry and
+# the tag agreed. This does the same work on the same runner the PR build uses,
+# and refuses rather than publishing something half right.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release, without the v. For example 1.0.0.0'
+        required: true
+        type: string
+
+# The default token is read only. Creating the release and its tag needs write.
+permissions:
+  contents: write
+
+jobs:
+
+  release:
+    runs-on: windows-2022
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+
+    # Same cheap check the PR build runs, and for the same reason: nothing is
+    # downloaded or built until the repository is known to be clean.
+    - name: No em dashes
+      shell: pwsh
+      run: |
+        $dash = [char]0x2014
+        $skip = '[\\/](\.git|bin|obj)[\\/]'
+        $binary = '\.(ttf|otf|ttc|png|jpg|jpeg|ico|zip|dll|pdb|exe|snk)$'
+
+        $hits = Get-ChildItem -Recurse -File -Force |
+          Where-Object { $_.FullName -notmatch $skip -and $_.Name -notmatch $binary } |
+          Select-String -SimpleMatch -Pattern $dash -Encoding utf8
+
+        if ($hits) {
+          foreach ($hit in $hits) {
+            Write-Host ('{0}:{1}: {2}' -f $hit.Path, $hit.LineNumber, $hit.Line.Trim())
+          }
+          Write-Host ''
+          Write-Host ('Found {0} em dash(es). The em dash is banned repo-wide.' -f $hits.Count)
+          exit 1
+        }
+
+        Write-Host 'No em dashes.'
+
+    # Everything that can disagree, checked before anything is built. The
+    # version asked for has to be the version the assembly will report, or
+    # Dalamud offers an update it then does not install.
+    - name: Check the version and the tag
+      shell: pwsh
+      run: |
+        $asked = '${{ inputs.version }}'.Trim()
+
+        if ($asked -notmatch '^\d+\.\d+\.\d+\.\d+$') {
+          throw "Version '$asked' is not four numbers separated by dots."
+        }
+
+        $csproj = Get-Content -Raw 'src/RegionsOfXIV/RegionsOfXIV.csproj'
+        if ($csproj -notmatch '<Version>([^<]+)</Version>') {
+          throw 'No <Version> in the plugin csproj.'
+        }
+
+        $inCsproj = $Matches[1].Trim()
+        if ($inCsproj -ne $asked) {
+          throw "Asked to release $asked but the csproj says $inCsproj. Bump the csproj first."
+        }
+
+        $existing = git tag -l "v$asked"
+        if ($existing) {
+          throw "Tag v$asked already exists. Releases are not reissued under the same version."
+        }
+
+        Write-Host "Releasing $asked from $(git rev-parse --short HEAD)."
+
+    # The notes are the changelog entry, so the release and the in game What's
+    # new window cannot say different things about the same version.
+    - name: Build the release notes
+      shell: pwsh
+      run: |
+        $asked = '${{ inputs.version }}'.Trim()
+        $source = Get-Content -Raw -Encoding utf8 'src/RegionsOfXIV/Changelog.cs'
+
+        $entry = [regex]::Match(
+          $source,
+          'new\(new Version\("' + [regex]::Escape($asked) + '"\)\s*,\s*\[(?<body>.*?)\]\s*\)',
+          [Text.RegularExpressions.RegexOptions]::Singleline)
+
+        if (-not $entry.Success) {
+          throw "Changelog.cs has no entry for $asked. A release with nothing to say about it is a release nobody can read."
+        }
+
+        $lines = [regex]::Matches($entry.Groups['body'].Value, '"((?:[^"\\]|\\.)*)"') |
+          ForEach-Object { '- ' + $_.Groups[1].Value.Replace('\"', '"').Replace('\\', '\') }
+
+        if ($lines.Count -eq 0) {
+          throw "The $asked entry in Changelog.cs is empty."
+        }
+
+        Set-Content -Path 'release-notes.md' -Value $lines -Encoding utf8
+        Write-Host ('Notes: {0} lines.' -f $lines.Count)
+
+    - name: Install .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Download Dalamud
+      run: |
+        Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/latest.zip -OutFile dalamud.zip
+        Expand-Archive -Force dalamud.zip "$env:AppData\XIVLauncher\addon\Hooks\dev"
+
+    # Debug first, for the reason the PR build gives: the developer tools behind
+    # #if DEBUG are gone from Release, so a Release only pipeline cannot see
+    # them break.
+    - name: Build (Debug)
+      run: dotnet build RegionsOfXIV.sln --configuration Debug
+
+    - name: Build (Release)
+      run: dotnet build RegionsOfXIV.sln --configuration Release
+
+    - name: Test
+      run: dotnet test RegionsOfXIV.sln --configuration Release --no-build
+
+    # The packager writes it, but a wrong Content path fails silently by simply
+    # not copying, so the zip is found rather than assumed and its contents are
+    # printed for the record.
+    - name: Find the package
+      shell: pwsh
+      run: |
+        $zip = Get-ChildItem -Recurse -Filter 'latest.zip' -Path 'src/RegionsOfXIV/bin' |
+          Select-Object -First 1
+
+        if (-not $zip) {
+          throw 'No latest.zip under src/RegionsOfXIV/bin. The packager did not produce one.'
+        }
+
+        Write-Host ('Package: {0} ({1:N0} bytes)' -f $zip.FullName, $zip.Length)
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        [IO.Compression.ZipFile]::OpenRead($zip.FullName).Entries |
+          ForEach-Object { Write-Host ('  {0}' -f $_.FullName) }
+
+        "PACKAGE=$($zip.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+    # Creating the release creates the tag with it, which is how every earlier
+    # tag on this repository was made. The asset goes up in the same call, so
+    # the release is never public without its download: discord-release.yml
+    # fires on publication and would otherwise announce a dead link.
+    - name: Publish
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        $asked = '${{ inputs.version }}'.Trim()
+        gh release create "v$asked" "$env:PACKAGE" --title "v$asked" --notes-file 'release-notes.md'
+        if ($LASTEXITCODE -ne 0) { throw 'gh release create failed.' }
+        Write-Host "Published v$asked."
