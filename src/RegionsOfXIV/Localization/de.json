@@ -156,8 +156,14 @@
   "about.issue": {
     "message": "Problem melden"
   },
+  "about.coffee": {
+    "message": "Kaffee spendieren"
+  },
   "about.issue.tooltip": {
     "message": "Etwas ist falsch, oder etwas fehlt."
+  },
+  "about.coffee.tooltip": {
+    "message": "Völlig freiwillig. Nichts hier hängt davon ab."
   },
   "about.commands": {
     "message": "Befehle"

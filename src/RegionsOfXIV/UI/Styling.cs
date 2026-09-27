@@ -24,6 +24,11 @@ internal static class Styling
     public static readonly Vector4 AccentBlueSoft = new(0.640f, 0.810f, 1.000f, 1.00f);
     public static readonly Vector4 AccentDiscord = new(0.345f, 0.396f, 0.949f, 1.00f);
 
+    // Buy Me a Coffee's own yellow, the way AccentDiscord is Discord's own blurple. A tile people
+    // are meant to recognise at a glance is worth the brand colour rather than a palette one, and
+    // ForegroundOn puts dark ink on it, since it is far too bright to carry light text.
+    public static readonly Vector4 AccentCoffee = new(1.000f, 0.867f, 0.000f, 1.00f);
+
     public static readonly Vector4 WindowBg = new(0.051f, 0.043f, 0.035f, 0.985f);
     public static readonly Vector4 Surface0 = new(0.082f, 0.071f, 0.059f, 1.00f);
     public static readonly Vector4 Surface1 = new(0.110f, 0.096f, 0.080f, 1.00f);

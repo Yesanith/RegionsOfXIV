@@ -25,6 +25,8 @@ internal sealed partial class ConfigWindow
 
     private const string InspirationUrl = "https://blishhud.com/modules/?module=Nekres.Regions_Of_Tyria";
 
+    private const string SupportUrl = "https://buymeacoffee.com/yesanith";
+
     private const float SectionGap = 22f;
     private const float RevealMs = 460f;
     private const float RevealStaggerMs = 110f;
@@ -42,7 +44,7 @@ internal sealed partial class ConfigWindow
 
     private const float TileHeight = 96f;
     private const float TileGap = 14f;
-    private const float TileStackBelow = 720f;
+    private const float TileMinWidth = 250f;
     private const float TilePad = 18f;
     private const float TileMedallion = 26f;
     private const float TileTextGap = 16f;
@@ -60,6 +62,7 @@ internal sealed partial class ConfigWindow
         new("##rox-about-discord", FontAwesomeIcon.Comments, DiscordInvite, Styling.AccentDiscord),
         new("##rox-about-github", FontAwesomeIcon.CodeBranch, RepositoryUrl, Styling.AccentGold),
         new("##rox-about-issue", FontAwesomeIcon.Bug, IssuesUrl, Styling.AccentRose),
+        new("##rox-about-coffee", FontAwesomeIcon.MugHot, SupportUrl, Styling.AccentCoffee),
     ];
 
     // Literal call sites, so the English is where the translators' export expects to find it.
@@ -67,14 +70,16 @@ internal sealed partial class ConfigWindow
     {
         0 => Loc.Get("about.discord", "Join the Discord"),
         1 => Loc.Get("about.github", "GitHub"),
-        _ => Loc.Get("about.issue", "Report an issue"),
+        2 => Loc.Get("about.issue", "Report an issue"),
+        _ => Loc.Get("about.coffee", "Buy me a coffee"),
     };
 
     private static string CommunityBody(int index) => index switch
     {
         0 => Loc.Get("about.discord.tooltip", "Ideas, bug reports and preset codes."),
         1 => Loc.Get("about.github.tooltip", "The source, the releases, and the licence."),
-        _ => Loc.Get("about.issue.tooltip", "Something wrong, or something missing."),
+        2 => Loc.Get("about.issue.tooltip", "Something wrong, or something missing."),
+        _ => Loc.Get("about.coffee.tooltip", "Entirely optional. Nothing here is behind it."),
     };
 
     private static string Summary => Loc.Get(
@@ -349,7 +354,15 @@ internal sealed partial class ConfigWindow
 
         var origin = new Vector2(this.aboutColumnX, ImGui.GetCursorScreenPos().Y);
         var gap = TileGap * scale;
-        var columns = this.aboutColumnWidth < TileStackBelow * scale ? 1 : CommunityLinks.Length;
+        // Fitted to a minimum tile width rather than "one column, or all of them in a row". That
+        // was fine for three tiles and is not for four: at the width the old rule switched over,
+        // a fourth tile came out 170 wide, and the medallion, the arrow and the padding take a
+        // fixed share that left about 30 for the title and the line under it. Now a column is
+        // added only when there is honestly room for one.
+        var columns = Math.Clamp(
+            (int)((this.aboutColumnWidth + gap) / ((TileMinWidth * scale) + gap)),
+            1,
+            CommunityLinks.Length);
         var tileSize = new Vector2((this.aboutColumnWidth - (gap * (columns - 1))) / columns, TileHeight * scale);
         for (var index = 0; index < CommunityLinks.Length; index++)
         {

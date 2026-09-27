@@ -1711,5 +1711,13 @@
   "changelog.1.0.0.1.01": {
     "message": "The What's new page and the notice after an update read in the window's language. They were the last part of the window still in English whatever you picked.",
     "description": ""
+  },
+  "about.coffee": {
+    "message": "Buy me a coffee",
+    "description": ""
+  },
+  "about.coffee.tooltip": {
+    "message": "Entirely optional. Nothing here is behind it.",
+    "description": ""
   }
 }

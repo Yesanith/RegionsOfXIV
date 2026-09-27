@@ -161,8 +161,14 @@
   "about.issue": {
     "message": "Sorun bildir"
   },
+  "about.coffee": {
+    "message": "Bana bir kahve ısmarla"
+  },
   "about.issue.tooltip": {
     "message": "Yanlış giden ya da eksik olan bir şey."
+  },
+  "about.coffee.tooltip": {
+    "message": "Tamamen isteğe bağlı. Buradaki hiçbir şey buna bağlı değil."
   },
   "about.commands": {
     "message": "Komutlar"

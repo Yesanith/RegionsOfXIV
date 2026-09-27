@@ -157,8 +157,14 @@
   "about.issue": {
     "message": "問題を報告"
   },
+  "about.coffee": {
+    "message": "コーヒーをおごる"
+  },
   "about.issue.tooltip": {
     "message": "おかしいところ、足りないところがあれば。"
+  },
+  "about.coffee.tooltip": {
+    "message": "完全に任意です。ここの機能が制限されることはありません。"
   },
   "about.commands": {
     "message": "コマンド"

@@ -156,8 +156,14 @@
   "about.issue": {
     "message": "Signaler un problème"
   },
+  "about.coffee": {
+    "message": "Offrir un café"
+  },
   "about.issue.tooltip": {
     "message": "Quelque chose ne va pas, ou quelque chose manque."
+  },
+  "about.coffee.tooltip": {
+    "message": "Entièrement facultatif. Rien ici n'en dépend."
   },
   "about.commands": {
     "message": "Commandes"
