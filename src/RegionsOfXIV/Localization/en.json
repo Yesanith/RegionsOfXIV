@@ -1719,5 +1719,9 @@
   "about.coffee.tooltip": {
     "message": "Entirely optional. Nothing here is behind it.",
     "description": ""
+  },
+  "changelog.1.0.0.2.01": {
+    "message": "A Buy Me a Coffee tile sits with Discord and GitHub on the About page. Entirely optional, and nothing in the plugin is behind it.",
+    "description": ""
   }
 }

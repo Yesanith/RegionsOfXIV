@@ -46,6 +46,11 @@ internal static class Changelog
 
     private static ChangelogEntry[] Build() =>
     [
+        new(new Version("1.0.0.2"),
+        [
+            Loc.Get("changelog.1.0.0.2.01", "A Buy Me a Coffee tile sits with Discord and GitHub on the About page. Entirely optional, and nothing in the plugin is behind it."),
+        ]),
+
         new(new Version("1.0.0.1"),
         [
             Loc.Get("changelog.1.0.0.1.01", "The What's new page and the notice after an update read in the window's language. They were the last part of the window still in English whatever you picked."),

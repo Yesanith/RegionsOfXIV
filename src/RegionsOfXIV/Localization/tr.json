@@ -1328,5 +1328,8 @@
   },
   "changelog.1.0.0.1.01": {
     "message": "Yenilikler sayfası ve güncelleme sonrası çıkan bildirim pencerenin dilinde okunuyor. Ne seçersen seç İngilizce kalan son bölümdü."
+  },
+  "changelog.1.0.0.2.01": {
+    "message": "Hakkında sayfasında Discord ve GitHub'ın yanında bir Buy Me a Coffee kutusu var. Tamamen isteğe bağlı ve eklentideki hiçbir şey buna bağlı değil."
   }
 }

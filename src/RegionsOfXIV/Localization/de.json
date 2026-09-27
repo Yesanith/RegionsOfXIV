@@ -1323,5 +1323,8 @@
   },
   "changelog.1.0.0.1.01": {
     "message": "Die Seite Neuerungen und der Hinweis nach einem Update stehen in der Sprache des Fensters. Sie waren der letzte Teil des Fensters, der auf Englisch blieb, was du auch gewählt hattest."
+  },
+  "changelog.1.0.0.2.01": {
+    "message": "Auf der Seite Über steht neben Discord und GitHub eine Kachel für Buy Me a Coffee. Völlig freiwillig, und nichts im Plugin hängt davon ab."
   }
 }

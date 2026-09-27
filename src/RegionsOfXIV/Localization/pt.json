@@ -428,5 +428,6 @@
   "changelog.1.0.0.0.14": { "message": "Espanhol, português, russo e chinês se juntam a alemão, francês, japonês e turco, todos redigidos por máquina e marcados assim no topo até que um falante os revise. Todo texto da janela está traduzido nos oito, e os seletores de idioma escrevem o nome de cada idioma com inicial maiúscula." },
   "changelog.1.0.0.0.15": { "message": "Nada do que você salvou é afetado. Predefinições, códigos de compartilhamento e suas configurações atuais passam como estavam, toda configuração nova começa no visual de sempre, e uma predefinição de uma versão mais antiga continua valendo." },
   "changelog.1.0.0.0.16": { "message": "A aba Sobre credita o autor do plugin e o autor da interface." },
-  "changelog.1.0.0.1.01": { "message": "A página de novidades e o aviso depois de uma atualização aparecem no idioma da janela. Eram a última parte da janela que continuava em inglês, não importa o que você escolhesse." }
+  "changelog.1.0.0.1.01": { "message": "A página de novidades e o aviso depois de uma atualização aparecem no idioma da janela. Eram a última parte da janela que continuava em inglês, não importa o que você escolhesse." },
+  "changelog.1.0.0.2.01": { "message": "Na página Sobre há um bloco do Buy Me a Coffee ao lado de Discord e GitHub. Totalmente opcional, e nada do plugin depende disso." }
 }
