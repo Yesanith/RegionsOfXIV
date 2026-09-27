@@ -104,6 +104,21 @@ preset falls back to Noto on someone else's machine.
 
 </details>
 
+## A look around
+
+<div align="center">
+
+| | | |
+| :---: | :---: | :---: |
+| <img src="assets/images/settings-appearance.png" width="270" alt="The Appearance page"> | <img src="assets/images/settings-motion.png" width="270" alt="The Motion page"> | <img src="assets/images/settings-presets.png" width="270" alt="The Presets page"> |
+| **Appearance** | **Motion** | **Presets** |
+| Placement, lettering, colours, outline, glow and shadow | Arrival, decode, particles, and how long each stage takes | Six looks to start from, each one a motion, a particle and a palette |
+
+<sub>The preview in the Presets shot is caught partway through, still in the Eorzean
+script the name resolves out of.</sub>
+
+</div>
+
 ## Installing
 
 > Regions of XIV is distributed through the custom repository below. Add it once
